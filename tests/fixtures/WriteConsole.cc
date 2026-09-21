@@ -7,16 +7,18 @@
 #include <string>
 #include <vector>
 
-static std::wstring mbsToWcs(const std::string &s) {
-    const size_t len = mbstowcs(nullptr, s.c_str(), 0);
-    if (len == static_cast<size_t>(-1)) {
-        assert(false && "mbsToWcs: invalid string");
+static std::wstring mbsToWcs(const std::string &value) {
+    const int length = MultiByteToWideChar(
+        CP_ACP, MB_ERR_INVALID_CHARS, value.c_str(), -1, nullptr, 0);
+    if (length == 0) {
+        fprintf(stderr, "MultiByteToWideChar failed: %lu\n", GetLastError());
+        exit(1);
     }
-    std::wstring ret;
-    ret.resize(len);
-    const size_t len2 = mbstowcs(&ret[0], s.c_str(), len);
-    assert(len == len2);
-    return ret;
+    std::vector<wchar_t> buffer(static_cast<size_t>(length));
+    const int converted = MultiByteToWideChar(
+        CP_ACP, MB_ERR_INVALID_CHARS, value.c_str(), -1, buffer.data(), length);
+    assert(converted == length);
+    return std::wstring(buffer.data(), static_cast<size_t>(length - 1));
 }
 
 uint32_t parseHex(wchar_t ch, bool &invalid) {
@@ -67,7 +69,7 @@ int main(int argc, char *argv[]) {
                             uint32_t d2 = parseHex(arg[i + 3], invalid);
                             if (!invalid) {
                                 i += 3;
-                                ch = (d1 << 4) | d2;
+                                ch = static_cast<wchar_t>((d1 << 4) | d2);
                             }
                         }
                         break;
@@ -80,7 +82,8 @@ int main(int argc, char *argv[]) {
                             uint32_t d4 = parseHex(arg[i + 5], invalid);
                             if (!invalid) {
                                 i += 5;
-                                ch = (d1 << 24) | (d2 << 16) | (d3 << 8) | d4;
+                                ch = static_cast<wchar_t>(
+                                    (d1 << 12) | (d2 << 8) | (d3 << 4) | d4);
                             }
                         }
                         break;
@@ -92,10 +95,14 @@ int main(int argc, char *argv[]) {
     }
 
     DWORD actual = 0;
+    if (out.size() > MAXDWORD) {
+        fprintf(stderr, "Output is too large for WriteConsoleW\n");
+        return 1;
+    }
     if (!WriteConsoleW(
             GetStdHandle(STD_OUTPUT_HANDLE),
             out.c_str(),
-            out.size(),
+            static_cast<DWORD>(out.size()),
             &actual,
             nullptr)) {
         fprintf(stderr, "WriteConsole failed (is stdout a console?)\n");

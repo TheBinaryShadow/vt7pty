@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Fixture">
+    <ProjectGuid>{B6F9CA25-F802-452D-9596-AE6AC9D6662E}</ProjectGuid>
+    <RootNamespace>fixture_show_console_input</RootNamespace>
+    <VT7PtySourceFile>..\tests\fixtures\ShowConsoleInput.cc</VT7PtySourceFile>
+    <VT7PtyEnableAssertions>true</VT7PtyEnableAssertions>
+    <VT7PtyFileDescription>VT7Pty console-input fixture</VT7PtyFileDescription>
+  </PropertyGroup>
+  <Import Project="NativeConsoleProgram.props" />
+</Project>

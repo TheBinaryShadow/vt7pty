@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Fixture">
+    <ProjectGuid>{7BA2EEDC-5228-4271-980A-3A5C88812B69}</ProjectGuid>
+    <RootNamespace>fixture_write_console</RootNamespace>
+    <VT7PtySourceFile>..\tests\fixtures\WriteConsole.cc</VT7PtySourceFile>
+    <VT7PtyEnableAssertions>true</VT7PtyEnableAssertions>
+    <VT7PtyFileDescription>VT7Pty console-output fixture</VT7PtyFileDescription>
+  </PropertyGroup>
+  <Import Project="NativeConsoleProgram.props" />
+</Project>

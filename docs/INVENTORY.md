@@ -1,6 +1,7 @@
 # Inherited Component Inventory
 
-Status: completed for Roadmap Step 0.1. Updated: 2026-09-21.
+Status: completed for Roadmap Step 0.1 and maintained as components move.
+Updated: 2026-09-21.
 
 This inventory classifies the WinPTY-derived tree before build replacement,
 removal, technical rebranding, or runtime modernization. It describes intended
@@ -130,8 +131,10 @@ useful knowledge does not disappear with Unix-era tooling.
 | `EnableExtendedFlags.txt`, `MouseInputNotes.txt`, `font-notes.txt` | Rehome under `docs/historical` as input/font research |
 | `Font-Report-June2016/*` | Rehome under `docs/historical` as dated console-font evidence |
 | `TestUtil.cc`, `FormatChar.h` | Rehome as maintained fixture/test helpers and convert included `.cc` patterns to ordinary compilation where appropriate |
-| `ShowArgv.cc`, `ShowConsoleInput.cc`, `GetCh.cc`, `Utf16Echo.cc`, `Win32Echo1.cc`, `Win32Echo2.cc`, `Win32Write1.cc`, `WriteConsole.cc` | Rehome as process/input/output fixtures |
-| `ConinMode.cc`, `ConinMode.ps1`, `ConoutMode.cc` | Rehome as console-mode inspection/control tools |
+| `ShowArgv.cc`, `ShowConsoleInput.cc`, `Utf16Echo.cc`, `Win32Echo1.cc`, `Win32Echo2.cc`, `Win32Write1.cc`, `WriteConsole.cc` | Rehomed under `tests/fixtures` with maintained MSBuild projects in Step 0.2 |
+| `GetCh.cc` | Evaluate against the maintained `_getch` fixture, then rehome unique behavior or remove the duplicate |
+| `ConinMode.cc`, `ConoutMode.cc` | Rehomed under `tools/console` with maintained MSBuild projects in Step 0.2 |
+| `ConinMode.ps1` | Rehome or remove after its behavior is compared with the maintained native mode tool |
 | `GetConsolePos.cc`, `MoveConsoleWindow.cc`, `SetBufferSize.cc`, `SetBufInfo.cc`, `SetCursorPos.cc`, `SetWindowRect.cc` | Rehome as console geometry/manual diagnostic tools; automate only where assertions are stable |
 | `ChangeScreenBuffer.cc`, `ClearConsole.cc`, `ScreenBufferTest.cc`, `ScreenBufferTest2.cc` | Rehome as screen-buffer behavior tests; split destructive/manual scenarios from routine verification |
 | `BufferResizeTests.cc`, `Win10ResizeWhileFrozen.cc`, `Win10WrapTest1.cc`, `Win10WrapTest2.cc` | Rehome as version-aware resize/wrap tests and research fixtures |

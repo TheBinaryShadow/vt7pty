@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Fixture">
+    <ProjectGuid>{90569E6C-8DB6-42B3-B673-B735A9A896C9}</ProjectGuid>
+    <RootNamespace>tool_conin_mode</RootNamespace>
+    <VT7PtySourceFile>..\tools\console\ConinMode.cc</VT7PtySourceFile>
+    <VT7PtyEnableAssertions>true</VT7PtyEnableAssertions>
+    <VT7PtyFileDescription>VT7Pty console-input mode tool</VT7PtyFileDescription>
+  </PropertyGroup>
+  <Import Project="NativeConsoleProgram.props" />
+</Project>

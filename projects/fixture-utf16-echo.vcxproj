@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Fixture">
+    <ProjectGuid>{9D769A8D-7649-4C90-B47F-5DBA2904D70E}</ProjectGuid>
+    <RootNamespace>fixture_utf16_echo</RootNamespace>
+    <VT7PtySourceFile>..\tests\fixtures\Utf16Echo.cc</VT7PtySourceFile>
+    <VT7PtyEnableAssertions>true</VT7PtyEnableAssertions>
+    <VT7PtyFileDescription>VT7Pty UTF-16 echo fixture</VT7PtyFileDescription>
+  </PropertyGroup>
+  <Import Project="NativeConsoleProgram.props" />
+</Project>

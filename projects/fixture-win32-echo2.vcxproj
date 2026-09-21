@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Fixture">
+    <ProjectGuid>{135A7313-486B-41C4-818C-C456B5CB116D}</ProjectGuid>
+    <RootNamespace>fixture_win32_echo2</RootNamespace>
+    <VT7PtySourceFile>..\tests\fixtures\Win32Echo2.cc</VT7PtySourceFile>
+    <VT7PtyEnableAssertions>true</VT7PtyEnableAssertions>
+    <VT7PtyFileDescription>VT7Pty direct-input echo fixture</VT7PtyFileDescription>
+  </PropertyGroup>
+  <Import Project="NativeConsoleProgram.props" />
+</Project>

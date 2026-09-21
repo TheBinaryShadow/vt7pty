@@ -15,7 +15,12 @@ int main()
         CONSOLE_SCREEN_BUFFER_INFO info;
         GetConsoleScreenBufferInfo(conout, &info);
 
-        SMALL_RECT src = { 0, 1, info.dwSize.X - 1, info.dwSize.Y - 1 };
+        SMALL_RECT src = {
+            0,
+            1,
+            static_cast<SHORT>(info.dwSize.X - 1),
+            static_cast<SHORT>(info.dwSize.Y - 1),
+        };
         COORD destOrigin = { 0, 0 };
         CHAR_INFO fillCharInfo = { 0 };
         fillCharInfo.Char.AsciiChar = ' ';
@@ -32,7 +37,7 @@ int main()
         COORD bufferSize = { 1, 1 };
         COORD bufferCoord = { 0, 0 };
         SMALL_RECT writeRegion = { 0, 0, 0, 0 };
-        writeRegion.Left = writeRegion.Right = i;
+        writeRegion.Left = writeRegion.Right = static_cast<SHORT>(i);
         writeRegion.Top = writeRegion.Bottom = 5;
         WriteConsoleOutput(conout, 
                            &buffer, bufferSize, bufferCoord,

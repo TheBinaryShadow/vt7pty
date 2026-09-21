@@ -117,6 +117,15 @@ $expectedImports = [ordered]@{
     'winpty-debugserver.exe' = @('ADVAPI32.dll', 'KERNEL32.dll')
     'trivial_test.exe' = @('KERNEL32.dll', 'winpty.dll')
     'StringBuilderTest.exe' = @('KERNEL32.dll')
+    'fixture-show-argv.exe' = @('KERNEL32.dll')
+    'fixture-show-console-input.exe' = @('KERNEL32.dll')
+    'fixture-utf16-echo.exe' = @('KERNEL32.dll')
+    'fixture-win32-echo1.exe' = @('KERNEL32.dll')
+    'fixture-win32-echo2.exe' = @('KERNEL32.dll')
+    'fixture-win32-write1.exe' = @('KERNEL32.dll')
+    'fixture-write-console.exe' = @('KERNEL32.dll')
+    'tool-conin-mode.exe' = @('KERNEL32.dll')
+    'tool-conout-mode.exe' = @('KERNEL32.dll')
 }
 
 foreach ($configurationName in $configurations) {
@@ -129,7 +138,16 @@ foreach ($configurationName in $configurations) {
         'winpty-agent.exe', 'winpty-agent.pdb',
         'winpty-debugserver.exe', 'winpty-debugserver.pdb',
         'StringBuilderTest.exe', 'StringBuilderTest.pdb',
-        'trivial_test.exe', 'trivial_test.pdb'
+        'trivial_test.exe', 'trivial_test.pdb',
+        'fixture-show-argv.exe', 'fixture-show-argv.pdb',
+        'fixture-show-console-input.exe', 'fixture-show-console-input.pdb',
+        'fixture-utf16-echo.exe', 'fixture-utf16-echo.pdb',
+        'fixture-win32-echo1.exe', 'fixture-win32-echo1.pdb',
+        'fixture-win32-echo2.exe', 'fixture-win32-echo2.pdb',
+        'fixture-win32-write1.exe', 'fixture-win32-write1.pdb',
+        'fixture-write-console.exe', 'fixture-write-console.pdb',
+        'tool-conin-mode.exe', 'tool-conin-mode.pdb',
+        'tool-conout-mode.exe', 'tool-conout-mode.pdb'
     )
     foreach ($artifact in $requiredArtifacts) {
         $artifactPath = Join-Path $binaryDirectory $artifact
@@ -142,6 +160,7 @@ foreach ($configurationName in $configurations) {
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'StringBuilderTest.exe') -WorkingDirectory $binaryDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'trivial_test.exe') -WorkingDirectory $binaryDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'winpty-agent.exe') -WorkingDirectory $binaryDirectory -Arguments @('--version')
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'fixture-show-argv.exe') -WorkingDirectory $binaryDirectory -Arguments @('alpha', 'two words')
     )
     foreach ($test in $tests) {
         Assert-NativeTestPassed -Result $test
@@ -157,6 +176,11 @@ foreach ($configurationName in $configurations) {
     }
     if ($agentVersion.StandardOutput -notmatch [regex]::Escape("commit $sourceCommit")) {
         throw "$configurationName agent did not report source commit $sourceCommit."
+    }
+    $argumentFixture = $tests | Where-Object { $_.Name -eq 'fixture-show-argv.exe' }
+    if ($argumentFixture.StandardOutput -notmatch '(?m)^\[alpha\]\r?$' -or
+            $argumentFixture.StandardOutput -notmatch '(?m)^\[two words\]\r?$') {
+        throw "$configurationName argument fixture did not preserve its test arguments."
     }
 
     $binaryRecords = @()

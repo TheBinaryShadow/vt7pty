@@ -24,7 +24,7 @@ identify the exact source and binaries under test.
 Verification uses repository-owned native executables and Windows PowerShell
 scripts. There is no hosted build or test service.
 
-The planned maintained entry point is `Verify-VT7Pty.ps1`. Tests that must run
+The maintained entry point is `Verify-VT7Pty.ps1`. Tests that must run
 on Windows 7 will work from a portable package without Visual Studio. Their
 orchestration will remain compatible with Windows PowerShell 5.1.
 
@@ -61,13 +61,25 @@ Roadmap Step 0.2 now provides the first maintained development-host command:
 .\Verify-VT7Pty.ps1
 ```
 
-It builds Debug and Release by default, runs the two inherited tests plus the
-agent version check, and validates architecture, subsystem floor, direct
-imports, the inherited DLL export boundary, PDB presence, and generated
-artifact identity. Results and dumpbin evidence are written below ignored
-`artifacts/verification`. These checks establish build-transition parity only;
-they do not satisfy the broader permanent suite or either physical Windows 7
-tier.
+It builds Debug and Release by default, runs the two inherited tests, the agent
+version check, and a deterministic argument-quoting fixture. It validates
+architecture, subsystem floor, direct imports, the inherited DLL export
+boundary, PDB presence, and generated artifact identity for all maintained
+binaries. Results and dumpbin evidence are written below ignored
+`artifacts/verification`. The interactive console fixtures are built and
+inspected here but remain reserved for focused tests that can provide their
+required console and input state.
+
+Source and caller line resolution can be checked independently with:
+
+```powershell
+.\tools\debug\Verify-SourceDebugging.ps1
+```
+
+That check launches the Debug integration test under CDB, breaks at
+`winpty_config_new`, and requires resolved locations in both `winpty.cc` and
+`trivial_test.cc`. These checks establish build-transition parity only; they do
+not satisfy the broader permanent suite or either physical Windows 7 tier.
 
 The accepted clean-commit result is the
 [2026-09-21 MSBuild transition record](validation/2026-09-21-msbuild-transition.md).

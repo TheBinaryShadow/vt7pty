@@ -32,15 +32,15 @@ static void setConsoleMode(DWORD mode) {
     }
 }
 
-static long parseInt(const std::string &s) {
+static DWORD parseMode(const std::string &s) {
     errno = 0;
     char *endptr = nullptr;
-    long result = strtol(s.c_str(), &endptr, 0);
-    if (errno != 0 || !endptr || *endptr != '\0') {
+    const unsigned long result = strtoul(s.c_str(), &endptr, 0);
+    if (errno != 0 || endptr == s.c_str() || *endptr != '\0') {
         fprintf(stderr, "error: could not parse integral argument '%s'\n", s.c_str());
         exit(1);
     }
-    return result;
+    return static_cast<DWORD>(result);
 }
 
 static void usage() {
@@ -71,11 +71,11 @@ struct {
 
 int main(int argc, char *argv[]) {
     std::vector<std::string> args;
-    for (size_t i = 1; i < argc; ++i) {
+    for (int i = 1; i < argc; ++i) {
         args.push_back(argv[i]);
     }
 
-    if (args.empty() || args.size() == 1 && args[0] == "info") {
+    if (args.empty() || (args.size() == 1 && args[0] == "info")) {
         DWORD mode = getConsoleMode();
         printf("mode: 0x%lx\n", mode);
         for (const auto &flag : kInputFlags) {
@@ -94,12 +94,12 @@ int main(int argc, char *argv[]) {
 
     if (verb == "set") {
         if (args.size() == 2) {
-            const DWORD newMode = parseInt(args[1]);
+            const DWORD newMode = parseMode(args[1]);
             setConsoleMode(newMode);
         } else if (args.size() == 3) {
-            const DWORD mode = parseInt(args[1]);
-            const DWORD mask = parseInt(args[2]);
-            const int newMode = (getConsoleMode() & ~mask) | (mode & mask);
+            const DWORD mode = parseMode(args[1]);
+            const DWORD mask = parseMode(args[2]);
+            const DWORD newMode = (getConsoleMode() & ~mask) | (mode & mask);
             setConsoleMode(newMode);
         } else {
             usage();

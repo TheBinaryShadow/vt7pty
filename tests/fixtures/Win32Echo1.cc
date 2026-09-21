@@ -11,7 +11,6 @@ int main()
 {
     int count = 0;
     HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
-    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleMode(hStdIn, 0);
 
     while (true) {
