@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Fixture">
+    <ProjectGuid>{AB5F2735-11C8-4873-A2C5-E746F0EDB573}</ProjectGuid>
+    <RootNamespace>fixture_console_color_grid</RootNamespace>
+    <VT7PtySourceFile>..\tests\fixtures\ConsoleColorGrid.cc</VT7PtySourceFile>
+    <VT7PtyEnableAssertions>true</VT7PtyEnableAssertions>
+    <VT7PtyFileDescription>VT7Pty console color-grid fixture</VT7PtyFileDescription>
+  </PropertyGroup>
+  <Import Project="NativeConsoleProgram.props" />
+</Project>

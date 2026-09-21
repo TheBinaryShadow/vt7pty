@@ -37,7 +37,7 @@ Release. Outputs are written below ignored `artifacts`, with intermediates
 below ignored `build`.
 
 The solution contains projects for the inherited client DLL, console-owning
-agent, native debug server, two inherited tests, seven controlled child-process
+agent, native debug server, two inherited tests, nine controlled child-process
 fixtures, and two console-mode tools. The fixture and tool purpose is described
 under [tests/fixtures](tests/fixtures/README.md) and
 [tools/console](tools/console/README.md). Shared compiler and linker settings

@@ -117,6 +117,8 @@ $expectedImports = [ordered]@{
     'winpty-debugserver.exe' = @('ADVAPI32.dll', 'KERNEL32.dll')
     'trivial_test.exe' = @('KERNEL32.dll', 'winpty.dll')
     'StringBuilderTest.exe' = @('KERNEL32.dll')
+    'fixture-console-color-grid.exe' = @('KERNEL32.dll')
+    'fixture-output-lines.exe' = @('KERNEL32.dll')
     'fixture-show-argv.exe' = @('KERNEL32.dll')
     'fixture-show-console-input.exe' = @('KERNEL32.dll')
     'fixture-utf16-echo.exe' = @('KERNEL32.dll')
@@ -139,6 +141,8 @@ foreach ($configurationName in $configurations) {
         'winpty-debugserver.exe', 'winpty-debugserver.pdb',
         'StringBuilderTest.exe', 'StringBuilderTest.pdb',
         'trivial_test.exe', 'trivial_test.pdb',
+        'fixture-console-color-grid.exe', 'fixture-console-color-grid.pdb',
+        'fixture-output-lines.exe', 'fixture-output-lines.pdb',
         'fixture-show-argv.exe', 'fixture-show-argv.pdb',
         'fixture-show-console-input.exe', 'fixture-show-console-input.pdb',
         'fixture-utf16-echo.exe', 'fixture-utf16-echo.pdb',
@@ -161,6 +165,7 @@ foreach ($configurationName in $configurations) {
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'trivial_test.exe') -WorkingDirectory $binaryDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'winpty-agent.exe') -WorkingDirectory $binaryDirectory -Arguments @('--version')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'fixture-show-argv.exe') -WorkingDirectory $binaryDirectory -Arguments @('alpha', 'two words')
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'fixture-output-lines.exe') -WorkingDirectory $binaryDirectory -Arguments @('3', '5')
     )
     foreach ($test in $tests) {
         Assert-NativeTestPassed -Result $test
@@ -181,6 +186,10 @@ foreach ($configurationName in $configurations) {
     if ($argumentFixture.StandardOutput -notmatch '(?m)^\[alpha\]\r?$' -or
             $argumentFixture.StandardOutput -notmatch '(?m)^\[two words\]\r?$') {
         throw "$configurationName argument fixture did not preserve its test arguments."
+    }
+    $outputFixture = $tests | Where-Object { $_.Name -eq 'fixture-output-lines.exe' }
+    if ($outputFixture.StandardOutput -ne "1 XXXXX`r`n2 XXXXX`r`n3 XXXXX") {
+        throw "$configurationName output-lines fixture did not produce its exact bounded output."
     }
 
     $binaryRecords = @()

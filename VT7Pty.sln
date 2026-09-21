@@ -30,6 +30,10 @@ Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "tool-conin-mode", "projects
 EndProject
 Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "tool-conout-mode", "projects\tool-conout-mode.vcxproj", "{DE7FBA97-C4CD-4E7A-8FC2-2657681C273F}"
 EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "fixture-output-lines", "projects\fixture-output-lines.vcxproj", "{1F01466F-8FFC-43A0-8D98-1F8BE3720190}"
+EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "fixture-console-color-grid", "projects\fixture-console-color-grid.vcxproj", "{AB5F2735-11C8-4873-A2C5-E746F0EDB573}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -92,6 +96,14 @@ Global
 		{DE7FBA97-C4CD-4E7A-8FC2-2657681C273F}.Debug|x64.Build.0 = Debug|x64
 		{DE7FBA97-C4CD-4E7A-8FC2-2657681C273F}.Release|x64.ActiveCfg = Release|x64
 		{DE7FBA97-C4CD-4E7A-8FC2-2657681C273F}.Release|x64.Build.0 = Release|x64
+		{1F01466F-8FFC-43A0-8D98-1F8BE3720190}.Debug|x64.ActiveCfg = Debug|x64
+		{1F01466F-8FFC-43A0-8D98-1F8BE3720190}.Debug|x64.Build.0 = Debug|x64
+		{1F01466F-8FFC-43A0-8D98-1F8BE3720190}.Release|x64.ActiveCfg = Release|x64
+		{1F01466F-8FFC-43A0-8D98-1F8BE3720190}.Release|x64.Build.0 = Release|x64
+		{AB5F2735-11C8-4873-A2C5-E746F0EDB573}.Debug|x64.ActiveCfg = Debug|x64
+		{AB5F2735-11C8-4873-A2C5-E746F0EDB573}.Debug|x64.Build.0 = Debug|x64
+		{AB5F2735-11C8-4873-A2C5-E746F0EDB573}.Release|x64.ActiveCfg = Release|x64
+		{AB5F2735-11C8-4873-A2C5-E746F0EDB573}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

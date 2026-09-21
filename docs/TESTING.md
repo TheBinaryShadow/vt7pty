@@ -62,7 +62,8 @@ Roadmap Step 0.2 now provides the first maintained development-host command:
 ```
 
 It builds Debug and Release by default, runs the two inherited tests, the agent
-version check, and a deterministic argument-quoting fixture. It validates
+version check, a deterministic argument-quoting fixture, and a bounded-output
+fixture. It validates
 architecture, subsystem floor, direct imports, the inherited DLL export
 boundary, PDB presence, and generated artifact identity for all maintained
 binaries. Results and dumpbin evidence are written below ignored

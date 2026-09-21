@@ -7,6 +7,8 @@ interactive behavior into unattended tests.
 
 | Fixture | Purpose |
 | --- | --- |
+| `fixture-console-color-grid` | Writes every legacy foreground/background attribute combination. |
+| `fixture-output-lines` | Produces bounded, deterministic numbered output for volume and drain tests. |
 | `fixture-show-argv` | Prints the raw command line and parsed arguments. |
 | `fixture-show-console-input` | Reports input records read from the console. |
 | `fixture-utf16-echo` | Writes specified UTF-16 code units through the console API. |
@@ -17,7 +19,7 @@ interactive behavior into unattended tests.
 
 The solution builds every fixture with Debug and Release symbols. The main
 verifier checks their architecture, Windows 7 subsystem floor, imports,
-version identity, and presence. It also runs `fixture-show-argv` as a
-deterministic quoting check. The other fixtures require a real console or
-specific input and will be driven by focused test cases in later roadmap
-steps.
+version identity, and presence. It runs `fixture-show-argv` as a deterministic
+quoting check and `fixture-output-lines` as a bounded output check. The other
+fixtures require a real console or specific input and will be driven by focused
+test cases in later roadmap steps.
