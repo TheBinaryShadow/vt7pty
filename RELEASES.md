@@ -2,7 +2,8 @@
 
 The entries below are preserved from WinPTY. "Next Version" refers to the
 upstream development version, not a VT7Pty release. See [UPSTREAM.md](UPSTREAM.md)
-for the inherited revision and [README.md](README.md) for VT7Pty's current status.
+for the inherited revision, [CHANGELOG.md](CHANGELOG.md) for VT7Pty changes,
+and [README.md](README.md) for current status.
 
 # Next Version
 

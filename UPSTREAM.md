@@ -23,6 +23,15 @@ behavior, remove components, rename runtime artifacts, or change the inherited
 `VERSION.txt`. That version identifies the inherited source, not a new VT7Pty
 release.
 
+The [roadmap](ROADMAP.md) proposes infrastructure modernization, audited
+component removal, technical rebranding, and a new 0.5.x version series in
+Milestone 0. These are future divergence points; no runtime change or version
+bump is implied by the planning documents. Historical WinPTY names and notices
+remain part of the attribution record after technical renaming.
+
+VT7Pty changes are recorded separately in [CHANGELOG.md](CHANGELOG.md), under
+the identity rules in [docs/VERSIONING.md](docs/VERSIONING.md).
+
 ## ConPTY and Microsoft Terminal
 
 [Microsoft Terminal](https://github.com/microsoft/terminal), including its

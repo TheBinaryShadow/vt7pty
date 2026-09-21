@@ -42,6 +42,8 @@ VT7Pty security-support commitment.
 | Third-party or modified builds | Reproduction against identifiable repository source may be needed |
 
 This policy will be revised when VT7Pty publishes a supported release.
+Current platform and application claims are tracked separately in the
+[compatibility contract](docs/COMPATIBILITY.md).
 
 ## Scope
 

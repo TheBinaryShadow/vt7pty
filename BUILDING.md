@@ -3,6 +3,17 @@
 The repository currently retains WinPTY's original build and packaging systems.
 Rebranding has not renamed their targets or introduced a new build system.
 
+[Roadmap Step 0.1](ROADMAP.md#step-01-modernize-build-and-auxiliary-infrastructure)
+proposes a modern native build, CI, packaging, and debugging workflow. Those
+changes are not implemented yet; the instructions below describe the inherited
+entry points. Audited cleanup, runtime rebranding, and the 0.5.x identity follow
+in Steps 0.2A through 0.2C, with comprehensive validation in Step 0.3.
+
+The planned platform and runtime requirements are tracked in
+[Compatibility](docs/COMPATIBILITY.md). Build and test changes must produce the
+artifact identity and evidence described in [Testing](docs/TESTING.md) and
+[Versioning](docs/VERSIONING.md).
+
 ## Native Windows library and tools
 
 The native components include `winpty.dll`, `winpty-agent.exe`, and

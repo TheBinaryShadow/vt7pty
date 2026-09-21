@@ -6,8 +6,9 @@ are especially useful.
 
 ## Before starting
 
-Read the [README](README.md), [build notes](BUILDING.md), and
-[upstream record](UPSTREAM.md). Search the
+Read the [README](README.md), [roadmap](ROADMAP.md),
+[architecture](docs/ARCHITECTURE.md), [compatibility contract](docs/COMPATIBILITY.md),
+[build notes](BUILDING.md), and [upstream record](UPSTREAM.md). Search the
 [issue tracker](https://github.com/TheBinaryShadow/vt7pty/issues) before opening
 a new report or proposal.
 
@@ -32,6 +33,9 @@ Useful contributions include:
 - Focused improvements that preserve known working legacy-console behavior.
 
 All inherited components are currently retained, including the Unix adapter.
+The roadmap proposes their audited cleanup in Milestone 0, after the modern
+build and baseline checks exist. Relate a proposed change to the relevant
+roadmap step and its acceptance criteria; draft plans are not completed work.
 Avoid mixing renames, removals, broad formatting changes, and functional fixes
 in the same pull request. Work in this repository; changes to VT7 itself belong
 in that project's own review process.
@@ -52,6 +56,11 @@ configuration, Windows version and update level, affected application and its
 version, and exact test steps. Identify local development results separately
 from Windows 7 results. State what was not tested and retain evidence of
 remaining failures.
+
+Follow the result and artifact-identification requirements in
+[Testing](docs/TESTING.md). Changes to package, public API, ABI, or agent
+protocol identity must also update [Versioning](docs/VERSIONING.md) and the
+[VT7Pty changelog](CHANGELOG.md).
 
 Remove credentials, private terminal content, and personal information from
 logs and crash reports. Report suspected vulnerabilities through

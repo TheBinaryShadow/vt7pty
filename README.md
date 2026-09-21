@@ -18,6 +18,12 @@ VT7Pty is in early development. This repository currently contains the inherited
 WinPTY `0.4.4-dev` implementation, with a new project identity and development
 direction. A VT7Pty-specific API and backend improvements are planned work.
 
+The [roadmap](ROADMAP.md) owns the draft development plan and completion state. Milestone 0 proposes
+modernizing the build and supporting tools, removing obsolete components and
+completing technical rebranding into the 0.5.x series, then establishing and
+running the comprehensive test system. Small baseline checks accompany the
+first two steps. Implementation has not started.
+
 All inherited components are still present, including the Cygwin/MSYS Unix
 adapter, tests, debugging tools, and build and packaging scripts. Binaries,
 API symbols, environment variables, and build targets retain their existing
@@ -75,12 +81,18 @@ is preserved for historical build, adapter, embedding, and debugging details.
 
 Useful starting points:
 
+- [Roadmap and milestone acceptance criteria](ROADMAP.md)
+- [Architecture and current data flows](docs/ARCHITECTURE.md)
+- [Testing strategy and evidence requirements](docs/TESTING.md)
+- [Compatibility targets and verified status](docs/COMPATIBILITY.md)
+- [Versioning policy](docs/VERSIONING.md)
 - [Public WinPTY header](src/include/winpty.h)
 - [Client library](src/libwinpty)
 - [Console agent](src/agent)
 - [Tests](src/tests)
 - [Upstream baseline and attribution policy](UPSTREAM.md)
 - [Historical WinPTY release notes](RELEASES.md)
+- [VT7Pty changelog](CHANGELOG.md)
 
 ## Contributing and community
 

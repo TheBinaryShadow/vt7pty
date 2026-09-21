@@ -13,7 +13,7 @@ documentation is **VT7Pty**. A repository rename is not required.
 Suggested topics:
 
 ```text
-windows-7 winpty pty console terminal conpty vt7 cpp
+windows-7 winpty pty pseudoconsole console terminal conpty vt7 cpp
 ```
 
 An optional website link can point to [VT7](https://github.com/TheBinaryShadow/VT7)
