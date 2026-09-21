@@ -83,6 +83,8 @@ not satisfy the broader permanent suite or either physical Windows 7 tier.
 
 The accepted clean-commit result is the
 [2026-09-21 MSBuild transition record](validation/2026-09-21-msbuild-transition.md).
+The added fixture/tool boundary and source-debugging proof are recorded in the
+[2026-09-22 Step 0.2 completion record](validation/2026-09-22-step-0.2-completion.md).
 
 ## Coverage matrix
 

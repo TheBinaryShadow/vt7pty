@@ -72,8 +72,9 @@ acceptance.
 `Package-VT7Pty.ps1` currently creates one transition ZIP with binaries,
 headers, the import library, symbols, attribution, a manifest, and a SHA-256
 sidecar. Roadmap Step 0.9 will fix the final release archive split and naming.
-The accepted development-host result for this workflow is recorded in the
-[MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md).
+The accepted build boundary and completed developer workflow are recorded in
+the [MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
+and [Step 0.2 completion validation](docs/validation/2026-09-22-step-0.2-completion.md).
 
 ## Inherited build paths
 

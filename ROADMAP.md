@@ -1,6 +1,6 @@
 # VT7Pty Roadmap
 
-Status: approved. Updated: 2026-09-21.
+Status: approved. Updated: 2026-09-22.
 
 This file owns milestone scope and completion. It records intended work, not
 implemented capability. Milestones follow technical dependencies rather than
@@ -23,6 +23,7 @@ Supporting documents:
 - [Inherited component inventory](docs/INVENTORY.md)
 - [Inherited native baseline](docs/validation/2026-09-21-upstream-baseline.md)
 - [MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
+- [Step 0.2 completion validation](docs/validation/2026-09-22-step-0.2-completion.md)
 - [Upstream provenance](UPSTREAM.md)
 
 ## Goal and boundaries
@@ -46,9 +47,9 @@ either project.
   [`7e59fe2`](https://github.com/rprichard/winpty/commit/7e59fe2d09adf0fa2aa606492e7ca98efbc5184e).
 - Runtime names, public APIs, version metadata, build scripts, and components
   remain inherited from WinPTY, including the Unix adapter.
-- A temporary local harness built and debugged the x64 native components and
-  passed the inherited process/output and StringBuilder smoke tests. This is
-  development-host evidence, not a supported build path or Windows 7 acceptance.
+- The maintained VS2022/MSBuild workflow builds, verifies, packages, and
+  source-debugs the inherited x64 native boundary. This is development-host
+  evidence, not Windows 7 acceptance.
 
 Completed project foundation:
 
@@ -65,14 +66,14 @@ Completed project foundation:
 - [x] Establish this roadmap and its supporting documentation as the Milestone 0
   development foundation.
 
-These decisions authorize the work; they do not claim that any implementation
-item below has been completed.
+These decisions authorize the work. Implementation status and evidence are
+recorded separately by the checked items below.
 
 ## Milestone overview
 
 | Milestone | Outcome | Status |
 | --- | --- | --- |
-| 0 | Fully modernized, native VT7Pty 0.5.x foundation | Approved |
+| 0 | Fully modernized, native VT7Pty 0.5.x foundation | In progress; Steps 0.1-0.2 complete |
 | 1 | Measured backend fidelity and reliability improvements | Direction approved; detailed scope follows Milestone 0 evidence |
 | 2 | Documented VT7Pty API and standalone integration host | Direction approved; detailed scope follows Milestone 1 |
 | 3 | Versioned backend handoff ready for separately authorized VT7 integration | Direction approved; detailed scope follows Milestone 2 |
@@ -114,8 +115,8 @@ packages, and debugs the native project from a clean checkout.
 
 - [x] Add a Visual Studio solution and MSBuild C++ projects for the client DLL,
   agent, native debug server, and inherited tests.
-- [ ] Add maintained project membership for retained fixtures and tools as they
-  move from `misc` into their permanent locations.
+- [x] Add maintained project membership for the initial retained fixture and
+  tool set as it moves from `misc` into permanent locations.
 - [x] Centralize configuration in `Directory.Build.props` and
   `Directory.Build.targets`.
 - [x] Target MSVC v143, C++20, Windows SDK 10.0.26100.0, Unicode, and x64 Debug
@@ -130,21 +131,22 @@ packages, and debugs the native project from a clean checkout.
 - [x] Keep target-side scripts compatible with Windows PowerShell 5.1 where
   they must run on Windows 7.
 - [x] Generate version and artifact identity from repository-owned sources.
-- [ ] Verify source-level debugging and inspect imports and runtime dependencies.
+- [x] Verify source-level debugging and inspect imports and runtime dependencies.
 - [x] Reproduce the inherited baseline before removing any old build route.
 
-The first transition build and verifier are implemented. The clean-commit
-[transition record](docs/validation/2026-09-21-msbuild-transition.md) reproduces
-the inherited tests, imports, exports, and artifact boundary. Step 0.2 remains
-open until source-level debugger validation and retained fixture/tool membership
-are complete.
+The clean-commit [transition record](docs/validation/2026-09-21-msbuild-transition.md)
+reproduces the inherited tests, imports, exports, and artifact boundary. The
+[Step 0.2 completion record](docs/validation/2026-09-22-step-0.2-completion.md)
+adds the maintained fixture/tool projects, verifies their binaries, and proves
+source and caller line resolution under CDB.
 
 The project will not add hosted build or test automation. Release qualification
 uses the maintained local commands and physical acceptance machines.
 
-Exit criterion: a clean checkout builds, verifies, packages, and debugs through
-MSBuild and maintained PowerShell entry points without relying on the inherited
-build system.
+Exit criterion met: clean commit `a43f319` builds, verifies, packages, and
+debugs through MSBuild and maintained PowerShell entry points without relying
+on the inherited build system. Remaining `misc` classification and obsolete
+infrastructure removal belong to Step 0.3.
 
 ### Step 0.3: Remove obsolete infrastructure and Unix-derived components
 
@@ -326,8 +328,8 @@ published manually with complete identity and acceptance evidence.
 
 ### Milestone 0 acceptance
 
-- [ ] Accept Step 0.1 with linked baseline evidence.
-- [ ] Accept Step 0.2 with linked build and debugging evidence.
+- [x] Accept Step 0.1 with linked baseline evidence.
+- [x] Accept Step 0.2 with linked build and debugging evidence.
 - [ ] Accept Step 0.3 with linked removal and regression evidence.
 - [ ] Accept Step 0.4 with linked platform and physical-machine evidence.
 - [ ] Accept Step 0.5 with linked naming, version, protocol, and package evidence.
