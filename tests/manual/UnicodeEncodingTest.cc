@@ -21,7 +21,7 @@
 // Encode every code-point using this module and verify that it matches the
 // encoding generated using Windows WideCharToMultiByte.
 
-#include "UnicodeEncoding.h"
+#include "../../src/agent/UnicodeEncoding.h"
 
 #include <windows.h>
 #include <assert.h>

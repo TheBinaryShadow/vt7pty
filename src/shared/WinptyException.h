@@ -23,17 +23,9 @@
 
 #include <windows.h>
 
-#if defined(__GNUC__)
-#define WINPTY_NOEXCEPT noexcept
-#elif defined(_MSC_VER) && _MSC_VER >= 1900
-#define WINPTY_NOEXCEPT noexcept
-#else
-#define WINPTY_NOEXCEPT
-#endif
-
 class WinptyException {
 public:
-    virtual const wchar_t *what() const WINPTY_NOEXCEPT = 0;
+    virtual const wchar_t *what() const noexcept = 0;
     virtual ~WinptyException() {}
 };
 

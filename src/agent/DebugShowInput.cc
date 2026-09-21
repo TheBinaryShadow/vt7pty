@@ -144,7 +144,7 @@ void debugShowInput(bool enableMouse, bool escapeInput) {
         // we have no way of knowning whether QuickEdit or InsertMode are
         // currently enabled.  Enable them both (eventually), because they're
         // sensible defaults.  This case shouldn't happen typically.  See
-        // misc/EnableExtendedFlags.txt.
+        // docs/historical/EnableExtendedFlags.txt.
         restoreConsoleMode |= ENABLE_EXTENDED_FLAGS;
         restoreConsoleMode |= ENABLE_QUICK_EDIT_MODE;
         restoreConsoleMode |= ENABLE_INSERT_MODE;

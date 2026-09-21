@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <string>
 
-#include "../shared/winpty_snprintf.h"
+#include "../shared/StringFormatting.h"
 #include "Coord.h"
 
 struct SmallRect : SMALL_RECT
@@ -134,7 +134,7 @@ struct SmallRect : SMALL_RECT
     std::string toString() const
     {
         char ret[64];
-        winpty_snprintf(ret, "(x=%d,y=%d,w=%d,h=%d)",
+        formatString(ret, "(x=%d,y=%d,w=%d,h=%d)",
                         Left, Top, width(), height());
         return std::string(ret);
     }

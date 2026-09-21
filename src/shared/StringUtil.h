@@ -31,7 +31,6 @@
 
 #include "WinptyAssert.h"
 
-size_t winpty_wcsnlen(const wchar_t *s, size_t maxlen);
 std::string utf8FromWide(const std::wstring &input);
 
 // Return a vector containing each character in the string.

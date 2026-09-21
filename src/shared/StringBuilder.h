@@ -24,8 +24,7 @@
 //
 //  * std::stringstream: Inefficient, even more so than stdio.
 //
-//  * std::to_string: No hexadecimal output, tends to use heap allocation, not
-//    supported on Cygwin.
+//  * std::to_string: No hexadecimal output and tends to use heap allocation.
 //
 //  * stdio routines: Requires parsing a format string (inefficient).  The
 //    caller *must* know how large the content is for correctness.  The
@@ -65,21 +64,6 @@ struct ValueString {
     }
 };
 
-#ifdef _MSC_VER
-// Disable an MSVC /SDL error that forbids unsigned negation.  Signed negation
-// invokes undefined behavior for INTxx_MIN, so unsigned negation is simpler to
-// reason about.  (We assume twos-complement in any case.)
-#define STRING_BUILDER_ALLOW_UNSIGNED_NEGATE(x) \
-    (                                           \
-        __pragma(warning(push))                 \
-        __pragma(warning(disable:4146))         \
-        (x)                                     \
-        __pragma(warning(pop))                  \
-    )
-#else
-#define STRING_BUILDER_ALLOW_UNSIGNED_NEGATE(x) (x)
-#endif
-
 // Formats an integer as decimal without leading zeros.
 template <typename C, typename I>
 ValueString<C, sizeof(I) * 3 + 1 + 1> gdecOfInt(const I value) {
@@ -87,7 +71,7 @@ ValueString<C, sizeof(I) * 3 + 1 + 1> gdecOfInt(const I value) {
     auto unsValue = static_cast<U>(value);
     const bool isNegative = (value < 0);
     if (isNegative) {
-        unsValue = STRING_BUILDER_ALLOW_UNSIGNED_NEGATE(-unsValue);
+        unsValue = U(0) - unsValue;
     }
     decltype(gdecOfInt<C, I>(value)) out;
     auto &arr = out.m_array;

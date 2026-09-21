@@ -18,40 +18,47 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include "WinptyException.h"
+#ifndef VT7PTY_SHARED_STRING_FORMATTING_H
+#define VT7PTY_SHARED_STRING_FORMATTING_H
 
-#include <memory>
-#include <string>
+#include <cstdarg>
+#include <cstddef>
+#include <cstdio>
 
-#include "StringBuilder.h"
-
-namespace {
-
-class ExceptionImpl : public WinptyException {
-public:
-    ExceptionImpl(const wchar_t *what) :
-        m_what(std::make_shared<std::wstring>(what)) {}
-    virtual const wchar_t *what() const noexcept override {
-        return m_what->c_str();
+inline int formatStringV(
+        char *output,
+        size_t outputSize,
+        const char *format,
+        va_list arguments) {
+    if (outputSize == 0) {
+        return -1;
     }
-private:
-    // Using a shared_ptr ensures that copying the object raises no exception.
-    std::shared_ptr<std::wstring> m_what;
-};
 
-} // anonymous namespace
-
-void throwWinptyException(const wchar_t *what) {
-    throw ExceptionImpl(what);
+    output[0] = '\0';
+    const int count = std::vsnprintf(output, outputSize, format, arguments);
+    if (count < 0 || static_cast<size_t>(count) >= outputSize) {
+        output[outputSize - 1] = '\0';
+        return -1;
+    }
+    return count;
 }
 
-void throwWindowsError(const wchar_t *prefix, DWORD errorCode) {
-    WStringBuilder sb(64);
-    if (prefix != nullptr) {
-        sb << prefix << L": ";
-    }
-    // It might make sense to use FormatMessage here, but IIRC, its API is hard
-    // to figure out.
-    sb << L"Windows error " << errorCode;
-    throwWinptyException(sb.c_str());
+template <size_t Size>
+int formatStringV(char (&output)[Size], const char *format, va_list arguments) {
+    return formatStringV(output, Size, format, arguments);
 }
+
+template <size_t Size, typename... Arguments>
+int formatString(
+        char (&output)[Size],
+        const char *format,
+        Arguments... arguments) {
+    const int count = std::snprintf(output, Size, format, arguments...);
+    if (count < 0 || static_cast<size_t>(count) >= Size) {
+        output[Size - 1] = '\0';
+        return -1;
+    }
+    return count;
+}
+
+#endif // VT7PTY_SHARED_STRING_FORMATTING_H

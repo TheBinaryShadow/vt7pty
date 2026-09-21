@@ -25,7 +25,7 @@
 
 #include <string>
 
-#include "../shared/winpty_snprintf.h"
+#include "../shared/StringFormatting.h"
 
 struct Coord : COORD {
     Coord()
@@ -79,7 +79,7 @@ struct Coord : COORD {
     std::string toString() const
     {
         char ret[32];
-        winpty_snprintf(ret, "(%d,%d)", X, Y);
+        formatString(ret, "(%d,%d)", X, Y);
         return std::string(ret);
     }
 };

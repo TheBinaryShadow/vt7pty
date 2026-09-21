@@ -22,11 +22,11 @@
 #define LIBWINPTY_WINPTY_INTERNAL_H
 
 #include <memory>
+#include <mutex>
 #include <string>
 
 #include "../include/winpty.h"
 
-#include "../shared/Mutex.h"
 #include "../shared/OwnedHandle.h"
 
 // The structures in this header are not intended to be accessed directly by
@@ -50,7 +50,7 @@ struct winpty_config_s {
 };
 
 struct winpty_s {
-    Mutex mutex;
+    std::mutex mutex;
     OwnedHandle agentProcess;
     OwnedHandle controlPipe;
     DWORD agentTimeoutMs = 0;

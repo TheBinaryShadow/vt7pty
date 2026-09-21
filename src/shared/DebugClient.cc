@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <string>
 
-#include "winpty_snprintf.h"
+#include "StringFormatting.h"
 
 const wchar_t *const kPipeName = L"\\\\.\\pipe\\DebugServer";
 
@@ -163,7 +163,7 @@ void trace(const char *format, ...)
 
     va_list ap;
     va_start(ap, format);
-    winpty_vsnprintf(message, format, ap);
+    formatStringV(message, format, ap);
     message[sizeof(message) - 1] = '\0';
     va_end(ap);
 
@@ -176,7 +176,7 @@ void trace(const char *format, ...)
     baseName = (baseName != NULL) ? baseName + 1 : moduleName;
 
     char fullMessage[1024];
-    winpty_snprintf(fullMessage,
+    formatString(fullMessage,
              "[%05d.%03d %s,p%04d,t%04d]: %s",
              currentTime / 1000, currentTime % 1000,
              baseName, (int)GetCurrentProcessId(), (int)GetCurrentThreadId(),

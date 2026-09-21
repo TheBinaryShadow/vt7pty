@@ -30,7 +30,7 @@
 
 #include "../shared/DebugClient.h"
 #include "../shared/StringBuilder.h"
-#include "../shared/UnixCtrlChars.h"
+#include "../shared/ControlCharacters.h"
 
 #include "ConsoleInputReencoding.h"
 #include "DebugShowInput.h"
@@ -38,11 +38,6 @@
 #include "DsrSender.h"
 #include "UnicodeEncoding.h"
 #include "Win32Console.h"
-
-// MAPVK_VK_TO_VSC isn't defined by the old MinGW.
-#ifndef MAPVK_VK_TO_VSC
-#define MAPVK_VK_TO_VSC 0
-#endif
 
 namespace {
 
@@ -214,7 +209,7 @@ ConsoleInput::ConsoleInput(HANDLE conin, int mouseMode, DsrSender &dsrSender,
     //    then we must choose the InsertMode setting.  I don't *think* this
     //    case happens, though, because a new console always has ExtendedFlags
     //    ON.
-    // See misc/EnableExtendedFlags.txt.
+    // See docs/historical/EnableExtendedFlags.txt.
     DWORD mode = 0;
     if (!GetConsoleMode(conin, &mode)) {
         trace("Agent startup: GetConsoleMode failed");
@@ -246,7 +241,7 @@ void ConsoleInput::writeInput(const std::string &input)
             std::string dumpString;
             for (size_t i = 0; i < input.size(); ++i) {
                 const char ch = input[i];
-                const char ctrl = decodeUnixCtrlChar(ch);
+                const char ctrl = decodeControlCharacter(ch);
                 if (ctrl != '\0') {
                     dumpString += '^';
                     dumpString += ctrl;
@@ -261,7 +256,7 @@ void ConsoleInput::writeInput(const std::string &input)
                 }
                 const unsigned char uch = input[i];
                 char buf[32];
-                winpty_snprintf(buf, "%02X", uch);
+                formatString(buf, "%02X", uch);
                 dumpString += buf;
             }
             dumpString += ')';
@@ -321,7 +316,7 @@ bool ConsoleInput::shouldActivateTerminalMouse()
         // ENABLE_MOUSE_INPUT, but do not turn off QuickEdit mode and do not
         // actually care about mouse input.  Only enable the terminal mouse
         // mode if ENABLE_EXTENDED_FLAGS is on.  See
-        // misc/EnableExtendedFlags.txt.
+        // docs/historical/EnableExtendedFlags.txt.
         return m_mouseInputEnabled && !m_quickEditEnabled &&
                 m_enableExtendedEnabled;
     } else if (m_mouseMode == WINPTY_MOUSE_MODE_FORCE) {

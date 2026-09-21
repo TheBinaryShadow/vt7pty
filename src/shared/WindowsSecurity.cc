@@ -20,6 +20,8 @@
 
 #include "WindowsSecurity.h"
 
+#include <sddl.h>
+
 #include <array>
 
 #include "DebugClient.h"
@@ -314,51 +316,12 @@ SecurityDescriptor getObjectSecurityDescriptor(HANDLE handle) {
     return localItem<SecurityDescriptorTag>(sd);
 }
 
-// The (SID/SD)<->string conversion APIs are useful for testing/debugging, so
-// create convenient accessor functions for them.  They're too slow for
-// ordinary use.  The APIs exist in XP and up, but the MinGW headers only
-// declare the SID<->string APIs, not the SD APIs.  MinGW also gets the
-// prototype wrong for ConvertStringSidToSidW (LPWSTR instead of LPCWSTR) and
-// requires WINVER to be defined.  MSVC and MinGW-w64 get everything right, but
-// for consistency, use LoadLibrary/GetProcAddress for all four APIs.
-
-typedef BOOL WINAPI ConvertStringSidToSidW_t(
-    LPCWSTR StringSid,
-    PSID *Sid);
-
-typedef BOOL WINAPI ConvertSidToStringSidW_t(
-    PSID Sid,
-    LPWSTR *StringSid);
-
-typedef BOOL WINAPI ConvertStringSecurityDescriptorToSecurityDescriptorW_t(
-    LPCWSTR StringSecurityDescriptor,
-    DWORD StringSDRevision,
-    PSECURITY_DESCRIPTOR *SecurityDescriptor,
-    PULONG SecurityDescriptorSize);
-
-typedef BOOL WINAPI ConvertSecurityDescriptorToStringSecurityDescriptorW_t(
-    PSECURITY_DESCRIPTOR SecurityDescriptor,
-    DWORD RequestedStringSDRevision,
-    SECURITY_INFORMATION SecurityInformation,
-    LPWSTR *StringSecurityDescriptor,
-    PULONG StringSecurityDescriptorLen);
-
-#define GET_MODULE_PROC(mod, funcName)                                      \
-    const auto p##funcName =                                                \
-        reinterpret_cast<funcName##_t*>(                                    \
-            mod.proc(#funcName));                                           \
-    if (p##funcName == nullptr) {                                           \
-        throwWinptyException(                                               \
-            L"" L ## #funcName L" API is missing from ADVAPI32.DLL");     \
-    }
-
-const DWORD kSDDL_REVISION_1 = 1;
+// The (SID/SD)<->string conversion APIs are useful for testing and diagnostics
+// but are too slow for ordinary request processing.
 
 std::wstring sidToString(PSID sid) {
-    OsModule advapi32(L"advapi32.dll");
-    GET_MODULE_PROC(advapi32, ConvertSidToStringSidW);
     wchar_t *sidString = NULL;
-    BOOL success = pConvertSidToStringSidW(sid, &sidString);
+    BOOL success = ConvertSidToStringSidW(sid, &sidString);
     if (!success) {
         throwWindowsError(L"ConvertSidToStringSidW failed");
     }
@@ -367,15 +330,8 @@ std::wstring sidToString(PSID sid) {
 }
 
 Sid stringToSid(const std::wstring &str) {
-    // Cast the string from const wchar_t* to LPWSTR because the function is
-    // incorrectly prototyped in the MinGW sddl.h header.  The API does not
-    // modify the string -- it is correctly prototyped as taking LPCWSTR in
-    // MinGW-w64, MSVC, and MSDN.
-    OsModule advapi32(L"advapi32.dll");
-    GET_MODULE_PROC(advapi32, ConvertStringSidToSidW);
     PSID psid = nullptr;
-    BOOL success = pConvertStringSidToSidW(const_cast<LPWSTR>(str.c_str()),
-                                           &psid);
+    BOOL success = ConvertStringSidToSidW(str.c_str(), &psid);
     if (!success) {
         const auto err = GetLastError();
         throwWindowsError(
@@ -387,11 +343,9 @@ Sid stringToSid(const std::wstring &str) {
 }
 
 SecurityDescriptor stringToSd(const std::wstring &str) {
-    OsModule advapi32(L"advapi32.dll");
-    GET_MODULE_PROC(advapi32, ConvertStringSecurityDescriptorToSecurityDescriptorW);
     PSECURITY_DESCRIPTOR desc = nullptr;
-    if (!pConvertStringSecurityDescriptorToSecurityDescriptorW(
-            str.c_str(), kSDDL_REVISION_1, &desc, nullptr)) {
+    if (!ConvertStringSecurityDescriptorToSecurityDescriptorW(
+            str.c_str(), SDDL_REVISION_1, &desc, nullptr)) {
         const auto err = GetLastError();
         throwWindowsError(
             (std::wstring(L"ConvertStringSecurityDescriptorToSecurityDescriptorW failed on \"") +
@@ -402,12 +356,10 @@ SecurityDescriptor stringToSd(const std::wstring &str) {
 }
 
 std::wstring sdToString(PSECURITY_DESCRIPTOR sd) {
-    OsModule advapi32(L"advapi32.dll");
-    GET_MODULE_PROC(advapi32, ConvertSecurityDescriptorToStringSecurityDescriptorW);
     wchar_t *sdString = nullptr;
-    if (!pConvertSecurityDescriptorToStringSecurityDescriptorW(
+    if (!ConvertSecurityDescriptorToStringSecurityDescriptorW(
             sd,
-            kSDDL_REVISION_1,
+            SDDL_REVISION_1,
             OWNER_SECURITY_INFORMATION |
                 GROUP_SECURITY_INFORMATION |
                 DACL_SECURITY_INFORMATION,
@@ -425,9 +377,7 @@ std::wstring sdToString(PSECURITY_DESCRIPTOR sd) {
 // otherwise.
 DWORD rejectRemoteClientsPipeFlag() {
     if (isAtLeastWindowsVista()) {
-        // MinGW lacks this flag; MinGW-w64 has it.
-        const DWORD kPIPE_REJECT_REMOTE_CLIENTS = 8;
-        return kPIPE_REJECT_REMOTE_CLIENTS;
+        return PIPE_REJECT_REMOTE_CLIENTS;
     } else {
         trace("Omitting PIPE_REJECT_REMOTE_CLIENTS on pre-Vista OS");
         return 0;

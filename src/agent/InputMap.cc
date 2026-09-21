@@ -28,9 +28,9 @@
 #include "DebugShowInput.h"
 #include "SimplePool.h"
 #include "../shared/DebugClient.h"
-#include "../shared/UnixCtrlChars.h"
+#include "../shared/ControlCharacters.h"
 #include "../shared/WinptyAssert.h"
-#include "../shared/winpty_snprintf.h"
+#include "../shared/StringFormatting.h"
 
 namespace {
 
@@ -123,14 +123,14 @@ std::string InputMap::Key::toString() const {
                (virtualKey >= '0' && virtualKey <= '9')) {
         ret += static_cast<char>(virtualKey);
     } else {
-        winpty_snprintf(buf, "%#x", virtualKey);
+        formatString(buf, "%#x", virtualKey);
         ret += buf;
     }
     if (unicodeChar >= 32 && unicodeChar <= 126) {
-        winpty_snprintf(buf, " ch='%c'",
+        formatString(buf, " ch='%c'",
                         static_cast<char>(unicodeChar));
     } else {
-        winpty_snprintf(buf, " ch=%#x",
+        formatString(buf, " ch=%#x",
                         static_cast<unsigned int>(unicodeChar));
     }
     ret += buf;
@@ -230,7 +230,7 @@ void InputMap::dumpInputMapHelper(
             if (!encoding.empty()) {
                 encoding.push_back(' ');
             }
-            char ctrlChar = decodeUnixCtrlChar(i);
+            char ctrlChar = decodeControlCharacter(i);
             if (ctrlChar != '\0') {
                 encoding.push_back('^');
                 encoding.push_back(static_cast<char>(ctrlChar));

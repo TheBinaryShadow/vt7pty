@@ -47,8 +47,6 @@ void display(const std::wstring &str) { fprintf(stderr, "%ls", str.c_str()); }
 
 template <typename C, typename I>
 std::basic_string<C> decOfIntSS(const I value) {
-    // std::to_string and std::to_wstring are missing in Cygwin as of this
-    // writing (early 2016).
     std::basic_stringstream<C> ss;
     ss << +value; // We must promote char to print it as an integer.
     return ss.str();

@@ -42,24 +42,16 @@ typedef std::tuple<DWORD, DWORD> Version;
 // manifested for a newer version of Windows.  See the MSDN documentation for
 // GetVersionEx.
 OSVERSIONINFOEX getWindowsVersionInfo() {
-    // Allow use of deprecated functions (i.e. GetVersionEx).  We need to use
-    // GetVersionEx for the old MinGW toolchain and with MSVC when it targets XP.
-    // Having two code paths makes code harder to test, and it's not obvious how
-    // to detect the presence of a new enough SDK.  (Including ntverp.h and
-    // examining VER_PRODUCTBUILD apparently works, but even then, MinGW-w64 and
-    // MSVC seem to use different version numbers.)
-#ifdef _MSC_VER
+    // Keep the inherited version behavior until the Windows 7+ platform pass
+    // replaces it with the selected supported mechanism.
 #pragma warning(push)
 #pragma warning(disable:4996)
-#endif
     OSVERSIONINFOEX info = {};
     info.dwOSVersionInfoSize = sizeof(info);
     const auto success = GetVersionEx(reinterpret_cast<OSVERSIONINFO*>(&info));
     ASSERT(success && "GetVersionEx failed");
     return info;
-#ifdef _MSC_VER
 #pragma warning(pop)
-#endif
 }
 
 Version getWindowsVersion() {
@@ -68,7 +60,7 @@ Version getWindowsVersion() {
 }
 
 struct ModuleNotFound : WinptyException {
-    virtual const wchar_t *what() const WINPTY_NOEXCEPT override {
+    virtual const wchar_t *what() const noexcept override {
         return L"ModuleNotFound";
     }
 };
@@ -178,9 +170,9 @@ bool isAtLeastWindows8() {
 #define WINPTY_IA32     1
 #define WINPTY_X64      2
 
-#if defined(_M_IX86) || defined(__i386__)
+#if defined(_M_IX86)
 #define WINPTY_ARCH WINPTY_IA32
-#elif defined(_M_X64) || defined(__x86_64__)
+#elif defined(_M_X64)
 #define WINPTY_ARCH WINPTY_X64
 #endif
 

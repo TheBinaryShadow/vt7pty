@@ -215,13 +215,13 @@ public:
             waitForCompletion();
         }
     }
-    std::tuple<BOOL, DWORD> waitForCompletion(DWORD &actual) WINPTY_NOEXCEPT {
+    std::tuple<BOOL, DWORD> waitForCompletion(DWORD &actual) noexcept {
         m_finished = true;
         const BOOL success =
             GetOverlappedResult(m_file, &m_over, &actual, TRUE);
         return std::make_tuple(success, GetLastError());
     }
-    std::tuple<BOOL, DWORD> waitForCompletion() WINPTY_NOEXCEPT {
+    std::tuple<BOOL, DWORD> waitForCompletion() noexcept {
         DWORD actual = 0;
         return waitForCompletion(actual);
     }
@@ -855,7 +855,7 @@ winpty_spawn(winpty_t *wp,
         if (thread_handle != nullptr) { *thread_handle = nullptr; }
         if (create_process_error != nullptr) { *create_process_error = 0; }
 
-        LockGuard<Mutex> lock(wp->mutex);
+        std::lock_guard<std::mutex> lock(wp->mutex);
         RpcOperation rpc(*wp);
 
         // Send spawn request.
@@ -922,7 +922,7 @@ winpty_set_size(winpty_t *wp, int cols, int rows,
                 winpty_error_ptr_t *err /*OPTIONAL*/) {
     API_TRY {
         ASSERT(wp != nullptr && cols > 0 && rows > 0);
-        LockGuard<Mutex> lock(wp->mutex);
+        std::lock_guard<std::mutex> lock(wp->mutex);
         RpcOperation rpc(*wp);
         auto packet = newPacket();
         packet.putInt32(AgentMsg::SetSize);
@@ -941,7 +941,7 @@ winpty_get_console_process_list(winpty_t *wp, int *processList, const int proces
     API_TRY {
         ASSERT(wp != nullptr);
         ASSERT(processList != nullptr);
-        LockGuard<Mutex> lock(wp->mutex);
+        std::lock_guard<std::mutex> lock(wp->mutex);
         RpcOperation rpc(*wp);
         auto packet = newPacket();
         packet.putInt32(AgentMsg::GetConsoleProcessList);

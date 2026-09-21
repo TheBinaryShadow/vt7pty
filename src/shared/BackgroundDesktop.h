@@ -31,15 +31,14 @@ class BackgroundDesktop {
 public:
     BackgroundDesktop();
     ~BackgroundDesktop() { dispose(); }
-    void dispose() WINPTY_NOEXCEPT;
+    void dispose() noexcept;
     const std::wstring &desktopName() const { return m_newDesktopName; }
 
     BackgroundDesktop(const BackgroundDesktop &other) = delete;
     BackgroundDesktop &operator=(const BackgroundDesktop &other) = delete;
 
-    // We can't default the move constructor and assignment operator with
-    // MSVC 2013.  We *could* if we required at least MSVC 2015 to build.
-
+    // Transfer raw desktop handles explicitly so the source no longer owns
+    // them after the move.
     BackgroundDesktop(BackgroundDesktop &&other) :
             m_originalStation(other.m_originalStation),
             m_newStation(other.m_newStation),

@@ -21,8 +21,6 @@
 #ifndef WINPTY_GEN_RANDOM_H
 #define WINPTY_GEN_RANDOM_H
 
-// The original MinGW requires that we include wincrypt.h.  With MinGW-w64 and
-// MSVC, including windows.h is sufficient.
 #include <windows.h>
 #include <wincrypt.h>
 

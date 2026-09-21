@@ -21,17 +21,15 @@
 #ifndef DEBUGCLIENT_H
 #define DEBUGCLIENT_H
 
-#include "winpty_snprintf.h"
-
 bool isTracingEnabled();
 bool hasDebugFlag(const char *flag);
-void trace(const char *format, ...) WINPTY_SNPRINTF_FORMAT(1, 2);
+void trace(const char *format, ...);
 
 // This macro calls trace without evaluating the arguments.
 #define TRACE(format, ...)                          \
     do {                                            \
         if (isTracingEnabled()) {                   \
-            trace((format), ## __VA_ARGS__);        \
+            trace((format) __VA_OPT__(,) __VA_ARGS__); \
         }                                           \
     } while (false)
 

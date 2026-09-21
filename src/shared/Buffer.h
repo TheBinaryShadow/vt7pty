@@ -54,18 +54,14 @@ public:
     void putWString(const std::wstring &str)    { putWString(str.data(), str.size()); }
     std::vector<char> &buf()                    { return m_buf; }
 
-    // MSVC 2013 does not generate these automatically, so help it out.
-    WriteBuffer(WriteBuffer &&other) : m_buf(std::move(other.m_buf)) {}
-    WriteBuffer &operator=(WriteBuffer &&other) {
-        m_buf = std::move(other.m_buf);
-        return *this;
-    }
+    WriteBuffer(WriteBuffer &&other) = default;
+    WriteBuffer &operator=(WriteBuffer &&other) = default;
 };
 
 class ReadBuffer {
 public:
     class DecodeError : public WinptyException {
-        virtual const wchar_t *what() const WINPTY_NOEXCEPT override {
+        virtual const wchar_t *what() const noexcept override {
             return L"DecodeError: RPC message decoding error";
         }
     };
@@ -89,14 +85,8 @@ public:
     std::wstring getWString();
     void assertEof();
 
-    // MSVC 2013 does not generate these automatically, so help it out.
-    ReadBuffer(ReadBuffer &&other) :
-        m_buf(std::move(other.m_buf)), m_off(other.m_off) {}
-    ReadBuffer &operator=(ReadBuffer &&other) {
-        m_buf = std::move(other.m_buf);
-        m_off = other.m_off;
-        return *this;
-    }
+    ReadBuffer(ReadBuffer &&other) = default;
+    ReadBuffer &operator=(ReadBuffer &&other) = default;
 };
 
 #endif // WINPTY_SHARED_BUFFER_H

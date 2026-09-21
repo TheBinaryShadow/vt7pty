@@ -3,16 +3,16 @@
 #include <stdarg.h>
 #include <wchar.h>
 
-#include "../src/shared/OsModule.h"
-#include "../src/shared/StringUtil.h"
+#include "../../src/shared/OsModule.h"
+#include "../../src/shared/StringFormatting.h"
+#include "../../src/shared/StringUtil.h"
 
 #include "TestUtil.cc"
-#include "../src/shared/StringUtil.cc"
+#include "../../src/shared/StringUtil.cc"
 
 #define COUNT_OF(x) (sizeof(x) / sizeof((x)[0]))
 
-// Some of these types and functions are missing from the MinGW headers.
-// Others are undocumented.
+// These inherited declarations cover undocumented console-font APIs.
 
 struct AGENT_CONSOLE_FONT_INFO {
     DWORD nFont;
@@ -160,14 +160,14 @@ static void dumpFontTable(HANDLE conout) {
     size_t first = 0;
     while (first < table.size()) {
         size_t last = std::min(table.size() - 1, first + 10 - 1);
-        winpty_snprintf(tmp, "%02u-%02u:",
+        formatString(tmp, "%02u-%02u:",
             static_cast<unsigned>(first), static_cast<unsigned>(last));
         line = tmp;
         for (size_t i = first; i <= last; ++i) {
             if (i % 10 == 5) {
                 line += "  - ";
             }
-            winpty_snprintf(tmp, " %2dx%-2d",
+            formatString(tmp, " %2dx%-2d",
                 table[i].second.X, table[i].second.Y);
             line += tmp;
         }
@@ -183,7 +183,7 @@ static std::string stringToCodePoints(const std::wstring &str) {
     std::string ret = "(";
     for (size_t i = 0; i < str.size(); ++i) {
         char tmp[32];
-        winpty_snprintf(tmp, "%X", str[i]);
+        formatString(tmp, "%X", str[i]);
         if (ret.size() > 1) {
             ret.push_back(' ');
         }

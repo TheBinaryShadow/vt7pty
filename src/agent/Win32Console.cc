@@ -66,8 +66,8 @@ std::wstring Win32Console::title()
         // work around this, we must pass GetConsoleTitleW a buffer that is
         // twice as large as what is actually needed.
         //
-        // See misc/*/Test_GetConsoleTitleW.cc for tests demonstrating Windows'
-        // behavior.
+        // The original focused test is preserved in Git history; retain this
+        // workaround until Windows 7 console-title coverage replaces it.
 
         DWORD count = GetConsoleTitleW(m_titleWorkBuf.data(),
                                        m_titleWorkBuf.size());

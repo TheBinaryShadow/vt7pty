@@ -28,7 +28,7 @@
 #include <utility>
 
 #include "../shared/WinptyAssert.h"
-#include "../shared/winpty_snprintf.h"
+#include "../shared/StringFormatting.h"
 
 #include "ConsoleFont.h"
 #include "Win32Console.h"
@@ -327,7 +327,7 @@ void Scraper::syncConsoleContentAndSize(
     //  - Prior to Windows 8, the size of a ReadConsoleOutputW call was limited
     //    by the ~32KB RPC buffer.
     //  - Prior to Windows 10, an out-of-range read region crashes the caller.
-    //    (See misc/WindowsBugCrashReader.cc.)
+    //    (See tests/manual/WindowsBugCrashReader.cc.)
     //
     if (!m_console.isNewW10() || forceResize) {
         m_console.setFrozen(true);
@@ -652,7 +652,7 @@ void Scraper::syncMarkerText(CHAR_INFO (&output)[SYNC_MARKER_LEN])
     // XXX: The marker text generated here could easily collide with ordinary
     // console output.  Does it make sense to try to avoid the collision?
     char str[SYNC_MARKER_LEN + 1];
-    winpty_snprintf(str, "S*Y*N*C*%08x", m_syncCounter);
+    formatString(str, "S*Y*N*C*%08x", m_syncCounter);
     for (int i = 0; i < SYNC_MARKER_LEN; ++i) {
         output[i].Char.UnicodeChar = str[i];
         output[i].Attributes = 7;

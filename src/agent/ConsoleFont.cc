@@ -36,7 +36,7 @@
 #include "../shared/StringUtil.h"
 #include "../shared/WindowsVersion.h"
 #include "../shared/WinptyAssert.h"
-#include "../shared/winpty_snprintf.h"
+#include "../shared/StringFormatting.h"
 
 namespace {
 
@@ -81,7 +81,7 @@ struct Font {
 // prior to Windows 10 (including Windows 10's legacy mode), and it's
 // especially broken in Windows 8 and 8.1.
 //
-// Test by running: misc/Utf16Echo A2 A3 2014 3044 30FC 4000
+// Test with: fixture-utf16-echo A2 A3 2014 3044 30FC 4000
 //
 // The first three codepoints are always rendered as half-width with the
 // Windows Japanese fonts.  (Of these, the first two must be half-width,
@@ -108,9 +108,9 @@ struct Font {
 //
 
 // See:
-//  - misc/Font-Report-June2016 directory for per-size details
-//  - misc/font-notes.txt
-//  - misc/Utf16Echo.cc, misc/FontSurvey.cc, misc/SetFont.cc, misc/GetFont.cc
+//  - docs/historical/Font-Report-June2016 for per-size details
+//  - docs/historical/ConsoleFontNotes.txt
+//  - tests/fixtures/Utf16Echo.cc and the font probes under tests/manual
 
 const FontSize kLucidaFontSizes[] = {
     { 5, 3 },
@@ -239,8 +239,7 @@ const FontSize k950MingLight[] = {
     { 72, 36 },
 };
 
-// Some of these types and functions are missing from the MinGW headers.
-// Others are undocumented.
+// These private legacy-console declarations are absent from the public SDK.
 
 struct AGENT_CONSOLE_FONT_INFO {
     DWORD nFont;
@@ -391,14 +390,14 @@ static void dumpFontTable(HANDLE conout, const char *prefix) {
     size_t first = 0;
     while (first < table.size()) {
         size_t last = std::min(table.size() - 1, first + 10 - 1);
-        winpty_snprintf(tmp, "%sfonts %02u-%02u:",
+        formatString(tmp, "%sfonts %02u-%02u:",
             prefix, static_cast<unsigned>(first), static_cast<unsigned>(last));
         line = tmp;
         for (size_t i = first; i <= last; ++i) {
             if (i % 10 == 5) {
                 line += "  - ";
             }
-            winpty_snprintf(tmp, " %2dx%-2d",
+            formatString(tmp, " %2dx%-2d",
                 table[i].second.X, table[i].second.Y);
             line += tmp;
         }
@@ -415,7 +414,7 @@ static std::string stringToCodePoints(const std::wstring &str) {
     std::string ret = "(";
     for (size_t i = 0; i < str.size(); ++i) {
         char tmp[32];
-        winpty_snprintf(tmp, "%X", str[i]);
+        formatString(tmp, "%X", str[i]);
         if (ret.size() > 1) {
             ret.push_back(' ');
         }
@@ -432,7 +431,7 @@ static void dumpFontInfoEx(
         return;
     }
     std::wstring faceName(infoex.FaceName,
-        winpty_wcsnlen(infoex.FaceName, COUNT_OF(infoex.FaceName)));
+        wcsnlen(infoex.FaceName, COUNT_OF(infoex.FaceName)));
     trace("%snFont=%u dwFontSize=(%d,%d) "
         "FontFamily=0x%x FontWeight=%u FaceName=%s %s",
         prefix,

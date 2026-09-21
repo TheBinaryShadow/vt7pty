@@ -8,12 +8,12 @@
 #include <vector>
 #include <string>
 
-#include "../src/shared/DebugClient.h"
-#include "../src/shared/TimeMeasurement.h"
+#include "../../src/shared/DebugClient.h"
+#include "TimeMeasurement.h"
 
-#include "../src/shared/DebugClient.cc"
-#include "../src/shared/WinptyAssert.cc"
-#include "../src/shared/WinptyException.cc"
+#include "../../src/shared/DebugClient.cc"
+#include "../../src/shared/WinptyAssert.cc"
+#include "../../src/shared/WinptyException.cc"
 
 // Launch this test program again, in a new console that we will destroy.
 static void startChildProcess(const wchar_t *args) {

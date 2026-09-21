@@ -29,9 +29,9 @@
 
 /* On 32-bit Windows, winpty functions have the default __cdecl (not __stdcall)
  * calling convention.  (64-bit Windows has only a single calling convention.)
- * When compiled with __declspec(dllexport), with either MinGW or MSVC, the
- * winpty functions are unadorned--no underscore prefix or '@nn' suffix--so
- * GetProcAddress can be used easily. */
+ * When compiled with __declspec(dllexport), the winpty functions are
+ * unadorned--no underscore prefix or '@nn' suffix--so GetProcAddress can be
+ * used easily. */
 #ifdef COMPILING_WINPTY_DLL
 #define WINPTY_API __declspec(dllexport)
 #else

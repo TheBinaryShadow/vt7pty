@@ -30,16 +30,9 @@
 #include "UnicodeEncoding.h"
 #include "../shared/DebugClient.h"
 #include "../shared/WinptyAssert.h"
-#include "../shared/winpty_snprintf.h"
+#include "../shared/StringFormatting.h"
 
 #define CSI "\x1b["
-
-// Work around the old MinGW, which lacks COMMON_LVB_LEADING_BYTE and
-// COMMON_LVB_TRAILING_BYTE.
-const int WINPTY_COMMON_LVB_LEADING_BYTE  = 0x100;
-const int WINPTY_COMMON_LVB_TRAILING_BYTE = 0x200;
-const int WINPTY_COMMON_LVB_REVERSE_VIDEO = 0x4000;
-const int WINPTY_COMMON_LVB_UNDERSCORE    = 0x8000;
 
 const int COLOR_ATTRIBUTE_MASK =
         FOREGROUND_BLUE |
@@ -50,8 +43,8 @@ const int COLOR_ATTRIBUTE_MASK =
         BACKGROUND_GREEN |
         BACKGROUND_RED |
         BACKGROUND_INTENSITY |
-        WINPTY_COMMON_LVB_REVERSE_VIDEO |
-        WINPTY_COMMON_LVB_UNDERSCORE;
+        COMMON_LVB_REVERSE_VIDEO |
+        COMMON_LVB_UNDERSCORE;
 
 const int FLAG_RED    = 1;
 const int FLAG_GREEN  = 2;
@@ -115,7 +108,7 @@ static void outputSetColor(std::string &out, int color)
     if (color & BACKGROUND_BLUE)      back |= FLAG_BLUE;
     if (color & BACKGROUND_INTENSITY) back |= FLAG_BRIGHT;
 
-    if (color & WINPTY_COMMON_LVB_REVERSE_VIDEO) {
+    if (color & COMMON_LVB_REVERSE_VIDEO) {
         // n.b.: The COMMON_LVB_REVERSE_VIDEO flag also swaps
         // FOREGROUND_INTENSITY and BACKGROUND_INTENSITY.  Tested on
         // Windows 10 v14393.
@@ -205,7 +198,7 @@ static void outputSetColor(std::string &out, int color)
         // which some terminals support.
         out.append(";8");
     }
-    if (color & WINPTY_COMMON_LVB_UNDERSCORE) {
+    if (color & COMMON_LVB_UNDERSCORE) {
         out.append(";4");
     }
     out.push_back('m');
@@ -252,8 +245,8 @@ static inline bool isFullWidthCharacter(const CHAR_INFO *data, int width)
         return false;
     }
     return
-        (data[0].Attributes & WINPTY_COMMON_LVB_LEADING_BYTE) &&
-        (data[1].Attributes & WINPTY_COMMON_LVB_TRAILING_BYTE) &&
+        (data[0].Attributes & COMMON_LVB_LEADING_BYTE) &&
+        (data[1].Attributes & COMMON_LVB_TRAILING_BYTE) &&
         data[0].Char.UnicodeChar == data[1].Char.UnicodeChar;
 }
 
@@ -437,7 +430,7 @@ void Terminal::showTerminalCursor(int column, int64_t line)
     if (!m_plainMode) {
         if (m_remoteColumn != column) {
             char buffer[32];
-            winpty_snprintf(buffer, CSI "%dG", column + 1);
+            formatString(buffer, CSI "%dG", column + 1);
             m_output.write(buffer);
             m_lineDataValid = (column == 0);
             m_lineData.clear();
@@ -483,7 +476,7 @@ void Terminal::moveTerminalToLine(int64_t line)
             // Backtrack and overwrite previous lines.
             // CUrsor Up (CUU)
             char buffer[32];
-            winpty_snprintf(buffer, "\r" CSI "%uA",
+            formatString(buffer, "\r" CSI "%uA",
                 static_cast<unsigned int>(m_remoteLine - line));
             m_output.write(buffer);
             m_remoteLine = line;
@@ -521,7 +514,7 @@ void Terminal::enableMouseMode(bool enabled)
         // some terminals, both modes will be enabled, but 1006 will have
         // priority.  On other terminals, 1006 wins because it's listed last.
         //
-        // See misc/MouseInputNotes.txt for details.
+        // See docs/historical/MouseInputNotes.txt for details.
         m_output.write(
             CSI "?1005l"
             CSI "?1000h" CSI "?1002h" CSI "?1003h" CSI "?1015h" CSI "?1006h");

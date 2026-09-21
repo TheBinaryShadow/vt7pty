@@ -18,10 +18,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#ifndef UNIX_CTRL_CHARS_H
-#define UNIX_CTRL_CHARS_H
+#ifndef VT7PTY_SHARED_CONTROL_CHARACTERS_H
+#define VT7PTY_SHARED_CONTROL_CHARACTERS_H
 
-inline char decodeUnixCtrlChar(char ch) {
+inline char decodeControlCharacter(char ch) {
     const char ctrlKeys[] = {
         /* 0x00 */ '@', /* 0x01 */ 'A', /* 0x02 */ 'B', /* 0x03 */ 'C',
         /* 0x04 */ 'D', /* 0x05 */ 'E', /* 0x06 */ 'F', /* 0x07 */ 'G',
@@ -42,4 +42,4 @@ inline char decodeUnixCtrlChar(char ch) {
     }
 }
 
-#endif // UNIX_CTRL_CHARS_H
+#endif // VT7PTY_SHARED_CONTROL_CHARACTERS_H

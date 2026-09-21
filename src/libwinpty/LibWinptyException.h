@@ -33,15 +33,15 @@ public:
     LibWinptyException(winpty_result_t code, const wchar_t *what) :
         m_code(code), m_what(std::make_shared<std::wstring>(what)) {}
 
-    winpty_result_t code() const WINPTY_NOEXCEPT {
+    winpty_result_t code() const noexcept {
         return m_code;
     }
 
-    const wchar_t *what() const WINPTY_NOEXCEPT override {
+    const wchar_t *what() const noexcept override {
         return m_what->c_str();
     }
 
-    std::shared_ptr<std::wstring> whatSharedStr() const WINPTY_NOEXCEPT {
+    std::shared_ptr<std::wstring> whatSharedStr() const noexcept {
         return m_what;
     }
 

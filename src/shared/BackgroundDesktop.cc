@@ -87,7 +87,7 @@ BackgroundDesktop::BackgroundDesktop() {
     }
 }
 
-void BackgroundDesktop::dispose() WINPTY_NOEXCEPT {
+void BackgroundDesktop::dispose() noexcept {
     if (m_originalStation != nullptr) {
         SetProcessWindowStation(m_originalStation);
         m_originalStation = nullptr;

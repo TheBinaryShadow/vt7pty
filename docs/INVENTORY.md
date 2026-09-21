@@ -1,11 +1,11 @@
 # Inherited Component Inventory
 
-Status: completed for Roadmap Step 0.1 and maintained as components move.
-Updated: 2026-09-21.
+Status: completed for Roadmap Step 0.1 and updated through Step 0.3.
+Updated: 2026-09-22.
 
-This inventory classifies the WinPTY-derived tree before build replacement,
-removal, technical rebranding, or runtime modernization. It describes intended
-Milestone 0 treatment, not work already performed.
+This inventory began as the classification of the inherited WinPTY tree. It is
+kept current as items move or are removed so the disposition of inherited
+material remains reviewable.
 
 ## Classification
 
@@ -63,21 +63,21 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | `Buffer.*` | RPC message serialization and parsing | Retain; add bounds/malformed-message tests and typed size handling |
 | `DebugClient.*` | Native diagnostic transport | Retain, rebrand, and modernize with bounded structured logging |
 | `GenRandom.*` | Random identifiers for pipes and objects | Retain; modernize size conversions and verify failure handling |
-| `Mutex.h` | Mutex/lock shim for old MinGW | Replace with standard C++ synchronization, then remove |
+| `Mutex.h` | Mutex/lock shim for old MinGW | Replaced with `std::mutex` and removed in Step 0.3 |
 | `OsModule.h` | Dynamic module/symbol lookup | Retain and modernize for explicit Windows 7-safe capability detection |
 | `OwnedHandle.*` | Move-only Win32 handle ownership | Retain and modernize rather than replace for style alone |
-| `PrecompiledHeader.h` | Legacy common include set | Replace with the MSBuild-era include/precompiled-header policy |
+| `PrecompiledHeader.h` | Legacy common include set | Removed in Step 0.3; projects use explicit includes and shared MSBuild policy |
 | `StringBuilder.h`, `StringBuilderTest.cc` | Diagnostic string builder and standalone test | Retain behavior; rehome test and evaluate standard C++ replacement during modernization |
 | `StringUtil.*` | UTF-16 formatting and error strings | Retain; modernize conversions and bounds |
-| `TimeMeasurement.h` | Small timing helper | Rehome with tests/diagnostics if still used; otherwise remove after reference audit |
-| `UnixCtrlChars.h` | Control-character constants used by Windows input parsing | Retain behavior and rename to a platform-neutral control-character header |
+| `TimeMeasurement.h` | Small timing helper | Rehomed to `tests/manual` in Step 0.3 |
+| `ControlCharacters.h` (formerly `UnixCtrlChars.h`) | Control-character decoding used by Windows input parsing | Retained under a platform-neutral name in Step 0.3 |
 | `WindowsSecurity.*` | Security descriptors, pipe/process identity, token data | Retain as a security boundary; modernize conversions and add focused tests |
 | `WindowsVersion.*` | OS detection, architecture, native process launch helpers | Retain required launch work; remove x86, XP/Vista, old MinGW, and deprecated version-detection paths |
-| `winpty_snprintf.h` | Formatting shim for old MSVC, MinGW, Cygwin, and MSYS | Replace with current C++/MSVC formatting helpers, then remove |
+| `StringFormatting.h` (replaces `winpty_snprintf.h`) | Bounded diagnostic formatting | Uses the current C++ runtime; the retired-compiler shim was removed in Step 0.3 |
 | `WinptyAssert.*` | Agent-aware assertion reporting | Retain responsibility; rebrand and integrate with diagnostics |
 | `WinptyException.*` | Internal exception hierarchy and old `noexcept` shim | Retain hierarchy, remove compiler shim, and rebrand |
 | `WinptyVersion.*` | Reports generated version and commit | Replace with authoritative VT7Pty package/API/protocol/source identity |
-| `GetCommitHash.bat`, `UpdateGenVersion.bat` | GYP-era generated version header | Replace with MSBuild targets, then remove |
+| `GetCommitHash.bat`, `UpdateGenVersion.bat` | GYP-era generated version header | Replaced by MSBuild/PowerShell generation and removed in Step 0.3 |
 
 ## Executables, tests, and adapter
 
@@ -87,23 +87,23 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | `src/debugserver/subdir.mk` | GNU Make source list | Replace, then remove |
 | `src/tests/trivial_test.cc` | Opens a session, connects pipes, spawns a child, validates output and exit code | Retain and rehome as an integration test |
 | `src/tests/subdir.mk` | GNU Make test rule | Replace, then remove |
-| `src/unix-adapter/*` | Cygwin/MSYS terminal frontend, POSIX input/output, wakeup FD, utility wrappers | Remove in full after the native MSBuild baseline is reproduced |
-| `src/unix-adapter/subdir.mk` | Unix-adapter build membership | Remove with the adapter |
+| `src/unix-adapter/*` | Cygwin/MSYS terminal frontend, POSIX input/output, wakeup FD, utility wrappers | Removed in Step 0.3 after the native MSBuild baseline was reproduced |
+| `src/unix-adapter/subdir.mk` | Unix-adapter build membership | Removed with the adapter in Step 0.3 |
 
 ## Build, packaging, and repository infrastructure
 
 | Path | Current responsibility | Classification and destination |
 | --- | --- | --- |
-| `src/winpty.gyp`, `src/configurations.gypi`, `vcbuild.bat` | Python 2/GYP generation of VS2013/2015 projects, Win32/x64 and XP toolsets | Replace with checked-in VS2022/MSBuild files, then remove |
-| `configure`, `Makefile`, `src/subdir.mk`, component `subdir.mk` files | Cygwin/MSYS/MinGW configuration and GNU Make build | Remove after MSBuild contains the retained native source membership |
-| `appveyor.yml` | VS2015 job installing Cygwin/MSYS/MinGW and invoking Python 2 shipping | Remove; no hosted replacement is planned |
-| `ship/common_ship.py`, `ship/ship.py` | Python 2 environment, Unix variants, tar packaging | Replace retained manifest/hash/package duties with PowerShell, then remove |
-| `ship/make_msvc_package.py` | VS2013/2015, x86/x64, XP/non-XP ZIP production | Replace with x64 Windows 7+ packaging, then remove |
-| `ship/build-pty4j-libpty.bat` | IntelliJ/pty4j-specific legacy native packaging | Remove; unrelated to the VT7-first package contract |
-| `.gitignore` | Generated-file policy for inherited build routes | Replace entries as the new layout lands |
-| `.gitattributes` | Text and line-ending policy | Retain and update for new MSBuild/PowerShell/resource files |
+| `src/winpty.gyp`, `src/configurations.gypi`, `vcbuild.bat` | Python 2/GYP generation of VS2013/2015 projects, Win32/x64 and XP toolsets | Replaced by checked-in VS2022/MSBuild files and removed in Step 0.3 |
+| `configure`, `Makefile`, `src/subdir.mk`, component `subdir.mk` files | Cygwin/MSYS/MinGW configuration and GNU Make build | Removed in Step 0.3 after MSBuild captured retained membership |
+| `appveyor.yml` | VS2015 job installing Cygwin/MSYS/MinGW and invoking Python 2 shipping | Removed in Step 0.3; no hosted replacement is planned |
+| `ship/common_ship.py`, `ship/ship.py` | Python 2 environment, Unix variants, tar packaging | Manifest, hash, and package duties moved to PowerShell; removed in Step 0.3 |
+| `ship/make_msvc_package.py` | VS2013/2015, x86/x64, XP/non-XP ZIP production | Replaced by the x64 Windows 7+ PowerShell packager and removed in Step 0.3 |
+| `ship/build-pty4j-libpty.bat` | IntelliJ/pty4j-specific legacy native packaging | Removed in Step 0.3 as unrelated to the VT7-first package contract |
+| `.gitignore` | Generated-file policy | Updated for the maintained artifact, package, and MSBuild layout in Step 0.3 |
+| `.gitattributes` | Text and line-ending policy | Updated for the maintained MSBuild/PowerShell/resource files in Step 0.3 |
 | `VERSION.txt` | Single inherited `0.4.4-dev` string | Replace with authoritative `0.5.0-dev` version input during technical rebranding |
-| `tools/baseline/*` | Temporary reproducible capture of the inherited native boundary | Retain through Milestone 0 comparison; archive or remove after the permanent test/build evidence supersedes it |
+| `tools/baseline/*` | Temporary reproducible capture of the inherited native boundary | Removed in Step 0.3 after its results and commands were preserved in validation records |
 
 ## Documentation and provenance
 
@@ -114,36 +114,24 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | VT7Pty root policies and `docs/*.md` | Retain and update with implementation evidence |
 | `docs/validation/*` | Retain immutable milestone evidence; corrections append or supersede transparently |
 
-## `misc` native probes and research
+## Resolved `misc` classification
 
-The `misc` directory is not removed wholesale. Each item has a disposition so
-useful knowledge does not disappear with Unix-era tooling.
+Step 0.3 removed the `misc` container after classifying every item. Useful
+Windows-native probes now live under `tests`, developer utilities under
+`tools`, and research notes under `docs/historical`. Git history preserves the
+discarded experiments and obsolete scripts.
 
 | Item | Classification and destination |
 | --- | --- |
-| `.gitignore` | Merge relevant fixture outputs into the root ignore policy, then remove |
-| `build32.sh`, `build64.sh` | Remove; superseded Unix-shell compiler wrappers |
-| `color-test.sh` | Replace useful color patterns with a native fixture, then remove |
-| `DebugClient.py`, `DebugServer.py` | Remove after native diagnostics cover their useful behavior; pywin32/Python helpers are not retained |
-| `DumpLines.py`, `Spew.py` | Replace with deterministic native output fixtures, then remove |
-| `UnixEcho.cc` | Remove; Unix terminal-mode experiment |
-| `Notes.txt` | Archive any unique console findings; discard obsolete build commands |
-| `EnableExtendedFlags.txt`, `MouseInputNotes.txt`, `font-notes.txt` | Rehome under `docs/historical` as input/font research |
-| `Font-Report-June2016/*` | Rehome under `docs/historical` as dated console-font evidence |
-| `TestUtil.cc`, `FormatChar.h` | Rehome as maintained fixture/test helpers and convert included `.cc` patterns to ordinary compilation where appropriate |
+| `.gitignore`, `build32.sh`, `build64.sh`, `color-test.sh` | Removed; root policy and native MSBuild fixtures cover retained duties |
+| `DebugClient.py`, `DebugServer.py`, `DumpLines.py`, `Spew.py` | Removed; native diagnostics and deterministic output fixtures cover retained duties |
+| `UnixEcho.cc`, `GetCh.cc`, `FormatChar.h`, `ConinMode.ps1` | Removed after duplicate and retained behavior review |
+| `Notes.txt`, input/mouse/font notes, `Font-Report-June2016/*` | Preserved under `docs/historical` |
 | `ShowArgv.cc`, `ShowConsoleInput.cc`, `Utf16Echo.cc`, `Win32Echo1.cc`, `Win32Echo2.cc`, `Win32Write1.cc`, `WriteConsole.cc` | Rehomed under `tests/fixtures` with maintained MSBuild projects in Step 0.2 |
-| `GetCh.cc` | Evaluate against the maintained `_getch` fixture, then rehome unique behavior or remove the duplicate |
-| `ConinMode.cc`, `ConoutMode.cc` | Rehomed under `tools/console` with maintained MSBuild projects in Step 0.2 |
-| `ConinMode.ps1` | Rehome or remove after its behavior is compared with the maintained native mode tool |
-| `GetConsolePos.cc`, `MoveConsoleWindow.cc`, `SetBufferSize.cc`, `SetBufInfo.cc`, `SetCursorPos.cc`, `SetWindowRect.cc` | Rehome as console geometry/manual diagnostic tools; automate only where assertions are stable |
-| `ChangeScreenBuffer.cc`, `ClearConsole.cc`, `ScreenBufferTest.cc`, `ScreenBufferTest2.cc` | Rehome as screen-buffer behavior tests; split destructive/manual scenarios from routine verification |
-| `BufferResizeTests.cc`, `Win10ResizeWhileFrozen.cc`, `Win10WrapTest1.cc`, `Win10WrapTest2.cc` | Rehome as version-aware resize/wrap tests and research fixtures |
-| `FreezePerfTest.cc`, `ScreenBufferFreezeInactive.cc`, `SelectAllTest.cc`, `VkEscapeTest.cc` | Rehome as isolated selection/freeze/manual tests with bounded cleanup |
-| `UnicodeDoubleWidthTest.cc`, `UnicodeWideTest1.cc`, `UnicodeWideTest2.cc`, `VeryLargeRead.cc` | Rehome as Unicode/large-read research and derive deterministic regression cases |
-| `FontSurvey.cc`, `GetFont.cc`, `SetFont.cc` | Rehome as font diagnostic tools used to validate the Windows 7+ font rewrite |
-| `IsNewConsole.cc`, `OSVersion.cc` | Rehome temporarily as platform probes; remove when permanent capability/version tests supersede them |
-| `Win32Test1.cc`, `Win32Test2.cc`, `Win32Test3.cc` | Rehome useful window-station, selection, and console behavior cases; remove pre-Windows 7-only assumptions |
-| `winbug-15048.cc`, `WindowsBugCrashReader.cc` | Archive and keep any executable form in an explicitly destructive/manual test group |
+| `OutputLines.cc`, `ConsoleColorGrid.cc` | Added as native replacements for the useful deterministic output and color patterns |
+| `ConinMode.cc`, `ConoutMode.cc`, `IdentifyConsoleWindow.ps1` | Rehomed under `tools/console` |
+| Remaining native console, resize, screen-buffer, Unicode, font, platform, and bug probes | Rehomed individually under `tests/manual`; disruptive cases are explicitly documented |
+| `TestUtil.cc`, `TimeMeasurement.h`, `UnicodeEncodingTest.cc` | Rehomed under `tests/manual`; permanent test integration remains Step 0.8 |
 
 ## Removal gates
 
@@ -154,7 +142,7 @@ replacement or evidence exists. In particular:
    Python 2 packaging, or their source lists disappear.
 2. Physical Windows 7 evidence must precede removal of the background-desktop
    path and XP/Vista public flag.
-3. Useful native probes must reach their new test/tool/document location before
-   `misc` cleanup.
+3. Useful native probes reached their new test/tool/document locations before
+   `misc` was removed in Step 0.3.
 4. Attribution, original notices, and historical release material remain even
    when their implementation paths are removed.
