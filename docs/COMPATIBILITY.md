@@ -1,7 +1,7 @@
 # VT7Pty Compatibility Contract
 
 Status: approved target contract; implementation unqualified. Updated:
-2026-09-21.
+2026-09-22.
 
 This document separates approved targets from verified support. A target is not
 a compatibility claim until an identified build passes the required procedure.
@@ -11,10 +11,10 @@ a compatibility claim until an identified build passes the required procedure.
 | Area | Current status |
 | --- | --- |
 | Source baseline | WinPTY `0.4.4-dev` at upstream commit `7e59fe2` |
-| Development host | Inherited x64 native components built and debugged through a temporary local harness on Windows 10 build 19044 |
+| Development host | Maintained x64 Debug/Release workflow verified and source-debugged on Windows 10 build 19044 |
 | Windows 7 runtime | Approved minimum target; no VT7Pty acceptance record yet |
 | Architectures | x64 is the approved product architecture; inherited x64 smoke tests passed locally |
-| Build interface | Inherited Python 2/GYP and GNU Make paths remain; the approved MSBuild workflow is not implemented yet |
+| Build interface | VS2022/MSBuild and repository PowerShell entry points; inherited build and packaging paths removed |
 | API and binaries | Inherited WinPTY names and behavior remain |
 | ConPTY compatibility | Not implemented; ConPTY is a design and behavioral reference |
 | VT7 integration | Planned; no integration claim |

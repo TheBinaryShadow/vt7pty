@@ -1,9 +1,8 @@
 # Building VT7Pty
 
 VT7Pty's supported Visual Studio/MSBuild workflow builds, verifies, packages,
-and source-debugs the inherited native boundary. The repository still contains
-WinPTY's old build and packaging systems until their removal in Roadmap Step
-0.3.
+and source-debugs the inherited native boundary. It is the repository's only
+active build and packaging workflow.
 
 See the [development foundation](docs/FOUNDATION.md),
 [roadmap](ROADMAP.md), [compatibility contract](docs/COMPATIBILITY.md), and
@@ -51,7 +50,7 @@ is a local and physical-machine process described in
 
 ## Current native identity
 
-Until technical rebranding in Roadmap Step 0.3, outputs remain:
+Until technical rebranding in Roadmap Step 0.5, outputs remain:
 
 - `winpty.dll`
 - `winpty-agent.exe`
@@ -76,23 +75,14 @@ The accepted build boundary and completed developer workflow are recorded in
 the [MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
 and [Step 0.2 completion validation](docs/validation/2026-09-22-step-0.2-completion.md).
 
-## Inherited build paths
+## Retired build paths
 
-The inherited [vcbuild.bat](vcbuild.bat) path requires Python 2, GYP, and an
-older Visual Studio-compatible configuration. The root `configure` and
-`Makefile` paths build Cygwin/MSYS and MinGW variants. The `ship` directory uses
-Python 2 packaging. AppVeyor describes the old upstream automation.
-
-These paths are historical inputs to the Milestone 0 inventory, not supported
-VT7Pty prerequisites. Do not extend them. They will be removed only after the
-new MSBuild and PowerShell workflow performs every retained responsibility and
-reproduces the recorded baseline.
-
-Roadmap Step 0.1 now has a temporary
-[baseline harness](tools/baseline/README.md) and an
-[accepted result record](docs/validation/2026-09-21-upstream-baseline.md). That
-harness exists only to compare the inherited source before the supported build
-lands; it is not a second product build system.
+Roadmap Step 0.3 removed the inherited GYP, GNU Make, Cygwin/MSYS, MinGW,
+Python 2 packaging, and AppVeyor paths after the maintained workflow reproduced
+their required native boundary. The temporary baseline harness was also
+retired after its results were preserved in the
+[accepted baseline record](docs/validation/2026-09-21-upstream-baseline.md).
+Git history retains every removed file.
 
 The preserved [upstream README](docs/UPSTREAM_WINPTY_README.md) contains the
 original commands for historical reference.

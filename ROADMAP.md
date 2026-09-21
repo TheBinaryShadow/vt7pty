@@ -103,8 +103,7 @@ of the inherited native backend.
 - [x] Record current development-host results, failures, limitations, and
   untested behavior without treating them as Windows 7 acceptance.
 
-Exit criterion met by the [component inventory](docs/INVENTORY.md), temporary
-[baseline harness](tools/baseline/README.md), and
+Exit criterion met by the [component inventory](docs/INVENTORY.md) and
 [accepted development-host baseline](docs/validation/2026-09-21-upstream-baseline.md).
 Physical Windows 7 execution remains a later step and is not implied here.
 

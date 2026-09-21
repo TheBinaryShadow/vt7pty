@@ -2,9 +2,8 @@
 *.bat           text eol=crlf
 *.c             text
 *.cc            text
-*.gyp           text
-*.gypi          text
 *.h             text
+*.md            text
 *.ps1           text eol=crlf
 *.props         text eol=crlf
 *.targets       text eol=crlf
@@ -13,13 +12,7 @@
 *.json          text eol=lf
 *.yml           text eol=lf
 *.rst           text
-*.sh            text
 *.txt           text
 .gitignore      text
 .gitattributes  text
-Makefile        text
-configure       text
-
-*.sh            eol=lf
-configure       eol=lf
 VERSION.txt     eol=lf

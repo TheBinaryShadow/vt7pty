@@ -16,9 +16,9 @@ behavior. We are building on years of engineering by both communities.
 
 VT7Pty is in early development. This repository currently contains the inherited
 WinPTY `0.4.4-dev` implementation, with a new project identity and development
-direction. Milestone 0 implementation has started with an accepted inherited
-baseline and a supported VS2022/MSBuild transition build. A VT7Pty-specific API
-and backend improvements remain planned work.
+direction. Milestone 0 implementation has an accepted inherited baseline and a
+supported VS2022/MSBuild developer workflow. A VT7Pty-specific API and backend
+improvements remain planned work.
 
 The [development foundation](docs/FOUNDATION.md) and
 [roadmap](ROADMAP.md) record the approved product and engineering direction.
@@ -27,10 +27,10 @@ adapter and pre-Windows 7 compatibility, establish the native VT7Pty 0.5.x
 identity, modernize the retained C++ code, and create the permanent local build,
 test, diagnostic, and release systems.
 
-All inherited components are still present, including the Cygwin/MSYS Unix
-adapter, tests, debugging tools, and build and packaging scripts. Binaries,
-API symbols, environment variables, and build targets retain their existing
-WinPTY names. The rebranding does not change runtime behavior.
+The Cygwin/MSYS adapter and superseded GYP, GNU Make, Python 2 packaging, and
+hosted-build infrastructure have been removed. Binaries, API symbols, and
+environment variables retain their existing WinPTY names until the technical
+rebranding step. The cleanup does not intentionally change runtime behavior.
 
 VT7Pty targets x64 Windows 7 SP1 and later. Windows XP, Windows Vista, and x86
 are outside the maintained product. Historical WinPTY support claims and
@@ -92,6 +92,7 @@ Useful starting points:
 - [Inherited component inventory](docs/INVENTORY.md)
 - [Accepted inherited native baseline](docs/validation/2026-09-21-upstream-baseline.md)
 - [Accepted MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
+- [Accepted Step 0.2 completion validation](docs/validation/2026-09-22-step-0.2-completion.md)
 - [Architecture and current data flows](docs/ARCHITECTURE.md)
 - [Testing strategy and evidence requirements](docs/TESTING.md)
 - [Compatibility targets and verified status](docs/COMPATIBILITY.md)

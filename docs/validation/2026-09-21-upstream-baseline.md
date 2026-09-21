@@ -18,7 +18,7 @@ modernization. It is comparison evidence, not Windows 7 acceptance.
 | Architecture | x64 |
 | Configurations | Debug and Release |
 
-The harness is [documented here](../../tools/baseline/README.md). Generated
+The temporary harness is preserved in Git history at commit `068b665`. Generated
 artifacts and full compiler/dumpbin logs remain under ignored `build/baseline`
 and can be regenerated from the recorded commit.
 

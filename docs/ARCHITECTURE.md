@@ -1,7 +1,7 @@
 # VT7Pty Architecture
 
-Status: current inherited architecture and planned boundaries. Updated:
-2026-09-21.
+Status: current inherited native architecture and planned boundaries. Updated:
+2026-09-22.
 
 This document describes the repository as it exists before Milestone 0
 implementation. Planned names and interfaces are identified explicitly. Source
@@ -26,10 +26,10 @@ output from the legacy console state.
 | `winpty-agent.exe` / `src/agent` | Owns the hidden console, launches the child, handles input, scrapes output, resizes, and manages session lifetime | Retain as the backend core |
 | `src/shared` | Shared handles, buffers, security, protocol, encoding, and diagnostics | Retain required native code |
 | `winpty-debugserver.exe` / `src/debugserver` | Collects timestamped diagnostic output | Retain, rebrand, and modernize |
-| `src/tests` and native probes in `misc` | Existing smoke tests and focused console investigations | Audit, retain useful coverage, and integrate with the new test system |
-| `winpty.exe` / `src/unix-adapter` | Cygwin/MSYS terminal adapter | Planned removal in Roadmap Step 0.2A |
+| `src/tests`, `tests`, and native probes | Existing smoke tests and focused console investigations | Retain useful coverage and integrate it with the permanent test system |
 
-No component has been removed or renamed yet.
+The Cygwin/MSYS `winpty.exe` adapter and its Unix-facing source have been
+removed. Runtime binaries and API symbols remain inherited until Step 0.5.
 
 ## Current session flow
 
