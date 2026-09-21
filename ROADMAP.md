@@ -182,17 +182,17 @@ obsolete compiler compatibility code.
 Outcome: the maintained runtime has one explicit Windows platform floor and no
 XP/Vista implementation burden.
 
-- [ ] Set `_WIN32_WINNT` and the associated platform configuration to Windows 7.
-- [ ] Remove Windows XP and Vista build, runtime, font, console, desktop, and
+- [x] Set `_WIN32_WINNT` and the associated platform configuration to Windows 7.
+- [x] Remove Windows XP and Vista build, runtime, font, console, desktop, and
   diagnostic compatibility paths.
-- [ ] Remove XP toolset logic and SDK workarounds.
+- [x] Remove XP toolset logic and SDK workarounds.
 - [ ] Evaluate the background-desktop workaround and remove it and its public
   flag if baseline and Windows 7 validation confirm it serves only pre-Windows 7.
-- [ ] Simplify console-font behavior around APIs available on Windows 7 SP1.
-- [ ] Replace obsolete OS-version checks with correct version or capability
+- [x] Simplify console-font behavior around APIs available on Windows 7 SP1.
+- [x] Replace obsolete OS-version checks with correct version or capability
   detection.
-- [ ] Preserve later-Windows behavior branches that remain useful.
-- [ ] Audit subsystem versions, manifests, imports, delay loading, dynamically
+- [x] Preserve later-Windows behavior branches that remain useful.
+- [x] Audit subsystem versions, manifests, imports, delay loading, dynamically
   resolved APIs, structures, flags, and runtime dependencies.
 - [ ] Verify startup and representative sessions on physical non-ESU and ESU
   Windows 7 SP1 x64 machines.

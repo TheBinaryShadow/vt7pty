@@ -39,7 +39,8 @@ GenRandom::GenRandom() : m_advapi32(L"advapi32.dll") {
     // [1] http://blogs.msdn.com/b/michael_howard/archive/2005/01/14/353379.aspx
     // [2] https://msdn.microsoft.com/en-us/library/windows/desktop/aa387694(v=vs.85).aspx
     //
-    // Both RtlGenRandom and the Crypto API functions exist in XP and up.
+    // Both RtlGenRandom and the Crypto API functions are available throughout
+    // the supported Windows 7+ platform range.
     m_rtlGenRandom = reinterpret_cast<RtlGenRandom_t*>(
         m_advapi32.proc("SystemFunction036"));
     // The OsModule class logs an error message if the proc is nullptr.

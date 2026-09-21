@@ -47,7 +47,7 @@ void largeConsoleRead(LargeConsoleReadBuffer &out,
     out.m_rect = readArea;
     out.m_rectWidth = readArea.width();
 
-    static const bool useLargeReads = isAtLeastWindows8();
+    static const bool useLargeReads = isWindows8OrGreater();
     if (useLargeReads) {
         buffer.read(readArea, out.m_data.data());
     } else {

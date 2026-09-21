@@ -3,7 +3,10 @@ param(
     [ValidateSet('Debug', 'Release')]
     [string]$Configuration = 'Release',
 
-    [switch]$NoVerify
+    [switch]$NoVerify,
+
+    [ValidatePattern('^[a-z0-9][a-z0-9.-]*$')]
+    [string]$PackageSuffix
 )
 
 $ErrorActionPreference = 'Stop'
@@ -16,6 +19,9 @@ $packageRoot = Join-Path $artifactRoot 'packages'
 $stagingRoot = Join-Path $artifactRoot 'package-staging'
 $version = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'VERSION.txt')).Trim()
 $packageName = "VT7Pty-$version-win7-x64-$($Configuration.ToLowerInvariant())"
+if ($PackageSuffix) {
+    $packageName += "-$PackageSuffix"
+}
 $stagingDirectory = Join-Path $stagingRoot $packageName
 $archivePath = Join-Path $packageRoot ($packageName + '.zip')
 $checksumPath = $archivePath + '.sha256'
@@ -56,6 +62,9 @@ $directories = @(
     (Join-Path $stagingDirectory 'include'),
     (Join-Path $stagingDirectory 'lib'),
     (Join-Path $stagingDirectory 'symbols'),
+    (Join-Path $stagingDirectory 'symbols\tests'),
+    (Join-Path $stagingDirectory 'tests'),
+    (Join-Path $stagingDirectory 'tools\platform'),
     $packageRoot
 )
 foreach ($directory in $directories) {
@@ -72,9 +81,22 @@ $copyPlan = [ordered]@{
     'symbols\winpty.pdb' = (Join-Path $binaryDirectory 'winpty.pdb')
     'symbols\winpty-agent.pdb' = (Join-Path $binaryDirectory 'winpty-agent.pdb')
     'symbols\winpty-debugserver.pdb' = (Join-Path $binaryDirectory 'winpty-debugserver.pdb')
+    'RUN-WINDOWS7-ACCEPTANCE.cmd' = (Join-Path $repositoryRoot 'RUN-WINDOWS7-ACCEPTANCE.cmd')
+    'tools\platform\Invoke-Windows7Acceptance.ps1' = (Join-Path $repositoryRoot 'tools\platform\Invoke-Windows7Acceptance.ps1')
     'LICENSE.txt' = (Join-Path $repositoryRoot 'LICENSE')
     'CREDITS.md' = (Join-Path $repositoryRoot 'CREDITS.md')
     'UPSTREAM.md' = (Join-Path $repositoryRoot 'UPSTREAM.md')
+}
+$testPrograms = @(
+    'StringBuilderTest', 'trivial_test',
+    'fixture-console-color-grid', 'fixture-output-lines', 'fixture-show-argv',
+    'fixture-show-console-input', 'fixture-utf16-echo', 'fixture-win32-echo1',
+    'fixture-win32-echo2', 'fixture-win32-write1', 'fixture-write-console',
+    'tool-conin-mode', 'tool-conout-mode'
+)
+foreach ($testProgram in $testPrograms) {
+    $copyPlan["tests\$testProgram.exe"] = Join-Path $binaryDirectory "$testProgram.exe"
+    $copyPlan["symbols\tests\$testProgram.pdb"] = Join-Path $binaryDirectory "$testProgram.pdb"
 }
 foreach ($relativePath in $copyPlan.Keys) {
     $sourcePath = $copyPlan[$relativePath]
@@ -110,6 +132,7 @@ $manifest = [ordered]@{
     Configuration = $Configuration
     Architecture = 'x64'
     MinimumOperatingSystem = 'Windows 7 SP1'
+    PackageSuffix = $PackageSuffix
     SourceCommit = $sourceCommit
     SourceTreeClean = ($sourceChanges.Count -eq 0)
     SourceTreeChanges = $sourceChanges

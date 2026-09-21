@@ -21,9 +21,7 @@
 #ifndef WINPTY_SHARED_WINDOWS_VERSION_H
 #define WINPTY_SHARED_WINDOWS_VERSION_H
 
-bool isAtLeastWindowsVista();
-bool isAtLeastWindows7();
-bool isAtLeastWindows8();
+bool isWindows8OrGreater();
 void dumpWindowsVersion();
 
 #endif // WINPTY_SHARED_WINDOWS_VERSION_H

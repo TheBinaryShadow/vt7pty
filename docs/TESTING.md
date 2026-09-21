@@ -67,9 +67,12 @@ fixture. It validates
 architecture, subsystem floor, direct imports, the inherited DLL export
 boundary, PDB presence, and generated artifact identity for all maintained
 binaries. Results and dumpbin evidence are written below ignored
-`artifacts/verification`. The interactive console fixtures are built and
-inspected here but remain reserved for focused tests that can provide their
-required console and input state.
+`artifacts/verification`. Verification also extracts every embedded manifest,
+requires the Windows 7 through Windows 11 compatibility declarations, rejects
+delay-loaded DLLs and a maintained set of post-Windows 7 direct imports, and
+runs real Command Prompt and Windows PowerShell sessions after a resize. The
+interactive console fixtures are built and inspected here but remain reserved
+for focused tests that can provide their required console and input state.
 
 Source and caller line resolution can be checked independently with:
 
@@ -121,6 +124,11 @@ resource budgets are deliverables of the relevant implementation step.
 Each run records hardware, OS build, installed-update state, package identity,
 commands, per-case results, durations, logs, dumps, and deviations from the
 previous accepted result.
+
+The portable, Windows PowerShell 5.1-compatible procedure is documented in
+[Windows 7 Platform Acceptance](WINDOWS7_ACCEPTANCE.md). A clean-tree package
+contains the runner, runtime binaries, native tests, fixtures, symbols, and a
+hash manifest. The same candidate ZIP is run on both tiers.
 
 ## Initial stress profiles
 

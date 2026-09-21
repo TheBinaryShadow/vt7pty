@@ -125,7 +125,7 @@ and parent failure require explicit tests.
 
 ## Planned boundaries
 
-Milestone 0 will replace the build system, remove adapter-only and pre-Windows 7
+Milestone 0 replaces the build system, removes adapter-only and pre-Windows 7
 code, modernize the retained C++ implementation, and rename the runtime without
 changing backend semantics without evidence. The approved
 artifact names are `VT7Pty.dll`, `VT7Pty-Agent.exe`, and

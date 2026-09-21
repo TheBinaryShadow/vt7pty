@@ -220,7 +220,7 @@ void NamedPipe::openServerPipe(LPCWSTR pipeName, OpenMode::t openMode,
     HANDLE handle = CreateNamedPipeW(
         pipeName,
         /*dwOpenMode=*/winOpenMode,
-        /*dwPipeMode=*/rejectRemoteClientsPipeFlag(),
+        /*dwPipeMode=*/PIPE_REJECT_REMOTE_CLIENTS,
         /*nMaxInstances=*/1,
         /*nOutBufferSize=*/outBufferSize,
         /*nInBufferSize=*/inBufferSize,

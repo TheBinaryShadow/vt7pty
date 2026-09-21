@@ -358,8 +358,8 @@ void ConsoleInput::flushInputRecords(std::vector<INPUT_RECORD> &records)
 // window station's keyboard, which has no necessary relationship to the winpty
 // instance.  It's unlikely to be an issue in practice, but it's conceivable.
 // (Imagine a foreground SSH server, where the local user holds down Ctrl,
-// while the remote user tries to use WSL navigation keys.)  I suspect using
-// the BackgroundDesktop mechanism in winpty would fix the problem.
+// while the remote user tries to use WSL navigation keys.)  This remains a
+// keyboard-state limitation to cover with focused input tests.
 //
 // https://github.com/rprichard/winpty/issues/116
 static void sendKeyMessage(HWND hwnd, bool isKeyDown, uint16_t virtualKey)

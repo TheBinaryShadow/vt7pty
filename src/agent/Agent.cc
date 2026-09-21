@@ -72,7 +72,7 @@ static BOOL WINAPI consoleCtrlHandler(DWORD dwCtrlType)
 static void detectNewWindows10Console(
         Win32Console &console, Win32ConsoleBuffer &buffer)
 {
-    if (!isAtLeastWindows8()) {
+    if (!isWindows8OrGreater()) {
         return;
     }
 
@@ -360,11 +360,9 @@ void Agent::handleStartProcessPacket(ReadBuffer &packet)
     const auto cmdline = packet.getWString();
     const auto cwd = packet.getWString();
     const auto env = packet.getWString();
-    const auto desktop = packet.getWString();
     packet.assertEof();
 
     auto cmdlineV = vectorWithNulFromString(cmdline);
-    auto desktopV = vectorWithNulFromString(desktop);
     auto envV = vectorFromString(env);
 
     LPCWSTR programArg = program.empty() ? nullptr : program.c_str();
@@ -375,7 +373,6 @@ void Agent::handleStartProcessPacket(ReadBuffer &packet)
     STARTUPINFOW sui = {};
     PROCESS_INFORMATION pi = {};
     sui.cb = sizeof(sui);
-    sui.lpDesktop = desktop.empty() ? nullptr : desktopV.data();
     BOOL inheritHandles = FALSE;
     if (m_useConerr) {
         inheritHandles = TRUE;

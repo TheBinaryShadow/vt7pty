@@ -27,7 +27,6 @@
   <ItemGroup>
     <ClCompile Include="..\src\libwinpty\AgentLocation.cc" />
     <ClCompile Include="..\src\libwinpty\winpty.cc" />
-    <ClCompile Include="..\src\shared\BackgroundDesktop.cc" />
     <ClCompile Include="..\src\shared\Buffer.cc" />
     <ClCompile Include="..\src\shared\DebugClient.cc" />
     <ClCompile Include="..\src\shared\GenRandom.cc" />
@@ -46,7 +45,6 @@
     <ClInclude Include="..\src\libwinpty\LibWinptyException.h" />
     <ClInclude Include="..\src\libwinpty\WinptyInternal.h" />
     <ClInclude Include="..\src\shared\AgentMsg.h" />
-    <ClInclude Include="..\src\shared\BackgroundDesktop.h" />
     <ClInclude Include="..\src\shared\Buffer.h" />
     <ClInclude Include="..\src\shared\DebugClient.h" />
     <ClInclude Include="..\src\shared\GenRandom.h" />

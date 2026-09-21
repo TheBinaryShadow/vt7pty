@@ -46,6 +46,26 @@ function Find-Dumpbin {
     return $dumpbin.FullName
 }
 
+function Find-ManifestTool {
+    $kitsRoot = Join-Path ${env:ProgramFiles(x86)} 'Windows Kits\10\bin'
+    $manifestTool = Get-ChildItem -LiteralPath $kitsRoot -Filter mt.exe -File -Recurse |
+        Where-Object { $_.FullName -match '\\x64\\mt\.exe$' } |
+        Sort-Object {
+            $versionText = $_.Directory.Parent.Name
+            $parsedVersion = New-Object Version
+            if ([Version]::TryParse($versionText, [ref]$parsedVersion)) {
+                $parsedVersion
+            } else {
+                [Version]'0.0'
+            }
+        } -Descending |
+        Select-Object -First 1
+    if ($null -eq $manifestTool) {
+        throw "mt.exe was not found below $kitsRoot"
+    }
+    return $manifestTool.FullName
+}
+
 function Invoke-NativeTest {
     param(
         [Parameter(Mandatory = $true)][string]$Executable,
@@ -101,6 +121,8 @@ if (-not $NoBuild) {
 
 $dumpbinPath = Find-Dumpbin
 $dumpbinVersion = (Get-Item -LiteralPath $dumpbinPath).VersionInfo.FileVersion
+$manifestToolPath = Find-ManifestTool
+$manifestToolVersion = (Get-Item -LiteralPath $manifestToolPath).VersionInfo.FileVersion
 $configurations = if ($Configuration -eq 'All') { @('Debug', 'Release') } else { @($Configuration) }
 $expectedExports = @(
     'winpty_agent_process', 'winpty_conerr_name', 'winpty_config_free',
@@ -112,7 +134,7 @@ $expectedExports = @(
     'winpty_spawn', 'winpty_spawn_config_free', 'winpty_spawn_config_new'
 )
 $expectedImports = [ordered]@{
-    'winpty.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
+    'winpty.dll' = @('ADVAPI32.dll', 'KERNEL32.dll')
     'winpty-agent.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'SHELL32.dll', 'USER32.dll')
     'winpty-debugserver.exe' = @('ADVAPI32.dll', 'KERNEL32.dll')
     'trivial_test.exe' = @('KERNEL32.dll', 'winpty.dll')
@@ -129,6 +151,21 @@ $expectedImports = [ordered]@{
     'tool-conin-mode.exe' = @('KERNEL32.dll')
     'tool-conout-mode.exe' = @('KERNEL32.dll')
 }
+$supportedOsIds = @(
+    '{35138b9a-5d96-4fbd-8e2d-a2440225f93a}', # Windows 7
+    '{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}', # Windows 8
+    '{1f676c76-80e1-4239-95bb-83d0f6d0da78}', # Windows 8.1
+    '{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}'  # Windows 10 and 11
+)
+$postWindows7Imports = @(
+    'ClosePseudoConsole', 'CreatePseudoConsole', 'GetDpiForSystem',
+    'GetDpiForWindow', 'GetProcessInformation', 'GetSystemCpuSetInformation',
+    'GetSystemTimeAdjustmentPrecise', 'GetSystemTimePreciseAsFileTime',
+    'GetTempPath2W', 'GetThreadDescription', 'GetThreadInformation',
+    'IsWow64Process2', 'ResizePseudoConsole', 'SetProcessInformation',
+    'SetThreadDescription', 'SetThreadInformation', 'WaitOnAddress',
+    'WakeByAddressAll', 'WakeByAddressSingle'
+)
 
 foreach ($configurationName in $configurations) {
     $binaryDirectory = Join-Path $artifactRoot "bin\x64\$configurationName"
@@ -163,6 +200,7 @@ foreach ($configurationName in $configurations) {
     $tests = @(
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'StringBuilderTest.exe') -WorkingDirectory $binaryDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'trivial_test.exe') -WorkingDirectory $binaryDirectory
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'trivial_test.exe') -WorkingDirectory $binaryDirectory -Arguments @('APPLICATIONS')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'winpty-agent.exe') -WorkingDirectory $binaryDirectory -Arguments @('--version')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'fixture-show-argv.exe') -WorkingDirectory $binaryDirectory -Arguments @('alpha', 'two words')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'fixture-output-lines.exe') -WorkingDirectory $binaryDirectory -Arguments @('3', '5')
@@ -174,6 +212,13 @@ foreach ($configurationName in $configurations) {
     if ($stringBuilderTest.StandardError -notmatch 'All tests completed!' -or
             $stringBuilderTest.StandardError -match '(?m)^error:') {
         throw "$configurationName StringBuilderTest did not report a clean completion."
+    }
+    $applicationTest = @($tests | Where-Object {
+        $_.Name -eq 'trivial_test.exe' -and
+        $_.StandardOutput -match 'Command Prompt and Windows PowerShell sessions passed\.'
+    })
+    if ($applicationTest.Count -ne 1) {
+        throw "$configurationName application smoke test did not report a clean completion."
     }
     $agentVersion = $tests | Where-Object { $_.Name -eq 'winpty-agent.exe' }
     if ($agentVersion.StandardOutput -notmatch [regex]::Escape("winpty version $sourceVersion")) {
@@ -209,6 +254,19 @@ foreach ($configurationName in $configurations) {
         if ($inspection -notmatch '(?im)^\s*6\.01 subsystem version') {
             throw "$binaryName does not declare Windows 7 subsystem version 6.01."
         }
+        if ($inspection -notmatch '(?im)^\s*0 \[\s*0\] RVA \[size\] of Delay Import Directory') {
+            throw "$binaryName has a non-empty delay-import directory."
+        }
+        $prohibitedImports = @(
+            foreach ($apiName in $postWindows7Imports) {
+                if ($inspection -match "(?im)^\s+[0-9a-f]+\s+$([regex]::Escape($apiName))\s*$") {
+                    $apiName
+                }
+            }
+        )
+        if ($prohibitedImports.Count -ne 0) {
+            throw "$binaryName directly imports post-Windows 7 APIs: $($prohibitedImports -join ', ')."
+        }
         $imports = @(
             [regex]::Matches($inspection, '(?im)^\s+([A-Za-z0-9_.-]+\.dll)\s*$') |
                 ForEach-Object { $_.Groups[1].Value } |
@@ -217,6 +275,18 @@ foreach ($configurationName in $configurations) {
         $expected = @($expectedImports[$binaryName] | Sort-Object)
         if (($imports -join '|').ToUpperInvariant() -ne ($expected -join '|').ToUpperInvariant()) {
             throw "$binaryName imports [$($imports -join ', ')], expected [$($expected -join ', ')]."
+        }
+        $manifestPath = Join-Path $resultDirectory ($binaryName + '.manifest.xml')
+        $manifestResource = if ($binaryName.EndsWith('.dll', [StringComparison]::OrdinalIgnoreCase)) { 2 } else { 1 }
+        & $manifestToolPath -nologo "-inputresource:$binaryPath;#$manifestResource" "-out:$manifestPath"
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+            throw "Could not extract the embedded manifest from $binaryName."
+        }
+        $manifestText = [IO.File]::ReadAllText($manifestPath)
+        foreach ($supportedOsId in $supportedOsIds) {
+            if ($manifestText -notmatch [regex]::Escape($supportedOsId)) {
+                throw "$binaryName does not declare supported OS ID $supportedOsId."
+            }
         }
         $file = Get-Item -LiteralPath $binaryPath
         $versionInfo = $file.VersionInfo
@@ -231,6 +301,9 @@ foreach ($configurationName in $configurations) {
             Bytes = $file.Length
             Sha256 = (Get-FileHash -LiteralPath $binaryPath -Algorithm SHA256).Hash.ToLowerInvariant()
             Imports = $imports
+            DelayImports = @()
+            ProhibitedPostWindows7Imports = $prohibitedImports
+            SupportedOsIds = $supportedOsIds
             FileDescription = $versionInfo.FileDescription
             FileVersion = $versionInfo.FileVersion
             ProductName = $versionInfo.ProductName
@@ -285,8 +358,10 @@ foreach ($configurationName in $configurations) {
             Architecture = $env:PROCESSOR_ARCHITECTURE
         }
         InspectionTool = [ordered]@{
-            Path = $dumpbinPath
-            FileVersion = $dumpbinVersion
+            DumpbinPath = $dumpbinPath
+            DumpbinFileVersion = $dumpbinVersion
+            ManifestToolPath = $manifestToolPath
+            ManifestToolFileVersion = $manifestToolVersion
         }
         Tests = $tests
         Artifacts = $artifactRecords

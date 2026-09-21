@@ -42,26 +42,15 @@ Win32Console::Win32Console() : m_titleWorkBuf(16)
 std::wstring Win32Console::title()
 {
     while (true) {
-        // Calling GetConsoleTitleW is tricky, because its behavior changed
-        // from XP->Vista, then again from Win7->Win8.  The Vista+Win7 behavior
-        // is especially broken.
+        // Calling GetConsoleTitleW is tricky because Windows 7 interprets the
+        // buffer size differently from later supported releases.
         //
         // The MSDN documentation documents nSize as the "size of the buffer
         // pointed to by the lpConsoleTitle parameter, in characters" and the
         // successful return value as "the length of the console window's
         // title, in characters."
         //
-        // On XP, the function returns the title length, AFTER truncation
-        // (excluding the NUL terminator).  If the title is blank, the API
-        // returns 0 and does not NUL-terminate the buffer.  To accommodate
-        // XP, the function must:
-        //  * Terminate the buffer itself.
-        //  * Double the size of the title buffer in a loop.
-        //
-        // On Vista and up, the function returns the non-truncated title
-        // length (excluding the NUL terminator).
-        //
-        // On Vista and Windows 7, there is a bug where the buffer size is
+        // On Windows 7, there is a bug where the buffer size is
         // interpreted as a byte count rather than a wchar_t count.  To
         // work around this, we must pass GetConsoleTitleW a buffer that is
         // twice as large as what is actually needed.

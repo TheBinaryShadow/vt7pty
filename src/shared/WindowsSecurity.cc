@@ -25,10 +25,8 @@
 #include <array>
 
 #include "DebugClient.h"
-#include "OsModule.h"
 #include "OwnedHandle.h"
 #include "StringBuilder.h"
-#include "WindowsVersion.h"
 #include "WinptyAssert.h"
 #include "WinptyException.h"
 
@@ -372,34 +370,10 @@ std::wstring sdToString(PSECURITY_DESCRIPTOR sd) {
     return std::wstring(sdString);
 }
 
-// Vista added a useful flag to CreateNamedPipe, PIPE_REJECT_REMOTE_CLIENTS,
-// that rejects remote connections.  Return this flag on Vista, or return 0
-// otherwise.
-DWORD rejectRemoteClientsPipeFlag() {
-    if (isAtLeastWindowsVista()) {
-        return PIPE_REJECT_REMOTE_CLIENTS;
-    } else {
-        trace("Omitting PIPE_REJECT_REMOTE_CLIENTS on pre-Vista OS");
-        return 0;
-    }
-}
-
-typedef BOOL WINAPI GetNamedPipeClientProcessId_t(
-    HANDLE Pipe,
-    PULONG ClientProcessId);
-
 std::tuple<GetNamedPipeClientProcessId_Result, DWORD, DWORD>
 getNamedPipeClientProcessId(HANDLE serverPipe) {
-    OsModule kernel32(L"kernel32.dll");
-    const auto pGetNamedPipeClientProcessId =
-        reinterpret_cast<GetNamedPipeClientProcessId_t*>(
-            kernel32.proc("GetNamedPipeClientProcessId"));
-    if (pGetNamedPipeClientProcessId == nullptr) {
-        return std::make_tuple(
-            GetNamedPipeClientProcessId_Result::UnsupportedOs, 0, 0);
-    }
     ULONG pid = 0;
-    if (!pGetNamedPipeClientProcessId(serverPipe, &pid)) {
+    if (!GetNamedPipeClientProcessId(serverPipe, &pid)) {
         return std::make_tuple(
             GetNamedPipeClientProcessId_Result::Failure, 0, GetLastError());
     }

@@ -12,7 +12,7 @@ a compatibility claim until an identified build passes the required procedure.
 | --- | --- |
 | Source baseline | WinPTY `0.4.4-dev` at upstream commit `7e59fe2` |
 | Development host | Maintained x64 Debug/Release workflow verified and source-debugged on Windows 10 build 19044 |
-| Windows 7 runtime | Approved minimum target; no VT7Pty acceptance record yet |
+| Windows 7 runtime | Candidate implementation prepared; physical Tier A and Tier B records pending |
 | Architectures | x64 is the approved product architecture; inherited x64 smoke tests passed locally |
 | Build interface | VS2022/MSBuild and repository PowerShell entry points; inherited build and packaging paths removed |
 | API and binaries | Inherited WinPTY names and behavior remain |
@@ -35,7 +35,8 @@ The approved initial platform contract is:
   configuration.
 - Runtime model: static MSVC runtime initially.
 
-XP/Vista compatibility code and build paths will be removed during Milestone 0.
+XP/Vista compatibility code and build paths were removed in Roadmap Steps 0.3
+and 0.4.
 Later-Windows behavior remains in scope. An API newer than Windows 7 may be used
 only through a Windows 7-safe capability path with tested fallback behavior.
 

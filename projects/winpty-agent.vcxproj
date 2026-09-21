@@ -22,7 +22,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\agent\Agent.cc" />
-    <ClCompile Include="..\src\agent\AgentCreateDesktop.cc" />
     <ClCompile Include="..\src\agent\ConsoleFont.cc" />
     <ClCompile Include="..\src\agent\ConsoleInput.cc" />
     <ClCompile Include="..\src\agent\ConsoleInputReencoding.cc" />
@@ -38,7 +37,6 @@
     <ClCompile Include="..\src\agent\Terminal.cc" />
     <ClCompile Include="..\src\agent\Win32Console.cc" />
     <ClCompile Include="..\src\agent\Win32ConsoleBuffer.cc" />
-    <ClCompile Include="..\src\shared\BackgroundDesktop.cc" />
     <ClCompile Include="..\src\shared\Buffer.cc" />
     <ClCompile Include="..\src\shared\DebugClient.cc" />
     <ClCompile Include="..\src\shared\GenRandom.cc" />
@@ -52,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\agent\Agent.h" />
-    <ClInclude Include="..\src\agent\AgentCreateDesktop.h" />
     <ClInclude Include="..\src\agent\ConsoleFont.h" />
     <ClInclude Include="..\src\agent\ConsoleInput.h" />
     <ClInclude Include="..\src\agent\ConsoleInputReencoding.h" />
@@ -73,7 +70,6 @@
     <ClInclude Include="..\src\agent\Win32Console.h" />
     <ClInclude Include="..\src\agent\Win32ConsoleBuffer.h" />
     <ClInclude Include="..\src\shared\AgentMsg.h" />
-    <ClInclude Include="..\src\shared\BackgroundDesktop.h" />
     <ClInclude Include="..\src\shared\Buffer.h" />
     <ClInclude Include="..\src\shared\DebugClient.h" />
     <ClInclude Include="..\src\shared\GenRandom.h" />

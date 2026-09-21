@@ -20,11 +20,14 @@
 
 #include <windows.h>
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
+#include <cstring>
 #include <cstdio>
 #include <cstdlib>
 #include <cwchar>
+#include <string>
 #include <vector>
 
 #include "../include/winpty.h"
@@ -126,9 +129,85 @@ static void childTest() {
     exit(42);
 }
 
+static std::wstring systemProgram(const wchar_t *relativePath) {
+    wchar_t systemDirectory[MAX_PATH];
+    const UINT length = GetSystemDirectoryW(systemDirectory, MAX_PATH);
+    assert(length > 0 && length < MAX_PATH);
+    return std::wstring(systemDirectory, length) + L"\\" + relativePath;
+}
+
+static bool containsText(
+        const std::vector<unsigned char> &content,
+        const char *expectedText) {
+    const auto expectedBegin = reinterpret_cast<const unsigned char *>(expectedText);
+    const auto expectedEnd = expectedBegin + strlen(expectedText);
+    return std::search(
+        content.begin(), content.end(), expectedBegin, expectedEnd) != content.end();
+}
+
+static void applicationTest(
+        const std::wstring &program,
+        const std::wstring &arguments,
+        const char *expectedText) {
+    const std::wstring commandLine = L"\"" + program + L"\" " + arguments;
+
+    winpty_error_ptr_t error = nullptr;
+    auto agentCfg = winpty_config_new(0, &error);
+    assert(agentCfg != nullptr && error == nullptr);
+    winpty_config_set_initial_size(agentCfg, 80, 25);
+    auto pty = winpty_open(agentCfg, &error);
+    winpty_config_free(agentCfg);
+    assert(pty != nullptr && error == nullptr);
+
+    HANDLE conin = CreateFileW(
+        winpty_conin_name(pty),
+        GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+    HANDLE conout = CreateFileW(
+        winpty_conout_name(pty),
+        GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+    assert(conin != INVALID_HANDLE_VALUE);
+    assert(conout != INVALID_HANDLE_VALUE);
+    assert(winpty_set_size(pty, 100, 30, &error) && error == nullptr);
+
+    auto spawnCfg = winpty_spawn_config_new(
+        WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN,
+        program.c_str(), commandLine.c_str(), nullptr, nullptr, &error);
+    assert(spawnCfg != nullptr && error == nullptr);
+    HANDLE process = nullptr;
+    BOOL spawnSuccess = winpty_spawn(
+        pty, spawnCfg, &process, nullptr, nullptr, &error);
+    winpty_spawn_config_free(spawnCfg);
+    assert(spawnSuccess && process != nullptr && error == nullptr);
+
+    auto content = filterContent(readAll(conout));
+    DWORD exitCode = 0;
+    assert(GetExitCodeProcess(process, &exitCode) && exitCode == 0);
+    assert(containsText(content, expectedText));
+
+    CloseHandle(process);
+    CloseHandle(conin);
+    CloseHandle(conout);
+    winpty_free(pty);
+}
+
+static void applicationsTest() {
+    applicationTest(
+        systemProgram(L"cmd.exe"),
+        L"/D /S /C \"echo VT7PTY_CMD_OK\"",
+        "VT7PTY_CMD_OK");
+    applicationTest(
+        systemProgram(L"WindowsPowerShell\\v1.0\\powershell.exe"),
+        L"-NoLogo -NoProfile -NonInteractive -Command "
+        L"\"Write-Output 'VT7PTY_POWERSHELL_OK'\"",
+        "VT7PTY_POWERSHELL_OK");
+    printf("Command Prompt and Windows PowerShell sessions passed.\n");
+}
+
 int main(int argc, char *argv[]) {
     if (argc == 1) {
         parentTest();
+    } else if (argc == 2 && strcmp(argv[1], "APPLICATIONS") == 0) {
+        applicationsTest();
     } else {
         childTest();
     }

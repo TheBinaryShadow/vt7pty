@@ -90,12 +90,9 @@ Sid stringToSid(const std::wstring &str);
 SecurityDescriptor stringToSd(const std::wstring &str);
 std::wstring sdToString(PSECURITY_DESCRIPTOR sd);
 
-DWORD rejectRemoteClientsPipeFlag();
-
 enum class GetNamedPipeClientProcessId_Result {
     Success,
     Failure,
-    UnsupportedOs,
 };
 
 std::tuple<GetNamedPipeClientProcessId_Result, DWORD, DWORD>

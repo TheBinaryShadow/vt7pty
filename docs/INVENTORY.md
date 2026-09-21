@@ -27,7 +27,7 @@ for removed implementation material.
 | Path or group | Current responsibility | Classification and destination |
 | --- | --- | --- |
 | `src/include/winpty.h` | Public C API, ownership rules, pipe discovery, spawn, resize, errors | Retain and modernize as the renamed VT7Pty C surface; no WinPTY alias layer |
-| `src/include/winpty_constants.h` | Errors, agent flags, mouse modes, spawn flags | Retain and rebrand; remove the XP/Vista desktop-creation flag after validation |
+| `src/include/winpty_constants.h` | Errors, agent flags, mouse modes, spawn flags | Retain and rebrand; the XP/Vista desktop-creation flag was removed in Step 0.4 |
 | `src/libwinpty/AgentLocation.*` | Finds the colocated agent | Retain and modernize path/error handling; rename agent identity |
 | `src/libwinpty/LibWinptyException.h` | Maps internal exceptions to public errors | Retain, rebrand, and modernize |
 | `src/libwinpty/WinptyInternal.h` | Private client declarations | Retain, rebrand, and modernize |
@@ -47,8 +47,8 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | `DefaultInputMap.*`, `InputMap.*`, `DsrSender.h` | Key mapping and device-status response handling | Retain, rebrand, and test |
 | `Scraper.*`, `ConsoleLine.*`, `Terminal.*` | Screen-state comparison and VT output generation | Retain as core fidelity code; refactor only with observable-state tests |
 | `Win32Console.*`, `Win32ConsoleBuffer.*`, `LargeConsoleRead.*` | Console access, screen buffers, large reads | Retain; modernize Windows 7+ API boundaries |
-| `ConsoleFont.*` | Selects a usable console font across old Windows versions | Modernize around Windows 7+ APIs; remove XP-only undocumented fallback paths |
-| `AgentCreateDesktop.*` | Creates the pre-Windows 7 background desktop through a helper agent | Validate removal with the XP/Vista background-desktop path |
+| `ConsoleFont.*` | Selects a usable console font on Windows 7 and later | Uses the documented Windows 7+ extended console-font APIs after Step 0.4 |
+| `AgentCreateDesktop.*` | Formerly created the pre-Windows 7 background desktop through a helper agent | Removed in Step 0.4 with the unreachable XP/Vista path |
 | `DebugShowInput.*` | Human-readable input diagnostics | Retain and integrate with structured diagnostics |
 | `Coord.h`, `SmallRect.h`, `SimplePool.h`, `UnicodeEncoding.h` | Geometry, allocation, and Unicode helpers | Retain and modernize where tests justify it |
 | `UnicodeEncodingTest.cc` | Exhaustive encoder experiment and performance loop | Rehome under tests; split correctness from the multi-billion-iteration benchmark |
@@ -59,7 +59,7 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | Files | Current responsibility | Classification and destination |
 | --- | --- | --- |
 | `AgentMsg.h` | Client-agent message structures and opcodes | Retain, rebrand, validate sizes, and add explicit protocol identity/version |
-| `BackgroundDesktop.*` | XP/Vista hidden-console desktop management | Validate removal after confirming no Windows 7+ call path requires it |
+| `BackgroundDesktop.*` | Formerly managed a hidden desktop for XP/Vista consoles | Removed in Step 0.4; the inherited runtime selected it only below Windows 7 |
 | `Buffer.*` | RPC message serialization and parsing | Retain; add bounds/malformed-message tests and typed size handling |
 | `DebugClient.*` | Native diagnostic transport | Retain, rebrand, and modernize with bounded structured logging |
 | `GenRandom.*` | Random identifiers for pipes and objects | Retain; modernize size conversions and verify failure handling |
@@ -72,7 +72,7 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | `TimeMeasurement.h` | Small timing helper | Rehomed to `tests/manual` in Step 0.3 |
 | `ControlCharacters.h` (formerly `UnixCtrlChars.h`) | Control-character decoding used by Windows input parsing | Retained under a platform-neutral name in Step 0.3 |
 | `WindowsSecurity.*` | Security descriptors, pipe/process identity, token data | Retain as a security boundary; modernize conversions and add focused tests |
-| `WindowsVersion.*` | OS detection, architecture, native process launch helpers | Retain required launch work; remove x86, XP/Vista, old MinGW, and deprecated version-detection paths |
+| `WindowsVersion.*` | OS detection and module-version diagnostics | Retained with `RtlGetVersion`-based detection and x64-only diagnostics in Step 0.4 |
 | `StringFormatting.h` (replaces `winpty_snprintf.h`) | Bounded diagnostic formatting | Uses the current C++ runtime; the retired-compiler shim was removed in Step 0.3 |
 | `WinptyAssert.*` | Agent-aware assertion reporting | Retain responsibility; rebrand and integrate with diagnostics |
 | `WinptyException.*` | Internal exception hierarchy and old `noexcept` shim | Retain hierarchy, remove compiler shim, and rebrand |
@@ -140,8 +140,10 @@ replacement or evidence exists. In particular:
 
 1. The checked-in MSBuild build must reproduce the baseline before GYP, Make,
    Python 2 packaging, or their source lists disappear.
-2. Physical Windows 7 evidence must precede removal of the background-desktop
-   path and XP/Vista public flag.
+2. The inherited baseline and source path had to prove that the background
+   desktop served only systems below Windows 7 before its removal. The
+   resulting candidate must pass both physical Windows 7 tiers before Step 0.4
+   is accepted.
 3. Useful native probes reached their new test/tool/document locations before
    `misc` was removed in Step 0.3.
 4. Attribution, original notices, and historical release material remain even

@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
         kPipeName,
         /*dwOpenMode=*/PIPE_ACCESS_DUPLEX | FILE_FLAG_FIRST_PIPE_INSTANCE,
         /*dwPipeMode=*/PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE |
-            rejectRemoteClientsPipeFlag(),
+            PIPE_REJECT_REMOTE_CLIENTS,
         /*nMaxInstances=*/1,
         /*nOutBufferSize=*/MSG_SIZE,
         /*nInBufferSize=*/MSG_SIZE,

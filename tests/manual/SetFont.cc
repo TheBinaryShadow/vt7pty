@@ -23,7 +23,6 @@ int main() {
 
     if (argc == 1) {
         cprintf(L"Usage:\n");
-        cprintf(L"  SetFont <index>\n");
         cprintf(L"  SetFont options\n");
         cprintf(L"\n");
         cprintf(L"Options for SetCurrentConsoleFontEx:\n");
@@ -43,20 +42,6 @@ int main() {
         cprintf(L"  -modern\n");
         cprintf(L"  -script\n");
         cprintf(L"  -decorative\n");
-        return 0;
-    }
-
-    if (isdigit(argv[1][0])) {
-        int index = _wtoi(argv[1]);
-        HMODULE kernel32 = LoadLibraryW(L"kernel32.dll");
-        FARPROC proc = GetProcAddress(kernel32, "SetConsoleFont");
-        if (proc == NULL) {
-            cprintf(L"Couldn't get address of SetConsoleFont\n");
-        } else {
-            BOOL ret = reinterpret_cast<BOOL WINAPI(*)(HANDLE, DWORD)>(proc)(
-                    conout, index);
-            cprintf(L"SetFont returned %d\n", ret);
-        }
         return 0;
     }
 

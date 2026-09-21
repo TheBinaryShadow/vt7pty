@@ -31,7 +31,6 @@
 #include "../include/winpty.h"
 
 #include "../shared/AgentMsg.h"
-#include "../shared/BackgroundDesktop.h"
 #include "../shared/Buffer.h"
 #include "../shared/DebugClient.h"
 #include "../shared/GenRandom.h"
@@ -381,7 +380,7 @@ static OwnedHandle createControlPipe(const std::wstring &name) {
         PIPE_ACCESS_DUPLEX |
             FILE_FLAG_FIRST_PIPE_INSTANCE |
             FILE_FLAG_OVERLAPPED,
-        /*dwPipeMode=*/rejectRemoteClientsPipeFlag(),
+        /*dwPipeMode=*/PIPE_REJECT_REMOTE_CLIENTS,
         /*nMaxInstances=*/1,
         /*nOutBufferSize=*/8192,
         /*nInBufferSize=*/256,
@@ -414,47 +413,6 @@ static bool shouldShowConsoleWindow() {
     return GetEnvironmentVariableA("WINPTY_SHOW_CONSOLE", buf, sizeof(buf)) > 0;
 }
 
-static bool shouldCreateBackgroundDesktop(bool &createUsingAgent) {
-    // Prior to Windows 7, winpty's repeated selection-deselection loop
-    // prevented the user from interacting with their *visible* console
-    // windows, unless we placed the console onto a background desktop.
-    // The SetProcessWindowStation call interferes with the clipboard and
-    // isn't thread-safe, though[1].  The call should perhaps occur in a
-    // special agent subprocess.  Spawning a process in a background desktop
-    // also breaks ConEmu, but marking the process SW_HIDE seems to correct
-    // that[2].
-    //
-    // Windows 7 moved a lot of console handling out of csrss.exe and into
-    // a per-console conhost.exe process, which may explain why it isn't
-    // affected.
-    //
-    // This is a somewhat risky change, so there are low-level flags to
-    // assist in debugging if there are issues.
-    //
-    // [1] https://github.com/rprichard/winpty/issues/58
-    // [2] https://github.com/rprichard/winpty/issues/70
-    bool ret = !shouldShowConsoleWindow() && !isAtLeastWindows7();
-    const bool force = hasDebugFlag("force_desktop");
-    const bool force_spawn = hasDebugFlag("force_desktop_spawn");
-    const bool force_curproc = hasDebugFlag("force_desktop_curproc");
-    const bool suppress = hasDebugFlag("no_desktop");
-    if (force + force_spawn + force_curproc + suppress > 1) {
-        trace("error: Only one of force_desktop, force_desktop_spawn, "
-              "force_desktop_curproc, and no_desktop may be set");
-    } else if (force) {
-        ret = true;
-    } else if (force_spawn) {
-        ret = true;
-        createUsingAgent = true;
-    } else if (force_curproc) {
-        ret = true;
-        createUsingAgent = false;
-    } else if (suppress) {
-        ret = false;
-    }
-    return ret;
-}
-
 static bool shouldSpecifyHideFlag() {
     const bool force = hasDebugFlag("force_sw_hide");
     const bool suppress = hasDebugFlag("no_sw_hide");
@@ -470,7 +428,6 @@ static bool shouldSpecifyHideFlag() {
 }
 
 static OwnedHandle startAgentProcess(
-        const std::wstring &desktop,
         const std::wstring &controlPipeName,
         const std::wstring &params,
         DWORD creationFlags,
@@ -483,12 +440,9 @@ static OwnedHandle startAgentProcess(
             << params).str_moved();
 
     auto cmdlineV = vectorWithNulFromString(cmdline);
-    auto desktopV = vectorWithNulFromString(desktop);
-
     // Start the agent.
     STARTUPINFOW sui = {};
     sui.cb = sizeof(sui);
-    sui.lpDesktop = desktop.empty() ? nullptr : desktopV.data();
 
     if (shouldSpecifyHideFlag()) {
         sui.dwFlags |= STARTF_USESHOWWINDOW;
@@ -532,9 +486,6 @@ static void verifyPipeClientPid(HANDLE serverPipe, DWORD agentPid) {
                    << L") does not match agent pid (" << agentPid << L")";
             throwWinptyException(errMsg.c_str());
         }
-    } else if (success == GetNamedPipeClientProcessId_Result::UnsupportedOs) {
-        trace("Pipe client PID security check skipped: "
-            "GetNamedPipeClientProcessId unsupported on this OS version");
     } else {
         throwWindowsError(L"GetNamedPipeClientProcessId failed", lastError);
     }
@@ -542,7 +493,6 @@ static void verifyPipeClientPid(HANDLE serverPipe, DWORD agentPid) {
 
 static std::unique_ptr<winpty_t>
 createAgentSession(const winpty_config_t *cfg,
-                   const std::wstring &desktop,
                    const std::wstring &params,
                    DWORD creationFlags) {
     std::unique_ptr<winpty_t> wp(new winpty_t);
@@ -556,86 +506,11 @@ createAgentSession(const winpty_config_t *cfg,
 
     DWORD agentPid = 0;
     wp->agentProcess = startAgentProcess(
-        desktop, pipeName, params, creationFlags, agentPid);
+        pipeName, params, creationFlags, agentPid);
     connectControlPipe(*wp.get());
     verifyPipeClientPid(wp->controlPipe.get(), agentPid);
 
     return std::move(wp);
-}
-
-namespace {
-
-class AgentDesktop {
-public:
-    virtual std::wstring name() = 0;
-    virtual ~AgentDesktop() {}
-};
-
-class AgentDesktopDirect : public AgentDesktop {
-public:
-    AgentDesktopDirect(BackgroundDesktop &&desktop) :
-        m_desktop(std::move(desktop))
-    {
-    }
-    std::wstring name() override { return m_desktop.desktopName(); }
-private:
-    BackgroundDesktop m_desktop;
-};
-
-class AgentDesktopIndirect : public AgentDesktop {
-public:
-    AgentDesktopIndirect(std::unique_ptr<winpty_t> &&wp,
-                         std::wstring &&desktopName) :
-        m_wp(std::move(wp)),
-        m_desktopName(std::move(desktopName))
-    {
-    }
-    std::wstring name() override { return m_desktopName; }
-private:
-    std::unique_ptr<winpty_t> m_wp;
-    std::wstring m_desktopName;
-};
-
-} // anonymous namespace
-
-std::unique_ptr<AgentDesktop>
-setupBackgroundDesktop(const winpty_config_t *cfg) {
-    bool useDesktopAgent =
-        !(cfg->flags & WINPTY_FLAG_ALLOW_CURPROC_DESKTOP_CREATION);
-    const bool useDesktop = shouldCreateBackgroundDesktop(useDesktopAgent);
-
-    if (!useDesktop) {
-        return std::unique_ptr<AgentDesktop>();
-    }
-
-    if (useDesktopAgent) {
-        auto wp = createAgentSession(
-            cfg, std::wstring(), L"--create-desktop", DETACHED_PROCESS);
-
-        // Read the desktop name.
-        auto packet = readPacket(*wp.get());
-        auto desktopName = packet.getWString();
-        packet.assertEof();
-
-        if (desktopName.empty()) {
-            return std::unique_ptr<AgentDesktop>();
-        } else {
-            return std::unique_ptr<AgentDesktop>(
-                new AgentDesktopIndirect(std::move(wp),
-                                         std::move(desktopName)));
-        }
-    } else {
-        try {
-            BackgroundDesktop desktop;
-            return std::unique_ptr<AgentDesktop>(new AgentDesktopDirect(
-                std::move(desktop)));
-        } catch (const WinptyException &e) {
-            trace("Error: failed to create background desktop, "
-                  "using original desktop instead: %s",
-                  utf8FromWide(e.what()).c_str());
-            return std::unique_ptr<AgentDesktop>();
-        }
-    }
 }
 
 WINPTY_API winpty_t *
@@ -646,10 +521,6 @@ winpty_open(const winpty_config_t *cfg,
         dumpWindowsVersion();
         dumpVersionToTrace();
 
-        // Setup a background desktop for the agent.
-        auto desktop = setupBackgroundDesktop(cfg);
-        const auto desktopName = desktop ? desktop->name() : std::wstring();
-
         // Start the primary agent session.
         const auto params =
             (WStringBuilder(128)
@@ -657,25 +528,7 @@ winpty_open(const winpty_config_t *cfg,
                 << cfg->mouseMode << L' '
                 << cfg->cols << L' '
                 << cfg->rows).str_moved();
-        auto wp = createAgentSession(cfg, desktopName, params,
-                                     CREATE_NEW_CONSOLE);
-
-        // Close handles to the background desktop and restore the original
-        // window station.  This must wait until we know the agent is running
-        // -- if we close these handles too soon, then the desktop and
-        // windowstation will be destroyed before the agent can connect with
-        // them.
-        //
-        // If we used a separate agent process to create the desktop, we
-        // disconnect from that process here, allowing it to exit.
-        desktop.reset();
-
-        // If we ran the agent process on a background desktop, then when we
-        // spawn a child process from the agent, it will need to be explicitly
-        // placed back onto the original desktop.
-        if (!desktopName.empty()) {
-            wp->spawnDesktopName = getCurrentDesktopName();
-        }
+        auto wp = createAgentSession(cfg, params, CREATE_NEW_CONSOLE);
 
         // Get the CONIN/CONOUT pipe names.
         auto packet = readPacket(*wp.get());
@@ -868,7 +721,6 @@ winpty_spawn(winpty_t *wp,
         packet.putWString(cfg->cmdline);
         packet.putWString(cfg->cwd);
         packet.putWString(cfg->env);
-        packet.putWString(wp->spawnDesktopName);
         writePacket(*wp, packet);
 
         // Receive reply.

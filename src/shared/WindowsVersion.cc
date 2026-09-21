@@ -38,20 +38,30 @@ namespace {
 
 typedef std::tuple<DWORD, DWORD> Version;
 
-// This function can only return a version up to 6.2 unless the executable is
-// manifested for a newer version of Windows.  See the MSDN documentation for
-// GetVersionEx.
-OSVERSIONINFOEX getWindowsVersionInfo() {
-    // Keep the inherited version behavior until the Windows 7+ platform pass
-    // replaces it with the selected supported mechanism.
-#pragma warning(push)
-#pragma warning(disable:4996)
-    OSVERSIONINFOEX info = {};
+using RtlGetVersion_t = LONG (WINAPI *)(OSVERSIONINFOW *);
+
+OSVERSIONINFOEXW getWindowsVersionInfo() {
+    // RtlGetVersion reports the running system rather than a manifest-based
+    // compatibility version. It is present throughout VT7Pty's Windows 7+
+    // platform range.
+    const HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+    if (ntdll == nullptr) {
+        throwWindowsError(L"GetModuleHandleW(ntdll.dll) failed");
+    }
+    const auto rtlGetVersion = reinterpret_cast<RtlGetVersion_t>(
+        GetProcAddress(ntdll, "RtlGetVersion"));
+    if (rtlGetVersion == nullptr) {
+        throwWindowsError(L"RtlGetVersion is missing from ntdll.dll");
+    }
+
+    OSVERSIONINFOEXW info = {};
     info.dwOSVersionInfoSize = sizeof(info);
-    const auto success = GetVersionEx(reinterpret_cast<OSVERSIONINFO*>(&info));
-    ASSERT(success && "GetVersionEx failed");
+    const LONG status = rtlGetVersion(
+        reinterpret_cast<OSVERSIONINFOW *>(&info));
+    if (status < 0) {
+        throwWinptyException(L"RtlGetVersion failed");
+    }
     return info;
-#pragma warning(pop)
 }
 
 Version getWindowsVersion() {
@@ -101,8 +111,8 @@ VS_FIXEDFILEINFO getFixedFileInfo(const std::wstring &path) {
     GET_VERSION_DLL_API(VerQueryValueW);
     DWORD size = pGetFileVersionInfoSizeW(path.c_str(), nullptr);
     if (!size) {
-        // I see ERROR_FILE_NOT_FOUND on Win7 and
-        // ERROR_RESOURCE_DATA_NOT_FOUND on WinXP.
+        // Different Windows releases use either of these errors for a module
+        // without file-version data.
         if (GetLastError() == ERROR_FILE_NOT_FOUND ||
                 GetLastError() == ERROR_RESOURCE_DATA_NOT_FOUND) {
             throw ModuleNotFound();
@@ -152,31 +162,10 @@ std::string versionToString(uint64_t version) {
 
 } // anonymous namespace
 
-// Returns true for Windows Vista (or Windows Server 2008) or newer.
-bool isAtLeastWindowsVista() {
-    return getWindowsVersion() >= Version(6, 0);
-}
-
-// Returns true for Windows 7 (or Windows Server 2008 R2) or newer.
-bool isAtLeastWindows7() {
-    return getWindowsVersion() >= Version(6, 1);
-}
-
 // Returns true for Windows 8 (or Windows Server 2012) or newer.
-bool isAtLeastWindows8() {
+bool isWindows8OrGreater() {
     return getWindowsVersion() >= Version(6, 2);
 }
-
-#define WINPTY_IA32     1
-#define WINPTY_X64      2
-
-#if defined(_M_IX86)
-#define WINPTY_ARCH WINPTY_IA32
-#elif defined(_M_X64)
-#define WINPTY_ARCH WINPTY_X64
-#endif
-
-typedef BOOL WINAPI IsWow64Process_t(HANDLE hProcess, PBOOL Wow64Process);
 
 void dumpWindowsVersion() {
     if (!isTracingEnabled()) {
@@ -196,26 +185,7 @@ void dumpWindowsVersion() {
             b << "product=" << info.wProductType; break;
     }
     b << ' ';
-#if WINPTY_ARCH == WINPTY_IA32
-    b << "IA32";
-    OsModule kernel32(L"kernel32.dll");
-    IsWow64Process_t *pIsWow64Process =
-        reinterpret_cast<IsWow64Process_t*>(
-            kernel32.proc("IsWow64Process"));
-    if (pIsWow64Process != nullptr) {
-        BOOL result = false;
-        const BOOL success = pIsWow64Process(GetCurrentProcess(), &result);
-        if (!success) {
-            b << " WOW64:error";
-        } else if (success && result) {
-            b << " WOW64";
-        }
-    } else {
-        b << " WOW64:missingapi";
-    }
-#elif WINPTY_ARCH == WINPTY_X64
     b << "X64";
-#endif
     const auto dllVersion = [](const wchar_t *dllPath) -> std::string {
         try {
             const auto info = getFixedFileInfo(dllPath);
@@ -235,10 +205,6 @@ void dumpWindowsVersion() {
     b << ' ' << dllVersion(L"kernel32.dll");
     // ConEmu provides a DLL that hooks many Windows APIs, especially console
     // APIs.  Its existence and version number could be useful in debugging.
-#if WINPTY_ARCH == WINPTY_IA32
-    b << ' ' << dllVersion(L"ConEmuHk.dll");
-#elif WINPTY_ARCH == WINPTY_X64
     b << ' ' << dllVersion(L"ConEmuHk64.dll");
-#endif
     trace("Windows version: %s", b.c_str());
 }
