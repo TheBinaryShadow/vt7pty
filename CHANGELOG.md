@@ -22,6 +22,14 @@ changes until implemented.
 - Completed the inherited component inventory and captured a reproducible x64
   Debug/Release native baseline with artifact hashes, imports, exports, warning
   debt, and passing inherited tests.
+- Added the first supported VS2022/MSBuild x64 solution with centralized v143,
+  C++20, SDK 26100, Windows 7, static CRT, symbol, manifest, security, and
+  generated version-resource settings.
+- Added maintained local build, verification, and transition-package commands;
+  verification preserves the inherited export/import boundary and runs the
+  inherited native lifecycle tests.
+- Replaced an obsolete MinGW/Visual C++ 6 string-building workaround in the
+  lifecycle test with bounded MSVC formatting.
 - Preserved the original WinPTY README and release history as historical
   documentation.
 

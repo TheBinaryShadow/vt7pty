@@ -111,24 +111,31 @@ Physical Windows 7 execution remains a later step and is not implied here.
 Outcome: one maintained Visual Studio/MSBuild workflow builds, verifies,
 packages, and debugs the native project from a clean checkout.
 
-- [ ] Add a Visual Studio solution and MSBuild C++ projects for the client DLL,
-  agent, native debug server, tests, and retained fixtures and tools.
-- [ ] Centralize configuration in `Directory.Build.props` and
+- [x] Add a Visual Studio solution and MSBuild C++ projects for the client DLL,
+  agent, native debug server, and inherited tests.
+- [ ] Add maintained project membership for retained fixtures and tools as they
+  move from `misc` into their permanent locations.
+- [x] Centralize configuration in `Directory.Build.props` and
   `Directory.Build.targets`.
-- [ ] Target MSVC v143, C++20, Windows SDK 10.0.26100.0, Unicode, and x64 Debug
+- [x] Target MSVC v143, C++20, Windows SDK 10.0.26100.0, Unicode, and x64 Debug
   and Release configurations.
-- [ ] Use Windows 7 SP1 as the API floor and the static CRT for self-contained
+- [x] Use Windows 7 SP1 as the API floor and the static CRT for self-contained
   initial deployment.
-- [ ] Establish explicit conformance, warning, optimization, symbol, manifest,
+- [x] Establish explicit conformance, warning, optimization, symbol, manifest,
   version-resource, and Windows 7-compatible security settings.
-- [ ] Add `.vsconfig`, `.editorconfig`, and formatting configuration.
-- [ ] Add `Build-VT7Pty.ps1`, `Verify-VT7Pty.ps1`, and
+- [x] Add `.vsconfig`, `.editorconfig`, and formatting configuration.
+- [x] Add `Build-VT7Pty.ps1`, `Verify-VT7Pty.ps1`, and
   `Package-VT7Pty.ps1` as the maintained local entry points.
-- [ ] Keep target-side scripts compatible with Windows PowerShell 5.1 where
+- [x] Keep target-side scripts compatible with Windows PowerShell 5.1 where
   they must run on Windows 7.
-- [ ] Generate version and artifact identity from repository-owned sources.
+- [x] Generate version and artifact identity from repository-owned sources.
 - [ ] Verify source-level debugging and inspect imports and runtime dependencies.
 - [ ] Reproduce the inherited baseline before removing any old build route.
+
+The first transition build and verifier are implemented. They already produce
+full linked PDBs and inspect imports, subsystem versions, and exports. Step 0.2
+remains open until clean-commit transition evidence, source-level debugger
+validation, and retained fixture/tool membership are complete.
 
 The project will not add hosted build or test automation. Release qualification
 uses the maintained local commands and physical acceptance machines.

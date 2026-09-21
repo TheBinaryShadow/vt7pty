@@ -1,10 +1,10 @@
-*.sln
 *.suo
-*.vcxproj
-*.vcxproj.filters
+*.user
 *.pyc
 winpty.sdf
 winpty.opensdf
+/.vs
+/artifacts
 /config.mk
 /build
 /build-gyp
@@ -14,3 +14,6 @@ winpty.opensdf
 /src/Default
 /src/Release
 /src/gen
+/src/winpty.sln
+/src/*.vcxproj
+/src/*.vcxproj.filters

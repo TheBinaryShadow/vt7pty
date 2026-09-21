@@ -16,14 +16,16 @@ behavior. We are building on years of engineering by both communities.
 
 VT7Pty is in early development. This repository currently contains the inherited
 WinPTY `0.4.4-dev` implementation, with a new project identity and development
-direction. A VT7Pty-specific API and backend improvements are planned work.
+direction. Milestone 0 implementation has started with an accepted inherited
+baseline and a supported VS2022/MSBuild transition build. A VT7Pty-specific API
+and backend improvements remain planned work.
 
 The [development foundation](docs/FOUNDATION.md) and
 [roadmap](ROADMAP.md) record the approved product and engineering direction.
 Milestone 0 will replace the complete inherited toolchain, remove the Unix
 adapter and pre-Windows 7 compatibility, establish the native VT7Pty 0.5.x
 identity, modernize the retained C++ code, and create the permanent local build,
-test, diagnostic, and release systems. Implementation has not started.
+test, diagnostic, and release systems.
 
 All inherited components are still present, including the Cygwin/MSYS Unix
 adapter, tests, debugging tools, and build and packaging scripts. Binaries,
@@ -78,8 +80,8 @@ failures and tests, with proven behavior retained where it meets our needs.
 
 ## Building and exploring
 
-See [Building](BUILDING.md) for the approved MSBuild contract and the current
-inherited build limitations. The
+See [Building](BUILDING.md) for the supported local build, verify, and package
+commands and the remaining transition limitations. The
 [original WinPTY README](docs/UPSTREAM_WINPTY_README.md) is preserved for
 historical build, adapter, embedding, and debugging details.
 

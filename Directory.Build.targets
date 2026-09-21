@@ -1,0 +1,19 @@
+<Project>
+  <Target Name="CaptureVT7PtySourceIdentity"
+          BeforeTargets="GenerateVT7PtyVersionFiles">
+    <MakeDir Directories="$(VT7PtyGeneratedDirectory)" />
+    <Exec Command="powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(VT7PtyRepositoryRoot)tools\build\Write-SourceIdentity.ps1&quot; -RepositoryRoot &quot;$(VT7PtyRepositoryRoot).&quot; -OutputPath &quot;$(VT7PtyGeneratedDirectory)SourceIdentity.txt&quot;" />
+  </Target>
+
+  <Target Name="GenerateVT7PtyVersionFiles"
+          BeforeTargets="ClCompile;ResourceCompile"
+          DependsOnTargets="CaptureVT7PtySourceIdentity"
+          Inputs="$(VT7PtyGeneratedDirectory)SourceIdentity.txt;$(VT7PtyRepositoryRoot)tools\build\Write-VersionHeader.ps1"
+          Outputs="$(VT7PtyGeneratedDirectory)GenVersion.h;$(VT7PtyGeneratedDirectory)VersionInfo.rc">
+    <Exec Command="powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(VT7PtyRepositoryRoot)tools\build\Write-VersionHeader.ps1&quot; -SourceIdentityPath &quot;$(VT7PtyGeneratedDirectory)SourceIdentity.txt&quot; -OutputPath &quot;$(VT7PtyGeneratedDirectory)GenVersion.h&quot; -ResourceOutputPath &quot;$(VT7PtyGeneratedDirectory)VersionInfo.rc&quot; -FileDescription &quot;$(VT7PtyFileDescription)&quot; -OriginalFilename &quot;$(TargetName)$(TargetExt)&quot;" />
+  </Target>
+
+  <ItemGroup>
+    <ResourceCompile Include="$(VT7PtyGeneratedDirectory)VersionInfo.rc" />
+  </ItemGroup>
+</Project>

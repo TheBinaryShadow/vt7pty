@@ -1,6 +1,7 @@
 # Releasing VT7Pty
 
-Status: approved process; tooling not yet implemented. Updated: 2026-09-21.
+Status: approved process; transition tooling partially implemented. Updated:
+2026-09-21.
 
 VT7Pty uses local, repository-owned build, verification, and packaging commands
 followed by physical Windows 7 acceptance and a manual GitHub Release. The
@@ -11,8 +12,7 @@ release changes are recorded in [CHANGELOG.md](../CHANGELOG.md).
 
 ## Candidate preparation
 
-When the Milestone 0 scripts exist, a candidate will be prepared from a clean
-checkout using:
+The initial local commands now exist:
 
 ```powershell
 .\Build-VT7Pty.ps1 -Configuration Release
@@ -20,8 +20,10 @@ checkout using:
 .\Package-VT7Pty.ps1 -Configuration Release
 ```
 
-The commands and parameters are contractual goals until Roadmap Steps 0.2,
-0.8, and 0.9 implement them.
+The current package is a single transition archive used to prove the local
+workflow. Roadmap Steps 0.8 and 0.9 must still implement the complete suite,
+physical acceptance bundle, final archive split, and final naming before a
+release candidate is valid.
 
 A candidate must identify:
 

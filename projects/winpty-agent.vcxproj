@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{13EA7B4F-5CD5-4972-B95D-94488A850238}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>winpty_agent</RootNamespace>
+    <VT7PtyFileDescription>VT7Pty inherited console agent</VT7PtyFileDescription>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration"><ConfigurationType>Application</ConfigurationType></PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ItemDefinitionGroup>
+    <ClCompile><PreprocessorDefinitions>WINPTY_AGENT_ASSERT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <Link>
+      <AdditionalDependencies>advapi32.lib;shell32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\agent\Agent.cc" />
+    <ClCompile Include="..\src\agent\AgentCreateDesktop.cc" />
+    <ClCompile Include="..\src\agent\ConsoleFont.cc" />
+    <ClCompile Include="..\src\agent\ConsoleInput.cc" />
+    <ClCompile Include="..\src\agent\ConsoleInputReencoding.cc" />
+    <ClCompile Include="..\src\agent\ConsoleLine.cc" />
+    <ClCompile Include="..\src\agent\DebugShowInput.cc" />
+    <ClCompile Include="..\src\agent\DefaultInputMap.cc" />
+    <ClCompile Include="..\src\agent\EventLoop.cc" />
+    <ClCompile Include="..\src\agent\InputMap.cc" />
+    <ClCompile Include="..\src\agent\LargeConsoleRead.cc" />
+    <ClCompile Include="..\src\agent\main.cc" />
+    <ClCompile Include="..\src\agent\NamedPipe.cc" />
+    <ClCompile Include="..\src\agent\Scraper.cc" />
+    <ClCompile Include="..\src\agent\Terminal.cc" />
+    <ClCompile Include="..\src\agent\Win32Console.cc" />
+    <ClCompile Include="..\src\agent\Win32ConsoleBuffer.cc" />
+    <ClCompile Include="..\src\shared\BackgroundDesktop.cc" />
+    <ClCompile Include="..\src\shared\Buffer.cc" />
+    <ClCompile Include="..\src\shared\DebugClient.cc" />
+    <ClCompile Include="..\src\shared\GenRandom.cc" />
+    <ClCompile Include="..\src\shared\OwnedHandle.cc" />
+    <ClCompile Include="..\src\shared\StringUtil.cc" />
+    <ClCompile Include="..\src\shared\WindowsSecurity.cc" />
+    <ClCompile Include="..\src\shared\WindowsVersion.cc" />
+    <ClCompile Include="..\src\shared\WinptyAssert.cc" />
+    <ClCompile Include="..\src\shared\WinptyException.cc" />
+    <ClCompile Include="..\src\shared\WinptyVersion.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\agent\Agent.h" />
+    <ClInclude Include="..\src\agent\AgentCreateDesktop.h" />
+    <ClInclude Include="..\src\agent\ConsoleFont.h" />
+    <ClInclude Include="..\src\agent\ConsoleInput.h" />
+    <ClInclude Include="..\src\agent\ConsoleInputReencoding.h" />
+    <ClInclude Include="..\src\agent\ConsoleLine.h" />
+    <ClInclude Include="..\src\agent\Coord.h" />
+    <ClInclude Include="..\src\agent\DebugShowInput.h" />
+    <ClInclude Include="..\src\agent\DefaultInputMap.h" />
+    <ClInclude Include="..\src\agent\DsrSender.h" />
+    <ClInclude Include="..\src\agent\EventLoop.h" />
+    <ClInclude Include="..\src\agent\InputMap.h" />
+    <ClInclude Include="..\src\agent\LargeConsoleRead.h" />
+    <ClInclude Include="..\src\agent\NamedPipe.h" />
+    <ClInclude Include="..\src\agent\Scraper.h" />
+    <ClInclude Include="..\src\agent\SimplePool.h" />
+    <ClInclude Include="..\src\agent\SmallRect.h" />
+    <ClInclude Include="..\src\agent\Terminal.h" />
+    <ClInclude Include="..\src\agent\UnicodeEncoding.h" />
+    <ClInclude Include="..\src\agent\Win32Console.h" />
+    <ClInclude Include="..\src\agent\Win32ConsoleBuffer.h" />
+    <ClInclude Include="..\src\shared\AgentMsg.h" />
+    <ClInclude Include="..\src\shared\BackgroundDesktop.h" />
+    <ClInclude Include="..\src\shared\Buffer.h" />
+    <ClInclude Include="..\src\shared\DebugClient.h" />
+    <ClInclude Include="..\src\shared\GenRandom.h" />
+    <ClInclude Include="..\src\shared\OsModule.h" />
+    <ClInclude Include="..\src\shared\OwnedHandle.h" />
+    <ClInclude Include="..\src\shared\StringBuilder.h" />
+    <ClInclude Include="..\src\shared\StringUtil.h" />
+    <ClInclude Include="..\src\shared\UnixCtrlChars.h" />
+    <ClInclude Include="..\src\shared\WindowsSecurity.h" />
+    <ClInclude Include="..\src\shared\WindowsVersion.h" />
+    <ClInclude Include="..\src\shared\winpty_snprintf.h" />
+    <ClInclude Include="..\src\shared\WinptyAssert.h" />
+    <ClInclude Include="..\src\shared\WinptyException.h" />
+    <ClInclude Include="..\src\shared\WinptyVersion.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

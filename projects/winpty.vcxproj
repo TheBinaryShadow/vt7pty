@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FCD1D231-A00E-4A06-AE98-A495F9BF25D1}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>winpty</RootNamespace>
+    <VT7PtyFileDescription>VT7Pty inherited client library</VT7PtyFileDescription>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>COMPILING_WINPTY_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>advapi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\libwinpty\AgentLocation.cc" />
+    <ClCompile Include="..\src\libwinpty\winpty.cc" />
+    <ClCompile Include="..\src\shared\BackgroundDesktop.cc" />
+    <ClCompile Include="..\src\shared\Buffer.cc" />
+    <ClCompile Include="..\src\shared\DebugClient.cc" />
+    <ClCompile Include="..\src\shared\GenRandom.cc" />
+    <ClCompile Include="..\src\shared\OwnedHandle.cc" />
+    <ClCompile Include="..\src\shared\StringUtil.cc" />
+    <ClCompile Include="..\src\shared\WindowsSecurity.cc" />
+    <ClCompile Include="..\src\shared\WindowsVersion.cc" />
+    <ClCompile Include="..\src\shared\WinptyAssert.cc" />
+    <ClCompile Include="..\src\shared\WinptyException.cc" />
+    <ClCompile Include="..\src\shared\WinptyVersion.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\include\winpty.h" />
+    <ClInclude Include="..\src\include\winpty_constants.h" />
+    <ClInclude Include="..\src\libwinpty\AgentLocation.h" />
+    <ClInclude Include="..\src\libwinpty\LibWinptyException.h" />
+    <ClInclude Include="..\src\libwinpty\WinptyInternal.h" />
+    <ClInclude Include="..\src\shared\AgentMsg.h" />
+    <ClInclude Include="..\src\shared\BackgroundDesktop.h" />
+    <ClInclude Include="..\src\shared\Buffer.h" />
+    <ClInclude Include="..\src\shared\DebugClient.h" />
+    <ClInclude Include="..\src\shared\GenRandom.h" />
+    <ClInclude Include="..\src\shared\OsModule.h" />
+    <ClInclude Include="..\src\shared\OwnedHandle.h" />
+    <ClInclude Include="..\src\shared\StringBuilder.h" />
+    <ClInclude Include="..\src\shared\StringUtil.h" />
+    <ClInclude Include="..\src\shared\WindowsSecurity.h" />
+    <ClInclude Include="..\src\shared\WindowsVersion.h" />
+    <ClInclude Include="..\src\shared\winpty_snprintf.h" />
+    <ClInclude Include="..\src\shared\WinptyAssert.h" />
+    <ClInclude Include="..\src\shared\WinptyException.h" />
+    <ClInclude Include="..\src\shared\WinptyVersion.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

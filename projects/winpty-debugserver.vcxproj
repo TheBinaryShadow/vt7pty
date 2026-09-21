@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{70226E28-3588-41B2-AE38-DA182428BF12}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>winpty_debugserver</RootNamespace>
+    <VT7PtyFileDescription>VT7Pty inherited diagnostic server</VT7PtyFileDescription>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration"><ConfigurationType>Application</ConfigurationType></PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\debugserver\DebugServer.cc" />
+    <ClCompile Include="..\src\shared\DebugClient.cc" />
+    <ClCompile Include="..\src\shared\OwnedHandle.cc" />
+    <ClCompile Include="..\src\shared\StringUtil.cc" />
+    <ClCompile Include="..\src\shared\WindowsSecurity.cc" />
+    <ClCompile Include="..\src\shared\WindowsVersion.cc" />
+    <ClCompile Include="..\src\shared\WinptyAssert.cc" />
+    <ClCompile Include="..\src\shared\WinptyException.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\shared\DebugClient.h" />
+    <ClInclude Include="..\src\shared\OsModule.h" />
+    <ClInclude Include="..\src\shared\OwnedHandle.h" />
+    <ClInclude Include="..\src\shared\StringBuilder.h" />
+    <ClInclude Include="..\src\shared\StringUtil.h" />
+    <ClInclude Include="..\src\shared\WindowsSecurity.h" />
+    <ClInclude Include="..\src\shared\WindowsVersion.h" />
+    <ClInclude Include="..\src\shared\winpty_snprintf.h" />
+    <ClInclude Include="..\src\shared\WinptyAssert.h" />
+    <ClInclude Include="..\src\shared\WinptyException.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

@@ -55,6 +55,20 @@ imports, exports, warnings, and the two inherited test results. Step 0.2 must
 reproduce that boundary through the supported MSBuild workflow. The original
 ignored environment-check harness is no longer baseline evidence.
 
+Roadmap Step 0.2 now provides the first maintained development-host command:
+
+```powershell
+.\Verify-VT7Pty.ps1
+```
+
+It builds Debug and Release by default, runs the two inherited tests plus the
+agent version check, and validates architecture, subsystem floor, direct
+imports, the inherited DLL export boundary, PDB presence, and generated
+artifact identity. Results and dumpbin evidence are written below ignored
+`artifacts/verification`. These checks establish build-transition parity only;
+they do not satisfy the broader permanent suite or either physical Windows 7
+tier.
+
 ## Coverage matrix
 
 | Area | Minimum coverage |
