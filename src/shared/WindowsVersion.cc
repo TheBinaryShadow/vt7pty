@@ -31,8 +31,8 @@
 #include "OsModule.h"
 #include "StringBuilder.h"
 #include "StringUtil.h"
-#include "WinptyAssert.h"
-#include "WinptyException.h"
+#include "Assert.h"
+#include "Exception.h"
 
 namespace {
 
@@ -59,7 +59,7 @@ OSVERSIONINFOEXW getWindowsVersionInfo() {
     const LONG status = rtlGetVersion(
         reinterpret_cast<OSVERSIONINFOW *>(&info));
     if (status < 0) {
-        throwWinptyException(L"RtlGetVersion failed");
+        throwVT7PtyException(L"RtlGetVersion failed");
     }
     return info;
 }
@@ -69,20 +69,20 @@ Version getWindowsVersion() {
     return Version(info.dwMajorVersion, info.dwMinorVersion);
 }
 
-struct ModuleNotFound : WinptyException {
+struct ModuleNotFound : VT7PtyException {
     virtual const wchar_t *what() const noexcept override {
         return L"ModuleNotFound";
     }
 };
 
-// Throws WinptyException on error.
+// Throws VT7PtyException on error.
 std::wstring getSystemDirectory() {
     wchar_t systemDirectory[MAX_PATH];
     const UINT size = GetSystemDirectoryW(systemDirectory, MAX_PATH);
     if (size == 0) {
         throwWindowsError(L"GetSystemDirectory failed");
     } else if (size >= MAX_PATH) {
-        throwWinptyException(
+        throwVT7PtyException(
             L"GetSystemDirectory: path is longer than MAX_PATH");
     }
     return systemDirectory;
@@ -93,16 +93,16 @@ std::wstring getSystemDirectory() {
         reinterpret_cast<decltype(name)*>(                  \
             versionDll.proc(#name));                        \
     if (p ## name == nullptr) {                             \
-        throwWinptyException(L ## #name L" is missing");    \
+        throwVT7PtyException(L ## #name L" is missing");    \
     }
 
-// Throws WinptyException on error.
+// Throws VT7PtyException on error.
 VS_FIXEDFILEINFO getFixedFileInfo(const std::wstring &path) {
     // version.dll is not a conventional KnownDll, so if we link to it, there's
     // a danger of accidentally loading a malicious DLL.  In a more typical
     // application, perhaps we'd guard against this security issue by
     // controlling which directories this code runs in (e.g. *not* the
-    // "Downloads" directory), but that's harder for the winpty library.
+    // "Downloads" directory), but that's harder for the VT7Pty library.
     OsModule versionDll(
         (getSystemDirectory() + L"\\version.dll").c_str(),
         OsModule::LoadErrorBehavior::Throw);
@@ -133,7 +133,7 @@ VS_FIXEDFILEINFO getFixedFileInfo(const std::wstring &path) {
             versionInfo == nullptr ||
             versionInfoSize != sizeof(VS_FIXEDFILEINFO) ||
             versionInfo->dwSignature != 0xFEEF04BD) {
-        throwWinptyException((L"VerQueryValueW failed on " + path).c_str());
+        throwVT7PtyException((L"VerQueryValueW failed on " + path).c_str());
     }
     return *versionInfo;
 }
@@ -196,7 +196,7 @@ void dumpWindowsVersion() {
             return fb.str_moved();
         } catch (const ModuleNotFound&) {
             return utf8FromWide(dllPath) + ":none";
-        } catch (const WinptyException &e) {
+        } catch (const VT7PtyException &e) {
             trace("Error getting %s version: %s",
                 utf8FromWide(dllPath).c_str(), utf8FromWide(e.what()).c_str());
             return utf8FromWide(dllPath) + ":error";

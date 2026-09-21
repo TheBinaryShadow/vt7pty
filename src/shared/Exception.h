@@ -1,4 +1,4 @@
-// Copyright (c) 2015 Ryan Prichard
+// Copyright (c) 2016 Ryan Prichard
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -18,24 +18,18 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include "WinptyVersion.h"
+#ifndef VT7PTY_EXCEPTION_H
+#define VT7PTY_EXCEPTION_H
 
-#include <stdio.h>
-#include <string.h>
+#include <windows.h>
 
-#include "DebugClient.h"
+class VT7PtyException {
+public:
+    virtual const wchar_t *what() const noexcept = 0;
+    virtual ~VT7PtyException() {}
+};
 
-// The maintained MSBuild target generates this header below build/generated
-// and adds that directory to the include path.
-#include "GenVersion.h"
+void throwVT7PtyException(const wchar_t *what);
+void throwWindowsError(const wchar_t *prefix, DWORD error=GetLastError());
 
-void dumpVersionToStdout() {
-    printf("winpty version %s\n", GenVersion_Version);
-    printf("commit %s\n", GenVersion_Commit);
-}
-
-void dumpVersionToTrace() {
-    trace("winpty version %s (commit %s)",
-        GenVersion_Version,
-        GenVersion_Commit);
-}
+#endif // VT7PTY_EXCEPTION_H

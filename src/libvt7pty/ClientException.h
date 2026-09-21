@@ -18,18 +18,37 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#ifndef WINPTY_EXCEPTION_H
-#define WINPTY_EXCEPTION_H
+#ifndef LIB_VT7PTY_EXCEPTION_H
+#define LIB_VT7PTY_EXCEPTION_H
 
-#include <windows.h>
+#include "../include/vt7pty.h"
 
-class WinptyException {
+#include "../shared/Exception.h"
+
+#include <memory>
+#include <string>
+
+class ClientException : public VT7PtyException {
 public:
-    virtual const wchar_t *what() const noexcept = 0;
-    virtual ~WinptyException() {}
+    ClientException(vt7pty_result_t code, const wchar_t *what) :
+        m_code(code), m_what(std::make_shared<std::wstring>(what)) {}
+
+    vt7pty_result_t code() const noexcept {
+        return m_code;
+    }
+
+    const wchar_t *what() const noexcept override {
+        return m_what->c_str();
+    }
+
+    std::shared_ptr<std::wstring> whatSharedStr() const noexcept {
+        return m_what;
+    }
+
+private:
+    vt7pty_result_t m_code;
+    // Using a shared_ptr ensures that copying the object raises no exception.
+    std::shared_ptr<std::wstring> m_what;
 };
 
-void throwWinptyException(const wchar_t *what);
-void throwWindowsError(const wchar_t *prefix, DWORD error=GetLastError());
-
-#endif // WINPTY_EXCEPTION_H
+#endif // LIB_VT7PTY_EXCEPTION_H

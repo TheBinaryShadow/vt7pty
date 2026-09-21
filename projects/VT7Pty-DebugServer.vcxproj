@@ -7,7 +7,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{70226E28-3588-41B2-AE38-DA182428BF12}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>winpty_debugserver</RootNamespace>
+    <RootNamespace>vt7pty_debugserver</RootNamespace>
     <VT7PtyFileDescription>VT7Pty inherited diagnostic server</VT7PtyFileDescription>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -26,8 +26,8 @@
     <ClCompile Include="..\src\shared\StringUtil.cc" />
     <ClCompile Include="..\src\shared\WindowsSecurity.cc" />
     <ClCompile Include="..\src\shared\WindowsVersion.cc" />
-    <ClCompile Include="..\src\shared\WinptyAssert.cc" />
-    <ClCompile Include="..\src\shared\WinptyException.cc" />
+    <ClCompile Include="..\src\shared\Assert.cc" />
+    <ClCompile Include="..\src\shared\Exception.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\shared\DebugClient.h" />
@@ -38,8 +38,8 @@
     <ClInclude Include="..\src\shared\WindowsSecurity.h" />
     <ClInclude Include="..\src\shared\WindowsVersion.h" />
     <ClInclude Include="..\src\shared\StringFormatting.h" />
-    <ClInclude Include="..\src\shared\WinptyAssert.h" />
-    <ClInclude Include="..\src\shared\WinptyException.h" />
+    <ClInclude Include="..\src\shared\Assert.h" />
+    <ClInclude Include="..\src\shared\Exception.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

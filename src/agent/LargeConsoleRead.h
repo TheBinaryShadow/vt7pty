@@ -28,7 +28,7 @@
 
 #include "SmallRect.h"
 #include "../shared/DebugClient.h"
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 
 class Win32ConsoleBuffer;
 

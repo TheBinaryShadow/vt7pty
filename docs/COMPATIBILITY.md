@@ -15,7 +15,7 @@ a compatibility claim until an identified build passes the required procedure.
 | Windows 7 runtime | Step 0.4 candidate accepted on Windows 7 SP1 x64; recorded evidence deviation applies |
 | Architectures | x64 is the approved product architecture; inherited x64 smoke tests passed locally |
 | Build interface | VS2022/MSBuild and repository PowerShell entry points; inherited build and packaging paths removed |
-| API and binaries | Inherited WinPTY names and behavior remain |
+| API and binaries | VT7Pty technical identity implemented; API 1.0 and client-agent protocol 1; Step 0.5 physical candidate pending |
 | ConPTY compatibility | Not implemented; ConPTY is a design and behavioral reference |
 | VT7 integration | Planned; no integration claim |
 | Releases | No VT7Pty release has been published |

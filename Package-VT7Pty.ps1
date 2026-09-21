@@ -18,6 +18,19 @@ $binaryDirectory = Join-Path $artifactRoot "bin\x64\$Configuration"
 $packageRoot = Join-Path $artifactRoot 'packages'
 $stagingRoot = Join-Path $artifactRoot 'package-staging'
 $version = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'VERSION.txt')).Trim()
+$apiVersionHeader = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'src\include\vt7pty_version.h'))
+$protocolHeader = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'src\shared\Protocol.h'))
+$apiMajorMatch = [regex]::Match($apiVersionHeader, '(?m)^#define VT7PTY_API_VERSION_MAJOR (?<value>\d+)$')
+$apiMinorMatch = [regex]::Match($apiVersionHeader, '(?m)^#define VT7PTY_API_VERSION_MINOR (?<value>\d+)$')
+$protocolMatch = [regex]::Match(
+    $protocolHeader,
+    '(?m)^constexpr int32_t VT7PTY_PROTOCOL_VERSION = (?<value>\d+);$')
+if (-not $apiMajorMatch.Success -or -not $apiMinorMatch.Success -or
+        -not $protocolMatch.Success) {
+    throw 'Could not read the VT7Pty API or protocol version.'
+}
+$apiVersion = "$($apiMajorMatch.Groups['value'].Value).$($apiMinorMatch.Groups['value'].Value)"
+$protocolVersion = [int]$protocolMatch.Groups['value'].Value
 $packageName = "VT7Pty-$version-win7-x64-$($Configuration.ToLowerInvariant())"
 if ($PackageSuffix) {
     $packageName += "-$PackageSuffix"
@@ -72,15 +85,16 @@ foreach ($directory in $directories) {
 }
 
 $copyPlan = [ordered]@{
-    'bin\winpty.dll' = (Join-Path $binaryDirectory 'winpty.dll')
-    'bin\winpty-agent.exe' = (Join-Path $binaryDirectory 'winpty-agent.exe')
-    'bin\winpty-debugserver.exe' = (Join-Path $binaryDirectory 'winpty-debugserver.exe')
-    'include\winpty.h' = (Join-Path $repositoryRoot 'src\include\winpty.h')
-    'include\winpty_constants.h' = (Join-Path $repositoryRoot 'src\include\winpty_constants.h')
-    'lib\winpty.lib' = (Join-Path $binaryDirectory 'winpty.lib')
-    'symbols\winpty.pdb' = (Join-Path $binaryDirectory 'winpty.pdb')
-    'symbols\winpty-agent.pdb' = (Join-Path $binaryDirectory 'winpty-agent.pdb')
-    'symbols\winpty-debugserver.pdb' = (Join-Path $binaryDirectory 'winpty-debugserver.pdb')
+    'bin\VT7Pty.dll' = (Join-Path $binaryDirectory 'VT7Pty.dll')
+    'bin\VT7Pty-Agent.exe' = (Join-Path $binaryDirectory 'VT7Pty-Agent.exe')
+    'bin\VT7Pty-DebugServer.exe' = (Join-Path $binaryDirectory 'VT7Pty-DebugServer.exe')
+    'include\vt7pty.h' = (Join-Path $repositoryRoot 'src\include\vt7pty.h')
+    'include\vt7pty_constants.h' = (Join-Path $repositoryRoot 'src\include\vt7pty_constants.h')
+    'include\vt7pty_version.h' = (Join-Path $repositoryRoot 'src\include\vt7pty_version.h')
+    'lib\VT7Pty.lib' = (Join-Path $binaryDirectory 'VT7Pty.lib')
+    'symbols\VT7Pty.pdb' = (Join-Path $binaryDirectory 'VT7Pty.pdb')
+    'symbols\VT7Pty-Agent.pdb' = (Join-Path $binaryDirectory 'VT7Pty-Agent.pdb')
+    'symbols\VT7Pty-DebugServer.pdb' = (Join-Path $binaryDirectory 'VT7Pty-DebugServer.pdb')
     'RUN-WINDOWS7-ACCEPTANCE.cmd' = (Join-Path $repositoryRoot 'RUN-WINDOWS7-ACCEPTANCE.cmd')
     'tools\platform\Invoke-Windows7Acceptance.ps1' = (Join-Path $repositoryRoot 'tools\platform\Invoke-Windows7Acceptance.ps1')
     'LICENSE.txt' = (Join-Path $repositoryRoot 'LICENSE')
@@ -88,7 +102,7 @@ $copyPlan = [ordered]@{
     'UPSTREAM.md' = (Join-Path $repositoryRoot 'UPSTREAM.md')
 }
 $testPrograms = @(
-    'StringBuilderTest', 'trivial_test',
+    'StringBuilderTest', 'ProtocolTest', 'ProtocolTestAgent', 'BackendSmokeTest',
     'fixture-console-color-grid', 'fixture-output-lines', 'fixture-show-argv',
     'fixture-show-console-input', 'fixture-utf16-echo', 'fixture-win32-echo1',
     'fixture-win32-echo2', 'fixture-win32-write1', 'fixture-write-console',
@@ -129,6 +143,8 @@ $manifest = [ordered]@{
     SchemaVersion = 1
     Product = 'VT7Pty'
     Version = $version
+    ApiVersion = $apiVersion
+    ProtocolVersion = $protocolVersion
     Configuration = $Configuration
     Architecture = 'x64'
     MinimumOperatingSystem = 'Windows 7 SP1'

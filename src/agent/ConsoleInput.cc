@@ -26,7 +26,7 @@
 #include <algorithm>
 #include <string>
 
-#include "../include/winpty_constants.h"
+#include "../include/vt7pty_constants.h"
 
 #include "../shared/DebugClient.h"
 #include "../shared/StringBuilder.h"
@@ -202,7 +202,7 @@ ConsoleInput::ConsoleInput(HANDLE conin, int mouseMode, DsrSender &dsrSender,
     // Configure Quick Edit mode according to the mouse mode.  Enable
     // InsertMode for two reasons:
     //  - If it's OFF, it's difficult for the user to turn it ON.  The
-    //    properties dialog is inaccesible.  winpty still faithfully handles
+    //    properties dialog is inaccesible.  VT7Pty still faithfully handles
     //    the Insert key, which toggles between the insertion and overwrite
     //    modes.
     //  - When we modify the QuickEdit setting, if ExtendedFlags is OFF,
@@ -216,7 +216,7 @@ ConsoleInput::ConsoleInput(HANDLE conin, int mouseMode, DsrSender &dsrSender,
     } else {
         mode |= ENABLE_EXTENDED_FLAGS;
         mode |= ENABLE_INSERT_MODE;
-        if (m_mouseMode == WINPTY_MOUSE_MODE_AUTO) {
+        if (m_mouseMode == VT7PTY_MOUSE_MODE_AUTO) {
             mode |= ENABLE_QUICK_EDIT_MODE;
         } else {
             mode &= ~ENABLE_QUICK_EDIT_MODE;
@@ -310,7 +310,7 @@ void ConsoleInput::updateInputFlags(bool forceTrace)
 bool ConsoleInput::shouldActivateTerminalMouse()
 {
     // Return whether the agent should activate the terminal's mouse mode.
-    if (m_mouseMode == WINPTY_MOUSE_MODE_AUTO) {
+    if (m_mouseMode == VT7PTY_MOUSE_MODE_AUTO) {
         // Some programs (e.g. Cygwin command-line programs like bash.exe and
         // python2.7.exe) turn off ENABLE_EXTENDED_FLAGS and turn on
         // ENABLE_MOUSE_INPUT, but do not turn off QuickEdit mode and do not
@@ -319,7 +319,7 @@ bool ConsoleInput::shouldActivateTerminalMouse()
         // docs/historical/EnableExtendedFlags.txt.
         return m_mouseInputEnabled && !m_quickEditEnabled &&
                 m_enableExtendedEnabled;
-    } else if (m_mouseMode == WINPTY_MOUSE_MODE_FORCE) {
+    } else if (m_mouseMode == VT7PTY_MOUSE_MODE_FORCE) {
         return true;
     } else {
         return false;
@@ -355,7 +355,7 @@ void ConsoleInput::flushInputRecords(std::vector<INPUT_RECORD> &records)
 
 // This behavior isn't strictly correct, because the keypresses (probably?)
 // adopt the keyboard state (e.g. Ctrl/Alt/Shift modifiers) of the current
-// window station's keyboard, which has no necessary relationship to the winpty
+// window station's keyboard, which has no necessary relationship to the VT7Pty
 // instance.  It's unlikely to be an issue in practice, but it's conceivable.
 // (Imagine a foreground SSH server, where the local user holds down Ctrl,
 // while the remote user tries to use WSL navigation keys.)  This remains a

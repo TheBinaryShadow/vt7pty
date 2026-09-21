@@ -30,7 +30,7 @@
 
 #include "StringFormatting.h"
 
-const wchar_t *const kPipeName = L"\\\\.\\pipe\\DebugServer";
+const wchar_t *const kPipeName = L"\\\\.\\pipe\\VT7Pty-Debug-v1";
 
 void *volatile g_debugConfig;
 
@@ -102,7 +102,7 @@ static const char *getDebugConfig()
         const int bufSize = 256;
         char buf[bufSize];
         DWORD actualSize =
-            GetEnvironmentVariableA("WINPTY_DEBUG", buf, bufSize);
+            GetEnvironmentVariableA("VT7PTY_DEBUG", buf, bufSize);
         if (actualSize == 0 || actualSize >= static_cast<DWORD>(bufSize)) {
             buf[0] = '\0';
         }
@@ -126,7 +126,7 @@ bool isTracingEnabled()
     } else if (enabled) {
         return true;
     } else {
-        // Recognize WINPTY_DEBUG=1 for backwards compatibility.
+        // Accept "1" as a convenient shorthand for the trace flag.
         PreserveLastError preserve;
         bool value = hasDebugFlag("trace") || hasDebugFlag("1");
         disabled = !value;

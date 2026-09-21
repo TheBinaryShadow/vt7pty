@@ -10,7 +10,7 @@ Set-StrictMode -Version 2.0
 
 $repositoryRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $binaryDirectory = Join-Path $repositoryRoot 'artifacts\bin\x64\Debug'
-$debuggee = Join-Path $binaryDirectory 'trivial_test.exe'
+$debuggee = Join-Path $binaryDirectory 'BackendSmokeTest.exe'
 $resultDirectory = Join-Path $repositoryRoot 'artifacts\debugging'
 $resultPath = Join-Path $resultDirectory 'source-debugging.txt'
 $utf8NoBom = New-Object Text.UTF8Encoding($false)
@@ -36,7 +36,7 @@ if (-not (Test-Path -LiteralPath $debuggee -PathType Leaf)) {
 }
 
 $cdbPath = Find-Cdb
-$commands = 'bu winpty!winpty_config_new; g; .lines -e; ln @rip; k; q'
+$commands = 'bu VT7Pty!vt7pty_config_new; g; .lines -e; ln @rip; k; q'
 $startInfo = New-Object Diagnostics.ProcessStartInfo
 $startInfo.FileName = $cdbPath
 $startInfo.WorkingDirectory = $binaryDirectory
@@ -71,13 +71,13 @@ if ($process.ExitCode -ne 0) {
     throw "cdb.exe exited with $($process.ExitCode). See $resultPath"
 }
 if ($output -notmatch '(?im)^Breakpoint \d+ hit$' -or
-        $output -notmatch '(?i)winpty!winpty_config_new') {
-    throw "The debugger did not hit winpty_config_new. See $resultPath"
+        $output -notmatch '(?i)VT7Pty!vt7pty_config_new') {
+    throw "The debugger did not hit vt7pty_config_new. See $resultPath"
 }
-if ($output -notmatch '(?i)src\\libwinpty\\winpty\.cc @ \d+') {
-    throw "The debugger did not resolve winpty.cc source lines. See $resultPath"
+if ($output -notmatch '(?i)src\\libvt7pty\\vt7pty\.cc @ \d+') {
+    throw "The debugger did not resolve vt7pty.cc source lines. See $resultPath"
 }
-if ($output -notmatch '(?i)src\\tests\\trivial_test\.cc @ \d+') {
+if ($output -notmatch '(?i)src\\tests\\BackendSmokeTest\.cc @ \d+') {
     throw "The debugger did not resolve the test caller's source lines. See $resultPath"
 }
 

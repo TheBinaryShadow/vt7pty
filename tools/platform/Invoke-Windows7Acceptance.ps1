@@ -28,14 +28,21 @@ function Invoke-AcceptanceTest {
         [Parameter(Mandatory = $true)][string]$Executable,
         [string[]]$Arguments = @(),
         [string[]]$ExpectedOutput,
+        [hashtable]$Environment = @{},
         [ValidateSet('StandardOutput', 'StandardError')]
         [string]$ExpectedStream = 'StandardOutput'
     )
 
     $stopwatch = [Diagnostics.Stopwatch]::StartNew()
+    $displayExecutable = if ($Executable.StartsWith(
+            $packageRoot + '\', [StringComparison]::OrdinalIgnoreCase)) {
+        $Executable.Substring($packageRoot.Length + 1).Replace('\', '/')
+    } else {
+        $Executable
+    }
     $record = [ordered]@{
         Name = $Name
-        Executable = $Executable.Substring($packageRoot.Length + 1).Replace('\', '/')
+        Executable = $displayExecutable
         Arguments = $Arguments
         Status = 'Fail'
         DurationMilliseconds = 0
@@ -60,6 +67,10 @@ function Invoke-AcceptanceTest {
         $startInfo.Arguments = ($Arguments | ForEach-Object {
             '"' + $_.Replace('"', '\"') + '"'
         }) -join ' '
+        foreach ($variableName in $Environment.Keys) {
+            $startInfo.EnvironmentVariables[$variableName] =
+                [string]$Environment[$variableName]
+        }
 
         $process = New-Object Diagnostics.Process
         $process.StartInfo = $startInfo
@@ -100,6 +111,37 @@ function Invoke-AcceptanceTest {
         $record.DurationMilliseconds = $stopwatch.ElapsedMilliseconds
     }
     return [pscustomobject]$record
+}
+
+function Invoke-IsolatedAgentFailureTest {
+    param(
+        [Parameter(Mandatory = $true)][string]$Case,
+        [string]$ProtocolMode
+    )
+
+    $caseDirectory = Join-Path $OutputDirectory (
+        $resultBaseName + '-agent-' + $Case)
+    if (Test-Path -LiteralPath $caseDirectory) {
+        Remove-Item -LiteralPath $caseDirectory -Recurse -Force
+    }
+    [IO.Directory]::CreateDirectory($caseDirectory) | Out-Null
+    Copy-Item -LiteralPath (Join-Path $testDirectory 'BackendSmokeTest.exe') `
+        -Destination $caseDirectory
+    Copy-Item -LiteralPath (Join-Path $binDirectory 'VT7Pty.dll') `
+        -Destination $caseDirectory
+
+    if ($ProtocolMode) {
+        Copy-Item -LiteralPath (Join-Path $testDirectory 'ProtocolTestAgent.exe') `
+            -Destination (Join-Path $caseDirectory 'VT7Pty-Agent.exe')
+        return Invoke-AcceptanceTest -Name "Agent rejection: $Case" `
+            -Executable (Join-Path $caseDirectory 'BackendSmokeTest.exe') `
+            -Arguments @('EXPECT_INCOMPATIBLE_AGENT') `
+            -Environment @{ VT7PTY_PROTOCOL_TEST_MODE = $ProtocolMode }
+    }
+
+    return Invoke-AcceptanceTest -Name "Agent rejection: $Case" `
+        -Executable (Join-Path $caseDirectory 'BackendSmokeTest.exe') `
+        -Arguments @('EXPECT_MISSING_AGENT')
 }
 
 [IO.Directory]::CreateDirectory($OutputDirectory) | Out-Null
@@ -184,16 +226,23 @@ try {
         Invoke-AcceptanceTest -Name 'String builder unit test' `
             -Executable (Join-Path $testDirectory 'StringBuilderTest.exe') `
             -ExpectedOutput 'All tests completed!' -ExpectedStream StandardError
+        Invoke-AcceptanceTest -Name 'Client-agent protocol unit test' `
+            -Executable (Join-Path $testDirectory 'ProtocolTest.exe') `
+            -ExpectedOutput 'VT7Pty protocol tests passed'
         Invoke-AcceptanceTest -Name 'Inherited lifecycle session' `
-            -Executable (Join-Path $testDirectory 'trivial_test.exe')
+            -Executable (Join-Path $testDirectory 'BackendSmokeTest.exe')
         Invoke-AcceptanceTest -Name 'Command Prompt and Windows PowerShell sessions' `
-            -Executable (Join-Path $testDirectory 'trivial_test.exe') `
+            -Executable (Join-Path $testDirectory 'BackendSmokeTest.exe') `
             -Arguments @('APPLICATIONS') `
             -ExpectedOutput 'Command Prompt and Windows PowerShell sessions passed.'
         Invoke-AcceptanceTest -Name 'Agent source identity' `
-            -Executable (Join-Path $binDirectory 'winpty-agent.exe') `
+            -Executable (Join-Path $binDirectory 'VT7Pty-Agent.exe') `
             -Arguments @('--version') `
-            -ExpectedOutput @("winpty version $($manifest.Version)", "commit $($manifest.SourceCommit)")
+            -ExpectedOutput @(
+                "VT7Pty version $($manifest.Version)",
+                "commit $($manifest.SourceCommit)",
+                "API version $($manifest.ApiVersion)",
+                "protocol version $($manifest.ProtocolVersion)")
         Invoke-AcceptanceTest -Name 'Argument quoting fixture' `
             -Executable (Join-Path $testDirectory 'fixture-show-argv.exe') `
             -Arguments @('alpha', 'two words') `
@@ -202,6 +251,11 @@ try {
             -Executable (Join-Path $testDirectory 'fixture-output-lines.exe') `
             -Arguments @('3', '5') `
             -ExpectedOutput '3 XXXXX'
+        Invoke-IsolatedAgentFailureTest -Case 'missing'
+        Invoke-IsolatedAgentFailureTest -Case 'malformed' -ProtocolMode 'malformed'
+        Invoke-IsolatedAgentFailureTest -Case 'wrong-identity' -ProtocolMode 'wrong-identity'
+        Invoke-IsolatedAgentFailureTest -Case 'older-protocol' -ProtocolMode 'older'
+        Invoke-IsolatedAgentFailureTest -Case 'newer-protocol' -ProtocolMode 'newer'
     )
 } finally {
     $env:PATH = $previousPath
@@ -248,6 +302,8 @@ $record = [ordered]@{
     Package = [ordered]@{
         Product = $manifest.Product
         Version = $manifest.Version
+        ApiVersion = $manifest.ApiVersion
+        ProtocolVersion = $manifest.ProtocolVersion
         Configuration = $manifest.Configuration
         Architecture = $manifest.Architecture
         MinimumOperatingSystem = $manifest.MinimumOperatingSystem

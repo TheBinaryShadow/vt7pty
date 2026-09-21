@@ -18,22 +18,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#ifndef LIBWINPTY_WINPTY_INTERNAL_H
-#define LIBWINPTY_WINPTY_INTERNAL_H
+#ifndef LIBVT7PTY_VT7PTY_INTERNAL_H
+#define LIBVT7PTY_VT7PTY_INTERNAL_H
 
 #include <memory>
 #include <mutex>
 #include <string>
 
-#include "../include/winpty.h"
+#include "../include/vt7pty.h"
 
 #include "../shared/OwnedHandle.h"
 
 // The structures in this header are not intended to be accessed directly by
 // client programs.
 
-struct winpty_error_s {
-    winpty_result_t code;
+struct vt7pty_error_s {
+    vt7pty_result_t code;
     const wchar_t *msgStatic;
     // Use a pointer to a std::shared_ptr so that the struct remains simple
     // enough to statically initialize, for the benefit of static error
@@ -41,15 +41,15 @@ struct winpty_error_s {
     std::shared_ptr<std::wstring> *msgDynamic;
 };
 
-struct winpty_config_s {
+struct vt7pty_config_s {
     uint64_t flags = 0;
     int cols = 80;
     int rows = 25;
-    int mouseMode = WINPTY_MOUSE_MODE_AUTO;
+    int mouseMode = VT7PTY_MOUSE_MODE_AUTO;
     DWORD timeoutMs = 30000;
 };
 
-struct winpty_s {
+struct vt7pty_s {
     std::mutex mutex;
     OwnedHandle agentProcess;
     OwnedHandle controlPipe;
@@ -60,12 +60,12 @@ struct winpty_s {
     std::wstring conerrPipeName;
 };
 
-struct winpty_spawn_config_s {
-    uint64_t winptyFlags = 0;
+struct vt7pty_spawn_config_s {
+    uint64_t spawnFlags = 0;
     std::wstring appname;
     std::wstring cmdline;
     std::wstring cwd;
     std::wstring env;
 };
 
-#endif // LIBWINPTY_WINPTY_INTERNAL_H
+#endif // LIBVT7PTY_VT7PTY_INTERNAL_H

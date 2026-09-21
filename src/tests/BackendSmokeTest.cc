@@ -30,7 +30,7 @@
 #include <string>
 #include <vector>
 
-#include "../include/winpty.h"
+#include "../include/vt7pty.h"
 #include "../shared/DebugClient.h"
 
 static std::vector<unsigned char> filterContent(
@@ -85,27 +85,27 @@ static void parentTest() {
         cmdline, _countof(cmdline), L"\"%ls\" CHILD", program);
     assert(commandLength > 0);
 
-    auto agentCfg = winpty_config_new(0, nullptr);
+    auto agentCfg = vt7pty_config_new(0, nullptr);
     assert(agentCfg != nullptr);
-    auto pty = winpty_open(agentCfg, nullptr);
+    auto pty = vt7pty_open(agentCfg, nullptr);
     assert(pty != nullptr);
-    winpty_config_free(agentCfg);
+    vt7pty_config_free(agentCfg);
 
     HANDLE conin = CreateFileW(
-        winpty_conin_name(pty),
+        vt7pty_conin_name(pty),
         GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr);
     HANDLE conout = CreateFileW(
-        winpty_conout_name(pty),
+        vt7pty_conout_name(pty),
         GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
     assert(conin != INVALID_HANDLE_VALUE);
     assert(conout != INVALID_HANDLE_VALUE);
 
-    auto spawnCfg = winpty_spawn_config_new(
-            WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN, program, cmdline,
+    auto spawnCfg = vt7pty_spawn_config_new(
+            VT7PTY_SPAWN_FLAG_AUTO_SHUTDOWN, program, cmdline,
             nullptr, nullptr, nullptr);
     assert(spawnCfg != nullptr);
     HANDLE process = nullptr;
-    BOOL spawnSuccess = winpty_spawn(
+    BOOL spawnSuccess = vt7pty_spawn(
         pty, spawnCfg, &process, nullptr, nullptr, nullptr);
     assert(spawnSuccess && process != nullptr);
 
@@ -121,7 +121,7 @@ static void parentTest() {
     CloseHandle(conin);
     CloseHandle(conout);
     assert(content == expectedContent);
-    winpty_free(pty);
+    vt7pty_free(pty);
 }
 
 static void childTest() {
@@ -151,32 +151,32 @@ static void applicationTest(
         const char *expectedText) {
     const std::wstring commandLine = L"\"" + program + L"\" " + arguments;
 
-    winpty_error_ptr_t error = nullptr;
-    auto agentCfg = winpty_config_new(0, &error);
+    vt7pty_error_ptr_t error = nullptr;
+    auto agentCfg = vt7pty_config_new(0, &error);
     assert(agentCfg != nullptr && error == nullptr);
-    winpty_config_set_initial_size(agentCfg, 80, 25);
-    auto pty = winpty_open(agentCfg, &error);
-    winpty_config_free(agentCfg);
+    vt7pty_config_set_initial_size(agentCfg, 80, 25);
+    auto pty = vt7pty_open(agentCfg, &error);
+    vt7pty_config_free(agentCfg);
     assert(pty != nullptr && error == nullptr);
 
     HANDLE conin = CreateFileW(
-        winpty_conin_name(pty),
+        vt7pty_conin_name(pty),
         GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, 0, nullptr);
     HANDLE conout = CreateFileW(
-        winpty_conout_name(pty),
+        vt7pty_conout_name(pty),
         GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
     assert(conin != INVALID_HANDLE_VALUE);
     assert(conout != INVALID_HANDLE_VALUE);
-    assert(winpty_set_size(pty, 100, 30, &error) && error == nullptr);
+    assert(vt7pty_set_size(pty, 100, 30, &error) && error == nullptr);
 
-    auto spawnCfg = winpty_spawn_config_new(
-        WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN,
+    auto spawnCfg = vt7pty_spawn_config_new(
+        VT7PTY_SPAWN_FLAG_AUTO_SHUTDOWN,
         program.c_str(), commandLine.c_str(), nullptr, nullptr, &error);
     assert(spawnCfg != nullptr && error == nullptr);
     HANDLE process = nullptr;
-    BOOL spawnSuccess = winpty_spawn(
+    BOOL spawnSuccess = vt7pty_spawn(
         pty, spawnCfg, &process, nullptr, nullptr, &error);
-    winpty_spawn_config_free(spawnCfg);
+    vt7pty_spawn_config_free(spawnCfg);
     assert(spawnSuccess && process != nullptr && error == nullptr);
 
     auto content = filterContent(readAll(conout));
@@ -187,7 +187,7 @@ static void applicationTest(
     CloseHandle(process);
     CloseHandle(conin);
     CloseHandle(conout);
-    winpty_free(pty);
+    vt7pty_free(pty);
 }
 
 static void applicationsTest() {
@@ -203,11 +203,38 @@ static void applicationsTest() {
     printf("Command Prompt and Windows PowerShell sessions passed.\n");
 }
 
+static void expectedOpenFailure(
+        vt7pty_result_t expectedCode,
+        const wchar_t *expectedMessage) {
+    vt7pty_error_ptr_t error = nullptr;
+    auto agentCfg = vt7pty_config_new(0, &error);
+    assert(agentCfg != nullptr && error == nullptr);
+    auto pty = vt7pty_open(agentCfg, &error);
+    vt7pty_config_free(agentCfg);
+
+    assert(pty == nullptr);
+    assert(error != nullptr);
+    assert(vt7pty_error_code(error) == expectedCode);
+    const wchar_t *message = vt7pty_error_msg(error);
+    assert(message != nullptr && wcsstr(message, expectedMessage) != nullptr);
+    wprintf(L"Expected VT7Pty failure: %ls\n", message);
+    vt7pty_error_free(error);
+}
+
 int main(int argc, char *argv[]) {
     if (argc == 1) {
         parentTest();
     } else if (argc == 2 && strcmp(argv[1], "APPLICATIONS") == 0) {
         applicationsTest();
+    } else if (argc == 2 && strcmp(argv[1], "EXPECT_MISSING_AGENT") == 0) {
+        expectedOpenFailure(
+            VT7PTY_ERROR_AGENT_EXE_MISSING,
+            L"VT7Pty agent executable is missing");
+    } else if (argc == 2 &&
+            strcmp(argv[1], "EXPECT_INCOMPATIBLE_AGENT") == 0) {
+        expectedOpenFailure(
+            VT7PTY_ERROR_AGENT_INCOMPATIBLE,
+            L"VT7Pty agent");
     } else {
         childTest();
     }

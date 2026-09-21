@@ -24,9 +24,9 @@
 #include <windows.h>
 
 #include "../shared/WindowsSecurity.h"
-#include "../shared/WinptyException.h"
+#include "../shared/Exception.h"
 
-const wchar_t *kPipeName = L"\\\\.\\pipe\\DebugServer";
+const wchar_t *kPipeName = L"\\\\.\\pipe\\VT7Pty-Debug-v1";
 
 // A message may not be larger than this size.
 const int MSG_SIZE = 4096;
@@ -38,9 +38,8 @@ static void usage(const char *program, int code) {
            "message to stdout.  By default, only the current user can send messages.\n"
            "Pass --everyone to let anyone send a message.\n"
            "\n"
-           "Use the WINPTY_DEBUG environment variable to enable winpty trace output.\n"
-           "(e.g. WINPTY_DEBUG=trace for the default trace output.)  Set WINPTYDBG=1\n"
-           "to enable trace with older winpty versions.\n",
+           "Use the VT7PTY_DEBUG environment variable to enable VT7Pty trace output.\n"
+           "For example, set VT7PTY_DEBUG=trace for the default trace output.\n",
            program, kPipeName);
     exit(code);
 }
@@ -64,7 +63,7 @@ int main(int argc, char *argv[]) {
     if (everyone) {
         try {
             sd = createPipeSecurityDescriptorOwnerFullControlEveryoneWrite();
-        } catch (const WinptyException &e) {
+        } catch (const VT7PtyException &e) {
             fprintf(stderr,
                 "error creating security descriptor: %ls\n", e.what());
             exit(1);

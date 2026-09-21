@@ -25,7 +25,7 @@
 
 #include <vector>
 
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 
 template <typename T, size_t chunkSize>
 class SimplePool {

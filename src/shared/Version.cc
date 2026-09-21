@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Ryan Prichard
+// Copyright (c) 2015 Ryan Prichard
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -18,37 +18,33 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#ifndef LIB_WINPTY_EXCEPTION_H
-#define LIB_WINPTY_EXCEPTION_H
+#include "Version.h"
 
-#include "../include/winpty.h"
+#include <stdio.h>
+#include <string.h>
 
-#include "../shared/WinptyException.h"
+#include "DebugClient.h"
 
-#include <memory>
-#include <string>
+// The maintained MSBuild target generates this header below build/generated
+// and adds that directory to the include path.
+#include "GenVersion.h"
+#include "../include/vt7pty_version.h"
+#include "Protocol.h"
 
-class LibWinptyException : public WinptyException {
-public:
-    LibWinptyException(winpty_result_t code, const wchar_t *what) :
-        m_code(code), m_what(std::make_shared<std::wstring>(what)) {}
+void dumpVersionToStdout() {
+    printf("VT7Pty version %s\n", GenVersion_Version);
+    printf("commit %s\n", GenVersion_Commit);
+    printf("API version %d.%d\n",
+        VT7PTY_API_VERSION_MAJOR,
+        VT7PTY_API_VERSION_MINOR);
+    printf("protocol version %d\n", VT7PTY_PROTOCOL_VERSION);
+}
 
-    winpty_result_t code() const noexcept {
-        return m_code;
-    }
-
-    const wchar_t *what() const noexcept override {
-        return m_what->c_str();
-    }
-
-    std::shared_ptr<std::wstring> whatSharedStr() const noexcept {
-        return m_what;
-    }
-
-private:
-    winpty_result_t m_code;
-    // Using a shared_ptr ensures that copying the object raises no exception.
-    std::shared_ptr<std::wstring> m_what;
-};
-
-#endif // LIB_WINPTY_EXCEPTION_H
+void dumpVersionToTrace() {
+    trace("VT7Pty version %s (commit %s, API %d.%d, protocol %d)",
+        GenVersion_Version,
+        GenVersion_Commit,
+        VT7PTY_API_VERSION_MAJOR,
+        VT7PTY_API_VERSION_MINOR,
+        VT7PTY_PROTOCOL_VERSION);
+}

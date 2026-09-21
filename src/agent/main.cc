@@ -25,8 +25,8 @@
 
 #include "../shared/StringUtil.h"
 #include "../shared/WindowsVersion.h"
-#include "../shared/WinptyAssert.h"
-#include "../shared/WinptyVersion.h"
+#include "../shared/Assert.h"
+#include "../shared/Version.h"
 
 #include "Agent.h"
 #include "DebugShowInput.h"
@@ -34,9 +34,9 @@
 const char USAGE[] =
 "Usage: %ls controlPipeName flags mouseMode cols rows\n"
 "\n"
-"Ordinarily, this program is launched by winpty.dll and is not directly\n"
-"useful to winpty users.  However, it also has options intended for\n"
-"debugging winpty.\n"
+"Ordinarily, this program is launched by VT7Pty.dll and is not directly\n"
+"useful to VT7Pty users.  However, it also has options intended for\n"
+"debugging VT7Pty.\n"
 "\n"
 "Usage: %ls [options]\n"
 "\n"
@@ -47,9 +47,9 @@ const char USAGE[] =
 "                       output\n"
 "                   --escape-input: Direct the new Windows 10 console to use\n"
 "                       escape sequences for input\n"
-"  --version        Print the winpty version\n";
+"  --version        Print the VT7Pty version\n";
 
-static uint64_t winpty_atoi64(const char *str) {
+static uint64_t vt7pty_atoi64(const char *str) {
     return strtoll(str, NULL, 10);
 }
 
@@ -95,7 +95,7 @@ int main() {
     }
 
     Agent agent(argv[1],
-                winpty_atoi64(utf8FromWide(argv[2]).c_str()),
+                vt7pty_atoi64(utf8FromWide(argv[2]).c_str()),
                 atoi(utf8FromWide(argv[3]).c_str()),
                 atoi(utf8FromWide(argv[4]).c_str()),
                 atoi(utf8FromWide(argv[5]).c_str()));

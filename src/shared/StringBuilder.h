@@ -34,8 +34,8 @@
 //
 // StringBuilderTest.cc is a standalone program that tests this header.
 
-#ifndef WINPTY_STRING_BUILDER_H
-#define WINPTY_STRING_BUILDER_H
+#ifndef VT7PTY_STRING_BUILDER_H
+#define VT7PTY_STRING_BUILDER_H
 
 #include <array>
 #include <string>
@@ -48,7 +48,7 @@
 #define STRING_BUILDER_CHECK(cond)
 #endif // STRING_BUILDER_TESTING
 
-#include "WinptyAssert.h"
+#include "Assert.h"
 
 template <typename C, size_t sz>
 struct ValueString {
@@ -208,4 +208,4 @@ private:
 typedef GStringBuilder<char> StringBuilder;
 typedef GStringBuilder<wchar_t> WStringBuilder;
 
-#endif // WINPTY_STRING_BUILDER_H
+#endif // VT7PTY_STRING_BUILDER_H

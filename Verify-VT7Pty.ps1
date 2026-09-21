@@ -15,6 +15,21 @@ $repositoryRoot = $PSScriptRoot
 $artifactRoot = Join-Path $repositoryRoot 'artifacts'
 $utf8NoBom = New-Object Text.UTF8Encoding($false)
 $sourceVersion = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'VERSION.txt')).Trim()
+$apiVersionHeader = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'src\include\vt7pty_version.h'))
+$protocolHeader = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'src\shared\Protocol.h'))
+$apiMajorMatch = [regex]::Match($apiVersionHeader, '(?m)^#define VT7PTY_API_VERSION_MAJOR (?<value>\d+)$')
+$apiMinorMatch = [regex]::Match($apiVersionHeader, '(?m)^#define VT7PTY_API_VERSION_MINOR (?<value>\d+)$')
+if (-not $apiMajorMatch.Success -or -not $apiMinorMatch.Success) {
+    throw 'Could not read the public API version from vt7pty_version.h.'
+}
+$apiVersion = "$($apiMajorMatch.Groups['value'].Value).$($apiMinorMatch.Groups['value'].Value)"
+$protocolMatch = [regex]::Match(
+    $protocolHeader,
+    '(?m)^constexpr int32_t VT7PTY_PROTOCOL_VERSION = (?<value>\d+);$')
+if (-not $protocolMatch.Success) {
+    throw 'Could not read the client-agent protocol version from Protocol.h.'
+}
+$protocolVersion = [int]$protocolMatch.Groups['value'].Value
 $sourceCommit = (& git -C $repositoryRoot rev-parse --verify HEAD 2>&1 | Out-String).Trim()
 if ($LASTEXITCODE -ne 0) {
     throw "Could not resolve source commit: $sourceCommit"
@@ -70,7 +85,8 @@ function Invoke-NativeTest {
     param(
         [Parameter(Mandatory = $true)][string]$Executable,
         [Parameter(Mandatory = $true)][string]$WorkingDirectory,
-        [string[]]$Arguments = @()
+        [string[]]$Arguments = @(),
+        [hashtable]$Environment = @{}
     )
 
     $startInfo = New-Object Diagnostics.ProcessStartInfo
@@ -81,6 +97,9 @@ function Invoke-NativeTest {
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
     $startInfo.Arguments = ($Arguments | ForEach-Object { '"' + $_.Replace('"', '\"') + '"' }) -join ' '
+    foreach ($name in $Environment.Keys) {
+        $startInfo.EnvironmentVariables[$name] = [string]$Environment[$name]
+    }
 
     $process = New-Object Diagnostics.Process
     $process.StartInfo = $startInfo
@@ -105,6 +124,40 @@ function Invoke-NativeTest {
     }
 }
 
+function Invoke-IsolatedAgentFailureTest {
+    param(
+        [Parameter(Mandatory = $true)][string]$BinaryDirectory,
+        [Parameter(Mandatory = $true)][string]$ResultDirectory,
+        [Parameter(Mandatory = $true)][string]$Case,
+        [string]$ProtocolMode
+    )
+
+    $caseDirectory = Join-Path $ResultDirectory ("agent-failure-" + $Case)
+    if (Test-Path -LiteralPath $caseDirectory) {
+        Remove-Item -LiteralPath $caseDirectory -Recurse -Force
+    }
+    [IO.Directory]::CreateDirectory($caseDirectory) | Out-Null
+    Copy-Item -LiteralPath (Join-Path $BinaryDirectory 'BackendSmokeTest.exe') -Destination $caseDirectory
+    Copy-Item -LiteralPath (Join-Path $BinaryDirectory 'VT7Pty.dll') -Destination $caseDirectory
+
+    if ($ProtocolMode) {
+        Copy-Item -LiteralPath (Join-Path $BinaryDirectory 'ProtocolTestAgent.exe') `
+            -Destination (Join-Path $caseDirectory 'VT7Pty-Agent.exe')
+        $result = Invoke-NativeTest `
+            -Executable (Join-Path $caseDirectory 'BackendSmokeTest.exe') `
+            -WorkingDirectory $caseDirectory `
+            -Arguments @('EXPECT_INCOMPATIBLE_AGENT') `
+            -Environment @{ VT7PTY_PROTOCOL_TEST_MODE = $ProtocolMode }
+    } else {
+        $result = Invoke-NativeTest `
+            -Executable (Join-Path $caseDirectory 'BackendSmokeTest.exe') `
+            -WorkingDirectory $caseDirectory `
+            -Arguments @('EXPECT_MISSING_AGENT')
+    }
+    $result.Name = "Agent rejection: $Case"
+    return $result
+}
+
 function Assert-NativeTestPassed {
     param([Parameter(Mandatory = $true)]$Result)
     if ($Result.TimedOut) {
@@ -125,19 +178,21 @@ $manifestToolPath = Find-ManifestTool
 $manifestToolVersion = (Get-Item -LiteralPath $manifestToolPath).VersionInfo.FileVersion
 $configurations = if ($Configuration -eq 'All') { @('Debug', 'Release') } else { @($Configuration) }
 $expectedExports = @(
-    'winpty_agent_process', 'winpty_conerr_name', 'winpty_config_free',
-    'winpty_config_new', 'winpty_config_set_agent_timeout',
-    'winpty_config_set_initial_size', 'winpty_config_set_mouse_mode',
-    'winpty_conin_name', 'winpty_conout_name', 'winpty_error_code',
-    'winpty_error_free', 'winpty_error_msg', 'winpty_free',
-    'winpty_get_console_process_list', 'winpty_open', 'winpty_set_size',
-    'winpty_spawn', 'winpty_spawn_config_free', 'winpty_spawn_config_new'
+    'vt7pty_agent_process', 'vt7pty_conerr_name', 'vt7pty_config_free',
+    'vt7pty_config_new', 'vt7pty_config_set_agent_timeout',
+    'vt7pty_config_set_initial_size', 'vt7pty_config_set_mouse_mode',
+    'vt7pty_conin_name', 'vt7pty_conout_name', 'vt7pty_error_code',
+    'vt7pty_error_free', 'vt7pty_error_msg', 'vt7pty_free',
+    'vt7pty_get_console_process_list', 'vt7pty_open', 'vt7pty_set_size',
+    'vt7pty_spawn', 'vt7pty_spawn_config_free', 'vt7pty_spawn_config_new'
 )
 $expectedImports = [ordered]@{
-    'winpty.dll' = @('ADVAPI32.dll', 'KERNEL32.dll')
-    'winpty-agent.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'SHELL32.dll', 'USER32.dll')
-    'winpty-debugserver.exe' = @('ADVAPI32.dll', 'KERNEL32.dll')
-    'trivial_test.exe' = @('KERNEL32.dll', 'winpty.dll')
+    'VT7Pty.dll' = @('ADVAPI32.dll', 'KERNEL32.dll')
+    'VT7Pty-Agent.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'SHELL32.dll', 'USER32.dll')
+    'VT7Pty-DebugServer.exe' = @('ADVAPI32.dll', 'KERNEL32.dll')
+    'BackendSmokeTest.exe' = @('KERNEL32.dll', 'VT7Pty.dll')
+    'ProtocolTest.exe' = @('KERNEL32.dll')
+    'ProtocolTestAgent.exe' = @('KERNEL32.dll')
     'StringBuilderTest.exe' = @('KERNEL32.dll')
     'fixture-console-color-grid.exe' = @('KERNEL32.dll')
     'fixture-output-lines.exe' = @('KERNEL32.dll')
@@ -172,12 +227,27 @@ foreach ($configurationName in $configurations) {
     $resultDirectory = Join-Path $artifactRoot "verification\x64\$configurationName"
     [IO.Directory]::CreateDirectory($resultDirectory) | Out-Null
 
-    $requiredArtifacts = @(
+    $legacyArtifacts = @(
         'winpty.dll', 'winpty.lib', 'winpty.pdb',
         'winpty-agent.exe', 'winpty-agent.pdb',
         'winpty-debugserver.exe', 'winpty-debugserver.pdb',
+        'trivial_test.exe', 'trivial_test.pdb'
+    )
+    foreach ($legacyArtifact in $legacyArtifacts) {
+        $legacyArtifactPath = Join-Path $binaryDirectory $legacyArtifact
+        if (Test-Path -LiteralPath $legacyArtifactPath -PathType Leaf) {
+            throw "Legacy artifact remains in the $configurationName output: $legacyArtifactPath"
+        }
+    }
+
+    $requiredArtifacts = @(
+        'VT7Pty.dll', 'VT7Pty.lib', 'VT7Pty.pdb',
+        'VT7Pty-Agent.exe', 'VT7Pty-Agent.pdb',
+        'VT7Pty-DebugServer.exe', 'VT7Pty-DebugServer.pdb',
         'StringBuilderTest.exe', 'StringBuilderTest.pdb',
-        'trivial_test.exe', 'trivial_test.pdb',
+        'BackendSmokeTest.exe', 'BackendSmokeTest.pdb',
+        'ProtocolTest.exe', 'ProtocolTest.pdb',
+        'ProtocolTestAgent.exe', 'ProtocolTestAgent.pdb',
         'fixture-console-color-grid.exe', 'fixture-console-color-grid.pdb',
         'fixture-output-lines.exe', 'fixture-output-lines.pdb',
         'fixture-show-argv.exe', 'fixture-show-argv.pdb',
@@ -199,11 +269,17 @@ foreach ($configurationName in $configurations) {
 
     $tests = @(
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'StringBuilderTest.exe') -WorkingDirectory $binaryDirectory
-        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'trivial_test.exe') -WorkingDirectory $binaryDirectory
-        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'trivial_test.exe') -WorkingDirectory $binaryDirectory -Arguments @('APPLICATIONS')
-        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'winpty-agent.exe') -WorkingDirectory $binaryDirectory -Arguments @('--version')
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'ProtocolTest.exe') -WorkingDirectory $binaryDirectory
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'BackendSmokeTest.exe') -WorkingDirectory $binaryDirectory
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'BackendSmokeTest.exe') -WorkingDirectory $binaryDirectory -Arguments @('APPLICATIONS')
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'VT7Pty-Agent.exe') -WorkingDirectory $binaryDirectory -Arguments @('--version')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'fixture-show-argv.exe') -WorkingDirectory $binaryDirectory -Arguments @('alpha', 'two words')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'fixture-output-lines.exe') -WorkingDirectory $binaryDirectory -Arguments @('3', '5')
+        Invoke-IsolatedAgentFailureTest -BinaryDirectory $binaryDirectory -ResultDirectory $resultDirectory -Case 'missing'
+        Invoke-IsolatedAgentFailureTest -BinaryDirectory $binaryDirectory -ResultDirectory $resultDirectory -Case 'malformed' -ProtocolMode 'malformed'
+        Invoke-IsolatedAgentFailureTest -BinaryDirectory $binaryDirectory -ResultDirectory $resultDirectory -Case 'wrong-identity' -ProtocolMode 'wrong-identity'
+        Invoke-IsolatedAgentFailureTest -BinaryDirectory $binaryDirectory -ResultDirectory $resultDirectory -Case 'older-protocol' -ProtocolMode 'older'
+        Invoke-IsolatedAgentFailureTest -BinaryDirectory $binaryDirectory -ResultDirectory $resultDirectory -Case 'newer-protocol' -ProtocolMode 'newer'
     )
     foreach ($test in $tests) {
         Assert-NativeTestPassed -Result $test
@@ -213,19 +289,27 @@ foreach ($configurationName in $configurations) {
             $stringBuilderTest.StandardError -match '(?m)^error:') {
         throw "$configurationName StringBuilderTest did not report a clean completion."
     }
+    $protocolTest = $tests | Where-Object { $_.Name -eq 'ProtocolTest.exe' }
+    if ($protocolTest.StandardOutput -notmatch 'VT7Pty protocol tests passed') {
+        throw "$configurationName protocol test did not report a clean completion."
+    }
     $applicationTest = @($tests | Where-Object {
-        $_.Name -eq 'trivial_test.exe' -and
+        $_.Name -eq 'BackendSmokeTest.exe' -and
         $_.StandardOutput -match 'Command Prompt and Windows PowerShell sessions passed\.'
     })
     if ($applicationTest.Count -ne 1) {
         throw "$configurationName application smoke test did not report a clean completion."
     }
-    $agentVersion = $tests | Where-Object { $_.Name -eq 'winpty-agent.exe' }
-    if ($agentVersion.StandardOutput -notmatch [regex]::Escape("winpty version $sourceVersion")) {
+    $agentVersion = $tests | Where-Object { $_.Name -eq 'VT7Pty-Agent.exe' }
+    if ($agentVersion.StandardOutput -notmatch [regex]::Escape("VT7Pty version $sourceVersion")) {
         throw "$configurationName agent did not report version $sourceVersion."
     }
     if ($agentVersion.StandardOutput -notmatch [regex]::Escape("commit $sourceCommit")) {
         throw "$configurationName agent did not report source commit $sourceCommit."
+    }
+    if ($agentVersion.StandardOutput -notmatch [regex]::Escape("API version $apiVersion") -or
+            $agentVersion.StandardOutput -notmatch [regex]::Escape("protocol version $protocolVersion")) {
+        throw "$configurationName agent did not report API $apiVersion and protocol $protocolVersion."
     }
     $argumentFixture = $tests | Where-Object { $_.Name -eq 'fixture-show-argv.exe' }
     if ($argumentFixture.StandardOutput -notmatch '(?m)^\[alpha\]\r?$' -or
@@ -312,11 +396,11 @@ foreach ($configurationName in $configurations) {
         }
     }
 
-    $exportInspection = (& $dumpbinPath /exports (Join-Path $binaryDirectory 'winpty.dll') 2>&1 | Out-String)
+    $exportInspection = (& $dumpbinPath /exports (Join-Path $binaryDirectory 'VT7Pty.dll') 2>&1 | Out-String)
     if ($LASTEXITCODE -ne 0) {
-        throw "$configurationName winpty.dll export inspection failed."
+        throw "$configurationName VT7Pty.dll export inspection failed."
     }
-    [IO.File]::WriteAllText((Join-Path $resultDirectory 'winpty.dll.exports.txt'), $exportInspection, $utf8NoBom)
+    [IO.File]::WriteAllText((Join-Path $resultDirectory 'VT7Pty.dll.exports.txt'), $exportInspection, $utf8NoBom)
     $actualExports = @(
         [regex]::Matches(
             $exportInspection,
@@ -326,7 +410,7 @@ foreach ($configurationName in $configurations) {
     $actualExportKey = (@($actualExports | Sort-Object) -join '|')
     $expectedExportKey = (@($expectedExports | Sort-Object) -join '|')
     if ($actualExportKey -ne $expectedExportKey) {
-        throw "$configurationName winpty.dll does not expose the complete inherited export surface."
+        throw "$configurationName VT7Pty.dll does not expose the complete inherited export surface."
     }
 
     $artifactRecords = @(
@@ -345,6 +429,8 @@ foreach ($configurationName in $configurations) {
         SchemaVersion = 1
         SourceCommit = $sourceCommit
         SourceVersion = $sourceVersion
+        ApiVersion = $apiVersion
+        ProtocolVersion = $protocolVersion
         SourceTreeClean = ($sourceChanges.Count -eq 0)
         SourceTreeChanges = $sourceChanges
         Configuration = $configurationName

@@ -37,8 +37,8 @@ verify accept `-Configuration Debug`, `Release`, or `All`; package defaults to
 Release. Outputs are written below ignored `artifacts`, with intermediates
 below ignored `build`.
 
-The solution contains projects for the inherited client DLL, console-owning
-agent, native debug server, two inherited tests, nine controlled child-process
+The solution contains projects for the client DLL, console-owning agent,
+native debug server, protocol tests, backend smoke test, nine controlled child-process
 fixtures, and two console-mode tools. The fixture and tool purpose is described
 under [tests/fixtures](tests/fixtures/README.md) and
 [tools/console](tools/console/README.md). Shared compiler and linker settings
@@ -49,23 +49,24 @@ The project does not use a hosted build or test service. Release qualification
 is a local and physical-machine process described in
 [Releasing](docs/RELEASING.md).
 
-## Current native identity
+## Native identity
 
-Until technical rebranding in Roadmap Step 0.5, outputs remain:
+Roadmap Step 0.5 established these outputs:
 
-- `winpty.dll`
-- `winpty-agent.exe`
-- `winpty-debugserver.exe`
-- inherited tests under `src/tests`
+- `VT7Pty.dll`
+- `VT7Pty-Agent.exe`
+- `VT7Pty-DebugServer.exe`
+- `BackendSmokeTest.exe`, `ProtocolTest.exe`, and the isolated
+  `ProtocolTestAgent.exe` negative-control fixture
 
-Their public interface is [winpty.h](src/include/winpty.h). This temporary
-name preservation lets the verifier compare the new build against the accepted
-inherited exports, imports, and process lifecycle before those names change.
+Their public interface is [vt7pty.h](src/include/vt7pty.h), with API-version
+macros in [vt7pty_version.h](src/include/vt7pty_version.h). See the
+[technical naming map](docs/NAMING.md) for the intentional break from WinPTY.
 
-`Verify-VT7Pty.ps1` runs `StringBuilderTest.exe`, `trivial_test.exe`, the agent
-version command, and the deterministic argument fixture. It also requires x64
-images, PE subsystem version 6.01, the expected direct imports, the 19 inherited
-DLL exports, PDBs, and generated version resources for maintained binaries. Its
+`Verify-VT7Pty.ps1` runs the string-builder, protocol, backend, missing-agent,
+incompatible-agent, application, and deterministic fixture checks. It also
+requires x64 images, PE subsystem version 6.01, the expected direct imports,
+the 19 renamed DLL exports, PDBs, and generated version resources. Its
 development-host result is transition evidence and is not physical Windows 7
 acceptance.
 
@@ -92,11 +93,11 @@ original commands for historical reference.
 
 ## Debugging
 
-The native debugger uses `winpty-debugserver.exe`, `WINPTY_DEBUG=trace`, and
-optionally `WINPTY_SHOW_CONSOLE=1`. Milestone 0 will rebrand and modernize this
-diagnostic path while retaining source-level Visual Studio debugging.
+The native debugger uses `VT7Pty-DebugServer.exe`, `VT7PTY_DEBUG=trace`, and
+optionally `VT7PTY_SHOW_CONSOLE=1`. Diagnostic messages use the versioned
+`\\.\pipe\VT7Pty-Debug-v1` endpoint.
 
-Open `VT7Pty.sln`, select `Debug|x64`, and use `trivial_test` as a convenient
+Open `VT7Pty.sln`, select `Debug|x64`, and use `BackendSmokeTest` as a convenient
 debugging startup project. The repository also provides a repeatable command
 line proof that the linked PDBs resolve both library and caller source lines:
 

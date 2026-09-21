@@ -18,8 +18,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#ifndef WINPTY_WINDOWS_SECURITY_H
-#define WINPTY_WINDOWS_SECURITY_H
+#ifndef VT7PTY_WINDOWS_SECURITY_H
+#define VT7PTY_WINDOWS_SECURITY_H
 
 #include <windows.h>
 #include <aclapi.h>
@@ -98,4 +98,4 @@ enum class GetNamedPipeClientProcessId_Result {
 std::tuple<GetNamedPipeClientProcessId_Result, DWORD, DWORD>
 getNamedPipeClientProcessId(HANDLE serverPipe);
 
-#endif // WINPTY_WINDOWS_SECURITY_H
+#endif // VT7PTY_WINDOWS_SECURITY_H

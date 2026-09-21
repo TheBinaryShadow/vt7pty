@@ -18,8 +18,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#ifndef WINPTY_GEN_RANDOM_H
-#define WINPTY_GEN_RANDOM_H
+#ifndef VT7PTY_GEN_RANDOM_H
+#define VT7PTY_GEN_RANDOM_H
 
 #include <windows.h>
 #include <wincrypt.h>
@@ -50,4 +50,4 @@ public:
     }
 };
 
-#endif // WINPTY_GEN_RANDOM_H
+#endif // VT7PTY_GEN_RANDOM_H

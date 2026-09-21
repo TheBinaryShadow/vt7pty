@@ -18,10 +18,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#ifndef WINPTY_ASSERT_H
-#define WINPTY_ASSERT_H
+#ifndef VT7PTY_ASSERT_H
+#define VT7PTY_ASSERT_H
 
-#ifdef WINPTY_AGENT_ASSERT
+#ifdef VT7PTY_AGENT_ASSERT
 
 void agentShutdown();
 void agentAssertFail(const char *file, int line, const char *cond);
@@ -61,4 +61,4 @@ void assertTrace(const char *file, int line, const char *cond);
 
 #endif
 
-#endif // WINPTY_ASSERT_H
+#endif // VT7PTY_ASSERT_H

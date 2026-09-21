@@ -7,14 +7,14 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{13EA7B4F-5CD5-4972-B95D-94488A850238}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>winpty_agent</RootNamespace>
-    <VT7PtyFileDescription>VT7Pty inherited console agent</VT7PtyFileDescription>
+    <RootNamespace>vt7pty_agent</RootNamespace>
+    <VT7PtyFileDescription>VT7Pty console agent</VT7PtyFileDescription>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration"><ConfigurationType>Application</ConfigurationType></PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ItemDefinitionGroup>
-    <ClCompile><PreprocessorDefinitions>WINPTY_AGENT_ASSERT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
+    <ClCompile><PreprocessorDefinitions>VT7PTY_AGENT_ASSERT;%(PreprocessorDefinitions)</PreprocessorDefinitions></ClCompile>
     <Link>
       <AdditionalDependencies>advapi32.lib;shell32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
@@ -44,9 +44,9 @@
     <ClCompile Include="..\src\shared\StringUtil.cc" />
     <ClCompile Include="..\src\shared\WindowsSecurity.cc" />
     <ClCompile Include="..\src\shared\WindowsVersion.cc" />
-    <ClCompile Include="..\src\shared\WinptyAssert.cc" />
-    <ClCompile Include="..\src\shared\WinptyException.cc" />
-    <ClCompile Include="..\src\shared\WinptyVersion.cc" />
+    <ClCompile Include="..\src\shared\Assert.cc" />
+    <ClCompile Include="..\src\shared\Exception.cc" />
+    <ClCompile Include="..\src\shared\Version.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\agent\Agent.h" />
@@ -69,7 +69,7 @@
     <ClInclude Include="..\src\agent\UnicodeEncoding.h" />
     <ClInclude Include="..\src\agent\Win32Console.h" />
     <ClInclude Include="..\src\agent\Win32ConsoleBuffer.h" />
-    <ClInclude Include="..\src\shared\AgentMsg.h" />
+    <ClInclude Include="..\src\shared\Protocol.h" />
     <ClInclude Include="..\src\shared\Buffer.h" />
     <ClInclude Include="..\src\shared\DebugClient.h" />
     <ClInclude Include="..\src\shared\GenRandom.h" />
@@ -81,9 +81,9 @@
     <ClInclude Include="..\src\shared\WindowsSecurity.h" />
     <ClInclude Include="..\src\shared\WindowsVersion.h" />
     <ClInclude Include="..\src\shared\StringFormatting.h" />
-    <ClInclude Include="..\src\shared\WinptyAssert.h" />
-    <ClInclude Include="..\src\shared\WinptyException.h" />
-    <ClInclude Include="..\src\shared\WinptyVersion.h" />
+    <ClInclude Include="..\src\shared\Assert.h" />
+    <ClInclude Include="..\src\shared\Exception.h" />
+    <ClInclude Include="..\src\shared\Version.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

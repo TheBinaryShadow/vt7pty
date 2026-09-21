@@ -18,16 +18,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#ifndef WINPTY_SHARED_OS_MODULE_H
-#define WINPTY_SHARED_OS_MODULE_H
+#ifndef VT7PTY_SHARED_OS_MODULE_H
+#define VT7PTY_SHARED_OS_MODULE_H
 
 #include <windows.h>
 
 #include <string>
 
 #include "DebugClient.h"
-#include "WinptyAssert.h"
-#include "WinptyException.h"
+#include "Assert.h"
+#include "Exception.h"
 
 class OsModule {
     HMODULE m_module;
@@ -60,4 +60,4 @@ public:
     }
 };
 
-#endif // WINPTY_SHARED_OS_MODULE_H
+#endif // VT7PTY_SHARED_OS_MODULE_H

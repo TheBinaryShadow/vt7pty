@@ -26,7 +26,7 @@
 #include <algorithm>
 
 #include "../shared/StringBuilder.h"
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 #include "InputMap.h"
 
 #define ESC "\x1B"

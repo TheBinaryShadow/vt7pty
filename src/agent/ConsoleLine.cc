@@ -30,7 +30,7 @@
 
 #include <algorithm>
 
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 
 static CHAR_INFO blankChar(WORD attributes)
 {
@@ -112,7 +112,7 @@ bool ConsoleLine::detectChangeAndSetLine(const CHAR_INFO *const line, const int 
             // part is equal, and if both the extra characters and any
             // potentially reexposed characters are blank.
             //
-            // Two of the most relevant terminals for winpty--mintty and
+            // Two of the most relevant terminals for VT7Pty--mintty and
             // jediterm--don't (currently) erase the obscured content when a
             // line is cleared, so we should anticipate its existence when
             // making a terminal wider and reoutput the line.  See:

@@ -33,6 +33,15 @@ changes until implemented.
 
 ### Implementation
 
+- Established the `0.5.0-dev` VT7Pty technical identity across native
+  artifacts, projects, headers, 19 exported C functions, constants,
+  diagnostics, environment variables, named endpoints, packaging, and tests.
+- Added public API version 1.0 and client-agent protocol version 1 with an
+  explicit `VT7Pty-Agent` handshake. Missing, malformed, wrong-identity,
+  older, and newer agents now fail with specific actionable errors.
+- Added protocol unit and incompatible-agent negative-control tests and record
+  package, API, protocol, and source identities in verification and packages.
+
 - Removed the Cygwin/MSYS adapter, GYP, GNU Make, Python 2 packaging,
   AppVeyor, old generated-file helpers, and obsolete shell/batch build paths.
 - Classified and removed `misc`: native fixtures, manual probes, console tools,

@@ -18,7 +18,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include "WinptyAssert.h"
+#include "Assert.h"
 
 #include <windows.h>
 #include <stdlib.h>
@@ -30,7 +30,7 @@ void assertTrace(const char *file, int line, const char *cond) {
           cond, file, line);
 }
 
-#ifdef WINPTY_AGENT_ASSERT
+#ifdef VT7PTY_AGENT_ASSERT
 
 void agentShutdown() {
     HWND hwnd = GetConsoleWindow();

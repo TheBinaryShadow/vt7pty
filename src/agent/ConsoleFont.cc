@@ -32,7 +32,7 @@
 #include "../shared/DebugClient.h"
 #include "../shared/StringUtil.h"
 #include "../shared/WindowsVersion.h"
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 #include "../shared/StringFormatting.h"
 
 namespace {
@@ -288,7 +288,7 @@ static bool setConsoleFont(
     infoex.dwFontSize.Y = font.size;
     infoex.FontFamily = font.family;
     infoex.FontWeight = 400;
-    winpty_wcsncpy_nul(infoex.FaceName, font.faceName);
+    vt7pty_wcsncpy_nul(infoex.FaceName, font.faceName);
     dumpFontInfoEx(infoex, "setConsoleFont: setting font to: ");
     if (!SetCurrentConsoleFontEx(conout, FALSE, &infoex)) {
         trace("setConsoleFont: SetCurrentConsoleFontEx call failed");

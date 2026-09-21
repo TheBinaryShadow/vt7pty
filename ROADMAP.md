@@ -46,11 +46,11 @@ either project.
 
 - The inherited source is WinPTY `0.4.4-dev` at
   [`7e59fe2`](https://github.com/rprichard/winpty/commit/7e59fe2d09adf0fa2aa606492e7ca98efbc5184e).
-- Runtime names, public APIs, and version metadata remain inherited from
-  WinPTY until Step 0.5. The Unix adapter and superseded build, package, and
-  compiler-compatibility paths have been removed.
+- Active runtime names, public APIs, endpoints, diagnostics, and version
+  metadata use the VT7Pty `0.5.0-dev` identity. The Unix adapter and superseded
+  build, package, and compiler-compatibility paths have been removed.
 - The maintained VS2022/MSBuild workflow builds, verifies, packages, and
-  source-debugs the inherited x64 native boundary. This is development-host
+  source-debugs the renamed x64 native boundary. This is development-host
   evidence, not Windows 7 acceptance.
 
 Completed project foundation:
@@ -210,24 +210,26 @@ versions remain in scope, and no active XP/Vista compatibility path remains.
 Outcome: active artifacts, APIs, diagnostics, and protocols have a consistent
 VT7Pty identity while historical attribution retains the WinPTY name.
 
-- [ ] Publish an old-to-new naming map.
-- [ ] Rename the native artifacts to `VT7Pty.dll`, `VT7Pty-Agent.exe`, and
+- [x] Publish an old-to-new naming map.
+- [x] Rename the native artifacts to `VT7Pty.dll`, `VT7Pty-Agent.exe`, and
   `VT7Pty-DebugServer.exe`.
-- [ ] Rename active headers, exports, C API symbols, constants, source/build
+- [x] Rename active headers, exports, C API symbols, constants, source/build
   identifiers, diagnostics, agent lookup, environment variables, IPC/debug
   endpoints, package metadata, tests, and documentation.
-- [ ] Use `vt7pty_*` for the inherited public C surface and `VT7PTY_*` for its
+- [x] Use `vt7pty_*` for the inherited public C surface and `VT7PTY_*` for its
   constants and macros, without WinPTY compatibility aliases.
-- [ ] Change the development version to `0.5.0-dev` using one authoritative
+- [x] Change the development version to `0.5.0-dev` using one authoritative
   package-version source.
-- [ ] Introduce independent API and client-agent protocol versions where the
+- [x] Introduce independent API and client-agent protocol versions where the
   approved versioning policy requires them.
-- [ ] Add consistent Windows file and product version resources.
-- [ ] Reject missing, malformed, or incompatible agents with actionable errors.
-- [ ] Verify that remaining WinPTY names occur only in attribution, provenance,
+- [x] Add consistent Windows file and product version resources.
+- [x] Reject missing, malformed, or incompatible agents with actionable errors.
+- [x] Verify that remaining WinPTY names occur only in attribution, provenance,
   migration material, historical documentation, and inherited Git history.
-- [ ] Rebuild, package, inspect, and rerun the baseline on the development host
-  and both physical Windows 7 tiers.
+- [ ] Rebuild, package, inspect, and rerun the baseline:
+  - [x] Development host, Debug and Release.
+  - [ ] Physical non-ESU Windows 7 SP1 x64.
+  - [ ] Physical ESU Windows 7 SP1 x64.
 
 This is an intentional source and binary compatibility break. It does not claim
 interchangeability with WinPTY or ConPTY.

@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <utility>
 
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 #include "../shared/StringFormatting.h"
 
 #include "ConsoleFont.h"
@@ -396,10 +396,10 @@ void Scraper::syncConsoleContentAndSize(
 // documentation for SetConsoleMode and ENABLE_LVB_GRID_WORLDWIDE.
 WORD Scraper::attributesMask()
 {
-    const auto WINPTY_ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x4u;
-    const auto WINPTY_ENABLE_LVB_GRID_WORLDWIDE          = 0x10u;
-    const auto WINPTY_COMMON_LVB_REVERSE_VIDEO           = 0x4000u;
-    const auto WINPTY_COMMON_LVB_UNDERSCORE              = 0x8000u;
+    const auto VT7PTY_ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x4u;
+    const auto VT7PTY_ENABLE_LVB_GRID_WORLDWIDE          = 0x10u;
+    const auto VT7PTY_COMMON_LVB_REVERSE_VIDEO           = 0x4000u;
+    const auto VT7PTY_COMMON_LVB_UNDERSCORE              = 0x8000u;
 
     const auto cp = GetConsoleOutputCP();
     const auto isCjk = (cp == 932 || cp == 936 || cp == 949 || cp == 950);
@@ -413,9 +413,9 @@ WORD Scraper::attributesMask()
         return mode;
     }();
     const bool hasEnableLvbGridWorldwide =
-        (outputMode & WINPTY_ENABLE_LVB_GRID_WORLDWIDE) != 0;
+        (outputMode & VT7PTY_ENABLE_LVB_GRID_WORLDWIDE) != 0;
     const bool hasEnableVtProcessing =
-        (outputMode & WINPTY_ENABLE_VIRTUAL_TERMINAL_PROCESSING) != 0;
+        (outputMode & VT7PTY_ENABLE_VIRTUAL_TERMINAL_PROCESSING) != 0;
 
     // The new Windows 10 console (as of 14393) seems to respect
     // COMMON_LVB_REVERSE_VIDEO even in CP437 w/o the other enabling modes, so
@@ -426,8 +426,8 @@ WORD Scraper::attributesMask()
         isCjk || hasEnableLvbGridWorldwide || hasEnableVtProcessing;
 
     WORD mask = ~0;
-    if (!isReverseSupported)    { mask &= ~WINPTY_COMMON_LVB_REVERSE_VIDEO; }
-    if (!isUnderscoreSupported) { mask &= ~WINPTY_COMMON_LVB_UNDERSCORE; }
+    if (!isReverseSupported)    { mask &= ~VT7PTY_COMMON_LVB_REVERSE_VIDEO; }
+    if (!isUnderscoreSupported) { mask &= ~VT7PTY_COMMON_LVB_UNDERSCORE; }
     return mask;
 }
 

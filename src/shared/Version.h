@@ -18,10 +18,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#ifndef WINPTY_VERSION_H
-#define WINPTY_VERSION_H
+#ifndef VT7PTY_VERSION_H
+#define VT7PTY_VERSION_H
 
 void dumpVersionToStdout();
 void dumpVersionToTrace();
 
-#endif // WINPTY_VERSION_H
+#endif // VT7PTY_VERSION_H

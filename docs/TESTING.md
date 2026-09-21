@@ -61,9 +61,10 @@ Roadmap Step 0.2 now provides the first maintained development-host command:
 .\Verify-VT7Pty.ps1
 ```
 
-It builds Debug and Release by default, runs the two inherited tests, the agent
-version check, a deterministic argument-quoting fixture, and a bounded-output
-fixture. It validates
+It builds Debug and Release by default, runs unit, protocol, lifecycle,
+application, agent-rejection, argument-quoting, and bounded-output checks. The
+negative controls exercise a missing agent plus malformed, wrong-identity,
+older, and newer protocol handshakes. It validates
 architecture, subsystem floor, direct imports, the inherited DLL export
 boundary, PDB presence, and generated artifact identity for all maintained
 binaries. Results and dumpbin evidence are written below ignored
@@ -81,8 +82,8 @@ Source and caller line resolution can be checked independently with:
 ```
 
 That check launches the Debug integration test under CDB, breaks at
-`winpty_config_new`, and requires resolved locations in both `winpty.cc` and
-`trivial_test.cc`. These checks establish build-transition parity only; they do
+`vt7pty_config_new`, and requires resolved locations in both `vt7pty.cc` and
+`BackendSmokeTest.cc`. These checks establish build-transition parity only; they do
 not satisfy the broader permanent suite or either physical Windows 7 tier.
 
 The accepted clean-commit result is the

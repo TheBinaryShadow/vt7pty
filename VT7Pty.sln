@@ -2,15 +2,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "winpty", "projects\winpty.vcxproj", "{FCD1D231-A00E-4A06-AE98-A495F9BF25D1}"
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "VT7Pty", "projects\VT7Pty.vcxproj", "{FCD1D231-A00E-4A06-AE98-A495F9BF25D1}"
 EndProject
-Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "winpty-agent", "projects\winpty-agent.vcxproj", "{13EA7B4F-5CD5-4972-B95D-94488A850238}"
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "VT7Pty-Agent", "projects\VT7Pty-Agent.vcxproj", "{13EA7B4F-5CD5-4972-B95D-94488A850238}"
 EndProject
-Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "winpty-debugserver", "projects\winpty-debugserver.vcxproj", "{70226E28-3588-41B2-AE38-DA182428BF12}"
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "VT7Pty-DebugServer", "projects\VT7Pty-DebugServer.vcxproj", "{70226E28-3588-41B2-AE38-DA182428BF12}"
 EndProject
 Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "StringBuilderTest", "projects\StringBuilderTest.vcxproj", "{AC6481D4-5DB7-4939-A337-6119517A0BB1}"
 EndProject
-Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "trivial_test", "projects\trivial_test.vcxproj", "{91872616-C723-46D1-9032-9209D6796A68}"
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "BackendSmokeTest", "projects\BackendSmokeTest.vcxproj", "{91872616-C723-46D1-9032-9209D6796A68}"
+EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "ProtocolTest", "projects\ProtocolTest.vcxproj", "{F65B2F47-4CA4-4855-86B4-F301FF74645A}"
+EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "ProtocolTestAgent", "projects\ProtocolTestAgent.vcxproj", "{0C5ED42A-D50E-49B5-AF7E-CC3D0D06A301}"
 EndProject
 Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "fixture-show-argv", "projects\fixture-show-argv.vcxproj", "{41C3840B-9C52-498F-99D7-2EC790986F6A}"
 EndProject
@@ -60,6 +64,14 @@ Global
 		{91872616-C723-46D1-9032-9209D6796A68}.Debug|x64.Build.0 = Debug|x64
 		{91872616-C723-46D1-9032-9209D6796A68}.Release|x64.ActiveCfg = Release|x64
 		{91872616-C723-46D1-9032-9209D6796A68}.Release|x64.Build.0 = Release|x64
+		{F65B2F47-4CA4-4855-86B4-F301FF74645A}.Debug|x64.ActiveCfg = Debug|x64
+		{F65B2F47-4CA4-4855-86B4-F301FF74645A}.Debug|x64.Build.0 = Debug|x64
+		{F65B2F47-4CA4-4855-86B4-F301FF74645A}.Release|x64.ActiveCfg = Release|x64
+		{F65B2F47-4CA4-4855-86B4-F301FF74645A}.Release|x64.Build.0 = Release|x64
+		{0C5ED42A-D50E-49B5-AF7E-CC3D0D06A301}.Debug|x64.ActiveCfg = Debug|x64
+		{0C5ED42A-D50E-49B5-AF7E-CC3D0D06A301}.Debug|x64.Build.0 = Debug|x64
+		{0C5ED42A-D50E-49B5-AF7E-CC3D0D06A301}.Release|x64.ActiveCfg = Release|x64
+		{0C5ED42A-D50E-49B5-AF7E-CC3D0D06A301}.Release|x64.Build.0 = Release|x64
 		{41C3840B-9C52-498F-99D7-2EC790986F6A}.Debug|x64.ActiveCfg = Debug|x64
 		{41C3840B-9C52-498F-99D7-2EC790986F6A}.Debug|x64.Build.0 = Debug|x64
 		{41C3840B-9C52-498F-99D7-2EC790986F6A}.Release|x64.ActiveCfg = Release|x64

@@ -34,9 +34,23 @@ if (-not (Test-Path -LiteralPath $msbuildPath)) {
 
 $configurations = if ($Configuration -eq 'All') { @('Debug', 'Release') } else { @($Configuration) }
 $verbosity = if ($DetailedOutput) { 'normal' } else { 'minimal' }
+$legacyArtifactNames = @(
+    'winpty.dll', 'winpty.exp', 'winpty.lib', 'winpty.pdb',
+    'winpty-agent.exe', 'winpty-agent.pdb',
+    'winpty-debugserver.exe', 'winpty-debugserver.pdb',
+    'trivial_test.exe', 'trivial_test.pdb'
+)
 
 foreach ($configurationName in $configurations) {
-    Write-Host "Building VT7Pty inherited native targets: $configurationName|x64"
+    $binaryDirectory = Join-Path $repositoryRoot "artifacts\bin\x64\$configurationName"
+    foreach ($legacyArtifactName in $legacyArtifactNames) {
+        $legacyArtifactPath = Join-Path $binaryDirectory $legacyArtifactName
+        if (Test-Path -LiteralPath $legacyArtifactPath -PathType Leaf) {
+            Remove-Item -LiteralPath $legacyArtifactPath -Force
+        }
+    }
+
+    Write-Host "Building VT7Pty native targets: $configurationName|x64"
     $arguments = @(
         $solutionPath,
         '/nologo',

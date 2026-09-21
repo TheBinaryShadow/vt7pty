@@ -27,8 +27,8 @@
 #include "DebugClient.h"
 #include "OwnedHandle.h"
 #include "StringBuilder.h"
-#include "WinptyAssert.h"
-#include "WinptyException.h"
+#include "Assert.h"
+#include "Exception.h"
 
 namespace {
 
@@ -75,7 +75,7 @@ Sid allocatedSid(PSID v) {
 // process' security token is opened.  The handle is opened with TOKEN_QUERY.
 static OwnedHandle openSecurityTokenForQuery() {
     HANDLE token = nullptr;
-    // It is unclear to me whether OpenAsSelf matters for winpty, or what the
+    // It is unclear whether OpenAsSelf matters for VT7Pty, or what the
     // most appropriate value is.
     if (!OpenThreadToken(GetCurrentThread(), TOKEN_QUERY,
                          /*OpenAsSelf=*/FALSE, &token)) {
@@ -103,7 +103,7 @@ Sid getOwnerSid() {
     success = GetTokenInformation(token.get(), TokenOwner,
         nullptr, 0, &actual);
     if (success) {
-        throwWinptyException(L"getOwnerSid: GetTokenInformation: "
+        throwVT7PtyException(L"getOwnerSid: GetTokenInformation: "
             L"expected ERROR_INSUFFICIENT_BUFFER");
     } else if (GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
         throwWindowsError(L"getOwnerSid: GetTokenInformation: "
@@ -185,7 +185,7 @@ static SecurityDescriptor finishSecurityDescriptor(
             WStringBuilder sb(64);
             sb << L"finishSecurityDescriptor: "
                << L"SetEntriesInAcl failed: " << aclError;
-            throwWinptyException(sb.c_str());
+            throwVT7PtyException(sb.c_str());
         }
         outAcl = localItem<AclTag>(aclRaw);
     }
@@ -194,7 +194,7 @@ static SecurityDescriptor finishSecurityDescriptor(
         reinterpret_cast<PSECURITY_DESCRIPTOR>(
             LocalAlloc(LPTR, SECURITY_DESCRIPTOR_MIN_LENGTH));
     if (sdRaw == nullptr) {
-        throwWinptyException(L"finishSecurityDescriptor: LocalAlloc failed");
+        throwVT7PtyException(L"finishSecurityDescriptor: LocalAlloc failed");
     }
     SecurityDescriptor sd = localItem<SecurityDescriptorTag>(sdRaw);
     if (!InitializeSecurityDescriptor(sdRaw, SECURITY_DESCRIPTOR_REVISION)) {

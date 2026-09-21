@@ -1,4 +1,5 @@
 // Copyright (c) 2011-2012 Ryan Prichard
+// Copyright (c) 2026 VT7Pty contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -18,10 +19,52 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#ifndef WINPTY_SHARED_AGENT_MSG_H
-#define WINPTY_SHARED_AGENT_MSG_H
+#ifndef VT7PTY_SHARED_PROTOCOL_H
+#define VT7PTY_SHARED_PROTOCOL_H
 
-struct AgentMsg
+#include <stdint.h>
+#include <string>
+
+#include "Buffer.h"
+
+constexpr wchar_t VT7PTY_AGENT_IDENTITY[] = L"VT7Pty-Agent";
+constexpr int32_t VT7PTY_PROTOCOL_VERSION = 1;
+
+struct AgentHandshake {
+    std::wstring identity;
+    int32_t protocolVersion;
+};
+
+enum class AgentHandshakeStatus {
+    Compatible,
+    WrongIdentity,
+    UnsupportedVersion,
+};
+
+inline void writeAgentHandshake(WriteBuffer &packet) {
+    packet.putWString(VT7PTY_AGENT_IDENTITY);
+    packet.putInt32(VT7PTY_PROTOCOL_VERSION);
+}
+
+inline AgentHandshake readAgentHandshake(ReadBuffer &packet) {
+    AgentHandshake result;
+    result.identity = packet.getWString();
+    result.protocolVersion = packet.getInt32();
+    return result;
+}
+
+inline AgentHandshakeStatus classifyAgentHandshake(
+        const AgentHandshake &handshake) {
+    if (handshake.identity != VT7PTY_AGENT_IDENTITY) {
+        return AgentHandshakeStatus::WrongIdentity;
+    }
+    if (handshake.protocolVersion != VT7PTY_PROTOCOL_VERSION) {
+        return AgentHandshakeStatus::UnsupportedVersion;
+    }
+    return AgentHandshakeStatus::Compatible;
+}
+
+struct AgentMessage
 {
     enum Type {
         StartProcess,
@@ -35,4 +78,4 @@ enum class StartProcessResult {
     ProcessCreated,
 };
 
-#endif // WINPTY_SHARED_AGENT_MSG_H
+#endif // VT7PTY_SHARED_PROTOCOL_H

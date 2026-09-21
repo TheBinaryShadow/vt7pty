@@ -24,11 +24,11 @@
 
 #include <string>
 
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 
-#include "LibWinptyException.h"
+#include "ClientException.h"
 
-#define AGENT_EXE L"winpty-agent.exe"
+#define AGENT_EXE L"VT7Pty-Agent.exe"
 
 static HMODULE getCurrentModule() {
     HMODULE module;
@@ -67,9 +67,9 @@ std::wstring findAgentProgram() {
     std::wstring progDir = dirname(getModuleFileName(getCurrentModule()));
     std::wstring ret = progDir + (L"\\" AGENT_EXE);
     if (!pathExists(ret)) {
-        throw LibWinptyException(
-            WINPTY_ERROR_AGENT_EXE_MISSING,
-            (L"agent executable does not exist: '" + ret + L"'").c_str());
+        throw ClientException(
+            VT7PTY_ERROR_AGENT_EXE_MISSING,
+            (L"VT7Pty agent executable is missing: '" + ret + L"'").c_str());
     }
     return ret;
 }

@@ -7,7 +7,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{91872616-C723-46D1-9032-9209D6796A68}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>trivial_test</RootNamespace>
+    <RootNamespace>BackendSmokeTest</RootNamespace>
     <VT7PtyEnableAssertions>true</VT7PtyEnableAssertions>
     <VT7PtyFileDescription>VT7Pty inherited lifecycle test</VT7PtyFileDescription>
   </PropertyGroup>
@@ -15,9 +15,9 @@
   <PropertyGroup Label="Configuration"><ConfigurationType>Application</ConfigurationType></PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ItemDefinitionGroup><Link><SubSystem>Console</SubSystem></Link></ItemDefinitionGroup>
-  <ItemGroup><ClCompile Include="..\src\tests\trivial_test.cc" /></ItemGroup>
+  <ItemGroup><ClCompile Include="..\src\tests\BackendSmokeTest.cc" /></ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="winpty.vcxproj">
+    <ProjectReference Include="VT7Pty.vcxproj">
       <Project>{FCD1D231-A00E-4A06-AE98-A495F9BF25D1}</Project>
     </ProjectReference>
   </ItemGroup>

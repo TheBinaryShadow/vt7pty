@@ -18,8 +18,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#ifndef WINPTY_SHARED_STRING_UTIL_H
-#define WINPTY_SHARED_STRING_UTIL_H
+#ifndef VT7PTY_SHARED_STRING_UTIL_H
+#define VT7PTY_SHARED_STRING_UTIL_H
 
 #include <stdlib.h>
 #include <string.h>
@@ -29,7 +29,7 @@
 #include <string>
 #include <vector>
 
-#include "WinptyAssert.h"
+#include "Assert.h"
 
 std::string utf8FromWide(const std::wstring &input);
 
@@ -52,7 +52,7 @@ std::vector<T> vectorWithNulFromString(const std::basic_string<T> &str) {
 
 // A safer(?) version of wcsncpy that is accepted by MSVC's /SDL mode.
 template <size_t N>
-wchar_t *winpty_wcsncpy(wchar_t (&d)[N], const wchar_t *s) {
+wchar_t *vt7pty_wcsncpy(wchar_t (&d)[N], const wchar_t *s) {
     ASSERT(s != nullptr);
     size_t i = 0;
     for (; i < N; ++i) {
@@ -69,11 +69,11 @@ wchar_t *winpty_wcsncpy(wchar_t (&d)[N], const wchar_t *s) {
 
 // Like wcsncpy, but ensure that the destination buffer is NUL-terminated.
 template <size_t N>
-wchar_t *winpty_wcsncpy_nul(wchar_t (&d)[N], const wchar_t *s) {
+wchar_t *vt7pty_wcsncpy_nul(wchar_t (&d)[N], const wchar_t *s) {
     static_assert(N > 0, "array cannot be 0-size");
-    winpty_wcsncpy(d, s);
+    vt7pty_wcsncpy(d, s);
     d[N - 1] = L'\0';
     return d;
 }
 
-#endif // WINPTY_SHARED_STRING_UTIL_H
+#endif // VT7PTY_SHARED_STRING_UTIL_H

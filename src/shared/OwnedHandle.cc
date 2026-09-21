@@ -21,7 +21,7 @@
 #include "OwnedHandle.h"
 
 #include "DebugClient.h"
-#include "WinptyException.h"
+#include "Exception.h"
 
 void OwnedHandle::dispose(bool nothrow) {
     if (m_h != nullptr && m_h != INVALID_HANDLE_VALUE) {

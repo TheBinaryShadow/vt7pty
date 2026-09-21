@@ -28,7 +28,7 @@
 #include <string>
 
 #include "SimplePool.h"
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 
 class InputMap {
 public:

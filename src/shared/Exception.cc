@@ -18,7 +18,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#include "WinptyException.h"
+#include "Exception.h"
 
 #include <memory>
 #include <string>
@@ -27,7 +27,7 @@
 
 namespace {
 
-class ExceptionImpl : public WinptyException {
+class ExceptionImpl : public VT7PtyException {
 public:
     ExceptionImpl(const wchar_t *what) :
         m_what(std::make_shared<std::wstring>(what)) {}
@@ -41,7 +41,7 @@ private:
 
 } // anonymous namespace
 
-void throwWinptyException(const wchar_t *what) {
+void throwVT7PtyException(const wchar_t *what) {
     throw ExceptionImpl(what);
 }
 
@@ -53,5 +53,5 @@ void throwWindowsError(const wchar_t *prefix, DWORD errorCode) {
     // It might make sense to use FormatMessage here, but IIRC, its API is hard
     // to figure out.
     sb << L"Windows error " << errorCode;
-    throwWinptyException(sb.c_str());
+    throwVT7PtyException(sb.c_str());
 }

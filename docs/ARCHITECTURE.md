@@ -1,11 +1,11 @@
 # VT7Pty Architecture
 
-Status: current inherited native architecture and planned boundaries. Updated:
+Status: current native architecture and planned boundaries. Updated:
 2026-09-22.
 
-This document describes the repository as it exists before Milestone 0
-implementation. Planned names and interfaces are identified explicitly. Source
-code remains authoritative when this overview and the implementation disagree.
+This document describes the maintained native architecture through Roadmap
+Step 0.5. Source code remains authoritative when this overview and the
+implementation disagree.
 
 ## Purpose
 
@@ -22,27 +22,27 @@ output from the legacy console state.
 
 | Component | Current role | Milestone 0 direction |
 | --- | --- | --- |
-| `winpty.dll` / `src/libwinpty` | Client API, agent launch, control RPC, process requests, pipe discovery | Retain and rename; public redesign comes later |
-| `winpty-agent.exe` / `src/agent` | Owns the hidden console, launches the child, handles input, scrapes output, resizes, and manages session lifetime | Retain as the backend core |
+| `VT7Pty.dll` / `src/libvt7pty` | Client API, agent launch, versioned control RPC, process requests, pipe discovery | Retain and modernize; public redesign comes later |
+| `VT7Pty-Agent.exe` / `src/agent` | Owns the hidden console, launches the child, handles input, scrapes output, resizes, and manages session lifetime | Retain as the backend core |
 | `src/shared` | Shared handles, buffers, security, protocol, encoding, and diagnostics | Retain required native code |
-| `winpty-debugserver.exe` / `src/debugserver` | Collects timestamped diagnostic output | Retain, rebrand, and modernize |
+| `VT7Pty-DebugServer.exe` / `src/debugserver` | Collects timestamped diagnostic output | Retain and modernize |
 | `src/tests`, `tests`, and native probes | Existing smoke tests and focused console investigations | Retain useful coverage and integrate it with the permanent test system |
 
 The Cygwin/MSYS `winpty.exe` adapter and its Unix-facing source have been
-removed. Runtime binaries and API symbols remain inherited until Step 0.5.
+removed. Active runtime and API identity is documented in [Technical Naming](NAMING.md).
 
 ## Current session flow
 
 ```text
 Terminal host
     |
-    | inherited winpty API
+    | VT7Pty C API 1.0
     v
-winpty.dll
+VT7Pty.dll
     |  starts agent and exchanges control messages
     |  exposes named data-pipe paths
     v
-winpty-agent.exe
+VT7Pty-Agent.exe
     |  owns hidden legacy console
     |  launches child process
     +-------------------------------+
@@ -60,10 +60,11 @@ WriteConsoleInputW                 output pipe
               child application
 ```
 
-The current API creates one session object, starts one agent, returns names for
+The current API creates one session object, starts one agent, validates the
+`VT7Pty-Agent` protocol identity and version, returns names for
 the input/output pipes, permits one child spawn, supports resize and process-list
 queries, and closes the control relationship when the session is freed. See
-[winpty.h](../src/include/winpty.h) for the exact inherited contract.
+[vt7pty.h](../src/include/vt7pty.h) for the exact inherited contract.
 
 ## Process and handle ownership
 
@@ -125,11 +126,9 @@ and parent failure require explicit tests.
 
 ## Planned boundaries
 
-Milestone 0 replaces the build system, removes adapter-only and pre-Windows 7
-code, modernize the retained C++ implementation, and rename the runtime without
-changing backend semantics without evidence. The approved
-artifact names are `VT7Pty.dll`, `VT7Pty-Agent.exe`, and
-`VT7Pty-DebugServer.exe`.
+Milestone 0 has replaced the build system, removed adapter-only and pre-Windows
+7 code, and renamed the runtime. It continues by modernizing the retained C++
+implementation without changing backend semantics without evidence.
 
 Milestone 1 improves observable backend behavior against a tested application
 corpus. Milestone 2 defines the VT7Pty integration API around the proven

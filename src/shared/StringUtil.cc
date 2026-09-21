@@ -22,7 +22,7 @@
 
 #include <windows.h>
 
-#include "WinptyAssert.h"
+#include "Assert.h"
 
 std::string utf8FromWide(const std::wstring &input) {
     int mblen = WideCharToMultiByte(

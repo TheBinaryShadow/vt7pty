@@ -26,7 +26,7 @@
 #include <string>
 
 #include "../shared/DebugClient.h"
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 
 Win32Console::Win32Console() : m_titleWorkBuf(16)
 {

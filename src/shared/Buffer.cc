@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 #include "DebugClient.h"
-#include "WinptyAssert.h"
+#include "Assert.h"
 
 // Define the READ_BUFFER_CHECK() macro.  It *must* evaluate its condition,
 // exactly once.

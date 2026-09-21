@@ -1,6 +1,6 @@
 # Inherited Component Inventory
 
-Status: completed for Roadmap Step 0.1 and updated through Step 0.3.
+Status: completed for Roadmap Step 0.1 and updated through Step 0.5.
 Updated: 2026-09-22.
 
 This inventory began as the classification of the inherited WinPTY tree. It is
@@ -26,13 +26,13 @@ for removed implementation material.
 
 | Path or group | Current responsibility | Classification and destination |
 | --- | --- | --- |
-| `src/include/winpty.h` | Public C API, ownership rules, pipe discovery, spawn, resize, errors | Retain and modernize as the renamed VT7Pty C surface; no WinPTY alias layer |
-| `src/include/winpty_constants.h` | Errors, agent flags, mouse modes, spawn flags | Retain and rebrand; the XP/Vista desktop-creation flag was removed in Step 0.4 |
-| `src/libwinpty/AgentLocation.*` | Finds the colocated agent | Retain and modernize path/error handling; rename agent identity |
-| `src/libwinpty/LibWinptyException.h` | Maps internal exceptions to public errors | Retain, rebrand, and modernize |
-| `src/libwinpty/WinptyInternal.h` | Private client declarations | Retain, rebrand, and modernize |
-| `src/libwinpty/winpty.cc` | Public API implementation, agent launch, RPC, spawn, lifecycle | Retain as the client core; rebrand and add version/protocol validation |
-| `src/libwinpty/subdir.mk` | GNU Make source list | Replace with MSBuild project membership, then remove |
+| `src/include/vt7pty.h` | Public C API, ownership rules, pipe discovery, spawn, resize, errors | Retain and modernize as the renamed VT7Pty C surface; no WinPTY alias layer |
+| `src/include/vt7pty_constants.h` | Errors, agent flags, mouse modes, spawn flags | Retain and rebrand; the XP/Vista desktop-creation flag was removed in Step 0.4 |
+| `src/libvt7pty/AgentLocation.*` | Finds the colocated `VT7Pty-Agent.exe` | Retain and modernize path/error handling |
+| `src/libvt7pty/ClientException.h` | Maps internal exceptions to public errors | Retain, rebrand, and modernize |
+| `src/libvt7pty/VT7PtyInternal.h` | Private client declarations | Retain, rebrand, and modernize |
+| `src/libvt7pty/vt7pty.cc` | Public API implementation, agent launch, RPC, spawn, lifecycle | Retain as the client core; explicit identity/protocol validation added in Step 0.5 |
+| `src/libvt7pty/subdir.mk` | GNU Make source list | Replace with MSBuild project membership, then remove |
 
 The inherited DLL exports 19 functions. The complete baseline is recorded in
 [the validation report](validation/2026-09-21-upstream-baseline.md).
@@ -58,7 +58,7 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 
 | Files | Current responsibility | Classification and destination |
 | --- | --- | --- |
-| `AgentMsg.h` | Client-agent message structures and opcodes | Retain, rebrand, validate sizes, and add explicit protocol identity/version |
+| `Protocol.h` | Client-agent identity, protocol version, handshake, message structures, and opcodes | Retain; explicit identity/version and negative tests added in Step 0.5 |
 | `BackgroundDesktop.*` | Formerly managed a hidden desktop for XP/Vista consoles | Removed in Step 0.4; the inherited runtime selected it only below Windows 7 |
 | `Buffer.*` | RPC message serialization and parsing | Retain; add bounds/malformed-message tests and typed size handling |
 | `DebugClient.*` | Native diagnostic transport | Retain, rebrand, and modernize with bounded structured logging |
@@ -73,10 +73,10 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | `ControlCharacters.h` (formerly `UnixCtrlChars.h`) | Control-character decoding used by Windows input parsing | Retained under a platform-neutral name in Step 0.3 |
 | `WindowsSecurity.*` | Security descriptors, pipe/process identity, token data | Retain as a security boundary; modernize conversions and add focused tests |
 | `WindowsVersion.*` | OS detection and module-version diagnostics | Retained with `RtlGetVersion`-based detection and x64-only diagnostics in Step 0.4 |
-| `StringFormatting.h` (replaces `winpty_snprintf.h`) | Bounded diagnostic formatting | Uses the current C++ runtime; the retired-compiler shim was removed in Step 0.3 |
-| `WinptyAssert.*` | Agent-aware assertion reporting | Retain responsibility; rebrand and integrate with diagnostics |
-| `WinptyException.*` | Internal exception hierarchy and old `noexcept` shim | Retain hierarchy, remove compiler shim, and rebrand |
-| `WinptyVersion.*` | Reports generated version and commit | Replace with authoritative VT7Pty package/API/protocol/source identity |
+| `StringFormatting.h` (replaces `vt7pty_snprintf.h`) | Bounded diagnostic formatting | Uses the current C++ runtime; the retired-compiler shim was removed in Step 0.3 |
+| `Assert.*` | Agent-aware assertion reporting | Retain responsibility; rebrand and integrate with diagnostics |
+| `Exception.*` | Internal exception hierarchy | Retain and modernize |
+| `Version.*` | Reports generated package, API, protocol, and source identity | Retain as the diagnostic identity boundary |
 | `GetCommitHash.bat`, `UpdateGenVersion.bat` | GYP-era generated version header | Replaced by MSBuild/PowerShell generation and removed in Step 0.3 |
 
 ## Executables, tests, and adapter
@@ -85,7 +85,7 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | --- | --- | --- |
 | `src/debugserver/DebugServer.cc` | Native timestamped diagnostic collector | Retain, rebrand, and modernize as `VT7Pty-DebugServer.exe` |
 | `src/debugserver/subdir.mk` | GNU Make source list | Replace, then remove |
-| `src/tests/trivial_test.cc` | Opens a session, connects pipes, spawns a child, validates output and exit code | Retain and rehome as an integration test |
+| `src/tests/BackendSmokeTest.cc` | Opens a session, connects pipes, spawns a child, validates output and exit code | Retain and rehome as an integration test |
 | `src/tests/subdir.mk` | GNU Make test rule | Replace, then remove |
 | `src/unix-adapter/*` | Cygwin/MSYS terminal frontend, POSIX input/output, wakeup FD, utility wrappers | Removed in Step 0.3 after the native MSBuild baseline was reproduced |
 | `src/unix-adapter/subdir.mk` | Unix-adapter build membership | Removed with the adapter in Step 0.3 |
@@ -102,7 +102,7 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | `ship/build-pty4j-libpty.bat` | IntelliJ/pty4j-specific legacy native packaging | Removed in Step 0.3 as unrelated to the VT7-first package contract |
 | `.gitignore` | Generated-file policy | Updated for the maintained artifact, package, and MSBuild layout in Step 0.3 |
 | `.gitattributes` | Text and line-ending policy | Updated for the maintained MSBuild/PowerShell/resource files in Step 0.3 |
-| `VERSION.txt` | Single inherited `0.4.4-dev` string | Replace with authoritative `0.5.0-dev` version input during technical rebranding |
+| `VERSION.txt` | Authoritative `0.5.0-dev` package version | Retain as the single package-version input |
 | `tools/baseline/*` | Temporary reproducible capture of the inherited native boundary | Removed in Step 0.3 after its results and commands were preserved in validation records |
 
 ## Documentation and provenance

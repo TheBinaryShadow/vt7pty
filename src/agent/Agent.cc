@@ -32,16 +32,16 @@
 #include <utility>
 #include <vector>
 
-#include "../include/winpty_constants.h"
+#include "../include/vt7pty_constants.h"
 
-#include "../shared/AgentMsg.h"
+#include "../shared/Protocol.h"
 #include "../shared/Buffer.h"
 #include "../shared/DebugClient.h"
 #include "../shared/GenRandom.h"
 #include "../shared/StringBuilder.h"
 #include "../shared/StringUtil.h"
 #include "../shared/WindowsVersion.h"
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 
 #include "ConsoleFont.h"
 #include "ConsoleInput.h"
@@ -148,8 +148,8 @@ Agent::Agent(LPCWSTR controlPipeName,
              int mouseMode,
              int initialCols,
              int initialRows) :
-    m_useConerr((agentFlags & WINPTY_FLAG_CONERR) != 0),
-    m_plainMode((agentFlags & WINPTY_FLAG_PLAIN_OUTPUT) != 0),
+    m_useConerr((agentFlags & VT7PTY_FLAG_CONERR) != 0),
+    m_plainMode((agentFlags & VT7PTY_FLAG_PLAIN_OUTPUT) != 0),
     m_mouseMode(mouseMode)
 {
     trace("Agent::Agent entered");
@@ -159,7 +159,7 @@ Agent::Agent(LPCWSTR controlPipeName,
     initialRows = std::min(initialRows, MAX_CONSOLE_HEIGHT);
 
     const bool outputColor =
-        !m_plainMode || (agentFlags & WINPTY_FLAG_COLOR_ESCAPES);
+        !m_plainMode || (agentFlags & VT7PTY_FLAG_COLOR_ESCAPES);
     const Coord initialSize(initialCols, initialRows);
 
     auto primaryBuffer = openPrimaryBuffer();
@@ -176,9 +176,10 @@ Agent::Agent(LPCWSTR controlPipeName,
         m_conerrPipe = &createDataServerPipe(true, L"conerr");
     }
 
-    // Send an initial response packet to winpty.dll containing pipe names.
+    // Send an initial response packet to VT7Pty.dll containing pipe names.
     {
         auto setupPacket = newPacket();
+        writeAgentHandshake(setupPacket);
         setupPacket.putWString(m_coninPipe->name());
         setupPacket.putWString(m_conoutPipe->name());
         if (m_useConerr) {
@@ -255,7 +256,7 @@ NamedPipe &Agent::createDataServerPipe(bool write, const wchar_t *kind)
 {
     const auto name =
         (WStringBuilder(128)
-            << L"\\\\.\\pipe\\winpty-"
+            << L"\\\\.\\pipe\\vt7pty-data-v1-"
             << kind << L'-'
             << GenRandom().uniqueName()).str_moved();
     NamedPipe &pipe = createNamedPipe();
@@ -322,10 +323,10 @@ void Agent::handlePacket(ReadBuffer &packet)
 {
     const int type = packet.getInt32();
     switch (type) {
-    case AgentMsg::StartProcess:
+    case AgentMessage::StartProcess:
         handleStartProcessPacket(packet);
         break;
-    case AgentMsg::SetSize:
+    case AgentMessage::SetSize:
         // TODO: I think it might make sense to collapse consecutive SetSize
         // messages.  i.e. The terminal process can probably generate SetSize
         // messages faster than they can be processed, and some GUIs might
@@ -333,7 +334,7 @@ void Agent::handlePacket(ReadBuffer &packet)
         // at once, we can ignore the early ones.
         handleSetSizePacket(packet);
         break;
-    case AgentMsg::GetConsoleProcessList:
+    case AgentMessage::GetConsoleProcessList:
         handleGetConsoleProcessListPacket(packet);
         break;
     default:
@@ -405,8 +406,8 @@ void Agent::handleStartProcessPacket(ReadBuffer &packet)
         }
         CloseHandle(pi.hThread);
         m_childProcess = pi.hProcess;
-        m_autoShutdown = (spawnFlags & WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN) != 0;
-        m_exitAfterShutdown = (spawnFlags & WINPTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN) != 0;
+        m_autoShutdown = (spawnFlags & VT7PTY_SPAWN_FLAG_AUTO_SHUTDOWN) != 0;
+        m_exitAfterShutdown = (spawnFlags & VT7PTY_SPAWN_FLAG_EXIT_AFTER_SHUTDOWN) != 0;
         reply.putInt32(static_cast<int32_t>(StartProcessResult::ProcessCreated));
         reply.putInt64(replyProcess);
         reply.putInt64(replyThread);
@@ -512,7 +513,7 @@ void Agent::autoClosePipesForShutdown()
 {
     if (m_closingOutputPipes) {
         // We don't want to close a pipe before it's connected!  If we do, the
-        // libwinpty client may try to connect to a non-existent pipe.  This
+        // libvt7pty client may try to connect to a non-existent pipe.  This
         // case is important for short-lived programs.
         if (m_conoutPipe->isConnected() &&
                 m_conoutPipe->bytesToSend() == 0) {
@@ -567,7 +568,7 @@ void Agent::resizeWindow(int cols, int rows)
     // Synthesize a WINDOW_BUFFER_SIZE_EVENT event.  Normally, Windows
     // generates this event only when the buffer size changes, not when the
     // window size changes.  This behavior is undesirable in two ways:
-    //  - When winpty expands the window horizontally, it must expand the
+    //  - When VT7Pty expands the window horizontally, it must expand the
     //    buffer first, then the window.  At least some programs (e.g. the WSL
     //    bash.exe wrapper) use the window width rather than the buffer width,
     //    so there is a short timespan during which they can read the wrong

@@ -27,7 +27,7 @@
 #include "../shared/DebugClient.h"
 #include "../shared/StringUtil.h"
 #include "../shared/WindowsSecurity.h"
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 
 // Returns true if anything happens (data received, data sent, pipe error).
 bool NamedPipe::serviceIo(std::vector<HANDLE> *waitHandles)

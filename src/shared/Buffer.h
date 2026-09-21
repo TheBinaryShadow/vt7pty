@@ -18,8 +18,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-#ifndef WINPTY_SHARED_BUFFER_H
-#define WINPTY_SHARED_BUFFER_H
+#ifndef VT7PTY_SHARED_BUFFER_H
+#define VT7PTY_SHARED_BUFFER_H
 
 #include <stdint.h>
 #include <string.h>
@@ -29,7 +29,7 @@
 #include <vector>
 #include <string>
 
-#include "WinptyException.h"
+#include "Exception.h"
 
 class WriteBuffer {
 private:
@@ -60,7 +60,7 @@ public:
 
 class ReadBuffer {
 public:
-    class DecodeError : public WinptyException {
+    class DecodeError : public VT7PtyException {
         virtual const wchar_t *what() const noexcept override {
             return L"DecodeError: RPC message decoding error";
         }
@@ -89,4 +89,4 @@ public:
     ReadBuffer &operator=(ReadBuffer &&other) = default;
 };
 
-#endif // WINPTY_SHARED_BUFFER_H
+#endif // VT7PTY_SHARED_BUFFER_H

@@ -29,7 +29,7 @@
 #include "NamedPipe.h"
 #include "UnicodeEncoding.h"
 #include "../shared/DebugClient.h"
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 #include "../shared/StringFormatting.h"
 
 #define CSI "\x1b["

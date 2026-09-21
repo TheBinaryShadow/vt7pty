@@ -28,9 +28,9 @@
 #include <string>
 #include <vector>
 
-#include "../include/winpty.h"
+#include "../include/vt7pty.h"
 
-#include "../shared/AgentMsg.h"
+#include "../shared/Protocol.h"
 #include "../shared/Buffer.h"
 #include "../shared/DebugClient.h"
 #include "../shared/GenRandom.h"
@@ -39,13 +39,13 @@
 #include "../shared/StringUtil.h"
 #include "../shared/WindowsSecurity.h"
 #include "../shared/WindowsVersion.h"
-#include "../shared/WinptyAssert.h"
-#include "../shared/WinptyException.h"
-#include "../shared/WinptyVersion.h"
+#include "../shared/Assert.h"
+#include "../shared/Exception.h"
+#include "../shared/Version.h"
 
 #include "AgentLocation.h"
-#include "LibWinptyException.h"
-#include "WinptyInternal.h"
+#include "ClientException.h"
+#include "VT7PtyInternal.h"
 
 
 
@@ -53,32 +53,32 @@
  * Error handling -- translate C++ exceptions to an optional error object
  * output and log the result. */
 
-static const winpty_error_s kOutOfMemory = {
-    WINPTY_ERROR_OUT_OF_MEMORY,
+static const vt7pty_error_s kOutOfMemory = {
+    VT7PTY_ERROR_OUT_OF_MEMORY,
     L"Out of memory",
     nullptr
 };
 
-static const winpty_error_s kBadRpcPacket = {
-    WINPTY_ERROR_UNSPECIFIED,
+static const vt7pty_error_s kBadRpcPacket = {
+    VT7PTY_ERROR_UNSPECIFIED,
     L"Bad RPC packet",
     nullptr
 };
 
-static const winpty_error_s kUncaughtException = {
-    WINPTY_ERROR_UNSPECIFIED,
+static const vt7pty_error_s kUncaughtException = {
+    VT7PTY_ERROR_UNSPECIFIED,
     L"Uncaught C++ exception",
     nullptr
 };
 
 /* Gets the error code from the error object. */
-WINPTY_API winpty_result_t winpty_error_code(winpty_error_ptr_t err) {
-    return err != nullptr ? err->code : WINPTY_ERROR_SUCCESS;
+VT7PTY_API vt7pty_result_t vt7pty_error_code(vt7pty_error_ptr_t err) {
+    return err != nullptr ? err->code : VT7PTY_ERROR_SUCCESS;
 }
 
 /* Returns a textual representation of the error.  The string is freed when
  * the error is freed. */
-WINPTY_API LPCWSTR winpty_error_msg(winpty_error_ptr_t err) {
+VT7PTY_API LPCWSTR vt7pty_error_msg(vt7pty_error_ptr_t err) {
     if (err != nullptr) {
         if (err->msgStatic != nullptr) {
             return err->msgStatic;
@@ -93,49 +93,49 @@ WINPTY_API LPCWSTR winpty_error_msg(winpty_error_ptr_t err) {
     }
 }
 
-/* Free the error object.  Every error returned from the winpty API must be
+/* Free the error object.  Every error returned from the VT7Pty API must be
  * freed. */
-WINPTY_API void winpty_error_free(winpty_error_ptr_t err) {
+VT7PTY_API void vt7pty_error_free(vt7pty_error_ptr_t err) {
     if (err != nullptr && err->msgDynamic != nullptr) {
         delete err->msgDynamic;
         delete err;
     }
 }
 
-static void translateException(winpty_error_ptr_t *&err) {
-    winpty_error_ptr_t ret = nullptr;
+static void translateException(vt7pty_error_ptr_t *&err) {
+    vt7pty_error_ptr_t ret = nullptr;
     try {
         try {
             throw;
         } catch (const ReadBuffer::DecodeError&) {
-            ret = const_cast<winpty_error_ptr_t>(&kBadRpcPacket);
-        } catch (const LibWinptyException &e) {
-            std::unique_ptr<winpty_error_t> obj(new winpty_error_t);
+            ret = const_cast<vt7pty_error_ptr_t>(&kBadRpcPacket);
+        } catch (const ClientException &e) {
+            std::unique_ptr<vt7pty_error_t> obj(new vt7pty_error_t);
             obj->code = e.code();
             obj->msgStatic = nullptr;
             obj->msgDynamic =
                 new std::shared_ptr<std::wstring>(e.whatSharedStr());
             ret = obj.release();
-        } catch (const WinptyException &e) {
-            std::unique_ptr<winpty_error_t> obj(new winpty_error_t);
+        } catch (const VT7PtyException &e) {
+            std::unique_ptr<vt7pty_error_t> obj(new vt7pty_error_t);
             std::shared_ptr<std::wstring> msg(new std::wstring(e.what()));
-            obj->code = WINPTY_ERROR_UNSPECIFIED;
+            obj->code = VT7PTY_ERROR_UNSPECIFIED;
             obj->msgStatic = nullptr;
             obj->msgDynamic = new std::shared_ptr<std::wstring>(msg);
             ret = obj.release();
         }
     } catch (const std::bad_alloc&) {
-        ret = const_cast<winpty_error_ptr_t>(&kOutOfMemory);
+        ret = const_cast<vt7pty_error_ptr_t>(&kOutOfMemory);
     } catch (...) {
-        ret = const_cast<winpty_error_ptr_t>(&kUncaughtException);
+        ret = const_cast<vt7pty_error_ptr_t>(&kUncaughtException);
     }
-    trace("libwinpty error: code=%u msg='%s'",
+    trace("libvt7pty error: code=%u msg='%s'",
         static_cast<unsigned>(ret->code),
-        utf8FromWide(winpty_error_msg(ret)).c_str());
+        utf8FromWide(vt7pty_error_msg(ret)).c_str());
     if (err != nullptr) {
         *err = ret;
     } else {
-        winpty_error_free(ret);
+        vt7pty_error_free(ret);
     }
 }
 
@@ -151,37 +151,37 @@ static void translateException(winpty_error_ptr_t *&err) {
 /*****************************************************************************
  * Configuration of a new agent. */
 
-WINPTY_API winpty_config_t *
-winpty_config_new(UINT64 flags, winpty_error_ptr_t *err /*OPTIONAL*/) {
+VT7PTY_API vt7pty_config_t *
+vt7pty_config_new(UINT64 flags, vt7pty_error_ptr_t *err /*OPTIONAL*/) {
     API_TRY {
-        ASSERT((flags & WINPTY_FLAG_MASK) == flags);
-        std::unique_ptr<winpty_config_t> ret(new winpty_config_t);
+        ASSERT((flags & VT7PTY_FLAG_MASK) == flags);
+        std::unique_ptr<vt7pty_config_t> ret(new vt7pty_config_t);
         ret->flags = flags;
         return ret.release();
     } API_CATCH(nullptr)
 }
 
-WINPTY_API void winpty_config_free(winpty_config_t *cfg) {
+VT7PTY_API void vt7pty_config_free(vt7pty_config_t *cfg) {
     delete cfg;
 }
 
-WINPTY_API void
-winpty_config_set_initial_size(winpty_config_t *cfg, int cols, int rows) {
+VT7PTY_API void
+vt7pty_config_set_initial_size(vt7pty_config_t *cfg, int cols, int rows) {
     ASSERT(cfg != nullptr && cols > 0 && rows > 0);
     cfg->cols = cols;
     cfg->rows = rows;
 }
 
-WINPTY_API void
-winpty_config_set_mouse_mode(winpty_config_t *cfg, int mouseMode) {
+VT7PTY_API void
+vt7pty_config_set_mouse_mode(vt7pty_config_t *cfg, int mouseMode) {
     ASSERT(cfg != nullptr &&
-        mouseMode >= WINPTY_MOUSE_MODE_NONE &&
-        mouseMode <= WINPTY_MOUSE_MODE_FORCE);
+        mouseMode >= VT7PTY_MOUSE_MODE_NONE &&
+        mouseMode <= VT7PTY_MOUSE_MODE_FORCE);
     cfg->mouseMode = mouseMode;
 }
 
-WINPTY_API void
-winpty_config_set_agent_timeout(winpty_config_t *cfg, DWORD timeoutMs) {
+VT7PTY_API void
+vt7pty_config_set_agent_timeout(vt7pty_config_t *cfg, DWORD timeoutMs) {
     ASSERT(cfg != nullptr && timeoutMs > 0);
     cfg->timeoutMs = timeoutMs;
 }
@@ -228,7 +228,7 @@ public:
 
 } // anonymous namespace
 
-static void handlePendingIo(winpty_t &wp, OVERLAPPED &over, BOOL &success,
+static void handlePendingIo(vt7pty_t &wp, OVERLAPPED &over, BOOL &success,
                             DWORD &lastError, DWORD &actual) {
     if (!success && lastError == ERROR_IO_PENDING) {
         PendingIo io(wp.controlPipe.get(), over);
@@ -240,9 +240,9 @@ static void handlePendingIo(winpty_t &wp, OVERLAPPED &over, BOOL &success,
             // The I/O is still pending.  Cancel it, close the I/O event, and
             // throw an exception.
             if (waitRet == WAIT_OBJECT_0 + 1) {
-                throw LibWinptyException(WINPTY_ERROR_AGENT_DIED, L"agent died");
+                throw ClientException(VT7PTY_ERROR_AGENT_DIED, L"agent died");
             } else if (waitRet == WAIT_TIMEOUT) {
-                throw LibWinptyException(WINPTY_ERROR_AGENT_TIMEOUT,
+                throw ClientException(VT7PTY_ERROR_AGENT_TIMEOUT,
                                       L"agent timed out");
             } else if (waitRet == WAIT_FAILED) {
                 throwWindowsError(L"WaitForMultipleObjects failed");
@@ -255,13 +255,13 @@ static void handlePendingIo(winpty_t &wp, OVERLAPPED &over, BOOL &success,
     }
 }
 
-static void handlePendingIo(winpty_t &wp, OVERLAPPED &over, BOOL &success,
+static void handlePendingIo(vt7pty_t &wp, OVERLAPPED &over, BOOL &success,
                             DWORD &lastError) {
     DWORD actual = 0;
     handlePendingIo(wp, over, success, lastError, actual);
 }
 
-static void handleReadWriteErrors(winpty_t &wp, BOOL success, DWORD lastError,
+static void handleReadWriteErrors(vt7pty_t &wp, BOOL success, DWORD lastError,
                                   const wchar_t *genericErrMsg) {
     if (!success) {
         // If the pipe connection is broken after it's been connected, then
@@ -272,7 +272,7 @@ static void handleReadWriteErrors(winpty_t &wp, BOOL success, DWORD lastError,
         // [1] https://gist.github.com/rprichard/8dd8ca134b39534b7da2733994aa07ba
         if (lastError == ERROR_BROKEN_PIPE || lastError == ERROR_NO_DATA ||
                 lastError == ERROR_PIPE_NOT_CONNECTED) {
-            throw LibWinptyException(WINPTY_ERROR_LOST_CONNECTION,
+            throw ClientException(VT7PTY_ERROR_LOST_CONNECTION,
                 L"lost connection to agent");
         } else {
             throwWindowsError(genericErrMsg, lastError);
@@ -282,7 +282,7 @@ static void handleReadWriteErrors(winpty_t &wp, BOOL success, DWORD lastError,
 
 // Calls ConnectNamedPipe to wait until the agent connects to the control pipe.
 static void
-connectControlPipe(winpty_t &wp) {
+connectControlPipe(vt7pty_t &wp) {
     OVERLAPPED over = {};
     over.hEvent = wp.ioEvent.get();
     BOOL success = ConnectNamedPipe(wp.controlPipe.get(), &over);
@@ -296,7 +296,7 @@ connectControlPipe(winpty_t &wp) {
     }
 }
 
-static void writeData(winpty_t &wp, const void *data, size_t amount) {
+static void writeData(vt7pty_t &wp, const void *data, size_t amount) {
     // Perform a single pipe write.
     DWORD actual = 0;
     OVERLAPPED over = {};
@@ -319,13 +319,13 @@ static inline WriteBuffer newPacket() {
     return packet;
 }
 
-static void writePacket(winpty_t &wp, WriteBuffer &packet) {
+static void writePacket(vt7pty_t &wp, WriteBuffer &packet) {
     const auto &buf = packet.buf();
     packet.replaceRawValue<uint64_t>(0, buf.size());
     writeData(wp, buf.data(), buf.size());
 }
 
-static size_t readData(winpty_t &wp, void *data, size_t amount) {
+static size_t readData(vt7pty_t &wp, void *data, size_t amount) {
     DWORD actual = 0;
     OVERLAPPED over = {};
     over.hEvent = wp.ioEvent.get();
@@ -339,7 +339,7 @@ static size_t readData(winpty_t &wp, void *data, size_t amount) {
     return actual;
 }
 
-static void readAll(winpty_t &wp, void *data, size_t amount) {
+static void readAll(vt7pty_t &wp, void *data, size_t amount) {
     while (amount > 0) {
         const size_t chunk = readData(wp, data, amount);
         ASSERT(chunk <= amount && "readData result is larger than amount");
@@ -348,17 +348,17 @@ static void readAll(winpty_t &wp, void *data, size_t amount) {
     }
 }
 
-static uint64_t readUInt64(winpty_t &wp) {
+static uint64_t readUInt64(vt7pty_t &wp) {
     uint64_t ret = 0;
     readAll(wp, &ret, sizeof(ret));
     return ret;
 }
 
 // Returns a reply packet's payload.
-static ReadBuffer readPacket(winpty_t &wp) {
+static ReadBuffer readPacket(vt7pty_t &wp) {
     const uint64_t packetSize = readUInt64(wp);
     if (packetSize < sizeof(packetSize) || packetSize > SIZE_MAX) {
-        throwWinptyException(L"Agent RPC error: invalid packet size");
+        throwVT7PtyException(L"Agent RPC error: invalid packet size");
     }
     const size_t payloadSize = packetSize - sizeof(packetSize);
     std::vector<char> bytes(payloadSize);
@@ -369,7 +369,7 @@ static ReadBuffer readPacket(winpty_t &wp) {
 static OwnedHandle createControlPipe(const std::wstring &name) {
     const auto sd = createPipeSecurityDescriptorOwnerFullControl();
     if (!sd) {
-        throwWinptyException(
+        throwVT7PtyException(
             L"could not create the control pipe's SECURITY_DESCRIPTOR");
     }
     SECURITY_ATTRIBUTES sa = {};
@@ -410,7 +410,7 @@ static OwnedHandle createEvent() {
 // station, visible.
 static bool shouldShowConsoleWindow() {
     char buf[32];
-    return GetEnvironmentVariableA("WINPTY_SHOW_CONSOLE", buf, sizeof(buf)) > 0;
+    return GetEnvironmentVariableA("VT7PTY_SHOW_CONSOLE", buf, sizeof(buf)) > 0;
 }
 
 static bool shouldSpecifyHideFlag() {
@@ -461,10 +461,10 @@ static OwnedHandle startAgentProcess(
         const DWORD lastError = GetLastError();
         const auto errStr =
             (WStringBuilder(256)
-                << L"winpty-agent CreateProcess failed: cmdline='" << cmdline
+                << L"VT7Pty-Agent CreateProcess failed: cmdline='" << cmdline
                 << L"' err=0x" << whexOfInt(lastError)).str_moved();
-        throw LibWinptyException(
-            WINPTY_ERROR_AGENT_CREATION_FAILED, errStr.c_str());
+        throw ClientException(
+            VT7PTY_ERROR_AGENT_CREATION_FAILED, errStr.c_str());
     }
     CloseHandle(pi.hThread);
     TRACE("Created agent successfully, pid=%u, cmdline=%s",
@@ -484,24 +484,24 @@ static void verifyPipeClientPid(HANDLE serverPipe, DWORD agentPid) {
             WStringBuilder errMsg;
             errMsg << L"Security check failed: pipe client pid (" << clientPid
                    << L") does not match agent pid (" << agentPid << L")";
-            throwWinptyException(errMsg.c_str());
+            throwVT7PtyException(errMsg.c_str());
         }
     } else {
         throwWindowsError(L"GetNamedPipeClientProcessId failed", lastError);
     }
 }
 
-static std::unique_ptr<winpty_t>
-createAgentSession(const winpty_config_t *cfg,
+static std::unique_ptr<vt7pty_t>
+createAgentSession(const vt7pty_config_t *cfg,
                    const std::wstring &params,
                    DWORD creationFlags) {
-    std::unique_ptr<winpty_t> wp(new winpty_t);
+    std::unique_ptr<vt7pty_t> wp(new vt7pty_t);
     wp->agentTimeoutMs = cfg->timeoutMs;
     wp->ioEvent = createEvent();
 
     // Create control server pipe.
     const auto pipeName =
-        L"\\\\.\\pipe\\winpty-control-" + GenRandom().uniqueName();
+        L"\\\\.\\pipe\\vt7pty-control-v1-" + GenRandom().uniqueName();
     wp->controlPipe = createControlPipe(pipeName);
 
     DWORD agentPid = 0;
@@ -513,9 +513,9 @@ createAgentSession(const winpty_config_t *cfg,
     return std::move(wp);
 }
 
-WINPTY_API winpty_t *
-winpty_open(const winpty_config_t *cfg,
-            winpty_error_ptr_t *err /*OPTIONAL*/) {
+VT7PTY_API vt7pty_t *
+vt7pty_open(const vt7pty_config_t *cfg,
+            vt7pty_error_ptr_t *err /*OPTIONAL*/) {
     API_TRY {
         ASSERT(cfg != nullptr);
         dumpWindowsVersion();
@@ -530,11 +530,42 @@ winpty_open(const winpty_config_t *cfg,
                 << cfg->rows).str_moved();
         auto wp = createAgentSession(cfg, params, CREATE_NEW_CONSOLE);
 
-        // Get the CONIN/CONOUT pipe names.
+        // Validate the agent before accepting its pipe names.  This prevents
+        // a colocated agent from a different VT7Pty build from silently using
+        // an incompatible protocol.
         auto packet = readPacket(*wp.get());
+        AgentHandshake handshake;
+        try {
+            handshake = readAgentHandshake(packet);
+        } catch (const ReadBuffer::DecodeError &) {
+            throw ClientException(
+                VT7PTY_ERROR_AGENT_INCOMPATIBLE,
+                L"VT7Pty agent handshake is missing or malformed");
+        }
+        const auto handshakeStatus = classifyAgentHandshake(handshake);
+        if (handshakeStatus == AgentHandshakeStatus::WrongIdentity) {
+            const auto message =
+                (WStringBuilder(192)
+                    << L"VT7Pty agent identity mismatch: expected '"
+                    << VT7PTY_AGENT_IDENTITY << L"', received '"
+                    << handshake.identity << L"'").str_moved();
+            throw ClientException(
+                VT7PTY_ERROR_AGENT_INCOMPATIBLE, message.c_str());
+        }
+        if (handshakeStatus == AgentHandshakeStatus::UnsupportedVersion) {
+            const auto message =
+                (WStringBuilder(192)
+                    << L"VT7Pty agent protocol mismatch: client="
+                    << VT7PTY_PROTOCOL_VERSION << L", agent="
+                    << handshake.protocolVersion).str_moved();
+            throw ClientException(
+                VT7PTY_ERROR_AGENT_INCOMPATIBLE, message.c_str());
+        }
+
+        // Get the CONIN/CONOUT pipe names.
         wp->coninPipeName = packet.getWString();
         wp->conoutPipeName = packet.getWString();
-        if (cfg->flags & WINPTY_FLAG_CONERR) {
+        if (cfg->flags & VT7PTY_FLAG_CONERR) {
             wp->conerrPipeName = packet.getWString();
         }
         packet.assertEof();
@@ -543,7 +574,7 @@ winpty_open(const winpty_config_t *cfg,
     } API_CATCH(nullptr)
 }
 
-WINPTY_API HANDLE winpty_agent_process(winpty_t *wp) {
+VT7PTY_API HANDLE vt7pty_agent_process(vt7pty_t *wp) {
     ASSERT(wp != nullptr);
     return wp->agentProcess.get();
 }
@@ -561,17 +592,17 @@ static const wchar_t *cstrFromWStringOrNull(const std::wstring &str) {
     }
 }
 
-WINPTY_API LPCWSTR winpty_conin_name(winpty_t *wp) {
+VT7PTY_API LPCWSTR vt7pty_conin_name(vt7pty_t *wp) {
     ASSERT(wp != nullptr);
     return cstrFromWStringOrNull(wp->coninPipeName);
 }
 
-WINPTY_API LPCWSTR winpty_conout_name(winpty_t *wp) {
+VT7PTY_API LPCWSTR vt7pty_conout_name(vt7pty_t *wp) {
     ASSERT(wp != nullptr);
     return cstrFromWStringOrNull(wp->conoutPipeName);
 }
 
-WINPTY_API LPCWSTR winpty_conerr_name(winpty_t *wp) {
+VT7PTY_API LPCWSTR vt7pty_conerr_name(vt7pty_t *wp) {
     ASSERT(wp != nullptr);
     if (wp->conerrPipeName.empty()) {
         return nullptr;
@@ -583,7 +614,7 @@ WINPTY_API LPCWSTR winpty_conerr_name(winpty_t *wp) {
 
 
 /*****************************************************************************
- * winpty agent RPC calls. */
+ * VT7Pty agent RPC calls. */
 
 namespace {
 
@@ -591,9 +622,9 @@ namespace {
 // which could leave the control pipe in an inconsistent state.
 class RpcOperation {
 public:
-    RpcOperation(winpty_t &wp) : m_wp(wp) {
+    RpcOperation(vt7pty_t &wp) : m_wp(wp) {
         if (m_wp.controlPipe.get() == nullptr) {
-            throwWinptyException(L"Agent shutdown due to RPC failure");
+            throwVT7PtyException(L"Agent shutdown due to RPC failure");
         }
     }
     ~RpcOperation() {
@@ -604,7 +635,7 @@ public:
     }
     void success() { m_success = true; }
 private:
-    winpty_t &m_wp;
+    vt7pty_t &m_wp;
     bool m_success = false;
 };
 
@@ -613,7 +644,7 @@ private:
 
 
 /*****************************************************************************
- * winpty agent RPC call: process creation. */
+ * VT7Pty agent RPC call: process creation. */
 
 // Return a std::wstring containing every character of the environment block.
 // Typically, the block is non-empty, so the std::wstring returned ends with
@@ -650,17 +681,17 @@ static std::wstring wstringFromEnvBlock(const wchar_t *env) {
     return envStr;
 }
 
-WINPTY_API winpty_spawn_config_t *
-winpty_spawn_config_new(UINT64 winptyFlags,
+VT7PTY_API vt7pty_spawn_config_t *
+vt7pty_spawn_config_new(UINT64 spawnFlags,
                         LPCWSTR appname /*OPTIONAL*/,
                         LPCWSTR cmdline /*OPTIONAL*/,
                         LPCWSTR cwd /*OPTIONAL*/,
                         LPCWSTR env /*OPTIONAL*/,
-                        winpty_error_ptr_t *err /*OPTIONAL*/) {
+                        vt7pty_error_ptr_t *err /*OPTIONAL*/) {
     API_TRY {
-        ASSERT((winptyFlags & WINPTY_SPAWN_FLAG_MASK) == winptyFlags);
-        std::unique_ptr<winpty_spawn_config_t> cfg(new winpty_spawn_config_t);
-        cfg->winptyFlags = winptyFlags;
+        ASSERT((spawnFlags & VT7PTY_SPAWN_FLAG_MASK) == spawnFlags);
+        std::unique_ptr<vt7pty_spawn_config_t> cfg(new vt7pty_spawn_config_t);
+        cfg->spawnFlags = spawnFlags;
         if (appname != nullptr) { cfg->appname = appname; }
         if (cmdline != nullptr) { cfg->cmdline = cmdline; }
         if (cwd != nullptr) { cfg->cwd = cwd; }
@@ -669,7 +700,7 @@ winpty_spawn_config_new(UINT64 winptyFlags,
     } API_CATCH(nullptr)
 }
 
-WINPTY_API void winpty_spawn_config_free(winpty_spawn_config_t *cfg) {
+VT7PTY_API void vt7pty_spawn_config_free(vt7pty_spawn_config_t *cfg) {
     delete cfg;
 }
 
@@ -694,13 +725,13 @@ static inline OwnedHandle stealHandle(HANDLE process, HANDLE handle) {
     return OwnedHandle(result);
 }
 
-WINPTY_API BOOL
-winpty_spawn(winpty_t *wp,
-             const winpty_spawn_config_t *cfg,
+VT7PTY_API BOOL
+vt7pty_spawn(vt7pty_t *wp,
+             const vt7pty_spawn_config_t *cfg,
              HANDLE *process_handle /*OPTIONAL*/,
              HANDLE *thread_handle /*OPTIONAL*/,
              DWORD *create_process_error /*OPTIONAL*/,
-             winpty_error_ptr_t *err /*OPTIONAL*/) {
+             vt7pty_error_ptr_t *err /*OPTIONAL*/) {
     API_TRY {
         ASSERT(wp != nullptr && cfg != nullptr);
 
@@ -713,8 +744,8 @@ winpty_spawn(winpty_t *wp,
 
         // Send spawn request.
         auto packet = newPacket();
-        packet.putInt32(AgentMsg::StartProcess);
-        packet.putInt64(cfg->winptyFlags);
+        packet.putInt32(AgentMessage::StartProcess);
+        packet.putInt64(cfg->spawnFlags);
         packet.putInt32(process_handle != nullptr);
         packet.putInt32(thread_handle != nullptr);
         packet.putWString(cfg->appname);
@@ -733,7 +764,7 @@ winpty_spawn(winpty_t *wp,
                 *create_process_error = lastError;
             }
             rpc.success();
-            throw LibWinptyException(WINPTY_ERROR_SPAWN_CREATE_PROCESS_FAILED,
+            throw ClientException(VT7PTY_ERROR_SPAWN_CREATE_PROCESS_FAILED,
                 L"CreateProcess failed");
         } else if (result == StartProcessResult::ProcessCreated) {
             const HANDLE remoteProcess = handleFromInt64(reply.getInt64());
@@ -757,7 +788,7 @@ winpty_spawn(winpty_t *wp,
             }
             rpc.success();
         } else {
-            throwWinptyException(
+            throwVT7PtyException(
                 L"Agent RPC error: invalid StartProcessResult");
         }
         return TRUE;
@@ -767,17 +798,17 @@ winpty_spawn(winpty_t *wp,
 
 
 /*****************************************************************************
- * winpty agent RPC calls: everything else */
+ * VT7Pty agent RPC calls: everything else */
 
-WINPTY_API BOOL
-winpty_set_size(winpty_t *wp, int cols, int rows,
-                winpty_error_ptr_t *err /*OPTIONAL*/) {
+VT7PTY_API BOOL
+vt7pty_set_size(vt7pty_t *wp, int cols, int rows,
+                vt7pty_error_ptr_t *err /*OPTIONAL*/) {
     API_TRY {
         ASSERT(wp != nullptr && cols > 0 && rows > 0);
         std::lock_guard<std::mutex> lock(wp->mutex);
         RpcOperation rpc(*wp);
         auto packet = newPacket();
-        packet.putInt32(AgentMsg::SetSize);
+        packet.putInt32(AgentMessage::SetSize);
         packet.putInt32(cols);
         packet.putInt32(rows);
         writePacket(*wp, packet);
@@ -787,16 +818,16 @@ winpty_set_size(winpty_t *wp, int cols, int rows,
     } API_CATCH(FALSE)
 }
 
-WINPTY_API int
-winpty_get_console_process_list(winpty_t *wp, int *processList, const int processCount,
-                                winpty_error_ptr_t *err /*OPTIONAL*/) {
+VT7PTY_API int
+vt7pty_get_console_process_list(vt7pty_t *wp, int *processList, const int processCount,
+                                vt7pty_error_ptr_t *err /*OPTIONAL*/) {
     API_TRY {
         ASSERT(wp != nullptr);
         ASSERT(processList != nullptr);
         std::lock_guard<std::mutex> lock(wp->mutex);
         RpcOperation rpc(*wp);
         auto packet = newPacket();
-        packet.putInt32(AgentMsg::GetConsoleProcessList);
+        packet.putInt32(AgentMessage::GetConsoleProcessList);
         writePacket(*wp, packet);
         auto reply = readPacket(*wp);
 
@@ -814,7 +845,7 @@ winpty_get_console_process_list(winpty_t *wp, int *processList, const int proces
     } API_CATCH(0)
 }
 
-WINPTY_API void winpty_free(winpty_t *wp) {
+VT7PTY_API void vt7pty_free(vt7pty_t *wp) {
     // At least in principle, CloseHandle can fail, so this deletion can
     // fail.  It won't throw an exception, but maybe there's an error that
     // should be propagated?

@@ -24,7 +24,7 @@
 
 #include "../shared/DebugClient.h"
 #include "../shared/StringBuilder.h"
-#include "../shared/WinptyAssert.h"
+#include "../shared/Assert.h"
 
 std::unique_ptr<Win32ConsoleBuffer> Win32ConsoleBuffer::openStdout() {
     return std::unique_ptr<Win32ConsoleBuffer>(
