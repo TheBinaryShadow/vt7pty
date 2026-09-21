@@ -20,6 +20,8 @@ Supporting documents:
 - [Compatibility contract](docs/COMPATIBILITY.md)
 - [Versioning policy](docs/VERSIONING.md)
 - [Manual release process](docs/RELEASING.md)
+- [Inherited component inventory](docs/INVENTORY.md)
+- [Inherited native baseline](docs/validation/2026-09-21-upstream-baseline.md)
 - [Upstream provenance](UPSTREAM.md)
 
 ## Goal and boundaries
@@ -87,20 +89,22 @@ attributed and corrected.
 Outcome: later work can be compared with an identifiable, reproducible record
 of the inherited native backend.
 
-- [ ] Inventory every source component, build path, generated file, dependency,
+- [x] Inventory every source component, build path, generated file, dependency,
   diagnostic tool, package responsibility, and test.
-- [ ] Classify every retained file as keep, modernize, replace, archive as
+- [x] Classify every retained file as keep, modernize, replace, archive as
   historical material, or remove.
-- [ ] Record the exact upstream revision and clean/dirty source state.
-- [ ] Produce x64 Debug and Release baseline artifacts with symbols.
-- [ ] Record artifact names, hashes, imports, exports, runtime dependencies, and
+- [x] Record the exact upstream revision and clean/dirty source state.
+- [x] Produce x64 Debug and Release baseline artifacts with symbols.
+- [x] Record artifact names, hashes, imports, exports, runtime dependencies, and
   compiler and SDK identity.
-- [ ] Run inherited automated tests and representative console sessions.
-- [ ] Record current development-host results, failures, limitations, and
+- [x] Run inherited automated tests and representative console sessions.
+- [x] Record current development-host results, failures, limitations, and
   untested behavior without treating them as Windows 7 acceptance.
 
-Exit criterion: the inherited backend has an identifiable artifact and result
-record suitable for comparison throughout Milestone 0.
+Exit criterion met by the [component inventory](docs/INVENTORY.md), temporary
+[baseline harness](tools/baseline/README.md), and
+[accepted development-host baseline](docs/validation/2026-09-21-upstream-baseline.md).
+Physical Windows 7 execution remains a later step and is not implied here.
 
 ### Step 0.2: Replace build and developer infrastructure
 

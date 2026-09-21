@@ -19,6 +19,9 @@ changes until implemented.
   Windows 7 SP1+ x64, Visual Studio/MSBuild, C++20, local-only verification,
   physical non-ESU/ESU acceptance, manual releases, and removal of inherited
   Unix, pre-Windows 7, and obsolete toolchain paths.
+- Completed the inherited component inventory and captured a reproducible x64
+  Debug/Release native baseline with artifact hashes, imports, exports, warning
+  debt, and passing inherited tests.
 - Preserved the original WinPTY README and release history as historical
   documentation.
 

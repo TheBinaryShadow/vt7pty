@@ -60,6 +60,12 @@ VT7Pty prerequisites. Do not extend them. They will be removed only after the
 new MSBuild and PowerShell workflow performs every retained responsibility and
 reproduces the recorded baseline.
 
+Roadmap Step 0.1 now has a temporary
+[baseline harness](tools/baseline/README.md) and an
+[accepted result record](docs/validation/2026-09-21-upstream-baseline.md). That
+harness exists only to compare the inherited source before the supported build
+lands; it is not a second product build system.
+
 The preserved [upstream README](docs/UPSTREAM_WINPTY_README.md) contains the
 original commands for historical reference.
 

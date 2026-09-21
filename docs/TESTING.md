@@ -48,9 +48,12 @@ Before obsolete components are removed, preserve:
 - development-host OS information and separate target information,
 - known failures, limitations, skipped cases, and reasons.
 
-The ignored local environment-check harness proves that the present workstation
-can build and debug the inherited x64 components. It is not the clean-checkout
-baseline. Roadmap Steps 0.1 and 0.2 replace it with maintained commands.
+Roadmap Step 0.1 produced the accepted
+[inherited native baseline](validation/2026-09-21-upstream-baseline.md) through
+a temporary checked-in harness. It records Debug/Release artifacts, hashes,
+imports, exports, warnings, and the two inherited test results. Step 0.2 must
+reproduce that boundary through the supported MSBuild workflow. The original
+ignored environment-check harness is no longer baseline evidence.
 
 ## Coverage matrix
 

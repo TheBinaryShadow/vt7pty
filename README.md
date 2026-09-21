@@ -87,6 +87,8 @@ Useful starting points:
 
 - [Roadmap and milestone acceptance criteria](ROADMAP.md)
 - [Approved development foundation](docs/FOUNDATION.md)
+- [Inherited component inventory](docs/INVENTORY.md)
+- [Accepted inherited native baseline](docs/validation/2026-09-21-upstream-baseline.md)
 - [Architecture and current data flows](docs/ARCHITECTURE.md)
 - [Testing strategy and evidence requirements](docs/TESTING.md)
 - [Compatibility targets and verified status](docs/COMPATIBILITY.md)
