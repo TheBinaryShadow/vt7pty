@@ -1,65 +1,88 @@
 # VT7Pty Compatibility Contract
 
-Status: current claims and proposed Milestone 0 decisions. Updated: 2026-09-21.
+Status: approved target contract; implementation unqualified. Updated:
+2026-09-21.
 
-This document separates project targets from verified support. A row marked
-planned or untested is not a compatibility promise.
+This document separates approved targets from verified support. A target is not
+a compatibility claim until an identified build passes the required procedure.
 
 ## Current status
 
 | Area | Current status |
 | --- | --- |
 | Source baseline | WinPTY `0.4.4-dev` at upstream commit `7e59fe2` |
-| Development host | Local x64 native build and debugger smoke check completed on Windows 10 build 19044 |
-| Windows 7 runtime | Primary target; current VT7Pty checkout has no recorded acceptance run |
-| Architectures | x64 locally exercised through a temporary harness; x86 compiler present but untested |
-| Build interface | Inherited Python 2/GYP and GNU make paths remain; no supported modern VT7Pty build yet |
-| API and binaries | Inherited WinPTY names and behavior |
+| Development host | Inherited x64 native components built and debugged through a temporary local harness on Windows 10 build 19044 |
+| Windows 7 runtime | Approved minimum target; no VT7Pty acceptance record yet |
+| Architectures | x64 is the approved product architecture; inherited x64 smoke tests passed locally |
+| Build interface | Inherited Python 2/GYP and GNU Make paths remain; the approved MSBuild workflow is not implemented yet |
+| API and binaries | Inherited WinPTY names and behavior remain |
 | ConPTY compatibility | Not implemented; ConPTY is a design and behavioral reference |
-| VT7 integration | Planned; no VT7Pty integration claim |
+| VT7 integration | Planned; no integration claim |
 | Releases | No VT7Pty release has been published |
 
 Historical WinPTY support statements describe upstream releases and do not
-automatically qualify future VT7Pty builds.
+qualify future VT7Pty builds.
 
-## Primary target
+## Supported platform policy
 
-The planned primary runtime target is Windows 7 SP1 x64. Before Roadmap Step
-0.1 can be accepted, this document must record the exact project prerequisite
-floor, including:
+The approved initial platform contract is:
 
-- Windows 7 servicing/update expectations.
-- Required loader or runtime updates.
-- CRT deployment model and packaged redistributables, if any.
-- Architecture and subsystem target.
-- Whether optional functionality needs additional OS components.
-- How a package detects or reports a missing prerequisite.
+- Minimum operating system: Windows 7 SP1 x64.
+- Supported family: Windows 7, Windows 8, Windows 8.1, Windows 10, and Windows
+  11 on x64.
+- Unsupported: Windows XP, Windows Vista, and x86.
+- Build API floor: `_WIN32_WINNT=0x0601` and matching subsystem/manifest
+  configuration.
+- Runtime model: static MSVC runtime initially.
 
-The target machine must not require the modern compiler or SDK. A build-time
-`_WIN32_WINNT` value, subsystem header value, successful link, or static CRT
-choice alone does not establish runtime compatibility.
+XP/Vista compatibility code and build paths will be removed during Milestone 0.
+Later-Windows behavior remains in scope. An API newer than Windows 7 may be used
+only through a Windows 7-safe capability path with tested fallback behavior.
+
+The target machine does not need the compiler or Windows SDK. Compiler macros,
+successful linking, subsystem headers, or static CRT selection do not by
+themselves establish runtime compatibility.
+
+## Windows 7 acceptance tiers
+
+VT7Pty uses the same physical environment available for VT7:
+
+| Tier | Configuration | Role |
+| --- | --- | --- |
+| A | Windows 7 SP1 x64, fully updated with the available non-ESU public update set | Routine target iteration and minimum-floor acceptance |
+| B | Windows 7 SP1 x64, fully updated through ESU | Additional milestone and release-candidate acceptance |
+
+Every run records the exact OS build and installed-update state. The initial
+acceptance work will determine and document required loader/runtime updates.
+VT7 graphics or managed-runtime prerequisites are not automatically VT7Pty
+prerequisites.
+
+Routine candidates run on Tier A. Milestone and release candidates run on both
+tiers. Results from one tier do not stand in for the other.
 
 ## Development and build hosts
 
-Modern toolchains may run on newer Windows versions while producing Windows 7
-binaries. Milestone 0 will select and record exact supported build tools. The
-current proposal is CMake with MSVC, x64 Debug/Release builds, and Ninja for
-scripted builds plus a Visual Studio debugging path.
+The approved reference build environment is Visual Studio 2022 17.14, MSVC
+v143 14.44.35207, and Windows SDK 10.0.26100.0. The project uses C++20, x64
+Debug/Release configurations, and MSBuild. Newer compatible toolchain revisions
+may be adopted through an explicit reproducibility and Windows 7 validation
+change.
 
-Hosted CI demonstrates reproducibility on its runner. It cannot replace the
-required Windows 7 execution and behavior checks.
+Builds and checks run through maintained local PowerShell and native tools.
+There is no hosted build or test service. Physical target evidence remains the
+authority for the Windows 7 floor.
 
 ## Runtime dependency audit
 
 Every candidate package must be checked for:
 
-- Direct imports from system DLLs.
-- Delay-loaded and dynamically resolved APIs.
-- Transitive DLL and CRT dependencies.
-- API flags, structures, interface versions, and behavior that differ on
-  Windows 7 even when an export exists.
-- Agent/client architecture and version agreement.
-- Accidental dependence on build-machine paths or tools.
+- direct imports from system DLLs,
+- delay-loaded and dynamically resolved APIs,
+- transitive DLL and CRT dependencies,
+- API flags, structures, interfaces, and behavior that differ on Windows 7,
+- DLL/agent architecture and version agreement,
+- subsystem and manifest settings,
+- accidental dependence on development-machine paths or tools.
 
 Record both static inspection and execution on the target. Unsupported imports
 or unexplained loader failures block acceptance.
@@ -67,24 +90,24 @@ or unexplained loader failures block acceptance.
 ## Application compatibility
 
 Compatibility is application- and behavior-specific. Launching successfully is
-insufficient. Claims should identify the application/version and tested input,
-output, resize, cancellation, screen restoration, and shutdown behavior.
+insufficient. Claims identify the application and version plus tested input,
+output, Unicode, resize, cancellation, screen restoration, process lifetime,
+and shutdown behavior.
 
-Initial required local applications are Command Prompt and Windows PowerShell.
-The SSH/full-screen application path will be defined after the exact compatible
-client and data path are selected. See [Testing](TESTING.md).
+Command Prompt and Windows PowerShell are initial required local applications.
+The SSH/full-screen application path will be fixed from measured Milestone 0
+evidence rather than assumed. See [Testing](TESTING.md).
 
 ## ConPTY and other consumers
 
 VT7Pty does not currently expose the ConPTY ABI, emulate
 `PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE`, or claim compatibility with unmodified
-ConPTY clients. A ConPTY-shaped VT7 integration API and a general ConPTY shim
-are distinct goals.
+ConPTY clients. A VT7Pty API for VT7 and a general ConPTY user-mode shim are
+separate goals.
 
 After VT7 readiness, the project may test a user-mode shim against named
 consumers. Compatibility must cover process creation, handle ownership,
-lifecycle, stream behavior, resize, and errors, not merely matching export
-names. A kernel driver is not planned.
+lifecycle, streams, resize, and errors. No kernel driver is planned.
 
 ## Publishing compatibility claims
 

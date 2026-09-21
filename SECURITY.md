@@ -35,6 +35,10 @@ VT7Pty is in early development and has no supported stable release series.
 The inherited `0.4.4-dev` version identifies the WinPTY baseline; it is not a
 VT7Pty security-support commitment.
 
+The approved product target is Windows 7 SP1 and later on x64. XP, Vista, and
+x86 are outside the maintained VT7Pty compatibility policy. This project policy
+does not provide operating-system vendor support.
+
 | Version | Status |
 | --- | --- |
 | Current VT7Pty development branch | Reports welcome; no stability or response-time guarantee |

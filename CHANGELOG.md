@@ -15,6 +15,10 @@ changes until implemented.
 - Added upstream provenance, credits, build notes, contribution guidance, code
   of conduct, security policy, roadmap, and supporting architecture, testing,
   compatibility, and versioning documents.
+- Approved and documented the full Milestone 0 modernization foundation:
+  Windows 7 SP1+ x64, Visual Studio/MSBuild, C++20, local-only verification,
+  physical non-ESU/ESU acceptance, manual releases, and removal of inherited
+  Unix, pre-Windows 7, and obsolete toolchain paths.
 - Preserved the original WinPTY README and release history as historical
   documentation.
 

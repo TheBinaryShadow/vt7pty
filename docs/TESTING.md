@@ -1,129 +1,139 @@
 # VT7Pty Testing Strategy
 
-Status: proposed Milestone 0 strategy. Updated: 2026-09-21.
+Status: approved Milestone 0 strategy. Updated: 2026-09-21.
 
-This document defines how VT7Pty will distinguish preserved WinPTY behavior,
-new regressions, inherited limitations, and accepted improvements. Test results
-must identify the source and binary under test; a plan is not evidence that a
-capability works.
+This document defines how VT7Pty distinguishes preserved WinPTY behavior, new
+regressions, inherited limitations, and accepted improvements. Results must
+identify the exact source and binaries under test.
 
 ## Principles
 
-- Capture a baseline before removal, renaming, or behavior changes.
+- Capture a baseline before removal, renaming, or intentional behavior changes.
+- Add tests throughout modernization rather than postponing them to its end.
 - Automate deterministic protocol and lifecycle checks where practical.
-- Test observable terminal state rather than requiring one exact VT byte
-  encoding when multiple encodings are equivalent.
-- Keep development-host results separate from Windows 7 acceptance.
+- Test observable terminal state when multiple byte encodings are equivalent.
+- Keep development-host results separate from physical Windows 7 acceptance.
 - Report every required case as pass, fail, skipped, or not run.
-- Preserve failures and partial results; do not turn missing coverage into a pass.
+- Preserve failures and partial results; missing coverage is not a pass.
 - Use negative controls to prove that the harness detects broken behavior.
 - Keep credentials, private terminal content, and personal information out of
   default logs and published artifacts.
 
-## Test layers
+## Execution model
+
+Verification uses repository-owned native executables and Windows PowerShell
+scripts. There is no hosted build or test service.
+
+The planned maintained entry point is `Verify-VT7Pty.ps1`. Tests that must run
+on Windows 7 will work from a portable package without Visual Studio. Their
+orchestration will remain compatible with Windows PowerShell 5.1.
 
 | Layer | Purpose | Expected execution |
 | --- | --- | --- |
-| Unit | Encoding, buffers, mappings, protocol helpers, and deterministic algorithms | Development host and CI |
-| Component | Client/agent control, fixtures, pipe behavior, spawn, resize, and teardown | Development host, CI where suitable, Windows 7 package |
-| Contract | Public API ownership, errors, concurrency, cancellation, and version negotiation | Added with Milestone 2 |
-| Application | Command Prompt, Windows PowerShell, and defined console applications | Development host comparison and Windows 7 acceptance |
-| Stress | Repeated lifecycle/resize, long sessions, resource stability, output load | Bounded local runs and Windows 7 acceptance |
-| Manual | Visible console behavior, keyboard layouts, interactive editing, repaint and screen restoration | Recorded target-machine procedure |
+| Unit | Encoding, buffers, mappings, protocol helpers, and deterministic algorithms | Development host; portable subset on targets where useful |
+| Component | Client/agent control, fixtures, pipes, spawn, resize, and teardown | Development host and portable Windows 7 package |
+| Contract | Public API ownership, errors, concurrency, cancellation, and version negotiation | Introduced during rebranding and completed in Milestone 2 |
+| Application | Command Prompt, Windows PowerShell, and defined console applications | Development-host comparison and physical acceptance |
+| Stress | Repeated lifecycle/resize, long sessions, resource stability, and output load | Bounded local and physical-machine runs |
+| Manual | Keyboard layouts, interactive editing, repaint, resize, and screen restoration | Recorded physical-machine procedure |
 
 ## Baseline record
 
-Before Step 0.2 begins, preserve:
+Before obsolete components are removed, preserve:
 
-- Exact source revision and working-tree state.
-- Compiler, SDK, architecture, configuration, runtime model, and build command.
-- Artifact names, sizes, hashes, imports, exports, and symbol identity.
-- Test command, timeout, exit status, and captured output.
-- Development-host OS information and separate Windows 7 target information.
-- Known failures, limitations, skipped cases, and reasons.
+- exact source revision and working-tree state,
+- compiler, SDK, architecture, configuration, runtime model, and build command,
+- artifact names, sizes, hashes, imports, exports, and symbol identity,
+- test command, timeout, exit status, and captured output,
+- development-host OS information and separate target information,
+- known failures, limitations, skipped cases, and reasons.
 
-The temporary ignored environment-check harness is useful evidence that local
-tools work, but it is not the reproducible baseline for a fresh clone. Step 0.1
-must produce the supported baseline through repository-owned commands.
+The ignored local environment-check harness proves that the present workstation
+can build and debug the inherited x64 components. It is not the clean-checkout
+baseline. Roadmap Steps 0.1 and 0.2 replace it with maintained commands.
 
-## Milestone 0 coverage matrix
+## Coverage matrix
 
 | Area | Minimum coverage |
 | --- | --- |
-| Build and package | Fresh checkout, Debug/Release, generated version, imports, exports, runtime dependencies, symbols, manifest and notices |
-| Discovery and startup | Correct agent, missing agent, wrong/incompatible agent, hidden console behavior, startup timeout and early agent exit |
-| Process and session | Application name/command line, arguments, environment, working directory, exit code, launch failure, EOF, simultaneous sessions |
-| Input | ASCII, UTF-16/Unicode cases, Enter/Tab/Backspace/Escape, navigation and function keys, modifiers, AltGr where available, processed/unprocessed Ctrl+C, supported mouse modes |
-| Output | Text and attributes, cursor movement, erase/clear, wrap, scroll, alternate or active buffer changes, large and fragmented output, final drain |
-| Unicode | Surrogate pairs and isolated surrogates where relevant, wide characters, combining sequences, malformed input, inherited width limitations |
-| Resize | Approved size set, repeated small/large transitions, application-observed dimensions, resize during output, startup and shutdown |
-| Lifecycle | Normal exit, close while idle/busy, blocked I/O, parent/agent failure, descendants, handles/pipes, orphan detection, repeated recreation |
-| Interactive | Command Prompt and Windows PowerShell editing, echo, cancellation, repaint, resize, exit and return to a stable prompt |
-| Diagnostics | Enabled/disabled logging, source/version identity, bounded data, useful failure messages, no secrets by default |
-| Stability/performance | Idle CPU, memory and handles, input response, output throughput, resize latency, repeated sessions and long-running use |
+| Build and package | Clean checkout, Debug/Release, version generation, imports, exports, dependencies, symbols, manifests, notices, and hashes |
+| Discovery and startup | Correct agent, missing agent, malformed or incompatible agent, hidden console, startup timeout, and early agent exit |
+| Process and session | Application/command line, arguments, environment, working directory, exit status, launch failure, EOF, and simultaneous sessions |
+| Input | ASCII, UTF-16, Enter/Tab/Backspace/Escape, navigation, function keys, modifiers, AltGr where available, processed/unprocessed Ctrl+C, and supported mouse modes |
+| Output | Text and attributes, cursor movement, erase/clear, wrap, scroll, buffer changes, large and fragmented output, and final drain |
+| Unicode | Surrogate pairs and isolated surrogates where relevant, wide characters, combining sequences, malformed input, and inherited width limitations |
+| Resize | Approved sizes, repeated transitions, application-observed dimensions, output under resize, startup, and shutdown |
+| Lifecycle | Normal exit, close while idle/busy, blocked I/O, parent/agent failure, descendants, handles/pipes, orphan detection, and repeated recreation |
+| Interactive | Command Prompt and Windows PowerShell editing, echo, cancellation, repaint, resize, exit, and return to a stable prompt |
+| Diagnostics | Enabled/disabled logging, source/version identity, bounded data, useful failure messages, and no secrets by default |
+| Security boundaries | Pipe peer/permissions, handle inheritance, malformed IPC, path lookup, command quoting, bounds, and cleanup races |
+| Stability/performance | Idle CPU, memory and handles, input response, output throughput, resize latency, repeated sessions, and long-running use |
 
-Exact fixtures, expected terminal state, timeouts, and platform-specific skips
-will be added before Step 0.3 implementation.
+Exact fixtures, expected terminal state, timeouts, target-specific skips, and
+resource budgets are deliverables of the relevant implementation step.
 
-## Proposed stress profiles
+## Physical Windows 7 matrix
 
-These values are starting proposals and are not current results:
+| Candidate | Non-ESU Windows 7 SP1 x64 | ESU Windows 7 SP1 x64 |
+| --- | --- | --- |
+| Routine development candidate | Required when target behavior or dependencies change | As needed for diagnosis |
+| Milestone candidate | Required | Required |
+| Release candidate | Required | Required |
 
-- At least 500 create, minimally interact, and close cycles.
-- At least 100 alternating small/large resize cycles under activity.
-- A two-hour session on the Windows 7 acceptance target, with defined idle and
-  active intervals.
-- Bounded output-heavy runs for throughput and memory observation.
+Each run records hardware, OS build, installed-update state, package identity,
+commands, per-case results, durations, logs, dumps, and deviations from the
+previous accepted result.
 
-Before accepting these profiles, define warm-up treatment, sampling intervals,
-process-tree cleanup, timeouts, resource budgets, and what constitutes material
-growth. Failed limits remain failures until the limit or implementation is
-changed through an explicit reviewed decision.
+## Initial stress profiles
+
+These are starting acceptance workloads and may be revised with recorded
+evidence:
+
+- at least 500 create, minimally interact, and close cycles,
+- at least 100 alternating small/large resize cycles under activity,
+- a two-hour Windows 7 session with defined idle and active intervals,
+- bounded output-heavy runs for throughput and memory observation.
+
+Define warm-up treatment, sampling intervals, cleanup, timeouts, and acceptable
+resource growth before treating a profile as an acceptance gate.
 
 ## Application and remote scenarios
 
 Command Prompt and Windows PowerShell are required local acceptance cases.
-Record exact versions and relevant configuration such as PowerShell profiles or
-line-editing modules.
+Record exact versions and relevant configuration such as profiles or line-editing
+modules.
 
-SSH, Vim, and htop remain valuable fidelity scenarios, but the test cannot be
-specified honestly until the project identifies:
-
-- The Windows 7-compatible SSH client and version.
-- Whether the client uses console APIs, inherited streams, or another path.
-- The terminal host or state model used to judge emitted output.
-- The remote OS, shell, `TERM`, locale, application versions, and PTY geometry.
-- Authentication setup that can be exercised without publishing credentials.
-
-Milestone 0 should record a baseline or a precise unresolved dependency.
-End-to-end remote fidelity becomes a Milestone 1 gate once this path is fixed.
+SSH, Vim, and htop remain useful fidelity scenarios. Milestone 0 will either
+record a reproducible baseline or document the missing dependency, including
+the Windows 7-compatible SSH client, data path, remote OS and shell, `TERM`,
+locale, application versions, geometry, and credential-safe setup. End-to-end
+remote fidelity becomes a Milestone 1 gate once that path is fixed.
 
 ## Negative controls
 
 At minimum, demonstrate that the suite fails when:
 
-- The agent is absent or deliberately incompatible.
-- A fixture returns incorrect output or exit status.
-- A test exceeds its timeout.
-- An assertion detects leaked/orphaned state.
-- Required output is truncated or reordered by an injected fixture.
+- the agent is absent or deliberately incompatible,
+- a fixture returns incorrect output or status,
+- a test exceeds its timeout,
+- an assertion detects leaked or orphaned state,
+- required output is truncated or reordered.
 
-Deliberate crashes, hangs, and parent/agent termination probes must run in an
-isolated test group with bounded cleanup. They should not make routine CI
-unreliable or leave processes behind.
+Deliberate crashes, hangs, and parent/agent termination probes run in an
+isolated group with bounded cleanup.
 
 ## Result records
 
-Each acceptance record should include:
+Each acceptance record includes:
 
-- Source commit, dirty-state description, version, and artifact hashes.
-- Build configuration, compiler, SDK, runtime dependencies, and package ID.
-- Host and target OS, update level, architecture, and VM/hardware description.
-- Commands and fixture/application versions.
-- Per-case status, duration, exit code, and relevant measurements.
-- Log locations and redaction notes.
-- Differences from the previous accepted baseline.
-- Known defects, untested areas, and the next decision enabled by the result.
+- source commit, dirty-state description, version, and artifact hashes,
+- configuration, compiler, SDK, dependencies, and package ID,
+- host and target OS, update level, architecture, and hardware description,
+- commands and fixture/application versions,
+- per-case status, duration, exit code, and relevant measurements,
+- log and dump locations with redaction notes,
+- differences from the previous accepted baseline,
+- known defects, untested areas, and the next decision enabled by the result.
 
-Roadmap items link to these records when completed. Results should live under a
-future `docs/validation/` directory, while reusable procedures stay here.
+Reusable procedures remain here. Immutable results will live under
+`docs/validation/` and roadmap items will link to their evidence.

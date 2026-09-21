@@ -1,14 +1,17 @@
 # Contributing to VT7Pty
 
-Thank you for helping improve the console backend for VT7 on Windows 7.
+Thank you for helping improve the console backend for VT7 on Windows 7 and
+later.
 VT7Pty is in early development, and focused changes with reproducible evidence
 are especially useful.
 
 ## Before starting
 
-Read the [README](README.md), [roadmap](ROADMAP.md),
-[architecture](docs/ARCHITECTURE.md), [compatibility contract](docs/COMPATIBILITY.md),
-[build notes](BUILDING.md), and [upstream record](UPSTREAM.md). Search the
+Read the [README](README.md),
+[development foundation](docs/FOUNDATION.md), [roadmap](ROADMAP.md),
+[architecture](docs/ARCHITECTURE.md),
+[compatibility contract](docs/COMPATIBILITY.md), [build notes](BUILDING.md), and
+[upstream record](UPSTREAM.md). Search the
 [issue tracker](https://github.com/TheBinaryShadow/vt7pty/issues) before opening
 a new report or proposal.
 
@@ -18,7 +21,7 @@ documentation corrections and focused fixes can go straight to a pull request.
 
 ## Project priorities
 
-The primary goal is application-facing fidelity and reliability on Windows 7,
+The primary goal is application-facing fidelity and reliability on Windows 7+,
 followed by a clean integration boundary for eventual use in VT7. ConPTY is a
 behavioral and architectural reference. Compatibility for unrelated consumers
 is later work; a kernel driver is outside the project direction.
@@ -28,12 +31,12 @@ Useful contributions include:
 - Minimal reproductions for input, output, Unicode, resize, and screen-restoration
   defects.
 - Tests for process lifetime, cancellation, shutdown, and resource leaks.
-- Reproducible native builds and checks for Windows 7 API compatibility.
+- Reproducible local native builds and checks for Windows 7 API compatibility.
 - Target-machine testing with clear environment and artifact details.
 - Focused improvements that preserve known working legacy-console behavior.
 
 All inherited components are currently retained, including the Unix adapter.
-The roadmap proposes their audited cleanup in Milestone 0, after the modern
+The approved roadmap requires their audited cleanup in Milestone 0, after the modern
 build and baseline checks exist. Relate a proposed change to the relevant
 roadmap step and its acceptance criteria; draft plans are not completed work.
 Avoid mixing renames, removals, broad formatting changes, and functional fixes
@@ -42,8 +45,9 @@ in that project's own review process.
 
 ## Windows 7 and validation
 
-Windows 7 SP1 x64 is the primary target. An API's presence in a modern SDK does
-not establish its availability or behavior on Windows 7. Check imports,
+Windows 7 SP1 x64 is the minimum target; Windows 8 through Windows 11 x64 remain
+in scope. XP, Vista, and x86 are unsupported. An API's presence in a modern SDK
+does not establish its availability or behavior on Windows 7. Check imports,
 runtime dependencies, flags, and lifetime assumptions when they change.
 
 For behavior changes, describe the expected and observed result and run the
@@ -68,8 +72,10 @@ logs and crash reports. Report suspected vulnerabilities through
 
 ## Source and attribution
 
-Follow the style of the code being changed. Explain why a compatibility
-workaround exists and preserve relevant historical context.
+Follow the approved C++20 and repository style as it is established in
+Milestone 0. Do not extend retired compiler, Unix-adapter, XP, or Vista paths.
+Explain why a remaining compatibility workaround exists and preserve relevant
+historical context.
 
 Keep WinPTY's copyright notices and Git authorship intact. For third-party
 code, identify the project, exact source URL and revision, applicable license,

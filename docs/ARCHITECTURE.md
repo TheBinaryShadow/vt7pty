@@ -9,7 +9,7 @@ code remains authoritative when this overview and the implementation disagree.
 
 ## Purpose
 
-VT7Pty is a user-mode console backend for Windows 7. It uses WinPTY's proven
+VT7Pty is a user-mode console backend for Windows 7 and later. It uses WinPTY's proven
 legacy-console bridge as its foundation and uses ConPTY as a behavioral and API
 reference. The primary intended consumer is VT7.
 
@@ -25,7 +25,7 @@ output from the legacy console state.
 | `winpty.dll` / `src/libwinpty` | Client API, agent launch, control RPC, process requests, pipe discovery | Retain and rename; public redesign comes later |
 | `winpty-agent.exe` / `src/agent` | Owns the hidden console, launches the child, handles input, scrapes output, resizes, and manages session lifetime | Retain as the backend core |
 | `src/shared` | Shared handles, buffers, security, protocol, encoding, and diagnostics | Retain required native code |
-| `winpty-debugserver.exe` / `src/debugserver` | Collects timestamped diagnostic output | Retain and evaluate during build modernization |
+| `winpty-debugserver.exe` / `src/debugserver` | Collects timestamped diagnostic output | Retain, rebrand, and modernize |
 | `src/tests` and native probes in `misc` | Existing smoke tests and focused console investigations | Audit, retain useful coverage, and integrate with the new test system |
 | `winpty.exe` / `src/unix-adapter` | Cygwin/MSYS terminal adapter | Planned removal in Roadmap Step 0.2A |
 
@@ -125,8 +125,9 @@ and parent failure require explicit tests.
 
 ## Planned boundaries
 
-Milestone 0 will modernize the build, remove adapter-only code, and rename the
-retained runtime without changing backend semantics intentionally. The proposed
+Milestone 0 will replace the build system, remove adapter-only and pre-Windows 7
+code, modernize the retained C++ implementation, and rename the runtime without
+changing backend semantics without evidence. The approved
 artifact names are `VT7Pty.dll`, `VT7Pty-Agent.exe`, and
 `VT7Pty-DebugServer.exe`.
 
@@ -141,7 +142,9 @@ process-creation attachment contract as well as public function names.
 
 ## Architectural rules
 
-- Keep Windows 7 compatibility visible at platform boundaries.
+- Keep the Windows 7 SP1 x64 floor visible at platform boundaries while
+  preserving useful behavior on later Windows versions.
+- Do not retain XP, Vista, x86, Unix-adapter, or obsolete toolchain paths.
 - Retain the separate agent unless evidence supports a reviewed design change.
 - Preserve observable behavior during build cleanup and technical renaming.
 - Separate public API design from internal protocol and implementation details.

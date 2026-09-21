@@ -1,6 +1,6 @@
 # VT7Pty
 
-**A WinPTY-derived console backend for Windows 7, built for VT7.**
+**A modern WinPTY-derived console backend for Windows 7 and later, built for VT7.**
 
 VT7Pty is a user-mode PTY project whose goal is to improve the fidelity and
 reliability of Windows console applications and prepare a better backend for
@@ -18,20 +18,23 @@ VT7Pty is in early development. This repository currently contains the inherited
 WinPTY `0.4.4-dev` implementation, with a new project identity and development
 direction. A VT7Pty-specific API and backend improvements are planned work.
 
-The [roadmap](ROADMAP.md) owns the draft development plan and completion state. Milestone 0 proposes
-modernizing the build and supporting tools, removing obsolete components and
-completing technical rebranding into the 0.5.x series, then establishing and
-running the comprehensive test system. Small baseline checks accompany the
-first two steps. Implementation has not started.
+The [development foundation](docs/FOUNDATION.md) and
+[roadmap](ROADMAP.md) record the approved product and engineering direction.
+Milestone 0 will replace the complete inherited toolchain, remove the Unix
+adapter and pre-Windows 7 compatibility, establish the native VT7Pty 0.5.x
+identity, modernize the retained C++ code, and create the permanent local build,
+test, diagnostic, and release systems. Implementation has not started.
 
 All inherited components are still present, including the Cygwin/MSYS Unix
 adapter, tests, debugging tools, and build and packaging scripts. Binaries,
 API symbols, environment variables, and build targets retain their existing
 WinPTY names. The rebranding does not change runtime behavior.
 
-Windows 7 SP1 x64 is the primary target for VT7Pty. Historical WinPTY support
-claims and release notes describe upstream behavior; they are not acceptance
-results for future VT7Pty builds. Changes must be validated on the target OS.
+VT7Pty targets x64 Windows 7 SP1 and later. Windows XP, Windows Vista, and x86
+are outside the maintained product. Historical WinPTY support claims and
+release notes describe upstream behavior; they are not acceptance results for
+future VT7Pty builds. Milestone and release candidates will be validated on
+physical non-ESU and ESU Windows 7 SP1 x64 machines.
 
 ## What we are working toward
 
@@ -39,8 +42,8 @@ results for future VT7Pty builds. Changes must be validated on the target OS.
   and screen restoration.
 - Predictable process and session lifetimes, clean teardown, and useful
   diagnostics.
-- A reproducible native Windows build and tests that expose regressions and
-  inherited limitations.
+- A modern Visual Studio/MSBuild and C++20 codebase with reproducible local
+  build, verification, packaging, and physical Windows 7 acceptance.
 - A documented API that makes eventual VT7 integration straightforward,
   using ConPTY conventions where they fit the legacy-console backend.
 
@@ -75,13 +78,15 @@ failures and tests, with proven behavior retained where it meets our needs.
 
 ## Building and exploring
 
-See [Building](BUILDING.md) for the inherited build entry points and their
-limitations. The [original WinPTY README](docs/UPSTREAM_WINPTY_README.md)
-is preserved for historical build, adapter, embedding, and debugging details.
+See [Building](BUILDING.md) for the approved MSBuild contract and the current
+inherited build limitations. The
+[original WinPTY README](docs/UPSTREAM_WINPTY_README.md) is preserved for
+historical build, adapter, embedding, and debugging details.
 
 Useful starting points:
 
 - [Roadmap and milestone acceptance criteria](ROADMAP.md)
+- [Approved development foundation](docs/FOUNDATION.md)
 - [Architecture and current data flows](docs/ARCHITECTURE.md)
 - [Testing strategy and evidence requirements](docs/TESTING.md)
 - [Compatibility targets and verified status](docs/COMPATIBILITY.md)
@@ -93,6 +98,7 @@ Useful starting points:
 - [Upstream baseline and attribution policy](UPSTREAM.md)
 - [Historical WinPTY release notes](RELEASES.md)
 - [VT7Pty changelog](CHANGELOG.md)
+- [Manual release process](docs/RELEASING.md)
 
 ## Contributing and community
 
