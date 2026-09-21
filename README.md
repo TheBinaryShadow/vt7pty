@@ -97,6 +97,7 @@ Useful starting points:
 - [Accepted MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
 - [Accepted Step 0.2 completion validation](docs/validation/2026-09-22-step-0.2-completion.md)
 - [Accepted Step 0.3 completion validation](docs/validation/2026-09-22-step-0.3-completion.md)
+- [Step 0.4 platform candidate and pending physical gate](docs/validation/2026-09-22-step-0.4-candidate.md)
 - [Architecture and current data flows](docs/ARCHITECTURE.md)
 - [Testing strategy and evidence requirements](docs/TESTING.md)
 - [Windows 7 physical acceptance procedure](docs/WINDOWS7_ACCEPTANCE.md)

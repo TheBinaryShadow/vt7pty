@@ -15,3 +15,4 @@ Current records:
 - [2026-09-21 MSBuild transition](2026-09-21-msbuild-transition.md)
 - [2026-09-22 Step 0.2 completion](2026-09-22-step-0.2-completion.md)
 - [2026-09-22 Step 0.3 completion](2026-09-22-step-0.3-completion.md)
+- [2026-09-22 Step 0.4 platform candidate](2026-09-22-step-0.4-candidate.md)

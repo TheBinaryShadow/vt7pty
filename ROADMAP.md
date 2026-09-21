@@ -197,6 +197,11 @@ XP/Vista implementation burden.
 - [ ] Verify startup and representative sessions on physical non-ESU and ESU
   Windows 7 SP1 x64 machines.
 
+Development-host verification and the exact portable candidate are recorded in
+the [Step 0.4 platform-candidate evidence](docs/validation/2026-09-22-step-0.4-candidate.md).
+The background-desktop and physical-machine items remain open until that
+candidate passes both Windows 7 tiers.
+
 Exit criterion: Windows 7 SP1 x64 is the demonstrable minimum, newer x64 Windows
 versions remain in scope, and no active XP/Vista compatibility path remains.
 
