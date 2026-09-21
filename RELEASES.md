@@ -1,3 +1,9 @@
+# Historical WinPTY release notes
+
+The entries below are preserved from WinPTY. "Next Version" refers to the
+upstream development version, not a VT7Pty release. See [UPSTREAM.md](UPSTREAM.md)
+for the inherited revision and [README.md](README.md) for VT7Pty's current status.
+
 # Next Version
 
 Input handling changes:

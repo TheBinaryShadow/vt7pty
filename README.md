@@ -1,151 +1,105 @@
-# winpty
+# VT7Pty
 
-[![Build Status](https://ci.appveyor.com/api/projects/status/69tb9gylsph1ee1x/branch/master?svg=true)](https://ci.appveyor.com/project/rprichard/winpty/branch/master)
+**A WinPTY-derived console backend for Windows 7, built for VT7.**
 
-winpty is a Windows software package providing an interface similar to a Unix
-pty-master for communicating with Windows console programs.  The package
-consists of a library (libwinpty) and a tool for Cygwin and MSYS for running
-Windows console programs in a Cygwin/MSYS pty.
+VT7Pty is a user-mode PTY project whose goal is to improve the fidelity and
+reliability of Windows console applications and prepare a better backend for
+[VT7](https://github.com/TheBinaryShadow/VT7).
 
-The software works by starting the `winpty-agent.exe` process with a new,
-hidden console window, which bridges between the console API and terminal
-input/output escape codes.  It polls the hidden console's screen buffer for
-changes and generates a corresponding stream of output.
+Our foundation is [WinPTY](https://github.com/rprichard/winpty), created by
+Ryan Prichard and developed with its contributors. Microsoft's
+[ConPTY and Windows Terminal work](https://github.com/microsoft/terminal)
+provides architectural inspiration and a reference for modern terminal
+behavior. We are building on years of engineering by both communities.
 
-The Unix adapter allows running Windows console programs (e.g. CMD, PowerShell,
-IronPython, etc.) under `mintty` or Cygwin's `sshd` with
-properly-functioning input (e.g. arrow and function keys) and output (e.g. line
-buffering).  The library could be also useful for writing a non-Cygwin SSH
-server.
+## Project status
 
-## Supported Windows versions
+VT7Pty is in early development. This repository currently contains the inherited
+WinPTY `0.4.4-dev` implementation, with a new project identity and development
+direction. A VT7Pty-specific API and backend improvements are planned work.
 
-winpty runs on Windows XP through Windows 10, including server versions.  It
-can be compiled into either 32-bit or 64-bit binaries.
+All inherited components are still present, including the Cygwin/MSYS Unix
+adapter, tests, debugging tools, and build and packaging scripts. Binaries,
+API symbols, environment variables, and build targets retain their existing
+WinPTY names. The rebranding does not change runtime behavior.
 
-## Cygwin/MSYS adapter (`winpty.exe`)
+Windows 7 SP1 x64 is the primary target for VT7Pty. Historical WinPTY support
+claims and release notes describe upstream behavior; they are not acceptance
+results for future VT7Pty builds. Changes must be validated on the target OS.
 
-### Prerequisites
+## What we are working toward
 
-You need the following to build winpty:
+- More faithful console output, keyboard input, Unicode handling, resizing,
+  and screen restoration.
+- Predictable process and session lifetimes, clean teardown, and useful
+  diagnostics.
+- A reproducible native Windows build and tests that expose regressions and
+  inherited limitations.
+- A documented API that makes eventual VT7 integration straightforward,
+  using ConPTY conventions where they fit the legacy-console backend.
 
-* A Cygwin or MSYS installation
-* GNU make
-* A MinGW g++ toolchain capable of compiling C++11 code to build `winpty.dll`
-  and `winpty-agent.exe`
-* A g++ toolchain targeting Cygwin or MSYS to build `winpty.exe`
+VT7 is the primary intended consumer. Compatibility for other consumers,
+including a possible ConPTY user-mode shim, is a later objective. VT7Pty does
+not currently provide a drop-in ConPTY replacement. A kernel driver is not
+part of the project direction.
 
-Winpty requires two g++ toolchains as it is split into two parts. The
-`winpty.dll` and `winpty-agent.exe` binaries interface with the native
-Windows command prompt window so they are compiled with the native MinGW
-toolchain.  The `winpty.exe` binary interfaces with the MSYS/Cygwin terminal so
-it is compiled with the MSYS/Cygwin toolchain.
+## How the current backend works
 
-MinGW appears to be split into two distributions -- MinGW (creates 32-bit
-binaries) and MinGW-w64 (creates both 32-bit and 64-bit binaries).  Either
-one is generally acceptable.
+The client library starts an agent that owns a hidden Windows console. The
+agent launches console applications, translates terminal input into Windows
+console events, and turns observed screen-buffer changes into VT output.
 
-#### Cygwin packages
+```text
+Terminal host
+    |
+    | WinPTY API today / VT7Pty API planned
+    v
+Client DLL <---- control and I/O ----> Agent
+                                      |
+                                      v
+                               Hidden Windows console
+                                      |
+                                      v
+                               Console applications
+```
 
-The default g++ compiler for Cygwin targets Cygwin itself, but Cygwin also
-packages MinGW-w64 compilers.  As of this writing, the necessary packages are:
+This preserves the legacy-console foundation that makes WinPTY useful on
+Windows 7. Backend improvements will be guided by reproducible application
+failures and tests, with proven behavior retained where it meets our needs.
 
-* Either `mingw64-i686-gcc-g++` or `mingw64-x86_64-gcc-g++`.  Select the
-  appropriate compiler for your CPU architecture.
-* `gcc-g++`
-* `make`
+## Building and exploring
 
-As of this writing (2016-01-23), only the MinGW-w64 compiler is acceptable.
-The MinGW compiler (e.g. from the `mingw-gcc-g++` package) is no longer
-maintained and is too buggy.
+See [Building](BUILDING.md) for the inherited build entry points and their
+limitations. The [original WinPTY README](docs/UPSTREAM_WINPTY_README.md)
+is preserved for historical build, adapter, embedding, and debugging details.
 
-#### MSYS packages
+Useful starting points:
 
-For the original MSYS, use the `mingw-get` tool (MinGW Installation Manager),
-and select at least these components:
+- [Public WinPTY header](src/include/winpty.h)
+- [Client library](src/libwinpty)
+- [Console agent](src/agent)
+- [Tests](src/tests)
+- [Upstream baseline and attribution policy](UPSTREAM.md)
+- [Historical WinPTY release notes](RELEASES.md)
 
-* `mingw-developer-toolkit`
-* `mingw32-base`
-* `mingw32-gcc-g++`
-* `msys-base`
-* `msys-system-builder`
+## Contributing and community
 
-When running `./configure`, make sure that `mingw32-g++` is in your
-`PATH`.  It will be in the `C:\MinGW\bin` directory.
+Read [Contributing](CONTRIBUTING.md) before opening a pull request. Report
+ordinary bugs and discuss proposals in the
+[VT7Pty issue tracker](https://github.com/TheBinaryShadow/vt7pty/issues).
 
-#### MSYS2 packages
+The [Code of Conduct](CODE_OF_CONDUCT.md) applies to project spaces. For
+vulnerabilities, use the private reporting instructions in our
+[Security Policy](SECURITY.md).
 
-For MSYS2, use `pacman` and install at least these packages:
+## Credits and license
 
-* `msys/gcc`
-* `mingw32/mingw-w64-i686-gcc` or `mingw64/mingw-w64-x86_64-gcc`.  Select
-  the appropriate compiler for your CPU architecture.
-* `make`
+Thank you to **Ryan Prichard and the WinPTY contributors** for the legacy
+console bridge on which this project is based, and to **Microsoft's Console,
+ConPTY, and Windows Terminal teams and community contributors** for the work
+that informs its future direction. See [Credits](CREDITS.md) for acknowledgements
+and the distinction between inherited code and design references.
 
-MSYS2 provides three start menu shortcuts for starting MSYS2:
-
-* MinGW-w64 Win32 Shell
-* MinGW-w64 Win64 Shell
-* MSYS2 Shell
-
-To build winpty, use the MinGW-w64 {Win32,Win64} shortcut of the architecture
-matching MSYS2.  These shortcuts will put the g++ compiler from the
-`{mingw32,mingw64}/mingw-w64-{i686,x86_64}-gcc` packages into the `PATH`.
-
-Alternatively, instead of installing `mingw32/mingw-w64-i686-gcc` or
-`mingw64/mingw-w64-x86_64-gcc`, install the `mingw-w64-cross-gcc` and
-`mingw-w64-cross-crt-git` packages.  These packages install cross-compilers
-into `/opt/bin`, and then any of the three shortcuts will work.
-
-### Building the Unix adapter
-
-In the project directory, run `./configure`, then `make`, then `make install`.
-By default, winpty is installed into `/usr/local`.  Pass `PREFIX=<path>` to
-`make install` to override this default.
-
-### Using the Unix adapter
-
-To run a Windows console program in `mintty` or Cygwin `sshd`, prepend
-`winpty` to the command-line:
-
-    $ winpty powershell
-    Windows PowerShell
-    Copyright (C) 2009 Microsoft Corporation. All rights reserved.
-
-    PS C:\rprichard\proj\winpty> 10 + 20
-    30
-    PS C:\rprichard\proj\winpty> exit
-
-## Embedding winpty / MSVC compilation
-
-See `src/include/winpty.h` for the prototypes of functions exported by
-`winpty.dll`.
-
-Only the `winpty.exe` binary uses Cygwin; all the other binaries work without
-it and can be compiled with either MinGW or MSVC.  To compile using MSVC,
-download gyp and run `gyp -I configurations.gypi` in the `src` subdirectory.
-This will generate a `winpty.sln` and associated project files.  See the
-`src/winpty.gyp` and `src/configurations.gypi` files for notes on dealing with
-MSVC versions and different architectures.
-
-Compiling winpty with MSVC currently requires MSVC 2013 or newer.
-
-## Debugging winpty
-
-winpty comes with a tool for collecting timestamped debugging output.  To use
-it:
-
-1. Run `winpty-debugserver.exe` on the same computer as winpty.
-2. Set the `WINPTY_DEBUG` environment variable to `trace` for the
-   `winpty.exe` process and/or the process using `libwinpty.dll`.
-
-winpty also recognizes a `WINPTY_SHOW_CONSOLE` environment variable.  Set it
-to 1 to prevent winpty from hiding the console window.
-
-## Copyright
-
-This project is distributed under the MIT license (see the `LICENSE` file in
-the project root).
-
-By submitting a pull request for this project, you agree to license your
-contribution under the MIT license to this project.
+VT7Pty is distributed under the [MIT License](LICENSE). Original copyright
+notices and upstream history are retained. VT7Pty is an independent project
+and is not an official Microsoft product or an upstream WinPTY release.
