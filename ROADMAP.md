@@ -186,7 +186,7 @@ XP/Vista implementation burden.
 - [x] Remove Windows XP and Vista build, runtime, font, console, desktop, and
   diagnostic compatibility paths.
 - [x] Remove XP toolset logic and SDK workarounds.
-- [ ] Evaluate the background-desktop workaround and remove it and its public
+- [x] Evaluate the background-desktop workaround and remove it and its public
   flag if baseline and Windows 7 validation confirm it serves only pre-Windows 7.
 - [x] Simplify console-font behavior around APIs available on Windows 7 SP1.
 - [x] Replace obsolete OS-version checks with correct version or capability
@@ -194,13 +194,13 @@ XP/Vista implementation burden.
 - [x] Preserve later-Windows behavior branches that remain useful.
 - [x] Audit subsystem versions, manifests, imports, delay loading, dynamically
   resolved APIs, structures, flags, and runtime dependencies.
-- [ ] Verify startup and representative sessions on physical non-ESU and ESU
+- [x] Verify startup and representative sessions on physical non-ESU and ESU
   Windows 7 SP1 x64 machines.
 
 Development-host verification and the exact portable candidate are recorded in
 the [Step 0.4 platform-candidate evidence](docs/validation/2026-09-22-step-0.4-candidate.md).
-The background-desktop and physical-machine items remain open until that
-candidate passes both Windows 7 tiers.
+The accepted physical results and evidence deviation are recorded in the
+[Step 0.4 completion evidence](docs/validation/2026-09-22-step-0.4-completion.md).
 
 Exit criterion: Windows 7 SP1 x64 is the demonstrable minimum, newer x64 Windows
 versions remain in scope, and no active XP/Vista compatibility path remains.
@@ -340,7 +340,7 @@ published manually with complete identity and acceptance evidence.
 - [x] Accept Step 0.1 with linked baseline evidence.
 - [x] Accept Step 0.2 with linked build and debugging evidence.
 - [x] Accept Step 0.3 with linked removal and regression evidence.
-- [ ] Accept Step 0.4 with linked platform and physical-machine evidence.
+- [x] Accept Step 0.4 with linked platform and physical-machine evidence.
 - [ ] Accept Step 0.5 with linked naming, version, protocol, and package evidence.
 - [ ] Accept Step 0.6 with linked code-quality and regression evidence.
 - [ ] Accept Step 0.7 with linked diagnostics and security evidence.

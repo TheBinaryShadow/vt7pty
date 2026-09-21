@@ -16,3 +16,8 @@
 .gitignore      text
 .gitattributes  text
 VERSION.txt     eol=lf
+
+# Preserve externally produced validation evidence byte-for-byte so recorded
+# hashes remain reproducible after checkout.
+docs/validation/results/**/*.json -text
+docs/validation/results/**/*.txt  -text

@@ -16,11 +16,10 @@ behavior. We are building on years of engineering by both communities.
 
 VT7Pty is in early development. This repository currently contains the inherited
 WinPTY `0.4.4-dev` implementation, with a new project identity and development
-direction. Milestone 0 Steps 0.1 through 0.3 established the inherited
+direction. Milestone 0 Steps 0.1 through 0.4 established the inherited
 baseline, the supported VS2022/MSBuild workflow, and a native-only active tree.
-Step 0.4 now has a Windows 7+ implementation candidate awaiting its two
-physical Windows 7 acceptance runs. A VT7Pty-specific API and backend
-improvements remain planned work.
+The Windows 7+ platform implementation and its physical candidate are accepted.
+A VT7Pty-specific API and backend improvements remain planned work.
 
 The [development foundation](docs/FOUNDATION.md) and
 [roadmap](ROADMAP.md) record the approved product and engineering direction.
@@ -97,7 +96,8 @@ Useful starting points:
 - [Accepted MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
 - [Accepted Step 0.2 completion validation](docs/validation/2026-09-22-step-0.2-completion.md)
 - [Accepted Step 0.3 completion validation](docs/validation/2026-09-22-step-0.3-completion.md)
-- [Step 0.4 platform candidate and pending physical gate](docs/validation/2026-09-22-step-0.4-candidate.md)
+- [Step 0.4 platform candidate](docs/validation/2026-09-22-step-0.4-candidate.md)
+- [Accepted Step 0.4 completion validation](docs/validation/2026-09-22-step-0.4-completion.md)
 - [Architecture and current data flows](docs/ARCHITECTURE.md)
 - [Testing strategy and evidence requirements](docs/TESTING.md)
 - [Windows 7 physical acceptance procedure](docs/WINDOWS7_ACCEPTANCE.md)

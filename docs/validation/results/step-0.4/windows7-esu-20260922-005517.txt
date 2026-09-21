@@ -1,0 +1,19 @@
+VT7Pty Windows 7 acceptance: Pass
+Tier: ESU
+Machine: TURTLE (Micro-Star International Co., Ltd. MS-7C35)
+OS: Microsoft Windows 7 Ultimate , version 6.1.7601.65536, SP1
+Package: VT7Pty 0.4.4-dev, commit a8ee515d29073e0b95b4056e84b10d3907fa2211
+Manifest SHA-256: 5a664bd89bc86b8d6218eb01e114af5d3e3e5239db6539524ad8ab5225edb3f9
+
+Preflight failures:
+  None
+
+Tests:
+  Pass: String builder unit test (228 ms)
+  Pass: Inherited lifecycle session (107 ms)
+  Pass: Command Prompt and Windows PowerShell sessions (183 ms)
+  Pass: Agent source identity (15 ms)
+  Pass: Argument quoting fixture (30 ms)
+  Pass: Bounded output fixture (29 ms)
+
+Machine-readable result: C:\Users\Binary\Desktop\VT7Pty-0.4.4-dev-win7-x64-release-step-0.4-candidate\results\windows7-esu-20260922-005517.json

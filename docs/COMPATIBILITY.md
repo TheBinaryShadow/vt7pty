@@ -1,6 +1,6 @@
 # VT7Pty Compatibility Contract
 
-Status: approved target contract; implementation unqualified. Updated:
+Status: approved target contract; Step 0.4 platform implementation qualified. Updated:
 2026-09-22.
 
 This document separates approved targets from verified support. A target is not
@@ -12,7 +12,7 @@ a compatibility claim until an identified build passes the required procedure.
 | --- | --- |
 | Source baseline | WinPTY `0.4.4-dev` at upstream commit `7e59fe2` |
 | Development host | Maintained x64 Debug/Release workflow verified and source-debugged on Windows 10 build 19044 |
-| Windows 7 runtime | Candidate implementation prepared; physical Tier A and Tier B records pending |
+| Windows 7 runtime | Step 0.4 candidate accepted on Windows 7 SP1 x64; recorded evidence deviation applies |
 | Architectures | x64 is the approved product architecture; inherited x64 smoke tests passed locally |
 | Build interface | VS2022/MSBuild and repository PowerShell entry points; inherited build and packaging paths removed |
 | API and binaries | Inherited WinPTY names and behavior remain |
@@ -59,7 +59,9 @@ VT7 graphics or managed-runtime prerequisites are not automatically VT7Pty
 prerequisites.
 
 Routine candidates run on Tier A. Milestone and release candidates run on both
-tiers. Results from one tier do not stand in for the other.
+tiers. Results from one tier ordinarily do not stand in for the other. Step
+0.4 has a documented owner-approved exception for two declared-tier runs on
+one installation; later milestone and release gates retain the normal rule.
 
 ## Development and build hosts
 
