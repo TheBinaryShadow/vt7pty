@@ -1,0 +1,25 @@
+VT7Pty Windows 7 acceptance: Pass
+Tier: NonESU
+Machine: TURTLE (Micro-Star International Co., Ltd. MS-7C35)
+OS: Microsoft Windows 7 Ultimate , version 6.1.7601.65536, SP1
+Package: VT7Pty 0.5.0-dev, commit f0cf39c4c45961c8f30f055ba3e01ca15ea22c9f
+Manifest SHA-256: 707f04dedfdaf2fa3608bb19f5af2a12464e9fc672e4d29cdee04023e774fde5
+
+Preflight failures:
+  None
+
+Tests:
+  Pass: String builder unit test (39 ms)
+  Pass: Client-agent protocol unit test (16 ms)
+  Pass: Inherited lifecycle session (46 ms)
+  Pass: Command Prompt and Windows PowerShell sessions (170 ms)
+  Pass: Agent source identity (15 ms)
+  Pass: Argument quoting fixture (7 ms)
+  Pass: Bounded output fixture (7 ms)
+  Pass: Agent rejection: missing (65 ms)
+  Pass: Agent rejection: malformed (70 ms)
+  Pass: Agent rejection: wrong-identity (80 ms)
+  Pass: Agent rejection: older-protocol (25 ms)
+  Pass: Agent rejection: newer-protocol (29 ms)
+
+Machine-readable result: C:\Users\Binary\Desktop\VT7Pty-0.5.0-dev-win7-x64-release-step-0.5-candidate\results\windows7-nonesu-20260922-012339.json

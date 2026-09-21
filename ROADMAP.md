@@ -226,10 +226,10 @@ VT7Pty identity while historical attribution retains the WinPTY name.
 - [x] Reject missing, malformed, or incompatible agents with actionable errors.
 - [x] Verify that remaining WinPTY names occur only in attribution, provenance,
   migration material, historical documentation, and inherited Git history.
-- [ ] Rebuild, package, inspect, and rerun the baseline:
+- [x] Rebuild, package, inspect, and rerun the baseline:
   - [x] Development host, Debug and Release.
-  - [ ] Physical non-ESU Windows 7 SP1 x64.
-  - [ ] Physical ESU Windows 7 SP1 x64.
+  - [x] Physical non-ESU Windows 7 SP1 x64.
+  - [x] Physical ESU Windows 7 SP1 x64.
 
 This is an intentional source and binary compatibility break. It does not claim
 interchangeability with WinPTY or ConPTY.
@@ -240,6 +240,8 @@ agent cannot silently form an incompatible pair.
 
 The implementation, development-host verification, and exact portable package
 are recorded in the [Step 0.5 technical identity candidate](docs/validation/2026-09-22-step-0.5-candidate.md).
+The accepted physical results and evidence deviation are recorded in the
+[Step 0.5 completion evidence](docs/validation/2026-09-22-step-0.5-completion.md).
 
 ### Step 0.6: Modernize the native codebase
 

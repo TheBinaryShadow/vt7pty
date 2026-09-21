@@ -1,6 +1,6 @@
 # VT7Pty Compatibility Contract
 
-Status: approved target contract; Step 0.4 platform implementation qualified. Updated:
+Status: approved target contract; Step 0.5 technical identity qualified. Updated:
 2026-09-22.
 
 This document separates approved targets from verified support. A target is not
@@ -12,10 +12,10 @@ a compatibility claim until an identified build passes the required procedure.
 | --- | --- |
 | Source baseline | WinPTY `0.4.4-dev` at upstream commit `7e59fe2` |
 | Development host | Maintained x64 Debug/Release workflow verified and source-debugged on Windows 10 build 19044 |
-| Windows 7 runtime | Step 0.4 candidate accepted on Windows 7 SP1 x64; recorded evidence deviation applies |
+| Windows 7 runtime | Steps 0.4 and 0.5 accepted on Windows 7 SP1 x64; recorded evidence deviations apply |
 | Architectures | x64 is the approved product architecture; inherited x64 smoke tests passed locally |
 | Build interface | VS2022/MSBuild and repository PowerShell entry points; inherited build and packaging paths removed |
-| API and binaries | VT7Pty technical identity implemented; API 1.0 and client-agent protocol 1; Step 0.5 physical candidate pending |
+| API and binaries | VT7Pty `0.5.0-dev` technical identity accepted; API 1.0 and client-agent protocol 1 |
 | ConPTY compatibility | Not implemented; ConPTY is a design and behavioral reference |
 | VT7 integration | Planned; no integration claim |
 | Releases | No VT7Pty release has been published |
@@ -61,7 +61,9 @@ prerequisites.
 Routine candidates run on Tier A. Milestone and release candidates run on both
 tiers. Results from one tier ordinarily do not stand in for the other. Step
 0.4 has a documented owner-approved exception for two declared-tier runs on
-one installation; later milestone and release gates retain the normal rule.
+one recorded installation; Step 0.5 has a documented owner-approved temporary
+two-machine treatment despite identical recorded machine metadata. Later
+milestone and release gates retain the normal rule.
 
 ## Development and build hosts
 

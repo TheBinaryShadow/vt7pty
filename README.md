@@ -17,8 +17,8 @@ behavior. We are building on years of engineering by both communities.
 VT7Pty is in early development at version `0.5.0-dev`. Milestone 0 Steps 0.1
 through 0.4 established the inherited baseline, the supported VS2022/MSBuild
 workflow, a native-only active tree, and the accepted Windows 7+ platform
-implementation. Step 0.5 has established the technical VT7Pty identity; its
-physical Windows 7 candidate remains to be accepted.
+implementation. Step 0.5 established and physically accepted the technical
+VT7Pty identity. Native code modernization proceeds in Step 0.6.
 
 The [development foundation](docs/FOUNDATION.md) and
 [roadmap](ROADMAP.md) record the approved product and engineering direction.
@@ -98,6 +98,7 @@ Useful starting points:
 - [Step 0.4 platform candidate](docs/validation/2026-09-22-step-0.4-candidate.md)
 - [Accepted Step 0.4 completion validation](docs/validation/2026-09-22-step-0.4-completion.md)
 - [Step 0.5 technical identity candidate](docs/validation/2026-09-22-step-0.5-candidate.md)
+- [Accepted Step 0.5 completion validation](docs/validation/2026-09-22-step-0.5-completion.md)
 - [Architecture and current data flows](docs/ARCHITECTURE.md)
 - [Testing strategy and evidence requirements](docs/TESTING.md)
 - [Windows 7 physical acceptance procedure](docs/WINDOWS7_ACCEPTANCE.md)

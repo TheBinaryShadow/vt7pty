@@ -41,6 +41,9 @@ changes until implemented.
   older, and newer agents now fail with specific actionable errors.
 - Added protocol unit and incompatible-agent negative-control tests and record
   package, API, protocol, and source identities in verification and packages.
+- Accepted the exact Step 0.5 candidate on both declared physical Windows 7
+  tiers, with the owner-approved evidence treatment recorded in the validation
+  record.
 
 - Removed the Cygwin/MSYS adapter, GYP, GNU Make, Python 2 packaging,
   AppVeyor, old generated-file helpers, and obsolete shell/batch build paths.
