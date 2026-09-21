@@ -22,6 +22,7 @@ Supporting documents:
 - [Manual release process](docs/RELEASING.md)
 - [Inherited component inventory](docs/INVENTORY.md)
 - [Inherited native baseline](docs/validation/2026-09-21-upstream-baseline.md)
+- [MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
 - [Upstream provenance](UPSTREAM.md)
 
 ## Goal and boundaries
@@ -130,12 +131,13 @@ packages, and debugs the native project from a clean checkout.
   they must run on Windows 7.
 - [x] Generate version and artifact identity from repository-owned sources.
 - [ ] Verify source-level debugging and inspect imports and runtime dependencies.
-- [ ] Reproduce the inherited baseline before removing any old build route.
+- [x] Reproduce the inherited baseline before removing any old build route.
 
-The first transition build and verifier are implemented. They already produce
-full linked PDBs and inspect imports, subsystem versions, and exports. Step 0.2
-remains open until clean-commit transition evidence, source-level debugger
-validation, and retained fixture/tool membership are complete.
+The first transition build and verifier are implemented. The clean-commit
+[transition record](docs/validation/2026-09-21-msbuild-transition.md) reproduces
+the inherited tests, imports, exports, and artifact boundary. Step 0.2 remains
+open until source-level debugger validation and retained fixture/tool membership
+are complete.
 
 The project will not add hosted build or test automation. Release qualification
 uses the maintained local commands and physical acceptance machines.

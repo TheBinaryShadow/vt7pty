@@ -91,6 +91,7 @@ Useful starting points:
 - [Approved development foundation](docs/FOUNDATION.md)
 - [Inherited component inventory](docs/INVENTORY.md)
 - [Accepted inherited native baseline](docs/validation/2026-09-21-upstream-baseline.md)
+- [Accepted MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
 - [Architecture and current data flows](docs/ARCHITECTURE.md)
 - [Testing strategy and evidence requirements](docs/TESTING.md)
 - [Compatibility targets and verified status](docs/COMPATIBILITY.md)

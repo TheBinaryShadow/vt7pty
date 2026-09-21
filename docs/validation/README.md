@@ -12,3 +12,4 @@ silently rewriting a failed or partial result.
 Current records:
 
 - [2026-09-21 inherited native baseline](2026-09-21-upstream-baseline.md)
+- [2026-09-21 MSBuild transition](2026-09-21-msbuild-transition.md)

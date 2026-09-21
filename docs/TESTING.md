@@ -69,6 +69,9 @@ artifact identity. Results and dumpbin evidence are written below ignored
 they do not satisfy the broader permanent suite or either physical Windows 7
 tier.
 
+The accepted clean-commit result is the
+[2026-09-21 MSBuild transition record](validation/2026-09-21-msbuild-transition.md).
+
 ## Coverage matrix
 
 | Area | Minimum coverage |
