@@ -16,9 +16,9 @@ behavior. We are building on years of engineering by both communities.
 
 VT7Pty is in early development. This repository currently contains the inherited
 WinPTY `0.4.4-dev` implementation, with a new project identity and development
-direction. Milestone 0 implementation has an accepted inherited baseline and a
-supported VS2022/MSBuild developer workflow. A VT7Pty-specific API and backend
-improvements remain planned work.
+direction. Milestone 0 Steps 0.1 through 0.3 have established the inherited
+baseline, the supported VS2022/MSBuild workflow, and a native-only active tree.
+A VT7Pty-specific API and backend improvements remain planned work.
 
 The [development foundation](docs/FOUNDATION.md) and
 [roadmap](ROADMAP.md) record the approved product and engineering direction.
@@ -93,6 +93,7 @@ Useful starting points:
 - [Accepted inherited native baseline](docs/validation/2026-09-21-upstream-baseline.md)
 - [Accepted MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
 - [Accepted Step 0.2 completion validation](docs/validation/2026-09-22-step-0.2-completion.md)
+- [Accepted Step 0.3 completion validation](docs/validation/2026-09-22-step-0.3-completion.md)
 - [Architecture and current data flows](docs/ARCHITECTURE.md)
 - [Testing strategy and evidence requirements](docs/TESTING.md)
 - [Compatibility targets and verified status](docs/COMPATIBILITY.md)

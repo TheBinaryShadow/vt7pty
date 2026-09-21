@@ -14,7 +14,7 @@ removed. It is not physical Windows 7 acceptance and does not complete Step
 | --- | --- |
 | Source commit | `2c8f1126946721f8e73e200f41429fc31b048c4f` |
 | Source state | Clean for the recorded builds and verification |
-| Package identity | Inherited `0.4.4-dev`; technical rebranding remains Step 0.3 |
+| Package identity | Inherited `0.4.4-dev`; technical rebranding remains Step 0.5 |
 | Host | Windows 10 IoT Enterprise LTSC 2021, build 19044, x64 |
 | Shell validation | Windows PowerShell 5.1 |
 | Visual Studio | Visual Studio 2022 Enterprise 17.14.40 |
@@ -72,7 +72,7 @@ exports the same 19 `winpty_*` functions listed in the
 [inherited baseline](2026-09-21-upstream-baseline.md). Every PE image contains
 generated `VT7Pty` product metadata, `0.4.4-dev` file/product versions, and the
 correct inherited filename. Binary names and API symbols intentionally remain
-unchanged until Step 0.3.
+unchanged until Step 0.5.
 
 ## Artifact record
 

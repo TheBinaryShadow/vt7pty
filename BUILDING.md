@@ -16,6 +16,7 @@ The maintained build uses:
 - MSVC v143, with 14.44.35207 as the initial reference compiler
 - Windows SDK 10.0.26100.0
 - C++20
+- the conforming MSVC preprocessor (`/Zc:preprocessor`)
 - x64 Debug and Release configurations
 - static MSVC runtime initially
 - Windows 7 SP1 as the API and runtime floor
@@ -74,6 +75,8 @@ sidecar. Roadmap Step 0.9 will fix the final release archive split and naming.
 The accepted build boundary and completed developer workflow are recorded in
 the [MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
 and [Step 0.2 completion validation](docs/validation/2026-09-22-step-0.2-completion.md).
+Step 0.3's removal and regression evidence is recorded in the
+[Step 0.3 completion validation](docs/validation/2026-09-22-step-0.3-completion.md).
 
 ## Retired build paths
 

@@ -14,3 +14,4 @@ Current records:
 - [2026-09-21 inherited native baseline](2026-09-21-upstream-baseline.md)
 - [2026-09-21 MSBuild transition](2026-09-21-msbuild-transition.md)
 - [2026-09-22 Step 0.2 completion](2026-09-22-step-0.2-completion.md)
+- [2026-09-22 Step 0.3 completion](2026-09-22-step-0.3-completion.md)

@@ -24,6 +24,7 @@ Supporting documents:
 - [Inherited native baseline](docs/validation/2026-09-21-upstream-baseline.md)
 - [MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
 - [Step 0.2 completion validation](docs/validation/2026-09-22-step-0.2-completion.md)
+- [Step 0.3 completion validation](docs/validation/2026-09-22-step-0.3-completion.md)
 - [Upstream provenance](UPSTREAM.md)
 
 ## Goal and boundaries
@@ -45,8 +46,9 @@ either project.
 
 - The inherited source is WinPTY `0.4.4-dev` at
   [`7e59fe2`](https://github.com/rprichard/winpty/commit/7e59fe2d09adf0fa2aa606492e7ca98efbc5184e).
-- Runtime names, public APIs, version metadata, build scripts, and components
-  remain inherited from WinPTY, including the Unix adapter.
+- Runtime names, public APIs, and version metadata remain inherited from
+  WinPTY until Step 0.5. The Unix adapter and superseded build, package, and
+  compiler-compatibility paths have been removed.
 - The maintained VS2022/MSBuild workflow builds, verifies, packages, and
   source-debugs the inherited x64 native boundary. This is development-host
   evidence, not Windows 7 acceptance.
@@ -73,7 +75,7 @@ recorded separately by the checked items below.
 
 | Milestone | Outcome | Status |
 | --- | --- | --- |
-| 0 | Fully modernized, native VT7Pty 0.5.x foundation | In progress; Steps 0.1-0.2 complete |
+| 0 | Fully modernized, native VT7Pty 0.5.x foundation | In progress; Steps 0.1-0.3 complete |
 | 1 | Measured backend fidelity and reliability improvements | Direction approved; detailed scope follows Milestone 0 evidence |
 | 2 | Documented VT7Pty API and standalone integration host | Direction approved; detailed scope follows Milestone 1 |
 | 3 | Versioned backend handoff ready for separately authorized VT7 integration | Direction approved; detailed scope follows Milestone 2 |
@@ -152,24 +154,26 @@ infrastructure removal belong to Step 0.3.
 Outcome: the active tree contains no technology retained solely for the Unix
 adapter, retired compilers, or superseded packaging.
 
-- [ ] Remove `src/unix-adapter` and the Cygwin/MSYS `winpty.exe` frontend.
-- [ ] Remove `configure`, GNU Makefiles, `subdir.mk`, GYP files, `vcbuild.bat`,
+- [x] Remove `src/unix-adapter` and the Cygwin/MSYS `winpty.exe` frontend.
+- [x] Remove `configure`, GNU Makefiles, `subdir.mk`, GYP files, `vcbuild.bat`,
   and their generated-file conventions.
-- [ ] Remove Cygwin, MSYS, MinGW, GCC, old MSVC, and Node/GYP conditionals that
+- [x] Remove Cygwin, MSYS, MinGW, GCC, old MSVC, and Node/GYP conditionals that
   no longer serve the native backend.
-- [ ] Remove Python 2 packaging and replace its retained responsibilities with
+- [x] Remove Python 2 packaging and replace its retained responsibilities with
   `Package-VT7Pty.ps1`.
-- [ ] Remove AppVeyor configuration and obsolete shell build scripts.
-- [ ] Classify `misc` individually: move useful console probes into tests, move
+- [x] Remove AppVeyor configuration and obsolete shell build scripts.
+- [x] Classify `misc` individually: move useful console probes into tests, move
   maintained developer utilities under `tools`, preserve valuable research as
   documentation, and remove obsolete experiments.
-- [ ] Rename and retain shared control-character behavior currently carrying a
+- [x] Rename and retain shared control-character behavior currently carrying a
   Unix-oriented filename when it remains part of the Windows input backend.
-- [ ] Refresh repository ignores, attributes, build documentation, and package
+- [x] Refresh repository ignores, attributes, build documentation, and package
   documentation for the single supported workflow.
-- [ ] Rebuild and rerun baseline checks after each coherent removal group.
+- [x] Rebuild and rerun baseline checks after each coherent removal group.
 
-Exit criterion: the active build and source tree has no operational dependency
+Exit criterion met by the
+[Step 0.3 completion record](docs/validation/2026-09-22-step-0.3-completion.md):
+the active build and source tree has no operational dependency
 on the Unix adapter, GYP, Python 2, GNU Make, Cygwin, MSYS, MinGW, AppVeyor, or
 obsolete compiler compatibility code.
 
@@ -232,7 +236,8 @@ agent cannot silently form an incompatible pair.
 Outcome: the retained implementation uses current C++ and Windows engineering
 practice without gratuitously rewriting proven console algorithms.
 
-- [ ] Replace the custom old-MinGW mutex layer with standard C++ synchronization.
+- [x] Replace the custom old-MinGW mutex layer with standard C++ synchronization
+  (completed and verified during Step 0.3).
 - [ ] Replace compiler compatibility macros with C++20 language and library
   facilities where their Windows 7 behavior is verified.
 - [ ] Remove legacy formatting, architecture, exception, integer, and header
@@ -329,7 +334,7 @@ published manually with complete identity and acceptance evidence.
 
 - [x] Accept Step 0.1 with linked baseline evidence.
 - [x] Accept Step 0.2 with linked build and debugging evidence.
-- [ ] Accept Step 0.3 with linked removal and regression evidence.
+- [x] Accept Step 0.3 with linked removal and regression evidence.
 - [ ] Accept Step 0.4 with linked platform and physical-machine evidence.
 - [ ] Accept Step 0.5 with linked naming, version, protocol, and package evidence.
 - [ ] Accept Step 0.6 with linked code-quality and regression evidence.

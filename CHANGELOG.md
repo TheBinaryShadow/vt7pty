@@ -28,11 +28,18 @@ changes until implemented.
 - Added maintained local build, verification, and transition-package commands;
   verification preserves the inherited export/import boundary and runs the
   inherited native lifecycle tests.
-- Replaced an obsolete MinGW/Visual C++ 6 string-building workaround in the
-  lifecycle test with bounded MSVC formatting.
 - Preserved the original WinPTY README and release history as historical
   documentation.
 
 ### Implementation
 
-- No VT7Pty runtime implementation changes yet.
+- Removed the Cygwin/MSYS adapter, GYP, GNU Make, Python 2 packaging,
+  AppVeyor, old generated-file helpers, and obsolete shell/batch build paths.
+- Classified and removed `misc`: native fixtures, manual probes, console tools,
+  and historical research now have maintained locations.
+- Replaced retired compiler shims with C++20/MSVC facilities, including
+  standard formatting, `noexcept`, defaulted moves, and `std::mutex`.
+- Renamed the Unix-oriented control-character helper for its retained Windows
+  input role and enabled MSVC's conforming preprocessor.
+- Preserved the inherited runtime behavior, 19-function DLL boundary, direct
+  dependency sets, and source-level debugging through the cleanup.
