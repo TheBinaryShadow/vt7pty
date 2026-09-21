@@ -238,6 +238,9 @@ Exit criterion: every active project-owned identity follows the approved map;
 package, API, protocol, and source identities are unambiguous; and the DLL and
 agent cannot silently form an incompatible pair.
 
+The implementation, development-host verification, and exact portable package
+are recorded in the [Step 0.5 technical identity candidate](docs/validation/2026-09-22-step-0.5-candidate.md).
+
 ### Step 0.6: Modernize the native codebase
 
 Outcome: the retained implementation uses current C++ and Windows engineering

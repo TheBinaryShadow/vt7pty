@@ -17,3 +17,4 @@ Current records:
 - [2026-09-22 Step 0.3 completion](2026-09-22-step-0.3-completion.md)
 - [2026-09-22 Step 0.4 platform candidate](2026-09-22-step-0.4-candidate.md)
 - [2026-09-22 Step 0.4 completion](2026-09-22-step-0.4-completion.md)
+- [2026-09-22 Step 0.5 technical identity candidate](2026-09-22-step-0.5-candidate.md)
