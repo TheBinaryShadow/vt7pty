@@ -7,9 +7,9 @@
 #include <utility>
 #include <vector>
 
-#include "../include/vt7pty_version.h"
-#include "../shared/Buffer.h"
-#include "../shared/Protocol.h"
+#include "../../src/include/vt7pty_version.h"
+#include "../../src/shared/Buffer.h"
+#include "../../src/shared/Protocol.h"
 
 static ReadBuffer readerFrom(WriteBuffer &writer) {
     return ReadBuffer(std::move(writer.buf()));

@@ -47,7 +47,7 @@ and result of each case.
 
 The candidate performs these bounded checks:
 
-- inherited string-builder unit coverage;
+- modern C++ formatting and checked-narrowing unit coverage;
 - client, agent, pipe, child-process, output, exit-status, and teardown flow;
 - resize followed by real Command Prompt and Windows PowerShell sessions;
 - embedded version and source-commit identity;

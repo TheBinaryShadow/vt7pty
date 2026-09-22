@@ -33,6 +33,19 @@ changes until implemented.
 
 ### Implementation
 
+- Modernized the retained implementation around C++20 standard formatting,
+  checked integer conversion, typed byte spans, scoped enums, explicit null
+  handling, and stronger RAII/move ownership for handles, modules, pipes,
+  allocations, and security data.
+- Removed the inherited string-builder, formatting, exception-indirection,
+  compiler, architecture, integer, and header compatibility shims that no
+  longer serve the supported MSVC toolchain.
+- Reorganized unit and integration tests and the native debug server under the
+  maintained `tests` and `tools` boundaries, and added a focused modern-C++
+  utility test.
+- Resolved the inherited warning baseline, enabled `/W4 /WX`, and added a
+  repeatable MSVC native static-analysis gate to Release verification.
+
 - Established the `0.5.0-dev` VT7Pty technical identity across native
   artifacts, projects, headers, 19 exported C functions, constants,
   diagnostics, environment variables, named endpoints, packaging, and tests.

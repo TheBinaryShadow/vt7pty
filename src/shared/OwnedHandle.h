@@ -24,20 +24,26 @@
 #include <windows.h>
 
 class OwnedHandle {
-    HANDLE m_h;
+    HANDLE m_h = nullptr;
 public:
-    OwnedHandle() : m_h(nullptr) {}
+    OwnedHandle() = default;
     explicit OwnedHandle(HANDLE h) : m_h(h) {}
-    ~OwnedHandle() { dispose(true); }
-    void dispose(bool nothrow=false);
+    ~OwnedHandle() noexcept { close(); }
+    void close() noexcept;
+    void reset(HANDLE h = nullptr);
     HANDLE get() const { return m_h; }
+    explicit operator bool() const {
+        return m_h != nullptr && m_h != INVALID_HANDLE_VALUE;
+    }
     HANDLE release() { HANDLE ret = m_h; m_h = nullptr; return ret; }
     OwnedHandle(const OwnedHandle &other) = delete;
-    OwnedHandle(OwnedHandle &&other) : m_h(other.release()) {}
+    OwnedHandle(OwnedHandle &&other) noexcept : m_h(other.release()) {}
     OwnedHandle &operator=(const OwnedHandle &other) = delete;
-    OwnedHandle &operator=(OwnedHandle &&other) {
-        dispose();
-        m_h = other.release();
+    OwnedHandle &operator=(OwnedHandle &&other) noexcept {
+        if (this != &other) {
+            close();
+            m_h = other.release();
+        }
         return *this;
     }
 };

@@ -223,9 +223,9 @@ $previousPath = $env:PATH
 $env:PATH = $binDirectory + ';' + $env:PATH
 try {
     $tests = @(
-        Invoke-AcceptanceTest -Name 'String builder unit test' `
-            -Executable (Join-Path $testDirectory 'StringBuilderTest.exe') `
-            -ExpectedOutput 'All tests completed!' -ExpectedStream StandardError
+        Invoke-AcceptanceTest -Name 'Modern C++ utility unit test' `
+            -Executable (Join-Path $testDirectory 'ModernCppTest.exe') `
+            -ExpectedOutput 'VT7Pty modern C++ utility tests passed.'
         Invoke-AcceptanceTest -Name 'Client-agent protocol unit test' `
             -Executable (Join-Path $testDirectory 'ProtocolTest.exe') `
             -ExpectedOutput 'VT7Pty protocol tests passed'

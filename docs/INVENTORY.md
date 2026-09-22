@@ -1,6 +1,6 @@
 # Inherited Component Inventory
 
-Status: completed for Roadmap Step 0.1 and updated through Step 0.5.
+Status: completed for Roadmap Step 0.1 and updated through Step 0.6.
 Updated: 2026-09-22.
 
 This inventory began as the classification of the inherited WinPTY tree. It is
@@ -60,22 +60,22 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | --- | --- | --- |
 | `Protocol.h` | Client-agent identity, protocol version, handshake, message structures, and opcodes | Retain; explicit identity/version and negative tests added in Step 0.5 |
 | `BackgroundDesktop.*` | Formerly managed a hidden desktop for XP/Vista consoles | Removed in Step 0.4; the inherited runtime selected it only below Windows 7 |
-| `Buffer.*` | RPC message serialization and parsing | Retain; add bounds/malformed-message tests and typed size handling |
-| `DebugClient.*` | Native diagnostic transport | Retain, rebrand, and modernize with bounded structured logging |
-| `GenRandom.*` | Random identifiers for pipes and objects | Retain; modernize size conversions and verify failure handling |
+| `Buffer.*` | RPC message serialization and parsing | Uses `std::span`, byte views, typed sizes, and checked bounds after Step 0.6; malformed-message expansion remains later test work |
+| `DebugClient.*` | Native diagnostic transport | Uses bounded standard formatting and thread-safe static configuration after Step 0.6; structured logging remains Step 0.7 |
+| `GenRandom.*` | Random identifiers for pipes and objects | Uses checked size conversions after Step 0.6; failure-path expansion remains later test work |
 | `Mutex.h` | Mutex/lock shim for old MinGW | Replaced with `std::mutex` and removed in Step 0.3 |
-| `OsModule.h` | Dynamic module/symbol lookup | Retain and modernize for explicit Windows 7-safe capability detection |
-| `OwnedHandle.*` | Move-only Win32 handle ownership | Retain and modernize rather than replace for style alone |
+| `OsModule.h` | Dynamic module/symbol lookup | Move-only, null-safe module ownership retained for explicit Windows 7-safe capability detection |
+| `OwnedHandle.*` | Move-only Win32 handle ownership | Provides nonthrowing close/reset/destruction and `noexcept` move semantics after Step 0.6 |
 | `PrecompiledHeader.h` | Legacy common include set | Removed in Step 0.3; projects use explicit includes and shared MSBuild policy |
-| `StringBuilder.h`, `StringBuilderTest.cc` | Diagnostic string builder and standalone test | Retain behavior; rehome test and evaluate standard C++ replacement during modernization |
-| `StringUtil.*` | UTF-16 formatting and error strings | Retain; modernize conversions and bounds |
+| `StringBuilder.h`, `StringBuilderTest.cc` | Former diagnostic string builder and standalone test | Removed in Step 0.6 after call sites moved to C++20 `std::format`, `std::to_chars`, or streams; the maintained replacement test is `tests/unit/ModernCppTest.cc` |
+| `StringUtil.*` | UTF-16 formatting and error strings | Uses standard formatting with explicit conversion and buffer bounds after Step 0.6 |
 | `TimeMeasurement.h` | Small timing helper | Rehomed to `tests/manual` in Step 0.3 |
 | `ControlCharacters.h` (formerly `UnixCtrlChars.h`) | Control-character decoding used by Windows input parsing | Retained under a platform-neutral name in Step 0.3 |
-| `WindowsSecurity.*` | Security descriptors, pipe/process identity, token data | Retain as a security boundary; modernize conversions and add focused tests |
+| `WindowsSecurity.*` | Security descriptors, pipe/process identity, token data | Retained as a security boundary with stronger RAII and checked conversions; focused security review remains Step 0.7 |
 | `WindowsVersion.*` | OS detection and module-version diagnostics | Retained with `RtlGetVersion`-based detection and x64-only diagnostics in Step 0.4 |
-| `StringFormatting.h` (replaces `vt7pty_snprintf.h`) | Bounded diagnostic formatting | Uses the current C++ runtime; the retired-compiler shim was removed in Step 0.3 |
+| `StringFormatting.h` (formerly replaced `vt7pty_snprintf.h`) | Former bounded diagnostic formatting shim | Removed in Step 0.6; maintained call sites use standard C++ or bounded CRT formatting directly |
 | `Assert.*` | Agent-aware assertion reporting | Retain responsibility; rebrand and integrate with diagnostics |
-| `Exception.*` | Internal exception hierarchy | Retain and modernize |
+| `Exception.*` | Internal exception hierarchy | Concrete exception ownership and direct throws replace the inherited indirection after Step 0.6 |
 | `Version.*` | Reports generated package, API, protocol, and source identity | Retain as the diagnostic identity boundary |
 | `GetCommitHash.bat`, `UpdateGenVersion.bat` | GYP-era generated version header | Replaced by MSBuild/PowerShell generation and removed in Step 0.3 |
 
@@ -83,10 +83,10 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 
 | Path | Current responsibility | Classification and destination |
 | --- | --- | --- |
-| `src/debugserver/DebugServer.cc` | Native timestamped diagnostic collector | Retain, rebrand, and modernize as `VT7Pty-DebugServer.exe` |
-| `src/debugserver/subdir.mk` | GNU Make source list | Replace, then remove |
-| `src/tests/BackendSmokeTest.cc` | Opens a session, connects pipes, spawns a child, validates output and exit code | Retain and rehome as an integration test |
-| `src/tests/subdir.mk` | GNU Make test rule | Replace, then remove |
+| `tools/debug/DebugServer.cc` | Native timestamped diagnostic collector | Rehomed in Step 0.6 and retained as `VT7Pty-DebugServer.exe` |
+| `tests/integration/BackendSmokeTest.cc` | Opens a session, connects pipes, spawns a child, validates output and exit code | Rehomed as the maintained integration test in Step 0.6 |
+| `tests/unit/ProtocolTest.cc`, `tests/unit/ModernCppTest.cc` | Protocol validation and standard-library/narrowing checks | Maintained unit-test boundary established in Step 0.6 |
+| `tests/fixtures/ProtocolTestAgent.cc` | Deliberately incompatible agent fixture | Rehomed with controlled child-process fixtures in Step 0.6 |
 | `src/unix-adapter/*` | Cygwin/MSYS terminal frontend, POSIX input/output, wakeup FD, utility wrappers | Removed in Step 0.3 after the native MSBuild baseline was reproduced |
 | `src/unix-adapter/subdir.mk` | Unix-adapter build membership | Removed with the adapter in Step 0.3 |
 

@@ -20,6 +20,8 @@
 
 #include "LargeConsoleRead.h"
 
+#include "../shared/Narrow.h"
+
 #include <stdlib.h>
 
 #include "../shared/WindowsVersion.h"
@@ -56,9 +58,10 @@ void largeConsoleRead(LargeConsoleReadBuffer &out,
         while (curLine <= readArea.Bottom) {
             const SmallRect subReadArea(
                 readArea.Left,
-                curLine,
+                vt7pty::internal::checkedNarrow<SHORT>(curLine),
                 readArea.width(),
-                std::min(maxReadLines, readArea.Bottom + 1 - curLine));
+                vt7pty::internal::checkedNarrow<SHORT>(
+                    std::min(maxReadLines, readArea.Bottom + 1 - curLine)));
             buffer.read(subReadArea, out.lineDataMut(curLine));
             curLine = subReadArea.Bottom + 1;
         }

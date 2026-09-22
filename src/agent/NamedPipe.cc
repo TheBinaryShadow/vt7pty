@@ -28,6 +28,15 @@
 #include "../shared/StringUtil.h"
 #include "../shared/WindowsSecurity.h"
 #include "../shared/Assert.h"
+#include "../shared/Narrow.h"
+
+namespace {
+
+constexpr bool hasMode(NamedPipe::OpenMode value, NamedPipe::OpenMode flag) {
+    return (static_cast<uint8_t>(value) & static_cast<uint8_t>(flag)) != 0;
+}
+
+} // namespace
 
 // Returns true if anything happens (data received, data sent, pipe error).
 bool NamedPipe::serviceIo(std::vector<HANDLE> *waitHandles)
@@ -58,7 +67,7 @@ bool NamedPipe::serviceIo(std::vector<HANDLE> *waitHandles)
         } else {
             TRACE("Server pipe [%s] connected",
                 utf8FromWide(m_name).c_str());
-            m_connectEvent.dispose();
+            m_connectEvent.close();
             startPipeWorkers();
             justConnected = true;
         }
@@ -188,7 +197,8 @@ bool NamedPipe::OutputWorker::shouldIssueIo(DWORD *size, bool *isRead)
     *isRead = false;
     if (!m_namedPipe.m_outQueue.empty()) {
         auto &out = m_namedPipe.m_outQueue;
-        const DWORD writeSize = std::min<size_t>(out.size(), kIoSize);
+        const DWORD writeSize = vt7pty::internal::checkedNarrow<DWORD>(
+            std::min<size_t>(out.size(), kIoSize));
         std::copy(&out[0], &out[writeSize], m_buffer);
         out.erase(0, writeSize);
         *size = writeSize;
@@ -203,13 +213,13 @@ DWORD NamedPipe::OutputWorker::getPendingIoSize()
     return m_pending ? m_currentIoSize : 0;
 }
 
-void NamedPipe::openServerPipe(LPCWSTR pipeName, OpenMode::t openMode,
+void NamedPipe::openServerPipe(LPCWSTR pipeName, OpenMode openMode,
                                int outBufferSize, int inBufferSize) {
     ASSERT(isClosed());
-    ASSERT((openMode & OpenMode::Duplex) != 0);
+    ASSERT(hasMode(openMode, OpenMode::Duplex));
     const DWORD winOpenMode =
-              ((openMode & OpenMode::Reading) ? PIPE_ACCESS_INBOUND : 0)
-            | ((openMode & OpenMode::Writing) ? PIPE_ACCESS_OUTBOUND : 0)
+              (hasMode(openMode, OpenMode::Reading) ? PIPE_ACCESS_INBOUND : 0)
+            | (hasMode(openMode, OpenMode::Writing) ? PIPE_ACCESS_OUTBOUND : 0)
             | FILE_FLAG_FIRST_PIPE_INSTANCE
             | FILE_FLAG_OVERLAPPED;
     const auto sd = createPipeSecurityDescriptorOwnerFullControl();
@@ -244,17 +254,17 @@ void NamedPipe::openServerPipe(LPCWSTR pipeName, OpenMode::t openMode,
     }
     if (success) {
         TRACE("Server pipe [%s] connected", utf8FromWide(pipeName).c_str());
-        m_connectEvent.dispose();
+        m_connectEvent.close();
         startPipeWorkers();
     } else if (err != ERROR_IO_PENDING) {
         ASSERT(false && "ConnectNamedPipe call failed");
     }
 }
 
-void NamedPipe::connectToServer(LPCWSTR pipeName, OpenMode::t openMode)
+void NamedPipe::connectToServer(LPCWSTR pipeName, OpenMode openMode)
 {
     ASSERT(isClosed());
-    ASSERT((openMode & OpenMode::Duplex) != 0);
+    ASSERT(hasMode(openMode, OpenMode::Duplex));
     HANDLE handle = CreateFileW(
         pipeName,
         GENERIC_READ | GENERIC_WRITE,
@@ -274,17 +284,17 @@ void NamedPipe::connectToServer(LPCWSTR pipeName, OpenMode::t openMode)
 
 void NamedPipe::startPipeWorkers()
 {
-    if (m_openMode & OpenMode::Reading) {
-        m_inputWorker.reset(new InputWorker(*this));
+    if (hasMode(m_openMode, OpenMode::Reading)) {
+        m_inputWorker = std::make_unique<InputWorker>(*this);
     }
-    if (m_openMode & OpenMode::Writing) {
-        m_outputWorker.reset(new OutputWorker(*this));
+    if (hasMode(m_openMode, OpenMode::Writing)) {
+        m_outputWorker = std::make_unique<OutputWorker>(*this);
     }
 }
 
 size_t NamedPipe::bytesToSend()
 {
-    ASSERT(m_openMode & OpenMode::Writing);
+    ASSERT(hasMode(m_openMode, OpenMode::Writing));
     auto ret = m_outQueue.size();
     if (m_outputWorker != NULL) {
         ret += m_outputWorker->getPendingIoSize();
@@ -294,7 +304,7 @@ size_t NamedPipe::bytesToSend()
 
 void NamedPipe::write(const void *data, size_t size)
 {
-    ASSERT(m_openMode & OpenMode::Writing);
+    ASSERT(hasMode(m_openMode, OpenMode::Writing));
     m_outQueue.append(reinterpret_cast<const char*>(data), size);
 }
 
@@ -305,25 +315,25 @@ void NamedPipe::write(const char *text)
 
 size_t NamedPipe::readBufferSize()
 {
-    ASSERT(m_openMode & OpenMode::Reading);
+    ASSERT(hasMode(m_openMode, OpenMode::Reading));
     return m_readBufferSize;
 }
 
 void NamedPipe::setReadBufferSize(size_t size)
 {
-    ASSERT(m_openMode & OpenMode::Reading);
+    ASSERT(hasMode(m_openMode, OpenMode::Reading));
     m_readBufferSize = size;
 }
 
 size_t NamedPipe::bytesAvailable()
 {
-    ASSERT(m_openMode & OpenMode::Reading);
+    ASSERT(hasMode(m_openMode, OpenMode::Reading));
     return m_inQueue.size();
 }
 
 size_t NamedPipe::peek(void *data, size_t size)
 {
-    ASSERT(m_openMode & OpenMode::Reading);
+    ASSERT(hasMode(m_openMode, OpenMode::Reading));
     const auto out = reinterpret_cast<char*>(data);
     const size_t ret = std::min(size, m_inQueue.size());
     std::copy(&m_inQueue[0], &m_inQueue[ret], out);
@@ -339,7 +349,7 @@ size_t NamedPipe::read(void *data, size_t size)
 
 std::string NamedPipe::readToString(size_t size)
 {
-    ASSERT(m_openMode & OpenMode::Reading);
+    ASSERT(hasMode(m_openMode, OpenMode::Reading));
     size_t retSize = std::min(size, m_inQueue.size());
     std::string ret = m_inQueue.substr(0, retSize);
     m_inQueue.erase(0, retSize);
@@ -348,7 +358,7 @@ std::string NamedPipe::readToString(size_t size)
 
 std::string NamedPipe::readAllToString()
 {
-    ASSERT(m_openMode & OpenMode::Reading);
+    ASSERT(hasMode(m_openMode, OpenMode::Reading));
     std::string ret = m_inQueue;
     m_inQueue.clear();
     return ret;
@@ -363,7 +373,7 @@ void NamedPipe::closePipe()
     if (m_connectEvent.get() != nullptr) {
         DWORD actual = 0;
         GetOverlappedResult(m_handle, &m_connectOver, &actual, TRUE);
-        m_connectEvent.dispose();
+        m_connectEvent.close();
     }
     if (m_inputWorker) {
         m_inputWorker->waitForCanceledIo();

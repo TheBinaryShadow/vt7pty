@@ -23,11 +23,12 @@
 #include <windows.h>
 
 #include "Assert.h"
+#include "Narrow.h"
 
 std::string utf8FromWide(const std::wstring &input) {
     int mblen = WideCharToMultiByte(
         CP_UTF8, 0,
-        input.data(), input.size(),
+        input.data(), vt7pty::internal::checkedNarrow<int>(input.size()),
         NULL, 0, NULL, NULL);
     if (mblen <= 0) {
         return std::string();
@@ -35,8 +36,8 @@ std::string utf8FromWide(const std::wstring &input) {
     std::vector<char> tmp(mblen);
     int mblen2 = WideCharToMultiByte(
         CP_UTF8, 0,
-        input.data(), input.size(),
-        tmp.data(), tmp.size(),
+        input.data(), vt7pty::internal::checkedNarrow<int>(input.size()),
+        tmp.data(), vt7pty::internal::checkedNarrow<int>(tmp.size()),
         NULL, NULL);
     ASSERT(mblen2 == mblen);
     return std::string(tmp.data(), tmp.size());

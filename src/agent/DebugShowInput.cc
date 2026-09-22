@@ -25,9 +25,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <format>
+#include <sstream>
 #include <string>
 
-#include "../shared/StringBuilder.h"
 #include "InputMap.h"
 
 namespace {
@@ -64,7 +65,7 @@ static const Flag kMouseEventFlags[] = {
     { MOUSE_WHEELED,        "Wheel"         },
 };
 
-static void writeFlags(StringBuilder &out, DWORD flags,
+static void writeFlags(std::ostringstream &out, DWORD flags,
                        const char *remainderName,
                        const Flag *table, size_t tableSize,
                        char pre, char sep, char post) {
@@ -89,7 +90,7 @@ static void writeFlags(StringBuilder &out, DWORD flags,
         } else if (wroteSomething && sep != '\0') {
             out << sep;
         }
-        out << remainderName << "(0x" << hexOfInt(remaining) << ')';
+        out << remainderName << "(0x" << std::format("{:x}", remaining) << ')';
         wroteSomething = true;
     }
     if (wroteSomething && post != '\0') {
@@ -98,7 +99,7 @@ static void writeFlags(StringBuilder &out, DWORD flags,
 }
 
 template <size_t n>
-static void writeFlags(StringBuilder &out, DWORD flags,
+static void writeFlags(std::ostringstream &out, DWORD flags,
                        const char *remainderName,
                        const Flag (&table)[n],
                        char pre, char sep, char post) {
@@ -108,16 +109,16 @@ static void writeFlags(StringBuilder &out, DWORD flags,
 } // anonymous namespace
 
 std::string controlKeyStatePrefix(DWORD controlKeyState) {
-    StringBuilder sb;
+    std::ostringstream sb;
     writeFlags(sb, controlKeyState,
                "keyState", kControlKeyStates, '\0', '-', '-');
-    return sb.str_moved();
+    return sb.str();
 }
 
 std::string mouseEventToString(const MOUSE_EVENT_RECORD &mer) {
     const uint16_t buttons = mer.dwButtonState & 0xFFFF;
     const int16_t wheel = mer.dwButtonState >> 16;
-    StringBuilder sb;
+    std::ostringstream sb;
     sb << "pos=" << mer.dwMousePosition.X << ','
                  << mer.dwMousePosition.Y;
     writeFlags(sb, mer.dwControlKeyState, "keyState", kControlKeyStates, ' ', ' ', '\0');
@@ -126,7 +127,7 @@ std::string mouseEventToString(const MOUSE_EVENT_RECORD &mer) {
     if (wheel != 0) {
         sb << " wheel=" << wheel;
     }
-    return sb.str_moved();
+    return sb.str();
 }
 
 void debugShowInput(bool enableMouse, bool escapeInput) {
@@ -185,7 +186,7 @@ void debugShowInput(bool enableMouse, bool escapeInput) {
     bool finished = false;
     while (!finished &&
             ReadConsoleInputW(conin, records, 32, &actual) && actual >= 1) {
-        StringBuilder sb;
+        std::ostringstream sb;
         for (DWORD i = 0; i < actual; ++i) {
             const INPUT_RECORD &record = records[i];
             if (record.EventType == KEY_EVENT) {
@@ -197,7 +198,8 @@ void debugShowInput(bool enableMouse, bool escapeInput) {
                 };
                 sb << "key: " << (ker.bKeyDown ? "dn" : "up")
                    << " rpt=" << ker.wRepeatCount
-                   << " scn=" << (ker.wVirtualScanCode ? "0x" : "") << hexOfInt(ker.wVirtualScanCode)
+                   << " scn=" << (ker.wVirtualScanCode ? "0x" : "")
+                   << std::format("{:x}", ker.wVirtualScanCode)
                    << ' ' << key.toString() << '\n';
                 if ((ker.dwControlKeyState &
                         (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)) &&
@@ -224,14 +226,14 @@ void debugShowInput(bool enableMouse, bool escapeInput) {
             } else if (record.EventType == MENU_EVENT) {
                 const MENU_EVENT_RECORD &mer = record.Event.MenuEvent;
                 sb << "menu-event: commandId=0x"
-                   << hexOfInt(mer.dwCommandId) << '\n';
+                   << std::format("{:x}", mer.dwCommandId) << '\n';
             } else if (record.EventType == FOCUS_EVENT) {
                 const FOCUS_EVENT_RECORD &fer = record.Event.FocusEvent;
                 sb << "focus: " << (fer.bSetFocus ? "gained" : "lost") << '\n';
             }
         }
 
-        const auto str = sb.str_moved();
+        const auto str = sb.str();
         fwrite(str.data(), 1, str.size(), stdout);
         fflush(stdout);
     }

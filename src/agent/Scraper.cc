@@ -25,10 +25,12 @@
 #include <stdint.h>
 
 #include <algorithm>
+#include <format>
+#include <limits>
 #include <utility>
 
 #include "../shared/Assert.h"
-#include "../shared/StringFormatting.h"
+#include "../shared/Narrow.h"
 
 #include "ConsoleFont.h"
 #include "Win32Console.h"
@@ -222,13 +224,14 @@ void Scraper::resizeImpl(const ConsoleScreenBufferInfo &origInfo)
         }
 
         finalBufferSize = Coord(
-            cols,
+            vt7pty::internal::checkedNarrow<SHORT>(cols),
             // If there was previously no scrollback (e.g. a full-screen app
             // in direct mode) and we're reducing the window height, then
             // reduce the console buffer's height too.
             (origWindowRect.height() == origBufferSize.Y)
-                ? rows
-                : std::max<int>(rows, origBufferSize.Y));
+                ? vt7pty::internal::checkedNarrow<SHORT>(rows)
+                : vt7pty::internal::checkedNarrow<SHORT>(
+                    std::max<int>(rows, origBufferSize.Y)));
 
         // Reset the console font size.  We need to do this before shrinking
         // the window, because we might need to make the font bigger to permit
@@ -244,8 +247,10 @@ void Scraper::resizeImpl(const ConsoleScreenBufferInfo &origInfo)
     // fits on the monitor, but it can't be guaranteed.
     const auto largest =
         GetLargestConsoleWindowSize(m_consoleBuffer->conout());
-    const short visibleCols = std::min<short>(cols, largest.X);
-    const short visibleRows = std::min<short>(rows, largest.Y);
+    const short visibleCols = std::min(
+        vt7pty::internal::checkedNarrow<SHORT>(cols), largest.X);
+    const short visibleRows = std::min(
+        vt7pty::internal::checkedNarrow<SHORT>(rows), largest.Y);
 
     {
         // Make the window small enough.  We want the console frozen during
@@ -257,10 +262,10 @@ void Scraper::resizeImpl(const ConsoleScreenBufferInfo &origInfo)
         const int tmpWindowHeight = std::min(bufferSize.Y, visibleRows);
         SmallRect tmpWindowRect(
             0,
-            std::min<int>(bufferSize.Y - tmpWindowHeight,
-                          info.windowRect().Top),
-            tmpWindowWidth,
-            tmpWindowHeight);
+            vt7pty::internal::checkedNarrow<SHORT>(std::min<int>(
+                bufferSize.Y - tmpWindowHeight, info.windowRect().Top)),
+            vt7pty::internal::checkedNarrow<SHORT>(tmpWindowWidth),
+            vt7pty::internal::checkedNarrow<SHORT>(tmpWindowHeight));
         if (cursorInWindow(info)) {
             tmpWindowRect = tmpWindowRect.ensureLineIncluded(
                 info.cursorPosition().Y);
@@ -281,8 +286,8 @@ void Scraper::resizeImpl(const ConsoleScreenBufferInfo &origInfo)
 
         SmallRect finalWindowRect(
             0,
-            std::min<int>(info.bufferSize().Y - visibleRows,
-                          info.windowRect().Top),
+            vt7pty::internal::checkedNarrow<SHORT>(std::min<int>(
+                info.bufferSize().Y - visibleRows, info.windowRect().Top)),
             visibleCols,
             visibleRows);
 
@@ -299,7 +304,8 @@ void Scraper::resizeImpl(const ConsoleScreenBufferInfo &origInfo)
             // unfrozen, so that the *top* of the window is now below the
             // dirtiest tracked line.
             finalWindowRect = SmallRect(
-                0, m_dirtyLineCount - visibleRows,
+                0, vt7pty::internal::checkedNarrow<SHORT>(
+                    m_dirtyLineCount - visibleRows),
                 visibleCols, visibleRows);
         }
 
@@ -425,7 +431,7 @@ WORD Scraper::attributesMask()
     const auto isUnderscoreSupported =
         isCjk || hasEnableLvbGridWorldwide || hasEnableVtProcessing;
 
-    WORD mask = ~0;
+    WORD mask = std::numeric_limits<WORD>::max();
     if (!isReverseSupported)    { mask &= ~VT7PTY_COMMON_LVB_REVERSE_VIDEO; }
     if (!isUnderscoreSupported) { mask &= ~VT7PTY_COMMON_LVB_UNDERSCORE; }
     return mask;
@@ -557,17 +563,21 @@ bool Scraper::scrollingScrapeOutput(const ConsoleScreenBufferInfo &info,
     // bottom of the window.  (It's not clear to me whether the
     // m_dirtyLineCount adjustment here is strictly necessary.  It isn't
     // necessary so long as the cursor is inside the current window.)
-    const int firstReadLine = std::min<int>(firstVirtLine - m_scrolledCount,
-                                            m_dirtyLineCount - 1);
+    const int firstReadLine = std::min(
+        vt7pty::internal::checkedNarrow<int>(
+            firstVirtLine - m_scrolledCount),
+        m_dirtyLineCount - 1);
     const int stopReadLine = std::max(windowRect.top() + windowRect.height(),
                                       m_dirtyLineCount);
     ASSERT(firstReadLine >= 0 && stopReadLine > firstReadLine);
     largeConsoleRead(m_readBuffer,
                      *m_consoleBuffer,
-                     SmallRect(0, firstReadLine,
+                     SmallRect(0,
+                               vt7pty::internal::checkedNarrow<SHORT>(firstReadLine),
                                std::min<SHORT>(info.bufferSize().X,
                                                MAX_CONSOLE_WIDTH),
-                               stopReadLine - firstReadLine),
+                               vt7pty::internal::checkedNarrow<SHORT>(
+                                   stopReadLine - firstReadLine)),
                      attributesMask());
 
     // If we're scraping the buffer without freezing it, we have to query the
@@ -620,7 +630,8 @@ bool Scraper::scrollingScrapeOutput(const ConsoleScreenBufferInfo &info,
     const int w = m_readBuffer.rect().width();
     for (int64_t line = firstVirtLine; line < stopVirtLine; ++line) {
         const CHAR_INFO *curLine =
-            m_readBuffer.lineData(line - m_scrolledCount);
+            m_readBuffer.lineData(vt7pty::internal::checkedNarrow<int>(
+                line - m_scrolledCount));
         ConsoleLine &bufLine = m_bufferData[line % BUFFER_LINE_COUNT];
         if (line > m_maxBufferedLine) {
             m_maxBufferedLine = line;
@@ -651,10 +662,10 @@ void Scraper::syncMarkerText(CHAR_INFO (&output)[SYNC_MARKER_LEN])
 {
     // XXX: The marker text generated here could easily collide with ordinary
     // console output.  Does it make sense to try to avoid the collision?
-    char str[SYNC_MARKER_LEN + 1];
-    formatString(str, "S*Y*N*C*%08x", m_syncCounter);
+    const auto str = std::format("S*Y*N*C*{:08x}", m_syncCounter);
     for (int i = 0; i < SYNC_MARKER_LEN; ++i) {
-        output[i].Char.UnicodeChar = str[i];
+        output[i].Char.UnicodeChar =
+            vt7pty::internal::checkedNarrow<wchar_t>(str[i]);
         output[i].Attributes = 7;
     }
 }
@@ -665,7 +676,8 @@ int Scraper::findSyncMarker()
     CHAR_INFO marker[SYNC_MARKER_LEN];
     CHAR_INFO column[BUFFER_LINE_COUNT];
     syncMarkerText(marker);
-    SmallRect rect(0, 0, 1, m_syncRow + SYNC_MARKER_LEN);
+    SmallRect rect(0, 0, 1, vt7pty::internal::checkedNarrow<SHORT>(
+        m_syncRow + SYNC_MARKER_LEN));
     m_consoleBuffer->read(rect, column);
     int i;
     for (i = m_syncRow; i >= 0; --i) {
@@ -694,6 +706,8 @@ void Scraper::createSyncMarker(int row)
     CHAR_INFO marker[SYNC_MARKER_LEN];
     syncMarkerText(marker);
     m_syncRow = row;
-    SmallRect markerRect(0, m_syncRow, 1, SYNC_MARKER_LEN);
+    SmallRect markerRect(0,
+        vt7pty::internal::checkedNarrow<SHORT>(m_syncRow),
+        1, SYNC_MARKER_LEN);
     m_consoleBuffer->write(markerRect, marker);
 }

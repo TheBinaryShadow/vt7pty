@@ -17,15 +17,15 @@ $utf8NoBom = New-Object Text.UTF8Encoding($false)
 $sourceVersion = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'VERSION.txt')).Trim()
 $apiVersionHeader = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'src\include\vt7pty_version.h'))
 $protocolHeader = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'src\shared\Protocol.h'))
-$apiMajorMatch = [regex]::Match($apiVersionHeader, '(?m)^#define VT7PTY_API_VERSION_MAJOR (?<value>\d+)$')
-$apiMinorMatch = [regex]::Match($apiVersionHeader, '(?m)^#define VT7PTY_API_VERSION_MINOR (?<value>\d+)$')
+$apiMajorMatch = [regex]::Match($apiVersionHeader, '(?m)^#define VT7PTY_API_VERSION_MAJOR (?<value>\d+)\r?$')
+$apiMinorMatch = [regex]::Match($apiVersionHeader, '(?m)^#define VT7PTY_API_VERSION_MINOR (?<value>\d+)\r?$')
 if (-not $apiMajorMatch.Success -or -not $apiMinorMatch.Success) {
     throw 'Could not read the public API version from vt7pty_version.h.'
 }
 $apiVersion = "$($apiMajorMatch.Groups['value'].Value).$($apiMinorMatch.Groups['value'].Value)"
 $protocolMatch = [regex]::Match(
     $protocolHeader,
-    '(?m)^constexpr int32_t VT7PTY_PROTOCOL_VERSION = (?<value>\d+);$')
+    '(?m)^constexpr int32_t VT7PTY_PROTOCOL_VERSION = (?<value>\d+);\r?$')
 if (-not $protocolMatch.Success) {
     throw 'Could not read the client-agent protocol version from Protocol.h.'
 }
@@ -170,6 +170,9 @@ function Assert-NativeTestPassed {
 
 if (-not $NoBuild) {
     & (Join-Path $repositoryRoot 'Build-VT7Pty.ps1') -Configuration $Configuration
+    if ($Configuration -in @('Release', 'All')) {
+        & (Join-Path $repositoryRoot 'Analyze-VT7Pty.ps1')
+    }
 }
 
 $dumpbinPath = Find-Dumpbin
@@ -193,7 +196,7 @@ $expectedImports = [ordered]@{
     'BackendSmokeTest.exe' = @('KERNEL32.dll', 'VT7Pty.dll')
     'ProtocolTest.exe' = @('KERNEL32.dll')
     'ProtocolTestAgent.exe' = @('KERNEL32.dll')
-    'StringBuilderTest.exe' = @('KERNEL32.dll')
+    'ModernCppTest.exe' = @('KERNEL32.dll')
     'fixture-console-color-grid.exe' = @('KERNEL32.dll')
     'fixture-output-lines.exe' = @('KERNEL32.dll')
     'fixture-show-argv.exe' = @('KERNEL32.dll')
@@ -225,13 +228,17 @@ $postWindows7Imports = @(
 foreach ($configurationName in $configurations) {
     $binaryDirectory = Join-Path $artifactRoot "bin\x64\$configurationName"
     $resultDirectory = Join-Path $artifactRoot "verification\x64\$configurationName"
+    if (Test-Path -LiteralPath $resultDirectory) {
+        Remove-Item -LiteralPath $resultDirectory -Recurse -Force
+    }
     [IO.Directory]::CreateDirectory($resultDirectory) | Out-Null
 
     $legacyArtifacts = @(
         'winpty.dll', 'winpty.lib', 'winpty.pdb',
         'winpty-agent.exe', 'winpty-agent.pdb',
         'winpty-debugserver.exe', 'winpty-debugserver.pdb',
-        'trivial_test.exe', 'trivial_test.pdb'
+        'trivial_test.exe', 'trivial_test.pdb',
+        'StringBuilderTest.exe', 'StringBuilderTest.pdb'
     )
     foreach ($legacyArtifact in $legacyArtifacts) {
         $legacyArtifactPath = Join-Path $binaryDirectory $legacyArtifact
@@ -244,7 +251,7 @@ foreach ($configurationName in $configurations) {
         'VT7Pty.dll', 'VT7Pty.lib', 'VT7Pty.pdb',
         'VT7Pty-Agent.exe', 'VT7Pty-Agent.pdb',
         'VT7Pty-DebugServer.exe', 'VT7Pty-DebugServer.pdb',
-        'StringBuilderTest.exe', 'StringBuilderTest.pdb',
+        'ModernCppTest.exe', 'ModernCppTest.pdb',
         'BackendSmokeTest.exe', 'BackendSmokeTest.pdb',
         'ProtocolTest.exe', 'ProtocolTest.pdb',
         'ProtocolTestAgent.exe', 'ProtocolTestAgent.pdb',
@@ -268,7 +275,7 @@ foreach ($configurationName in $configurations) {
     }
 
     $tests = @(
-        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'StringBuilderTest.exe') -WorkingDirectory $binaryDirectory
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'ModernCppTest.exe') -WorkingDirectory $binaryDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'ProtocolTest.exe') -WorkingDirectory $binaryDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'BackendSmokeTest.exe') -WorkingDirectory $binaryDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'BackendSmokeTest.exe') -WorkingDirectory $binaryDirectory -Arguments @('APPLICATIONS')
@@ -284,10 +291,10 @@ foreach ($configurationName in $configurations) {
     foreach ($test in $tests) {
         Assert-NativeTestPassed -Result $test
     }
-    $stringBuilderTest = $tests | Where-Object { $_.Name -eq 'StringBuilderTest.exe' }
-    if ($stringBuilderTest.StandardError -notmatch 'All tests completed!' -or
-            $stringBuilderTest.StandardError -match '(?m)^error:') {
-        throw "$configurationName StringBuilderTest did not report a clean completion."
+    $modernCppTest = $tests | Where-Object { $_.Name -eq 'ModernCppTest.exe' }
+    if ($modernCppTest.StandardOutput -notmatch
+            'VT7Pty modern C\+\+ utility tests passed\.') {
+        throw "$configurationName ModernCppTest did not report a clean completion."
     }
     $protocolTest = $tests | Where-Object { $_.Name -eq 'ProtocolTest.exe' }
     if ($protocolTest.StandardOutput -notmatch 'VT7Pty protocol tests passed') {

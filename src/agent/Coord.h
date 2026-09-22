@@ -23,9 +23,10 @@
 
 #include <windows.h>
 
+#include <format>
 #include <string>
 
-#include "../shared/StringFormatting.h"
+#include "../shared/Narrow.h"
 
 struct Coord : COORD {
     Coord()
@@ -40,21 +41,9 @@ struct Coord : COORD {
         Y = y;
     }
 
-    Coord(COORD other)
-    {
-        *(COORD*)this = other;
-    }
-
-    Coord(const Coord &other)
-    {
-        *(COORD*)this = *(const COORD*)&other;
-    }
-
-    Coord &operator=(const Coord &other)
-    {
-        *(COORD*)this = *(const COORD*)&other;
-        return *this;
-    }
+    Coord(COORD other) : Coord(other.X, other.Y) {}
+    Coord(const Coord &) = default;
+    Coord &operator=(const Coord &) = default;
 
     bool operator==(const Coord &other) const
     {
@@ -68,7 +57,9 @@ struct Coord : COORD {
 
     Coord operator+(const Coord &other) const
     {
-        return Coord(X + other.X, Y + other.Y);
+        return Coord(
+            vt7pty::internal::checkedNarrow<SHORT>(X + other.X),
+            vt7pty::internal::checkedNarrow<SHORT>(Y + other.Y));
     }
 
     bool isEmpty() const
@@ -78,9 +69,7 @@ struct Coord : COORD {
 
     std::string toString() const
     {
-        char ret[32];
-        formatString(ret, "(%d,%d)", X, Y);
-        return std::string(ret);
+        return std::format("({},{})", X, Y);
     }
 };
 

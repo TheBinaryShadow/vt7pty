@@ -16,7 +16,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ItemDefinitionGroup><Link><SubSystem>Console</SubSystem></Link></ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\tests\ProtocolTest.cc" />
+    <ClCompile Include="..\tests\unit\ProtocolTest.cc" />
     <ClCompile Include="..\src\shared\Assert.cc" />
     <ClCompile Include="..\src\shared\Buffer.cc" />
     <ClCompile Include="..\src\shared\DebugClient.cc" />

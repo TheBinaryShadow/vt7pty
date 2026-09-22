@@ -23,8 +23,8 @@
 
 #include <windows.h>
 
-#include "../shared/WindowsSecurity.h"
-#include "../shared/Exception.h"
+#include "../../src/shared/WindowsSecurity.h"
+#include "../../src/shared/Exception.h"
 
 const wchar_t *kPipeName = L"\\\\.\\pipe\\VT7Pty-Debug-v1";
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     if (everyone) {
         try {
             sd = createPipeSecurityDescriptorOwnerFullControlEveryoneWrite();
-        } catch (const VT7PtyException &e) {
+        } catch (const Exception &e) {
             fprintf(stderr,
                 "error creating security descriptor: %ls\n", e.what());
             exit(1);

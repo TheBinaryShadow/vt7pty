@@ -16,7 +16,9 @@ int main()
     while (true) {
         DWORD actual;
         char ch;
-        ReadFile(hStdIn, &ch, 1, &actual, NULL);
+        if (!ReadFile(hStdIn, &ch, 1, &actual, NULL) || actual != 1) {
+            return 1;
+        }
         printf("%02x ", ch);
         if (++count == 50)
             break;

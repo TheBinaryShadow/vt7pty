@@ -31,34 +31,37 @@
 
 // PSID and PSECURITY_DESCRIPTOR are both pointers to void, but we want
 // Sid and SecurityDescriptor to be different types.
-struct SidTag                   {   typedef PSID type;                  };
-struct AclTag                   {   typedef PACL type;                  };
-struct SecurityDescriptorTag    {   typedef PSECURITY_DESCRIPTOR type;  };
+struct SidTag                   { using type = PSID; };
+struct AclTag                   { using type = PACL; };
+struct SecurityDescriptorTag    { using type = PSECURITY_DESCRIPTOR; };
 
 template <typename T>
 class SecurityItem {
 public:
     struct Impl {
-        virtual ~Impl() {}
+        virtual ~Impl() = default;
     };
 
 private:
-    typedef typename T::type P;
+    using P = typename T::type;
     P m_v;
     std::unique_ptr<Impl> m_pimpl;
 
 public:
     P get() const { return m_v; }
-    operator bool() const { return m_v != nullptr; }
+    explicit operator bool() const { return m_v != nullptr; }
 
     SecurityItem() : m_v(nullptr) {}
     SecurityItem(P v, std::unique_ptr<Impl> &&pimpl) :
             m_v(v), m_pimpl(std::move(pimpl)) {}
-    SecurityItem(SecurityItem &&other) :
+    SecurityItem(SecurityItem &&other) noexcept :
             m_v(other.m_v), m_pimpl(std::move(other.m_pimpl)) {
         other.m_v = nullptr;
     }
-    SecurityItem &operator=(SecurityItem &&other) {
+    SecurityItem &operator=(SecurityItem &&other) noexcept {
+        if (this == &other) {
+            return *this;
+        }
         m_v = other.m_v;
         other.m_v = nullptr;
         m_pimpl = std::move(other.m_pimpl);
@@ -66,9 +69,9 @@ public:
     }
 };
 
-typedef SecurityItem<SidTag> Sid;
-typedef SecurityItem<AclTag> Acl;
-typedef SecurityItem<SecurityDescriptorTag> SecurityDescriptor;
+using Sid = SecurityItem<SidTag>;
+using Acl = SecurityItem<AclTag>;
+using SecurityDescriptor = SecurityItem<SecurityDescriptorTag>;
 
 Sid getOwnerSid();
 Sid wellKnownSid(

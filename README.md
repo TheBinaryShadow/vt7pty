@@ -18,7 +18,8 @@ VT7Pty is in early development at version `0.5.0-dev`. Milestone 0 Steps 0.1
 through 0.4 established the inherited baseline, the supported VS2022/MSBuild
 workflow, a native-only active tree, and the accepted Windows 7+ platform
 implementation. Step 0.5 established and physically accepted the technical
-VT7Pty identity. Native code modernization proceeds in Step 0.6.
+VT7Pty identity. Step 0.6 modernized the retained native code and established
+warning-clean C++20 build and analysis gates; physical acceptance is pending.
 
 The [development foundation](docs/FOUNDATION.md) and
 [roadmap](ROADMAP.md) record the approved product and engineering direction.
@@ -108,7 +109,7 @@ Useful starting points:
 - [Public VT7Pty header](src/include/vt7pty.h)
 - [Client library](src/libvt7pty)
 - [Console agent](src/agent)
-- [Tests](src/tests)
+- [Tests](tests)
 - [Upstream baseline and attribution policy](UPSTREAM.md)
 - [Historical WinPTY release notes](RELEASES.md)
 - [VT7Pty changelog](CHANGELOG.md)

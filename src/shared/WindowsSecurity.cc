@@ -23,10 +23,11 @@
 #include <sddl.h>
 
 #include <array>
+#include <format>
 
 #include "DebugClient.h"
 #include "OwnedHandle.h"
-#include "StringBuilder.h"
+#include "Narrow.h"
 #include "Assert.h"
 #include "Exception.h"
 
@@ -40,11 +41,11 @@ struct LocalFreer {
     }
 };
 
-typedef std::unique_ptr<void, LocalFreer> PointerLocal;
+using PointerLocal = std::unique_ptr<void, LocalFreer>;
 
 template <typename T>
 SecurityItem<T> localItem(typename T::type v) {
-    typedef typename T::type P;
+    using P = typename T::type;
     struct Impl : SecurityItem<T>::Impl {
         P m_v;
         Impl(P v) : m_v(v) {}
@@ -52,7 +53,7 @@ SecurityItem<T> localItem(typename T::type v) {
             LocalFree(reinterpret_cast<HLOCAL>(m_v));
         }
     };
-    return SecurityItem<T>(v, std::unique_ptr<Impl>(new Impl { v }));
+    return SecurityItem<T>(v, std::make_unique<Impl>(v));
 }
 
 Sid allocatedSid(PSID v) {
@@ -65,7 +66,7 @@ Sid allocatedSid(PSID v) {
             }
         }
     };
-    return Sid(v, std::unique_ptr<Impl>(new Impl { v }));
+    return Sid(v, std::make_unique<Impl>(v));
 }
 
 } // anonymous namespace
@@ -103,14 +104,14 @@ Sid getOwnerSid() {
     success = GetTokenInformation(token.get(), TokenOwner,
         nullptr, 0, &actual);
     if (success) {
-        throwVT7PtyException(L"getOwnerSid: GetTokenInformation: "
+        throw Exception(L"getOwnerSid: GetTokenInformation: "
             L"expected ERROR_INSUFFICIENT_BUFFER");
     } else if (GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
         throwWindowsError(L"getOwnerSid: GetTokenInformation: "
             L"expected ERROR_INSUFFICIENT_BUFFER");
     }
-    std::unique_ptr<Impl> impl(new Impl);
-    impl->buffer = std::unique_ptr<char[]>(new char[actual]);
+    auto impl = std::make_unique<Impl>();
+    impl->buffer = std::make_unique<char[]>(actual);
     success = GetTokenInformation(token.get(), TokenOwner,
                                   impl->buffer.get(), actual, &actual);
     if (!success) {
@@ -178,14 +179,14 @@ static SecurityDescriptor finishSecurityDescriptor(
     {
         PACL aclRaw = nullptr;
         DWORD aclError =
-            SetEntriesInAclW(daclEntryCount,
+            SetEntriesInAclW(
+                             vt7pty::internal::checkedNarrow<ULONG>(daclEntryCount),
                              daclEntries,
                              nullptr, &aclRaw);
         if (aclError != ERROR_SUCCESS) {
-            WStringBuilder sb(64);
-            sb << L"finishSecurityDescriptor: "
-               << L"SetEntriesInAcl failed: " << aclError;
-            throwVT7PtyException(sb.c_str());
+            throw Exception(std::format(
+                L"finishSecurityDescriptor: SetEntriesInAcl failed: {}",
+                aclError));
         }
         outAcl = localItem<AclTag>(aclRaw);
     }
@@ -194,7 +195,7 @@ static SecurityDescriptor finishSecurityDescriptor(
         reinterpret_cast<PSECURITY_DESCRIPTOR>(
             LocalAlloc(LPTR, SECURITY_DESCRIPTOR_MIN_LENGTH));
     if (sdRaw == nullptr) {
-        throwVT7PtyException(L"finishSecurityDescriptor: LocalAlloc failed");
+        throw Exception(L"finishSecurityDescriptor: LocalAlloc failed");
     }
     SecurityDescriptor sd = localItem<SecurityDescriptorTag>(sdRaw);
     if (!InitializeSecurityDescriptor(sdRaw, SECURITY_DESCRIPTOR_REVISION)) {
@@ -223,7 +224,7 @@ createPipeSecurityDescriptorOwnerFullControl() {
         SecurityDescriptor value;
     };
 
-    std::unique_ptr<Impl> impl(new Impl);
+    auto impl = std::make_unique<Impl>();
     impl->localSystem = localSystemSid();
     impl->builtinAdmins = builtinAdminsSid();
     impl->owner = getOwnerSid();
@@ -263,7 +264,7 @@ createPipeSecurityDescriptorOwnerFullControlEveryoneWrite() {
         SecurityDescriptor value;
     };
 
-    std::unique_ptr<Impl> impl(new Impl);
+    auto impl = std::make_unique<Impl>();
     impl->localSystem = localSystemSid();
     impl->builtinAdmins = builtinAdminsSid();
     impl->owner = getOwnerSid();

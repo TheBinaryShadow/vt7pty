@@ -24,13 +24,14 @@
 #include <string.h>
 
 #include <algorithm>
+#include <charconv>
+#include <iterator>
 
-#include "../shared/StringBuilder.h"
 #include "../shared/Assert.h"
+#include "../shared/Narrow.h"
 #include "InputMap.h"
 
 #define ESC "\x1B"
-#define DIM(x) (sizeof(x) / sizeof((x)[0]))
 
 namespace {
 
@@ -253,13 +254,14 @@ static void addSimpleEntries(InputMap &inputMap) {
         {   ESC ESC "[[E",  { VK_F5,    '\0',   LEFT_ALT_PRESSED                    } },
     };
 
-    for (size_t i = 0; i < DIM(simpleEncodings); ++i) {
+    for (size_t i = 0; i < std::size(simpleEncodings); ++i) {
         auto k = simpleEncodings[i].key;
         if (useEnhancedForVirtualKey(k.virtualKey)) {
             k.keyState |= ENHANCED_KEY;
         }
         inputMap.set(simpleEncodings[i].encoding,
-                     strlen(simpleEncodings[i].encoding),
+                     vt7pty::internal::checkedNarrow<int>(
+                         strlen(simpleEncodings[i].encoding)),
                      k);
     }
 }
@@ -291,7 +293,8 @@ static inline void setEncoding(const ExpandContext &ctx, char *end,
     if (useEnhancedForVirtualKey(k.virtualKey)) {
         k.keyState |= ENHANCED_KEY;
     }
-    ctx.inputMap.set(ctx.buffer, end - ctx.buffer, k);
+    ctx.inputMap.set(ctx.buffer,
+        vt7pty::internal::checkedNarrow<int>(end - ctx.buffer), k);
 }
 
 static inline uint16_t keyStateForMod(int mod) {
@@ -299,7 +302,7 @@ static inline uint16_t keyStateForMod(int mod) {
     if ((mod - 1) & kCsiShiftModifier)  ret |= SHIFT_PRESSED;
     if ((mod - 1) & kCsiAltModifier)    ret |= LEFT_ALT_PRESSED;
     if ((mod - 1) & kCsiCtrlModifier)   ret |= LEFT_CTRL_PRESSED;
-    return ret;
+    return vt7pty::internal::checkedNarrow<uint16_t>(ret);
 }
 
 static void expandNumericEncodingSuffix(const ExpandContext &ctx, char *p,
@@ -331,10 +334,9 @@ template <bool is_numeric>
 static inline void expandEncodingAfterAltPrefix(
         const ExpandContext &ctx, char *p, uint16_t extraKeyState) {
     auto appendId = [&](char *&ptr) {
-        const auto idstr = decOfInt(ctx.e.id);
-        ASSERT(ptr <= ctx.bufferEnd - idstr.size());
-        std::copy(idstr.data(), idstr.data() + idstr.size(), ptr);
-        ptr += idstr.size();
+        const auto result = std::to_chars(ptr, ctx.bufferEnd, ctx.e.id);
+        ASSERT(result.ec == std::errc());
+        ptr = result.ptr;
     };
     ASSERT(p <= ctx.bufferEnd - 2);
     *p++ = '\x1b';
@@ -355,7 +357,7 @@ static inline void expandEncodingAfterAltPrefix(
         for (int mod = 2; mod <= 8; ++mod) {
             char *q = p;
             ASSERT(q <= ctx.bufferEnd - 2);
-            *q++ = '0' + mod;
+            *q++ = vt7pty::internal::checkedNarrow<char>('0' + mod);
             *q++ = ctx.e.id;
             setEncoding(ctx, q, extraKeyState | keyStateForMod(mod));
         }
@@ -367,14 +369,14 @@ static inline void expandEncodingAfterAltPrefix(
                 appendId(q);
                 ASSERT(q <= ctx.bufferEnd - 2);
                 *q++ = ';';
-                *q++ = '0' + mod;
+                *q++ = vt7pty::internal::checkedNarrow<char>('0' + mod);
                 expandNumericEncodingSuffix(
                     ctx, q, extraKeyState | keyStateForMod(mod));
             } else {
                 ASSERT(q <= ctx.bufferEnd - 4);
                 *q++ = '1';
                 *q++ = ';';
-                *q++ = '0' + mod;
+                *q++ = vt7pty::internal::checkedNarrow<char>('0' + mod);
                 *q++ = ctx.e.id;
                 setEncoding(ctx, q, extraKeyState | keyStateForMod(mod));
             }
@@ -404,7 +406,7 @@ static inline void expandEncoding(const ExpandContext &ctx) {
 template <bool is_numeric, size_t N>
 static void addEscapes(InputMap &inputMap, const EscapeEncoding (&encodings)[N]) {
     char buffer[32];
-    for (size_t i = 0; i < DIM(encodings); ++i) {
+    for (size_t i = 0; i < std::size(encodings); ++i) {
         ExpandContext ctx = {
             inputMap, encodings[i],
             buffer, buffer + sizeof(buffer)

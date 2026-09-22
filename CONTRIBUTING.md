@@ -35,10 +35,10 @@ Useful contributions include:
 - Target-machine testing with clear environment and artifact details.
 - Focused improvements that preserve known working legacy-console behavior.
 
-All inherited components are currently retained, including the Unix adapter.
-The approved roadmap requires their audited cleanup in Milestone 0, after the modern
-build and baseline checks exist. Relate a proposed change to the relevant
-roadmap step and its acceptance criteria; draft plans are not completed work.
+The Unix adapter, obsolete toolchains, and pre-Windows 7 branches have been
+removed after their replacement and regression gates passed. Relate a proposed
+change to the relevant roadmap step and its acceptance criteria; draft plans
+are not completed work.
 Avoid mixing renames, removals, broad formatting changes, and functional fixes
 in the same pull request. Work in this repository; changes to VT7 itself belong
 in that project's own review process.
@@ -72,8 +72,9 @@ logs and crash reports. Report suspected vulnerabilities through
 
 ## Source and attribution
 
-Follow the approved C++20 and repository style as it is established in
-Milestone 0. Do not extend retired compiler, Unix-adapter, XP, or Vista paths.
+Follow the approved C++20 repository style and keep maintained targets clean
+under `/W4 /WX` and Release static analysis. Do not extend retired compiler,
+Unix-adapter, XP, or Vista paths.
 Explain why a remaining compatibility workaround exists and preserve relevant
 historical context.
 

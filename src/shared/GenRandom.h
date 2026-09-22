@@ -29,7 +29,7 @@
 #include "OsModule.h"
 
 class GenRandom {
-    typedef BOOLEAN WINAPI RtlGenRandom_t(PVOID, ULONG);
+    using RtlGenRandom_t = BOOLEAN WINAPI(PVOID, ULONG);
 
     OsModule m_advapi32;
     RtlGenRandom_t *m_rtlGenRandom = nullptr;

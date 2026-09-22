@@ -26,6 +26,8 @@
 #include <wchar.h>
 
 #include <algorithm>
+#include <format>
+#include <iterator>
 #include <string>
 #include <tuple>
 
@@ -33,11 +35,8 @@
 #include "../shared/StringUtil.h"
 #include "../shared/WindowsVersion.h"
 #include "../shared/Assert.h"
-#include "../shared/StringFormatting.h"
 
 namespace {
-
-#define COUNT_OF(x) (sizeof(x) / sizeof((x)[0]))
 
 // See https://en.wikipedia.org/wiki/List_of_CJK_fonts
 const wchar_t kLucidaConsole[] = L"Lucida Console";
@@ -239,12 +238,10 @@ const FontSize k950MingLight[] = {
 static std::string stringToCodePoints(const std::wstring &str) {
     std::string ret = "(";
     for (size_t i = 0; i < str.size(); ++i) {
-        char tmp[32];
-        formatString(tmp, "%X", str[i]);
         if (ret.size() > 1) {
             ret.push_back(' ');
         }
-        ret += tmp;
+        ret += std::format("{:X}", static_cast<unsigned>(str[i]));
     }
     ret.push_back(')');
     return ret;
@@ -257,7 +254,7 @@ static void dumpFontInfoEx(
         return;
     }
     std::wstring faceName(infoex.FaceName,
-        wcsnlen(infoex.FaceName, COUNT_OF(infoex.FaceName)));
+        wcsnlen(infoex.FaceName, std::size(infoex.FaceName)));
     trace("%snFont=%u dwFontSize=(%d,%d) "
         "FontFamily=0x%x FontWeight=%u FaceName=%s %s",
         prefix,
@@ -288,7 +285,11 @@ static bool setConsoleFont(
     infoex.dwFontSize.Y = font.size;
     infoex.FontFamily = font.family;
     infoex.FontWeight = 400;
-    vt7pty_wcsncpy_nul(infoex.FaceName, font.faceName);
+    std::fill(std::begin(infoex.FaceName), std::end(infoex.FaceName), L'\0');
+    const size_t faceLength = std::min(
+        std::char_traits<wchar_t>::length(font.faceName),
+        std::size(infoex.FaceName) - 1);
+    std::copy_n(font.faceName, faceLength, std::begin(infoex.FaceName));
     dumpFontInfoEx(infoex, "setConsoleFont: setting font to: ");
     if (!SetCurrentConsoleFontEx(conout, FALSE, &infoex)) {
         trace("setConsoleFont: SetCurrentConsoleFontEx call failed");
@@ -301,7 +302,7 @@ static bool setConsoleFont(
         return false;
     }
     if (wcsncmp(infoex.FaceName, font.faceName,
-            COUNT_OF(infoex.FaceName)) != 0) {
+            std::size(infoex.FaceName)) != 0) {
         trace("setConsoleFont: face name was not set");
         dumpFontInfoEx(infoex, "setConsoleFont: post-call font: ");
         return false;
@@ -329,38 +330,38 @@ static Font selectSmallFont(int codePage, int columns, bool isNewW10) {
             fontFamily = 0x36;
             if (isNewW10) {
                 table = k932GothicWin10;
-                tableSize = COUNT_OF(k932GothicWin10);
+                tableSize = std::size(k932GothicWin10);
             } else if (isWindows8OrGreater()) {
                 table = k932GothicWin8;
-                tableSize = COUNT_OF(k932GothicWin8);
+                tableSize = std::size(k932GothicWin8);
             } else {
                 table = k932GothicWin7;
-                tableSize = COUNT_OF(k932GothicWin7);
+                tableSize = std::size(k932GothicWin7);
             }
             break;
         case 936: // Chinese Simplified
             faceName = kNSimSun;
             fontFamily = 0x36;
             table = k936SimSun;
-            tableSize = COUNT_OF(k936SimSun);
+            tableSize = std::size(k936SimSun);
             break;
         case 949: // Korean
             faceName = kGulimChe;
             fontFamily = 0x36;
             table = k949GulimChe;
-            tableSize = COUNT_OF(k949GulimChe);
+            tableSize = std::size(k949GulimChe);
             break;
         case 950: // Chinese Traditional
             faceName = kMingLight;
             fontFamily = 0x36;
             table = k950MingLight;
-            tableSize = COUNT_OF(k950MingLight);
+            tableSize = std::size(k950MingLight);
             break;
         default:
             faceName = kLucidaConsole;
             fontFamily = 0x36;
             table = kLucidaFontSizes;
-            tableSize = COUNT_OF(kLucidaFontSizes);
+            tableSize = std::size(kLucidaFontSizes);
             break;
     }
 

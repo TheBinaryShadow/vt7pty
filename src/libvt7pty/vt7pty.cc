@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <format>
 #include <limits>
 #include <string>
 #include <vector>
@@ -34,8 +35,8 @@
 #include "../shared/Buffer.h"
 #include "../shared/DebugClient.h"
 #include "../shared/GenRandom.h"
+#include "../shared/Narrow.h"
 #include "../shared/OwnedHandle.h"
-#include "../shared/StringBuilder.h"
 #include "../shared/StringUtil.h"
 #include "../shared/WindowsSecurity.h"
 #include "../shared/WindowsVersion.h"
@@ -84,7 +85,7 @@ VT7PTY_API LPCWSTR vt7pty_error_msg(vt7pty_error_ptr_t err) {
             return err->msgStatic;
         } else {
             ASSERT(err->msgDynamic != nullptr);
-            std::wstring *msgPtr = err->msgDynamic->get();
+            const std::wstring *msgPtr = err->msgDynamic.get();
             ASSERT(msgPtr != nullptr);
             return msgPtr->c_str();
         }
@@ -97,7 +98,6 @@ VT7PTY_API LPCWSTR vt7pty_error_msg(vt7pty_error_ptr_t err) {
  * freed. */
 VT7PTY_API void vt7pty_error_free(vt7pty_error_ptr_t err) {
     if (err != nullptr && err->msgDynamic != nullptr) {
-        delete err->msgDynamic;
         delete err;
     }
 }
@@ -110,18 +110,17 @@ static void translateException(vt7pty_error_ptr_t *&err) {
         } catch (const ReadBuffer::DecodeError&) {
             ret = const_cast<vt7pty_error_ptr_t>(&kBadRpcPacket);
         } catch (const ClientException &e) {
-            std::unique_ptr<vt7pty_error_t> obj(new vt7pty_error_t);
+            auto obj = std::make_unique<vt7pty_error_t>();
             obj->code = e.code();
             obj->msgStatic = nullptr;
-            obj->msgDynamic =
-                new std::shared_ptr<std::wstring>(e.whatSharedStr());
+            obj->msgDynamic = e.sharedMessage();
             ret = obj.release();
-        } catch (const VT7PtyException &e) {
-            std::unique_ptr<vt7pty_error_t> obj(new vt7pty_error_t);
-            std::shared_ptr<std::wstring> msg(new std::wstring(e.what()));
+        } catch (const Exception &e) {
+            auto obj = std::make_unique<vt7pty_error_t>();
+            auto msg = std::make_shared<const std::wstring>(e.what());
             obj->code = VT7PTY_ERROR_UNSPECIFIED;
             obj->msgStatic = nullptr;
-            obj->msgDynamic = new std::shared_ptr<std::wstring>(msg);
+            obj->msgDynamic = std::move(msg);
             ret = obj.release();
         }
     } catch (const std::bad_alloc&) {
@@ -155,7 +154,7 @@ VT7PTY_API vt7pty_config_t *
 vt7pty_config_new(UINT64 flags, vt7pty_error_ptr_t *err /*OPTIONAL*/) {
     API_TRY {
         ASSERT((flags & VT7PTY_FLAG_MASK) == flags);
-        std::unique_ptr<vt7pty_config_t> ret(new vt7pty_config_t);
+        auto ret = std::make_unique<vt7pty_config_t>();
         ret->flags = flags;
         return ret.release();
     } API_CATCH(nullptr)
@@ -261,7 +260,7 @@ static void handlePendingIo(vt7pty_t &wp, OVERLAPPED &over, BOOL &success,
     handlePendingIo(wp, over, success, lastError, actual);
 }
 
-static void handleReadWriteErrors(vt7pty_t &wp, BOOL success, DWORD lastError,
+static void handleReadWriteErrors(vt7pty_t &, BOOL success, DWORD lastError,
                                   const wchar_t *genericErrMsg) {
     if (!success) {
         // If the pipe connection is broken after it's been connected, then
@@ -301,7 +300,8 @@ static void writeData(vt7pty_t &wp, const void *data, size_t amount) {
     DWORD actual = 0;
     OVERLAPPED over = {};
     over.hEvent = wp.ioEvent.get();
-    BOOL success = WriteFile(wp.controlPipe.get(), data, amount,
+    BOOL success = WriteFile(wp.controlPipe.get(), data,
+                             vt7pty::internal::checkedNarrow<DWORD>(amount),
                              &actual, &over);
     DWORD lastError = GetLastError();
     if (!success) {
@@ -329,7 +329,8 @@ static size_t readData(vt7pty_t &wp, void *data, size_t amount) {
     DWORD actual = 0;
     OVERLAPPED over = {};
     over.hEvent = wp.ioEvent.get();
-    BOOL success = ReadFile(wp.controlPipe.get(), data, amount,
+    BOOL success = ReadFile(wp.controlPipe.get(), data,
+                            vt7pty::internal::checkedNarrow<DWORD>(amount),
                             &actual, &over);
     DWORD lastError = GetLastError();
     if (!success) {
@@ -358,7 +359,7 @@ static uint64_t readUInt64(vt7pty_t &wp) {
 static ReadBuffer readPacket(vt7pty_t &wp) {
     const uint64_t packetSize = readUInt64(wp);
     if (packetSize < sizeof(packetSize) || packetSize > SIZE_MAX) {
-        throwVT7PtyException(L"Agent RPC error: invalid packet size");
+        throw Exception(L"Agent RPC error: invalid packet size");
     }
     const size_t payloadSize = packetSize - sizeof(packetSize);
     std::vector<char> bytes(payloadSize);
@@ -369,7 +370,7 @@ static ReadBuffer readPacket(vt7pty_t &wp) {
 static OwnedHandle createControlPipe(const std::wstring &name) {
     const auto sd = createPipeSecurityDescriptorOwnerFullControl();
     if (!sd) {
-        throwVT7PtyException(
+        throw Exception(
             L"could not create the control pipe's SECURITY_DESCRIPTOR");
     }
     SECURITY_ATTRIBUTES sa = {};
@@ -433,11 +434,8 @@ static OwnedHandle startAgentProcess(
         DWORD creationFlags,
         DWORD &agentPid) {
     const std::wstring exePath = findAgentProgram();
-    const std::wstring cmdline =
-        (WStringBuilder(256)
-            << L"\"" << exePath << L"\" "
-            << controlPipeName << L' '
-            << params).str_moved();
+    const auto cmdline = std::format(
+        L"\"{}\" {} {}", exePath, controlPipeName, params);
 
     auto cmdlineV = vectorWithNulFromString(cmdline);
     // Start the agent.
@@ -459,14 +457,13 @@ static OwnedHandle startAgentProcess(
                        &sui, &pi);
     if (!success) {
         const DWORD lastError = GetLastError();
-        const auto errStr =
-            (WStringBuilder(256)
-                << L"VT7Pty-Agent CreateProcess failed: cmdline='" << cmdline
-                << L"' err=0x" << whexOfInt(lastError)).str_moved();
+        const auto errStr = std::format(
+            L"VT7Pty-Agent CreateProcess failed: cmdline='{}' err=0x{:x}",
+            cmdline, lastError);
         throw ClientException(
             VT7PTY_ERROR_AGENT_CREATION_FAILED, errStr.c_str());
     }
-    CloseHandle(pi.hThread);
+    OwnedHandle thread(pi.hThread);
     TRACE("Created agent successfully, pid=%u, cmdline=%s",
           static_cast<unsigned int>(pi.dwProcessId),
           utf8FromWide(cmdline).c_str());
@@ -481,10 +478,9 @@ static void verifyPipeClientPid(HANDLE serverPipe, DWORD agentPid) {
     if (success == GetNamedPipeClientProcessId_Result::Success) {
         const auto clientPid = std::get<1>(client);
         if (clientPid != agentPid) {
-            WStringBuilder errMsg;
-            errMsg << L"Security check failed: pipe client pid (" << clientPid
-                   << L") does not match agent pid (" << agentPid << L")";
-            throwVT7PtyException(errMsg.c_str());
+            throw Exception(std::format(
+                L"Security check failed: pipe client pid ({}) does not match "
+                L"agent pid ({})", clientPid, agentPid));
         }
     } else {
         throwWindowsError(L"GetNamedPipeClientProcessId failed", lastError);
@@ -495,7 +491,7 @@ static std::unique_ptr<vt7pty_t>
 createAgentSession(const vt7pty_config_t *cfg,
                    const std::wstring &params,
                    DWORD creationFlags) {
-    std::unique_ptr<vt7pty_t> wp(new vt7pty_t);
+    auto wp = std::make_unique<vt7pty_t>();
     wp->agentTimeoutMs = cfg->timeoutMs;
     wp->ioEvent = createEvent();
 
@@ -522,12 +518,8 @@ vt7pty_open(const vt7pty_config_t *cfg,
         dumpVersionToTrace();
 
         // Start the primary agent session.
-        const auto params =
-            (WStringBuilder(128)
-                << cfg->flags << L' '
-                << cfg->mouseMode << L' '
-                << cfg->cols << L' '
-                << cfg->rows).str_moved();
+        const auto params = std::format(L"{} {} {} {}",
+            cfg->flags, cfg->mouseMode, cfg->cols, cfg->rows);
         auto wp = createAgentSession(cfg, params, CREATE_NEW_CONSOLE);
 
         // Validate the agent before accepting its pipe names.  This prevents
@@ -544,20 +536,16 @@ vt7pty_open(const vt7pty_config_t *cfg,
         }
         const auto handshakeStatus = classifyAgentHandshake(handshake);
         if (handshakeStatus == AgentHandshakeStatus::WrongIdentity) {
-            const auto message =
-                (WStringBuilder(192)
-                    << L"VT7Pty agent identity mismatch: expected '"
-                    << VT7PTY_AGENT_IDENTITY << L"', received '"
-                    << handshake.identity << L"'").str_moved();
+            const auto message = std::format(
+                L"VT7Pty agent identity mismatch: expected '{}', received '{}'",
+                VT7PTY_AGENT_IDENTITY, handshake.identity);
             throw ClientException(
                 VT7PTY_ERROR_AGENT_INCOMPATIBLE, message.c_str());
         }
         if (handshakeStatus == AgentHandshakeStatus::UnsupportedVersion) {
-            const auto message =
-                (WStringBuilder(192)
-                    << L"VT7Pty agent protocol mismatch: client="
-                    << VT7PTY_PROTOCOL_VERSION << L", agent="
-                    << handshake.protocolVersion).str_moved();
+            const auto message = std::format(
+                L"VT7Pty agent protocol mismatch: client={}, agent={}",
+                VT7PTY_PROTOCOL_VERSION, handshake.protocolVersion);
             throw ClientException(
                 VT7PTY_ERROR_AGENT_INCOMPATIBLE, message.c_str());
         }
@@ -624,13 +612,13 @@ class RpcOperation {
 public:
     RpcOperation(vt7pty_t &wp) : m_wp(wp) {
         if (m_wp.controlPipe.get() == nullptr) {
-            throwVT7PtyException(L"Agent shutdown due to RPC failure");
+            throw Exception(L"Agent shutdown due to RPC failure");
         }
     }
     ~RpcOperation() {
         if (!m_success) {
             trace("~RpcOperation: Closing control pipe");
-            m_wp.controlPipe.dispose(true);
+            m_wp.controlPipe.close();
         }
     }
     void success() { m_success = true; }
@@ -690,7 +678,7 @@ vt7pty_spawn_config_new(UINT64 spawnFlags,
                         vt7pty_error_ptr_t *err /*OPTIONAL*/) {
     API_TRY {
         ASSERT((spawnFlags & VT7PTY_SPAWN_FLAG_MASK) == spawnFlags);
-        std::unique_ptr<vt7pty_spawn_config_t> cfg(new vt7pty_spawn_config_t);
+        auto cfg = std::make_unique<vt7pty_spawn_config_t>();
         cfg->spawnFlags = spawnFlags;
         if (appname != nullptr) { cfg->appname = appname; }
         if (cmdline != nullptr) { cfg->cmdline = cmdline; }
@@ -788,7 +776,7 @@ vt7pty_spawn(vt7pty_t *wp,
             }
             rpc.success();
         } else {
-            throwVT7PtyException(
+            throw Exception(
                 L"Agent RPC error: invalid StartProcessResult");
         }
         return TRUE;

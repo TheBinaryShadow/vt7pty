@@ -77,7 +77,7 @@ if ($output -notmatch '(?im)^Breakpoint \d+ hit$' -or
 if ($output -notmatch '(?i)src\\libvt7pty\\vt7pty\.cc @ \d+') {
     throw "The debugger did not resolve vt7pty.cc source lines. See $resultPath"
 }
-if ($output -notmatch '(?i)src\\tests\\BackendSmokeTest\.cc @ \d+') {
+if ($output -notmatch '(?i)tests\\integration\\BackendSmokeTest\.cc @ \d+') {
     throw "The debugger did not resolve the test caller's source lines. See $resultPath"
 }
 

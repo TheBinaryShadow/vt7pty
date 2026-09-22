@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include <algorithm>
+#include <format>
 #include <string>
 #include <utility>
 #include <vector>
@@ -38,7 +39,7 @@
 #include "../shared/Buffer.h"
 #include "../shared/DebugClient.h"
 #include "../shared/GenRandom.h"
-#include "../shared/StringBuilder.h"
+#include "../shared/Narrow.h"
 #include "../shared/StringUtil.h"
 #include "../shared/WindowsVersion.h"
 #include "../shared/Assert.h"
@@ -160,7 +161,9 @@ Agent::Agent(LPCWSTR controlPipeName,
 
     const bool outputColor =
         !m_plainMode || (agentFlags & VT7PTY_FLAG_COLOR_ESCAPES);
-    const Coord initialSize(initialCols, initialRows);
+    const Coord initialSize(
+        vt7pty::internal::checkedNarrow<SHORT>(initialCols),
+        vt7pty::internal::checkedNarrow<SHORT>(initialRows));
 
     auto primaryBuffer = openPrimaryBuffer();
     if (m_useConerr) {
@@ -188,30 +191,22 @@ Agent::Agent(LPCWSTR controlPipeName,
         writePacket(setupPacket);
     }
 
-    std::unique_ptr<Terminal> primaryTerminal;
-    primaryTerminal.reset(new Terminal(*m_conoutPipe,
-                                       m_plainMode,
-                                       outputColor));
-    m_primaryScraper.reset(new Scraper(m_console,
-                                       *primaryBuffer,
-                                       std::move(primaryTerminal),
-                                       initialSize));
+    auto primaryTerminal = std::make_unique<Terminal>(
+        *m_conoutPipe, m_plainMode, outputColor);
+    m_primaryScraper = std::make_unique<Scraper>(
+        m_console, *primaryBuffer, std::move(primaryTerminal), initialSize);
     if (m_useConerr) {
-        std::unique_ptr<Terminal> errorTerminal;
-        errorTerminal.reset(new Terminal(*m_conerrPipe,
-                                         m_plainMode,
-                                         outputColor));
-        m_errorScraper.reset(new Scraper(m_console,
-                                         *m_errorBuffer,
-                                         std::move(errorTerminal),
-                                         initialSize));
+        auto errorTerminal = std::make_unique<Terminal>(
+            *m_conerrPipe, m_plainMode, outputColor);
+        m_errorScraper = std::make_unique<Scraper>(
+            m_console, *m_errorBuffer, std::move(errorTerminal), initialSize);
     }
 
     m_console.setTitle(m_currentTitle);
 
     const HANDLE conin = GetStdHandle(STD_INPUT_HANDLE);
-    m_consoleInput.reset(
-        new ConsoleInput(conin, m_mouseMode, *this, m_console));
+    m_consoleInput = std::make_unique<ConsoleInput>(
+        conin, m_mouseMode, *this, m_console);
 
     // Setup Ctrl-C handling.  First restore default handling of Ctrl-C.  This
     // attribute is inherited by child processes.  Then register a custom
@@ -254,11 +249,9 @@ NamedPipe &Agent::connectToControlPipe(LPCWSTR pipeName)
 // Returns a new server named pipe.  It has not yet been connected.
 NamedPipe &Agent::createDataServerPipe(bool write, const wchar_t *kind)
 {
-    const auto name =
-        (WStringBuilder(128)
-            << L"\\\\.\\pipe\\vt7pty-data-v1-"
-            << kind << L'-'
-            << GenRandom().uniqueName()).str_moved();
+    const auto name = std::format(
+        L"\\\\.\\pipe\\vt7pty-data-v1-{}-{}",
+        kind, GenRandom().uniqueName());
     NamedPipe &pipe = createNamedPipe();
     pipe.openServerPipe(
         name.c_str(),
@@ -433,14 +426,18 @@ void Agent::handleGetConsoleProcessListPacket(ReadBuffer &packet)
     packet.assertEof();
 
     auto processList = std::vector<DWORD>(64);
-    auto processCount = GetConsoleProcessList(&processList[0], processList.size());
+    auto processCount = GetConsoleProcessList(processList.data(),
+        vt7pty::internal::checkedNarrow<DWORD>(processList.size()));
 
     // The process list can change while we're trying to read it
     while (processList.size() < processCount) {
         // Multiplying by two caps the number of iterations
-        const auto newSize = std::max<DWORD>(processList.size() * 2, processCount);
+        const auto newSize = std::max(
+            vt7pty::internal::checkedNarrow<DWORD>(processList.size() * 2),
+            processCount);
         processList.resize(newSize);
-        processCount = GetConsoleProcessList(&processList[0], processList.size());
+        processCount = GetConsoleProcessList(processList.data(),
+            vt7pty::internal::checkedNarrow<DWORD>(processList.size()));
     }
 
     if (processCount == 0) {
@@ -448,7 +445,7 @@ void Agent::handleGetConsoleProcessListPacket(ReadBuffer &packet)
     }
 
     auto reply = newPacket();
-    reply.putInt32(processCount);
+    reply.putInt32(vt7pty::internal::checkedNarrow<int32_t>(processCount));
     for (DWORD i = 0; i < processCount; i++) {
         reply.putInt32(processList[i]);
     }
@@ -556,7 +553,9 @@ void Agent::resizeWindow(int cols, int rows)
     rows = std::min(rows, MAX_CONSOLE_HEIGHT);
 
     Win32Console::FreezeGuard guard(m_console, m_console.frozen());
-    const Coord newSize(cols, rows);
+    const Coord newSize(
+        vt7pty::internal::checkedNarrow<SHORT>(cols),
+        vt7pty::internal::checkedNarrow<SHORT>(rows));
     ConsoleScreenBufferInfo info;
     auto primaryBuffer = openPrimaryBuffer();
     m_primaryScraper->resizeWindow(*primaryBuffer, newSize, info);

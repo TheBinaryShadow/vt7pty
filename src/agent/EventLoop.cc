@@ -26,36 +26,31 @@
 #include "../shared/DebugClient.h"
 #include "../shared/Assert.h"
 
-EventLoop::~EventLoop() {
-    for (NamedPipe *pipe : m_pipes) {
-        delete pipe;
-    }
-    m_pipes.clear();
-}
+EventLoop::~EventLoop() = default;
 
 // Enter the event loop.  Runs until the I/O or timeout handler calls exit().
 void EventLoop::run()
 {
     std::vector<HANDLE> waitHandles;
-    DWORD lastTime = GetTickCount();
+    ULONGLONG lastTime = GetTickCount64();
     while (!m_exiting) {
         bool didSomething = false;
 
         // Attempt to make progress with the pipes.
         waitHandles.clear();
-        for (size_t i = 0; i < m_pipes.size(); ++i) {
-            if (m_pipes[i]->serviceIo(&waitHandles)) {
-                onPipeIo(*m_pipes[i]);
+        for (const auto &pipe : m_pipes) {
+            if (pipe->serviceIo(&waitHandles)) {
+                onPipeIo(*pipe);
                 didSomething = true;
             }
         }
 
         // Call the timeout if enough time has elapsed.
         if (m_pollInterval > 0) {
-            int elapsed = GetTickCount() - lastTime;
-            if (elapsed >= m_pollInterval) {
+            const ULONGLONG elapsed = GetTickCount64() - lastTime;
+            if (elapsed >= static_cast<ULONGLONG>(m_pollInterval)) {
                 onPollTimeout();
-                lastTime = GetTickCount();
+                lastTime = GetTickCount64();
                 didSomething = true;
             }
         }
@@ -65,14 +60,20 @@ void EventLoop::run()
 
         // If there's nothing to do, wait.
         DWORD timeout = INFINITE;
-        if (m_pollInterval > 0)
-            timeout = std::max(0, (int)(lastTime + m_pollInterval - GetTickCount()));
+        if (m_pollInterval > 0) {
+            const ULONGLONG elapsed = GetTickCount64() - lastTime;
+            timeout = elapsed >= static_cast<ULONGLONG>(m_pollInterval)
+                ? 0
+                : static_cast<DWORD>(
+                    static_cast<ULONGLONG>(m_pollInterval) - elapsed);
+        }
         if (waitHandles.size() == 0) {
             ASSERT(timeout != INFINITE);
             if (timeout > 0)
                 Sleep(timeout);
         } else {
-            DWORD result = WaitForMultipleObjects(waitHandles.size(),
+            DWORD result = WaitForMultipleObjects(
+                                                  static_cast<DWORD>(waitHandles.size()),
                                                   waitHandles.data(),
                                                   FALSE,
                                                   timeout);
@@ -83,9 +84,10 @@ void EventLoop::run()
 
 NamedPipe &EventLoop::createNamedPipe()
 {
-    NamedPipe *ret = new NamedPipe();
-    m_pipes.push_back(ret);
-    return *ret;
+    auto pipe = std::make_unique<NamedPipe>();
+    auto &result = *pipe;
+    m_pipes.push_back(std::move(pipe));
+    return result;
 }
 
 void EventLoop::setPollInterval(int ms)

@@ -20,11 +20,11 @@ $stagingRoot = Join-Path $artifactRoot 'package-staging'
 $version = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'VERSION.txt')).Trim()
 $apiVersionHeader = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'src\include\vt7pty_version.h'))
 $protocolHeader = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'src\shared\Protocol.h'))
-$apiMajorMatch = [regex]::Match($apiVersionHeader, '(?m)^#define VT7PTY_API_VERSION_MAJOR (?<value>\d+)$')
-$apiMinorMatch = [regex]::Match($apiVersionHeader, '(?m)^#define VT7PTY_API_VERSION_MINOR (?<value>\d+)$')
+$apiMajorMatch = [regex]::Match($apiVersionHeader, '(?m)^#define VT7PTY_API_VERSION_MAJOR (?<value>\d+)\r?$')
+$apiMinorMatch = [regex]::Match($apiVersionHeader, '(?m)^#define VT7PTY_API_VERSION_MINOR (?<value>\d+)\r?$')
 $protocolMatch = [regex]::Match(
     $protocolHeader,
-    '(?m)^constexpr int32_t VT7PTY_PROTOCOL_VERSION = (?<value>\d+);$')
+    '(?m)^constexpr int32_t VT7PTY_PROTOCOL_VERSION = (?<value>\d+);\r?$')
 if (-not $apiMajorMatch.Success -or -not $apiMinorMatch.Success -or
         -not $protocolMatch.Success) {
     throw 'Could not read the VT7Pty API or protocol version.'
@@ -102,7 +102,7 @@ $copyPlan = [ordered]@{
     'UPSTREAM.md' = (Join-Path $repositoryRoot 'UPSTREAM.md')
 }
 $testPrograms = @(
-    'StringBuilderTest', 'ProtocolTest', 'ProtocolTestAgent', 'BackendSmokeTest',
+    'ModernCppTest', 'ProtocolTest', 'ProtocolTestAgent', 'BackendSmokeTest',
     'fixture-console-color-grid', 'fixture-output-lines', 'fixture-show-argv',
     'fixture-show-console-input', 'fixture-utf16-echo', 'fixture-win32-echo1',
     'fixture-win32-echo2', 'fixture-win32-write1', 'fixture-write-console',

@@ -21,16 +21,19 @@
 #include "OwnedHandle.h"
 
 #include "DebugClient.h"
-#include "Exception.h"
-
-void OwnedHandle::dispose(bool nothrow) {
+void OwnedHandle::close() noexcept {
     if (m_h != nullptr && m_h != INVALID_HANDLE_VALUE) {
         if (!CloseHandle(m_h)) {
             trace("CloseHandle(%p) failed", m_h);
-            if (!nothrow) {
-                throwWindowsError(L"CloseHandle failed");
-            }
         }
     }
     m_h = nullptr;
+}
+
+void OwnedHandle::reset(HANDLE h) {
+    if (m_h == h) {
+        return;
+    }
+    close();
+    m_h = h;
 }

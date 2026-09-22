@@ -8,8 +8,8 @@
 
 #include <string>
 
-#include "../shared/Buffer.h"
-#include "../shared/Protocol.h"
+#include "../../src/shared/Buffer.h"
+#include "../../src/shared/Protocol.h"
 
 static void writeAll(HANDLE pipe, const void *data, size_t size) {
     const char *cursor = static_cast<const char *>(data);

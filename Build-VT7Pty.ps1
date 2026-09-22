@@ -6,7 +6,9 @@ param(
     [ValidateSet('Build', 'Rebuild', 'Clean')]
     [string]$Target = 'Build',
 
-    [switch]$DetailedOutput
+    [switch]$DetailedOutput,
+
+    [switch]$StaticAnalysis
 )
 
 $ErrorActionPreference = 'Stop'
@@ -38,7 +40,8 @@ $legacyArtifactNames = @(
     'winpty.dll', 'winpty.exp', 'winpty.lib', 'winpty.pdb',
     'winpty-agent.exe', 'winpty-agent.pdb',
     'winpty-debugserver.exe', 'winpty-debugserver.pdb',
-    'trivial_test.exe', 'trivial_test.pdb'
+    'trivial_test.exe', 'trivial_test.pdb',
+    'StringBuilderTest.exe', 'StringBuilderTest.pdb'
 )
 
 foreach ($configurationName in $configurations) {
@@ -61,6 +64,13 @@ foreach ($configurationName in $configurations) {
         '/p:PreferredToolArchitecture=x64',
         "/verbosity:$verbosity"
     )
+    if ($StaticAnalysis) {
+        $arguments += @(
+            '/p:EnablePREfast=true',
+            '/p:RunCodeAnalysis=true',
+            '/p:CodeAnalysisTreatWarningsAsErrors=true'
+        )
+    }
     & $msbuildPath @arguments
     if ($LASTEXITCODE -ne 0) {
         throw "MSBuild failed for $configurationName|x64 with exit code $LASTEXITCODE."

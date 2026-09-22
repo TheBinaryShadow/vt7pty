@@ -24,28 +24,28 @@
 
 #include "DebugClient.h"
 #include "Assert.h"
+#include "Narrow.h"
 
-// Define the READ_BUFFER_CHECK() macro.  It *must* evaluate its condition,
-// exactly once.
-#define READ_BUFFER_CHECK(cond)                                 \
-    do {                                                        \
-        if (!(cond)) {                                          \
-            trace("decode error: %s", #cond);                   \
-            throw DecodeError();                                \
-        }                                                       \
-    } while (false)
+[[noreturn]] static void throwDecodeError(const char *condition) {
+    trace("decode error: %s", condition);
+    throw ReadBuffer::DecodeError();
+}
+
+#define READ_BUFFER_CHECK(cond) \
+    ((cond) ? static_cast<void>(0) : throwDecodeError(#cond))
 
 enum class Piece : uint8_t { Int32, Int64, WString };
 
-void WriteBuffer::putRawData(const void *data, size_t len) {
-    const auto p = reinterpret_cast<const char*>(data);
-    m_buf.insert(m_buf.end(), p, p + len);
+void WriteBuffer::putRawData(std::span<const std::byte> data) {
+    const auto first = reinterpret_cast<const char *>(data.data());
+    m_buf.insert(m_buf.end(), first, first + data.size());
 }
 
-void WriteBuffer::replaceRawData(size_t pos, const void *data, size_t len) {
-    ASSERT(pos <= m_buf.size() && len <= m_buf.size() - pos);
-    const auto p = reinterpret_cast<const char*>(data);
-    std::copy(p, p + len, &m_buf[pos]);
+void WriteBuffer::replaceRawData(
+        size_t pos, std::span<const std::byte> data) {
+    ASSERT(pos <= m_buf.size() && data.size() <= m_buf.size() - pos);
+    const auto first = reinterpret_cast<const char *>(data.data());
+    std::copy(first, first + data.size(), m_buf.begin() + pos);
 }
 
 void WriteBuffer::putInt32(int32_t i) {
@@ -62,15 +62,16 @@ void WriteBuffer::putInt64(int64_t i) {
 void WriteBuffer::putWString(const wchar_t *str, size_t len) {
     putRawValue(Piece::WString);
     putRawValue(static_cast<uint64_t>(len));
-    putRawData(str, sizeof(wchar_t) * len);
+    putRawData(std::as_bytes(std::span { str, len }));
 }
 
-void ReadBuffer::getRawData(void *data, size_t len) {
+void ReadBuffer::getRawData(std::span<std::byte> data) {
     ASSERT(m_off <= m_buf.size());
-    READ_BUFFER_CHECK(len <= m_buf.size() - m_off);
-    const char *const inp = &m_buf[m_off];
-    std::copy(inp, inp + len, reinterpret_cast<char*>(data));
-    m_off += len;
+    READ_BUFFER_CHECK(data.size() <= m_buf.size() - m_off);
+    const auto input = std::as_bytes(std::span {
+        m_buf.data() + m_off, data.size() });
+    std::copy(input.begin(), input.end(), data.begin());
+    m_off += data.size();
 }
 
 int32_t ReadBuffer::getInt32() {
@@ -91,9 +92,8 @@ std::wstring ReadBuffer::getWString() {
     // constructor, because the string in m_buf mightn't be aligned.
     std::wstring ret;
     if (charLen > 0) {
-        const size_t byteLen = charLen * sizeof(wchar_t);
-        ret.resize(charLen);
-        getRawData(&ret[0], byteLen);
+        ret.resize(vt7pty::internal::checkedNarrow<size_t>(charLen));
+        getRawData(std::as_writable_bytes(std::span { ret.data(), ret.size() }));
     }
     return ret;
 }

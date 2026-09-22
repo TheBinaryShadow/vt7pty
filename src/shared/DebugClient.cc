@@ -26,13 +26,12 @@
 #include <string.h>
 
 #include <algorithm>
+#include <iterator>
 #include <string>
 
-#include "StringFormatting.h"
+#include "Narrow.h"
 
 const wchar_t *const kPipeName = L"\\\\.\\pipe\\VT7Pty-Debug-v1";
-
-void *volatile g_debugConfig;
 
 namespace {
 
@@ -76,7 +75,8 @@ static void sendToDebugServer(const char *message)
         char response[16];
         DWORD actual = 0;
         TransactNamedPipe(tracePipe,
-            const_cast<char*>(message), strlen(message),
+            const_cast<char*>(message),
+            vt7pty::internal::checkedNarrow<DWORD>(strlen(message)),
             response, sizeof(response), &actual, NULL);
         CloseHandle(tracePipe);
     }
@@ -97,42 +97,27 @@ static long long unixTimeMillis()
 
 static const char *getDebugConfig()
 {
-    if (g_debugConfig == NULL) {
+    static const std::string config = [] {
         PreserveLastError preserve;
-        const int bufSize = 256;
-        char buf[bufSize];
-        DWORD actualSize =
-            GetEnvironmentVariableA("VT7PTY_DEBUG", buf, bufSize);
-        if (actualSize == 0 || actualSize >= static_cast<DWORD>(bufSize)) {
-            buf[0] = '\0';
+        char buffer[256] = {};
+        const DWORD actualSize = GetEnvironmentVariableA(
+            "VT7PTY_DEBUG", buffer, static_cast<DWORD>(std::size(buffer)));
+        if (actualSize == 0 || actualSize >= std::size(buffer)) {
+            return std::string();
         }
-        const size_t len = strlen(buf) + 1;
-        char *newConfig = new char[len];
-        std::copy(buf, buf + len, newConfig);
-        void *oldValue = InterlockedCompareExchangePointer(
-            &g_debugConfig, newConfig, NULL);
-        if (oldValue != NULL) {
-            delete [] newConfig;
-        }
-    }
-    return static_cast<const char*>(g_debugConfig);
+        return std::string(buffer, actualSize);
+    }();
+    return config.c_str();
 }
 
 bool isTracingEnabled()
 {
-    static bool disabled, enabled;
-    if (disabled) {
-        return false;
-    } else if (enabled) {
-        return true;
-    } else {
+    static const bool enabled = [] {
         // Accept "1" as a convenient shorthand for the trace flag.
         PreserveLastError preserve;
-        bool value = hasDebugFlag("trace") || hasDebugFlag("1");
-        disabled = !value;
-        enabled = value;
-        return value;
-    }
+        return hasDebugFlag("trace") || hasDebugFlag("1");
+    }();
+    return enabled;
 }
 
 bool hasDebugFlag(const char *flag)
@@ -163,7 +148,10 @@ void trace(const char *format, ...)
 
     va_list ap;
     va_start(ap, format);
-    formatStringV(message, format, ap);
+    const int count = std::vsnprintf(message, sizeof(message), format, ap);
+    if (count < 0 || static_cast<size_t>(count) >= sizeof(message)) {
+        message[sizeof(message) - 1] = '\0';
+    }
     message[sizeof(message) - 1] = '\0';
     va_end(ap);
 
@@ -176,7 +164,7 @@ void trace(const char *format, ...)
     baseName = (baseName != NULL) ? baseName + 1 : moduleName;
 
     char fullMessage[1024];
-    formatString(fullMessage,
+    std::snprintf(fullMessage, sizeof(fullMessage),
              "[%05d.%03d %s,p%04d,t%04d]: %s",
              currentTime / 1000, currentTime % 1000,
              baseName, (int)GetCurrentProcessId(), (int)GetCurrentThreadId(),

@@ -30,8 +30,8 @@
 #include <string>
 #include <vector>
 
-#include "../include/vt7pty.h"
-#include "../shared/DebugClient.h"
+#include "../../src/include/vt7pty.h"
+#include "../../src/shared/DebugClient.h"
 
 static std::vector<unsigned char> filterContent(
         const std::vector<unsigned char> &content) {

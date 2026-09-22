@@ -52,14 +52,14 @@ private:
     };
 
     struct Node {
-        Node() : childCount(0) {
+        Node() : childCount(0), u{} {
             Key zeroKey = { 0, 0, 0 };
             key = zeroKey;
         }
 
         Key key;
         int childCount;
-        enum { kTinyCount = 8 };
+        static constexpr int kTinyCount = 8;
         union {
             Branch *branch;
             struct {

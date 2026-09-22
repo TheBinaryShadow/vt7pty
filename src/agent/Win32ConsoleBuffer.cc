@@ -22,8 +22,10 @@
 
 #include <windows.h>
 
+#include <sstream>
+
 #include "../shared/DebugClient.h"
-#include "../shared/StringBuilder.h"
+#include "../shared/Narrow.h"
 #include "../shared/Assert.h"
 
 std::unique_ptr<Win32ConsoleBuffer> Win32ConsoleBuffer::openStdout() {
@@ -68,12 +70,14 @@ void Win32ConsoleBuffer::clearLines(
     const int width = info.bufferSize().X;
     DWORD actual = 0;
     if (!FillConsoleOutputCharacterW(
-            m_conout, L' ', width * count, Coord(0, row),
+            m_conout, L' ', width * count,
+            Coord(0, vt7pty::internal::checkedNarrow<SHORT>(row)),
             &actual) || static_cast<int>(actual) != width * count) {
         trace("FillConsoleOutputCharacterW failed");
     }
     if (!FillConsoleOutputAttribute(
-            m_conout, kDefaultAttributes, width * count, Coord(0, row),
+            m_conout, kDefaultAttributes, width * count,
+            Coord(0, vt7pty::internal::checkedNarrow<SHORT>(row)),
             &actual) || static_cast<int>(actual) != width * count) {
         trace("FillConsoleOutputAttribute failed");
     }
@@ -159,7 +163,7 @@ void Win32ConsoleBuffer::read(const SmallRect &rect, CHAR_INFO *data) {
     SmallRect tmp(rect);
     if (!ReadConsoleOutputW(m_conout, data, rect.size(), Coord(), &tmp) &&
             isTracingEnabled()) {
-        StringBuilder sb(256);
+        std::ostringstream sb;
         auto outStruct = [&](const SMALL_RECT &sr) {
             sb << "{L=" << sr.Left << ",T=" << sr.Top
                << ",R=" << sr.Right << ",B=" << sr.Bottom << '}';
@@ -174,7 +178,7 @@ void Win32ConsoleBuffer::read(const SmallRect &rect, CHAR_INFO *data) {
         } else {
             sb << ", GetConsoleScreenBufferInfo also failed";
         }
-        trace("%s", sb.c_str());
+        trace("%s", sb.str().c_str());
     }
 }
 

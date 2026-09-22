@@ -1,6 +1,6 @@
 # VT7Pty Testing Strategy
 
-Status: approved Milestone 0 strategy. Updated: 2026-09-21.
+Status: approved Milestone 0 strategy. Updated: 2026-09-22.
 
 This document defines how VT7Pty distinguishes preserved WinPTY behavior, new
 regressions, inherited limitations, and accepted improvements. Results must
@@ -61,6 +61,10 @@ Roadmap Step 0.2 now provides the first maintained development-host command:
 .\Verify-VT7Pty.ps1
 ```
 
+Release verification also runs the MSVC native code analyzer. It can be run
+independently with `.\Analyze-VT7Pty.ps1`; diagnostics fail the build, just as
+compiler warnings do under the maintained `/W4 /WX` policy.
+
 It builds Debug and Release by default, runs unit, protocol, lifecycle,
 application, agent-rejection, argument-quoting, and bounded-output checks. The
 negative controls exercise a missing agent plus malformed, wrong-identity,
@@ -93,6 +97,8 @@ The added fixture/tool boundary and source-debugging proof are recorded in the
 The same boundary passed after obsolete infrastructure and compatibility code
 were removed, as recorded in the
 [2026-09-22 Step 0.3 completion record](validation/2026-09-22-step-0.3-completion.md).
+Step 0.6 adds the warning-clean compiler/analyzer gate and a focused
+`ModernCppTest` for the standard formatting and checked-narrowing replacements.
 
 ## Coverage matrix
 

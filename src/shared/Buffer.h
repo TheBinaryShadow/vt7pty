@@ -22,9 +22,10 @@
 #define VT7PTY_SHARED_BUFFER_H
 
 #include <stdint.h>
-#include <string.h>
 
 #include <algorithm>
+#include <cstddef>
+#include <span>
 #include <utility>
 #include <vector>
 #include <string>
@@ -36,21 +37,24 @@ private:
     std::vector<char> m_buf;
 
 public:
-    WriteBuffer() {}
+    WriteBuffer() = default;
 
     template <typename T> void putRawValue(const T &t) {
-        putRawData(&t, sizeof(t));
+        putRawData(std::as_bytes(std::span { &t, size_t { 1 } }));
     }
     template <typename T> void replaceRawValue(size_t pos, const T &t) {
-        replaceRawData(pos, &t, sizeof(t));
+        replaceRawData(
+            pos, std::as_bytes(std::span { &t, size_t { 1 } }));
     }
 
-    void putRawData(const void *data, size_t len);
-    void replaceRawData(size_t pos, const void *data, size_t len);
+    void putRawData(std::span<const std::byte> data);
+    void replaceRawData(size_t pos, std::span<const std::byte> data);
     void putInt32(int32_t i);
     void putInt64(int64_t i);
     void putWString(const wchar_t *str, size_t len);
-    void putWString(const wchar_t *str)         { putWString(str, wcslen(str)); }
+    void putWString(const wchar_t *str) {
+        putWString(str, std::char_traits<wchar_t>::length(str));
+    }
     void putWString(const std::wstring &str)    { putWString(str.data(), str.size()); }
     std::vector<char> &buf()                    { return m_buf; }
 
@@ -60,10 +64,9 @@ public:
 
 class ReadBuffer {
 public:
-    class DecodeError : public VT7PtyException {
-        virtual const wchar_t *what() const noexcept override {
-            return L"DecodeError: RPC message decoding error";
-        }
+    class DecodeError : public Exception {
+    public:
+        DecodeError() : Exception(L"DecodeError: RPC message decoding error") {}
     };
 
 private:
@@ -75,11 +78,11 @@ public:
 
     template <typename T> T getRawValue() {
         T ret = {};
-        getRawData(&ret, sizeof(ret));
+        getRawData(std::as_writable_bytes(std::span { &ret, size_t { 1 } }));
         return ret;
     }
 
-    void getRawData(void *data, size_t len);
+    void getRawData(std::span<std::byte> data);
     int32_t getInt32();
     int64_t getInt64();
     std::wstring getWString();

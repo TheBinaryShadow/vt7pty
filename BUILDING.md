@@ -17,6 +17,8 @@ The maintained build uses:
 - Windows SDK 10.0.26100.0
 - C++20
 - the conforming MSVC preprocessor (`/Zc:preprocessor`)
+- warning level 4 with warnings treated as errors (`/W4 /WX`)
+- the MSVC native code analyzer for Release verification
 - x64 Debug and Release configurations
 - static MSVC runtime initially
 - Windows 7 SP1 as the API and runtime floor
@@ -28,6 +30,7 @@ Installer if the required native workload or SDK is missing.
 
 ```powershell
 .\Build-VT7Pty.ps1
+.\Analyze-VT7Pty.ps1
 .\Verify-VT7Pty.ps1
 .\Package-VT7Pty.ps1
 ```
@@ -38,8 +41,9 @@ Release. Outputs are written below ignored `artifacts`, with intermediates
 below ignored `build`.
 
 The solution contains projects for the client DLL, console-owning agent,
-native debug server, protocol tests, backend smoke test, nine controlled child-process
-fixtures, and two console-mode tools. The fixture and tool purpose is described
+native debug server, protocol and modern-C++ unit tests, backend integration
+test, nine controlled child-process fixtures, and two console-mode tools. The
+fixture and tool purpose is described
 under [tests/fixtures](tests/fixtures/README.md) and
 [tools/console](tools/console/README.md). Shared compiler and linker settings
 live in `Directory.Build.props`, while generated version identity is wired
@@ -63,10 +67,11 @@ Their public interface is [vt7pty.h](src/include/vt7pty.h), with API-version
 macros in [vt7pty_version.h](src/include/vt7pty_version.h). See the
 [technical naming map](docs/NAMING.md) for the intentional break from WinPTY.
 
-`Verify-VT7Pty.ps1` runs the string-builder, protocol, backend, missing-agent,
+`Verify-VT7Pty.ps1` runs the modern-C++ utility, protocol, backend, missing-agent,
 incompatible-agent, application, and deterministic fixture checks. It also
 requires x64 images, PE subsystem version 6.01, the expected direct imports,
-the 19 renamed DLL exports, PDBs, and generated version resources. Its
+the 19 renamed DLL exports, PDBs, generated version resources, and a clean
+Release static-analysis pass. Its
 development-host result is transition evidence and is not physical Windows 7
 acceptance.
 

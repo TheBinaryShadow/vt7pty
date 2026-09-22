@@ -25,30 +25,17 @@
 
 #include "../shared/Exception.h"
 
-#include <memory>
-#include <string>
-
-class ClientException : public VT7PtyException {
+class ClientException : public Exception {
 public:
     ClientException(vt7pty_result_t code, const wchar_t *what) :
-        m_code(code), m_what(std::make_shared<std::wstring>(what)) {}
+        Exception(what), m_code(code) {}
 
     vt7pty_result_t code() const noexcept {
         return m_code;
     }
 
-    const wchar_t *what() const noexcept override {
-        return m_what->c_str();
-    }
-
-    std::shared_ptr<std::wstring> whatSharedStr() const noexcept {
-        return m_what;
-    }
-
 private:
     vt7pty_result_t m_code;
-    // Using a shared_ptr ensures that copying the object raises no exception.
-    std::shared_ptr<std::wstring> m_what;
 };
 
 #endif // LIB_VT7PTY_EXCEPTION_H

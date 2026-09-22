@@ -30,7 +30,7 @@
 #include "Exception.h"
 
 class OsModule {
-    HMODULE m_module;
+    HMODULE m_module = nullptr;
 public:
     enum class LoadErrorBehavior { Abort, Throw };
     OsModule(const wchar_t *fileName,
@@ -48,8 +48,12 @@ public:
         }
     }
     ~OsModule() {
-        FreeLibrary(m_module);
+        if (m_module != nullptr) {
+            FreeLibrary(m_module);
+        }
     }
+    OsModule(const OsModule &) = delete;
+    OsModule &operator=(const OsModule &) = delete;
     HMODULE handle() const { return m_module; }
     FARPROC proc(const char *funcName) {
         FARPROC ret = GetProcAddress(m_module, funcName);

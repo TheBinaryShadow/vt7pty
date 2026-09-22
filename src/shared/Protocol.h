@@ -32,7 +32,7 @@ constexpr int32_t VT7PTY_PROTOCOL_VERSION = 1;
 
 struct AgentHandshake {
     std::wstring identity;
-    int32_t protocolVersion;
+    int32_t protocolVersion = 0;
 };
 
 enum class AgentHandshakeStatus {

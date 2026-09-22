@@ -24,12 +24,13 @@
 #include <string.h>
 
 #include <algorithm>
+#include <format>
 #include <string>
 
 #include "../include/vt7pty_constants.h"
 
 #include "../shared/DebugClient.h"
-#include "../shared/StringBuilder.h"
+#include "../shared/Narrow.h"
 #include "../shared/ControlCharacters.h"
 
 #include "ConsoleInputReencoding.h"
@@ -50,13 +51,12 @@ struct MouseRecord {
 };
 
 std::string MouseRecord::toString() const {
-    StringBuilder sb(40);
-    sb << "pos=" << coord.X << ',' << coord.Y
-       << " flags=0x" << hexOfInt(flags);
+    auto result = std::format(
+        "pos={},{} flags=0x{:x}", coord.X, coord.Y, flags);
     if (release) {
-        sb << " release";
+        result += " release";
     }
-    return sb.str_moved();
+    return result;
 }
 
 const unsigned int kIncompleteEscapeTimeoutMs = 1000u;
@@ -113,7 +113,7 @@ static int matchDsr(const char *input, int inputSize)
     CHECK(*pch == ';');     ADVANCE();
     SCAN_INT(dummy, 8);
     CHECK(*pch == 'R');
-    return pch - input + 1;
+    return vt7pty::internal::checkedNarrow<int>(pch - input + 1);
 }
 
 static int matchMouseDefault(const char *input, int inputSize,
@@ -129,7 +129,7 @@ static int matchMouseDefault(const char *input, int inputSize,
     ADVANCE();
     out.coord.Y = (*pch - '!') & 0xFF;
     out.release = false;
-    return pch - input + 1;
+    return vt7pty::internal::checkedNarrow<int>(pch - input + 1);
 }
 
 static int matchMouse1006(const char *input, int inputSize, MouseRecord &out)
@@ -142,12 +142,14 @@ static int matchMouse1006(const char *input, int inputSize, MouseRecord &out)
     CHECK(*pch == '<');         ADVANCE();
     SCAN_INT(out.flags, 8);
     CHECK(*pch == ';');         ADVANCE();
-    SCAN_SIGNED_INT(temp, 8); out.coord.X = temp - 1;
+    SCAN_SIGNED_INT(temp, 8);
+    out.coord.X = vt7pty::internal::checkedNarrow<SHORT>(temp - 1);
     CHECK(*pch == ';');         ADVANCE();
-    SCAN_SIGNED_INT(temp, 8); out.coord.Y = temp - 1;
+    SCAN_SIGNED_INT(temp, 8);
+    out.coord.Y = vt7pty::internal::checkedNarrow<SHORT>(temp - 1);
     CHECK(*pch == 'M' || *pch == 'm');
     out.release = (*pch == 'm');
-    return pch - input + 1;
+    return vt7pty::internal::checkedNarrow<int>(pch - input + 1);
 }
 
 static int matchMouse1015(const char *input, int inputSize, MouseRecord &out)
@@ -159,12 +161,14 @@ static int matchMouse1015(const char *input, int inputSize, MouseRecord &out)
     CHECK(*pch == '[');         ADVANCE();
     SCAN_INT(out.flags, 8); out.flags -= 32;
     CHECK(*pch == ';');         ADVANCE();
-    SCAN_SIGNED_INT(temp, 8); out.coord.X = temp - 1;
+    SCAN_SIGNED_INT(temp, 8);
+    out.coord.X = vt7pty::internal::checkedNarrow<SHORT>(temp - 1);
     CHECK(*pch == ';');         ADVANCE();
-    SCAN_SIGNED_INT(temp, 8); out.coord.Y = temp - 1;
+    SCAN_SIGNED_INT(temp, 8);
+    out.coord.Y = vt7pty::internal::checkedNarrow<SHORT>(temp - 1);
     CHECK(*pch == 'M');
     out.release = false;
-    return pch - input + 1;
+    return vt7pty::internal::checkedNarrow<int>(pch - input + 1);
 }
 
 // Match a mouse input escape sequence of any kind.
@@ -255,9 +259,7 @@ void ConsoleInput::writeInput(const std::string &input)
                     dumpString += ' ';
                 }
                 const unsigned char uch = input[i];
-                char buf[32];
-                formatString(buf, "%02X", uch);
-                dumpString += buf;
+                dumpString += std::format("{:02X}", uch);
             }
             dumpString += ')';
             trace("input chars: %s", dumpString.c_str());
@@ -271,13 +273,13 @@ void ConsoleInput::writeInput(const std::string &input)
         m_dsrSender.sendDsr();
         m_dsrSent = true;
     }
-    m_lastWriteTick = GetTickCount();
+    m_lastWriteTick = GetTickCount64();
 }
 
 void ConsoleInput::flushIncompleteEscapeCode()
 {
     if (!m_byteQueue.empty() &&
-            (GetTickCount() - m_lastWriteTick) > kIncompleteEscapeTimeoutMs) {
+            (GetTickCount64() - m_lastWriteTick) > kIncompleteEscapeTimeoutMs) {
         doWrite(true);
         m_byteQueue.clear();
     }
@@ -332,7 +334,9 @@ void ConsoleInput::doWrite(bool isEof)
     std::vector<INPUT_RECORD> records;
     size_t idx = 0;
     while (idx < m_byteQueue.size()) {
-        int charSize = scanInput(records, &data[idx], m_byteQueue.size() - idx, isEof);
+        int charSize = scanInput(records, &data[idx],
+            vt7pty::internal::checkedNarrow<int>(m_byteQueue.size() - idx),
+            isEof);
         if (charSize == -1)
             break;
         idx += charSize;
@@ -347,7 +351,8 @@ void ConsoleInput::flushInputRecords(std::vector<INPUT_RECORD> &records)
         return;
     }
     DWORD actual = 0;
-    if (!WriteConsoleInputW(m_conin, records.data(), records.size(), &actual)) {
+    if (!WriteConsoleInputW(m_conin, records.data(),
+            vt7pty::internal::checkedNarrow<DWORD>(records.size()), &actual)) {
         trace("WriteConsoleInputW failed");
     }
     records.clear();
@@ -502,15 +507,15 @@ int ConsoleInput::scanMouseInput(std::vector<INPUT_RECORD> &records,
     newRecord.EventType = MOUSE_EVENT;
     MOUSE_EVENT_RECORD &mer = newRecord.Event.MouseEvent;
 
-    mer.dwMousePosition.X =
+    mer.dwMousePosition.X = vt7pty::internal::checkedNarrow<SHORT>(
         m_mouseWindowRect.Left +
-            std::max(0, std::min<int>(record.coord.X,
-                                      m_mouseWindowRect.width() - 1));
+        std::max(0, std::min<int>(record.coord.X,
+                                  m_mouseWindowRect.width() - 1)));
 
-    mer.dwMousePosition.Y =
+    mer.dwMousePosition.Y = vt7pty::internal::checkedNarrow<SHORT>(
         m_mouseWindowRect.Top +
-            std::max(0, std::min<int>(record.coord.Y,
-                                      m_mouseWindowRect.height() - 1));
+        std::max(0, std::min<int>(record.coord.Y,
+                                  m_mouseWindowRect.height() - 1)));
 
     // The modifier state is neatly independent of everything else.
     if (record.flags & 0x04) { mer.dwControlKeyState |= SHIFT_PRESSED;     }
@@ -562,7 +567,7 @@ int ConsoleInput::scanMouseInput(std::vector<INPUT_RECORD> &records,
                 // coordinates.
                 if (m_doubleClick.button == relevantFlag &&
                         m_doubleClick.pos == record.coord &&
-                        (GetTickCount() - m_doubleClick.tick <
+                        (GetTickCount64() - m_doubleClick.tick <
                             GetDoubleClickTime())) {
                     // Record a double-click and end double-click detection.
                     mer.dwEventFlags |= DOUBLE_CLICK;
@@ -571,7 +576,7 @@ int ConsoleInput::scanMouseInput(std::vector<INPUT_RECORD> &records,
                     // Begin double-click detection.
                     m_doubleClick.button = relevantFlag;
                     m_doubleClick.pos = record.coord;
-                    m_doubleClick.tick = GetTickCount();
+                    m_doubleClick.tick = GetTickCount64();
                 }
             }
         }
@@ -602,18 +607,18 @@ void ConsoleInput::appendUtf8Char(std::vector<INPUT_RECORD> &records,
     if (codePoint == static_cast<uint32_t>(-1)) {
         static bool debugInput = isTracingEnabled() && hasDebugFlag("input");
         if (debugInput) {
-            StringBuilder error(64);
-            error << "Discarding invalid UTF-8 sequence:";
+            std::string error = "Discarding invalid UTF-8 sequence:";
             for (int i = 0; i < charLen; ++i) {
-                error << ' ';
-                error << hexOfInt<true, uint8_t>(charBuffer[i]);
+                error += std::format(" {:02x}",
+                    static_cast<uint8_t>(charBuffer[i]));
             }
             trace("%s", error.c_str());
         }
         return;
     }
 
-    const short charScan = codePoint > 0xFFFF ? -1 : VkKeyScan(codePoint);
+    const short charScan = codePoint > 0xFFFF ? -1 :
+        VkKeyScan(vt7pty::internal::checkedNarrow<WCHAR>(codePoint));
     uint16_t virtualKey = 0;
     uint16_t winKeyState = 0;
     uint32_t winCodePointDn = codePoint;
@@ -829,8 +834,8 @@ void ConsoleInput::appendInputRecord(std::vector<INPUT_RECORD> &records,
     ir.Event.KeyEvent.bKeyDown = keyDown;
     ir.Event.KeyEvent.wRepeatCount = 1;
     ir.Event.KeyEvent.wVirtualKeyCode = virtualKey;
-    ir.Event.KeyEvent.wVirtualScanCode =
-            MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
+    ir.Event.KeyEvent.wVirtualScanCode = vt7pty::internal::checkedNarrow<WORD>(
+        MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC));
     ir.Event.KeyEvent.uChar.UnicodeChar = utf16Char;
     ir.Event.KeyEvent.dwControlKeyState = keyState;
     records.push_back(ir);

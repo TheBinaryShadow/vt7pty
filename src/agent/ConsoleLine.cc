@@ -28,6 +28,8 @@
 
 #include "ConsoleLine.h"
 
+#include "../shared/Narrow.h"
+
 #include <algorithm>
 
 #include "../shared/Assert.h"
@@ -124,7 +126,9 @@ bool ConsoleLine::detectChangeAndSetLine(const CHAR_INFO *const line, const int 
             equalLines =
                 areLinesEqual(m_prevData.data(), line, m_prevLength) &&
                 isLineBlank(m_prevData.data() + m_prevLength,
-                            std::min<int>(m_prevData.size(), newLength) - m_prevLength,
+                            std::min(
+                                vt7pty::internal::checkedNarrow<int>(m_prevData.size()),
+                                newLength) - m_prevLength,
                             prevBlank) &&
                 isLineBlank(line + m_prevLength,
                             newLength - m_prevLength,

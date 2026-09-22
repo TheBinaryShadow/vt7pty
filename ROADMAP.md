@@ -250,25 +250,25 @@ practice without gratuitously rewriting proven console algorithms.
 
 - [x] Replace the custom old-MinGW mutex layer with standard C++ synchronization
   (completed and verified during Step 0.3).
-- [ ] Replace compiler compatibility macros with C++20 language and library
+- [x] Replace compiler compatibility macros with C++20 language and library
   facilities where their Windows 7 behavior is verified.
-- [ ] Remove legacy formatting, architecture, exception, integer, and header
+- [x] Remove legacy formatting, architecture, exception, integer, and header
   shims that no longer serve the selected toolchain.
-- [ ] Strengthen handle, process, thread, pipe, and allocation ownership through
+- [x] Strengthen handle, process, thread, pipe, and allocation ownership through
   focused RAII and move semantics.
-- [ ] Modernize buffer and string handling, bounds checks, typed constants,
+- [x] Modernize buffer and string handling, bounds checks, typed constants,
   scoped enums, null handling, and error propagation.
-- [ ] Remove obsolete conditional compilation and introduce consistent internal
+- [x] Remove obsolete conditional compilation and introduce consistent internal
   namespaces and source organization.
-- [ ] Reorganize retained code under clear `include`, `src`, `tests`, `tools`,
+- [x] Reorganize retained code under clear `include`, `src`, `tests`, `tools`,
   and `docs` boundaries using Git-aware moves.
-- [ ] Clean the project to `/W4`; enable warnings as errors only after inherited
+- [x] Clean the project to `/W4`; enable warnings as errors only after inherited
   warning debt is resolved.
-- [ ] Add repeatable local static analysis to release verification.
-- [ ] Avoid new third-party dependencies unless they provide a reviewed,
+- [x] Add repeatable local static analysis to release verification.
+- [x] Avoid new third-party dependencies unless they provide a reviewed,
   documented benefit and retain Windows 7 compatibility.
-- [ ] Keep any bulk formatting change separate from functional changes.
-- [ ] Add focused regression evidence before refactoring input parsing, screen
+- [x] Keep any bulk formatting change separate from functional changes.
+- [x] Add focused regression evidence before refactoring input parsing, screen
   scraping, resize ordering, or lifecycle algorithms.
 
 Exit criterion: no obsolete compiler compatibility layer remains, maintained
@@ -348,7 +348,7 @@ published manually with complete identity and acceptance evidence.
 - [x] Accept Step 0.2 with linked build and debugging evidence.
 - [x] Accept Step 0.3 with linked removal and regression evidence.
 - [x] Accept Step 0.4 with linked platform and physical-machine evidence.
-- [ ] Accept Step 0.5 with linked naming, version, protocol, and package evidence.
+- [x] Accept Step 0.5 with linked naming, version, protocol, and package evidence.
 - [ ] Accept Step 0.6 with linked code-quality and regression evidence.
 - [ ] Accept Step 0.7 with linked diagnostics and security evidence.
 - [ ] Accept Step 0.8 with linked automated and physical test results.

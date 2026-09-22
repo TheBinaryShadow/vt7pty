@@ -15,7 +15,7 @@
   <PropertyGroup Label="Configuration"><ConfigurationType>Application</ConfigurationType></PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ItemDefinitionGroup><Link><SubSystem>Console</SubSystem></Link></ItemDefinitionGroup>
-  <ItemGroup><ClCompile Include="..\src\tests\BackendSmokeTest.cc" /></ItemGroup>
+  <ItemGroup><ClCompile Include="..\tests\integration\BackendSmokeTest.cc" /></ItemGroup>
   <ItemGroup>
     <ProjectReference Include="VT7Pty.vcxproj">
       <Project>{FCD1D231-A00E-4A06-AE98-A495F9BF25D1}</Project>

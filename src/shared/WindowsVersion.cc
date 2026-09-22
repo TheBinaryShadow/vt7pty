@@ -24,19 +24,19 @@
 #include <stdint.h>
 
 #include <memory>
+#include <format>
 #include <string>
 #include <tuple>
 
 #include "DebugClient.h"
 #include "OsModule.h"
-#include "StringBuilder.h"
 #include "StringUtil.h"
 #include "Assert.h"
 #include "Exception.h"
 
 namespace {
 
-typedef std::tuple<DWORD, DWORD> Version;
+using Version = std::tuple<DWORD, DWORD>;
 
 using RtlGetVersion_t = LONG (WINAPI *)(OSVERSIONINFOW *);
 
@@ -59,7 +59,7 @@ OSVERSIONINFOEXW getWindowsVersionInfo() {
     const LONG status = rtlGetVersion(
         reinterpret_cast<OSVERSIONINFOW *>(&info));
     if (status < 0) {
-        throwVT7PtyException(L"RtlGetVersion failed");
+        throw Exception(L"RtlGetVersion failed");
     }
     return info;
 }
@@ -69,34 +69,34 @@ Version getWindowsVersion() {
     return Version(info.dwMajorVersion, info.dwMinorVersion);
 }
 
-struct ModuleNotFound : VT7PtyException {
-    virtual const wchar_t *what() const noexcept override {
-        return L"ModuleNotFound";
-    }
+struct ModuleNotFound : Exception {
+    ModuleNotFound() : Exception(L"ModuleNotFound") {}
 };
 
-// Throws VT7PtyException on error.
+// Throws Exception on error.
 std::wstring getSystemDirectory() {
     wchar_t systemDirectory[MAX_PATH];
     const UINT size = GetSystemDirectoryW(systemDirectory, MAX_PATH);
     if (size == 0) {
         throwWindowsError(L"GetSystemDirectory failed");
     } else if (size >= MAX_PATH) {
-        throwVT7PtyException(
+        throw Exception(
             L"GetSystemDirectory: path is longer than MAX_PATH");
     }
     return systemDirectory;
 }
 
-#define GET_VERSION_DLL_API(name) \
-    const auto p ## name =                                  \
-        reinterpret_cast<decltype(name)*>(                  \
-            versionDll.proc(#name));                        \
-    if (p ## name == nullptr) {                             \
-        throwVT7PtyException(L ## #name L" is missing");    \
+template <typename Function>
+Function requireProc(
+        OsModule &module, const char *name, const wchar_t *wideName) {
+    const auto function = reinterpret_cast<Function>(module.proc(name));
+    if (function == nullptr) {
+        throw Exception(std::wstring(wideName) + L" is missing");
     }
+    return function;
+}
 
-// Throws VT7PtyException on error.
+// Throws Exception on error.
 VS_FIXEDFILEINFO getFixedFileInfo(const std::wstring &path) {
     // version.dll is not a conventional KnownDll, so if we link to it, there's
     // a danger of accidentally loading a malicious DLL.  In a more typical
@@ -106,9 +106,14 @@ VS_FIXEDFILEINFO getFixedFileInfo(const std::wstring &path) {
     OsModule versionDll(
         (getSystemDirectory() + L"\\version.dll").c_str(),
         OsModule::LoadErrorBehavior::Throw);
-    GET_VERSION_DLL_API(GetFileVersionInfoSizeW);
-    GET_VERSION_DLL_API(GetFileVersionInfoW);
-    GET_VERSION_DLL_API(VerQueryValueW);
+    const auto pGetFileVersionInfoSizeW =
+        requireProc<decltype(&GetFileVersionInfoSizeW)>(
+            versionDll, "GetFileVersionInfoSizeW", L"GetFileVersionInfoSizeW");
+    const auto pGetFileVersionInfoW =
+        requireProc<decltype(&GetFileVersionInfoW)>(
+            versionDll, "GetFileVersionInfoW", L"GetFileVersionInfoW");
+    const auto pVerQueryValueW = requireProc<decltype(&VerQueryValueW)>(
+        versionDll, "VerQueryValueW", L"VerQueryValueW");
     DWORD size = pGetFileVersionInfoSizeW(path.c_str(), nullptr);
     if (!size) {
         // Different Windows releases use either of these errors for a module
@@ -121,7 +126,7 @@ VS_FIXEDFILEINFO getFixedFileInfo(const std::wstring &path) {
                 (L"GetFileVersionInfoSizeW failed on " + path).c_str());
         }
     }
-    std::unique_ptr<char[]> versionBuffer(new char[size]);
+    auto versionBuffer = std::make_unique<char[]>(size);
     if (!pGetFileVersionInfoW(path.c_str(), 0, size, versionBuffer.get())) {
         throwWindowsError((L"GetFileVersionInfoW failed on " + path).c_str());
     }
@@ -133,7 +138,7 @@ VS_FIXEDFILEINFO getFixedFileInfo(const std::wstring &path) {
             versionInfo == nullptr ||
             versionInfoSize != sizeof(VS_FIXEDFILEINFO) ||
             versionInfo->dwSignature != 0xFEEF04BD) {
-        throwVT7PtyException((L"VerQueryValueW failed on " + path).c_str());
+        throw Exception((L"VerQueryValueW failed on " + path).c_str());
     }
     return *versionInfo;
 }
@@ -149,15 +154,11 @@ uint64_t fileVersionFromInfo(const VS_FIXEDFILEINFO &info) {
 }
 
 std::string versionToString(uint64_t version) {
-    StringBuilder b(32);
-    b << ((uint16_t)(version >> 48));
-    b << '.';
-    b << ((uint16_t)(version >> 32));
-    b << '.';
-    b << ((uint16_t)(version >> 16));
-    b << '.';
-    b << ((uint16_t)(version >> 0));
-    return b.str_moved();
+    return std::format("{}.{}.{}.{}",
+        static_cast<uint16_t>(version >> 48),
+        static_cast<uint16_t>(version >> 32),
+        static_cast<uint16_t>(version >> 16),
+        static_cast<uint16_t>(version));
 }
 
 } // anonymous namespace
@@ -172,39 +173,34 @@ void dumpWindowsVersion() {
         return;
     }
     const auto info = getWindowsVersionInfo();
-    StringBuilder b;
-    b << info.dwMajorVersion << '.' << info.dwMinorVersion
-      << '.' << info.dwBuildNumber << ' '
-      << "SP" << info.wServicePackMajor << '.' << info.wServicePackMinor
-      << ' ';
+    auto version = std::format("{}.{}.{} SP{}.{} ",
+        info.dwMajorVersion, info.dwMinorVersion, info.dwBuildNumber,
+        info.wServicePackMajor, info.wServicePackMinor);
     switch (info.wProductType) {
-        case VER_NT_WORKSTATION:        b << "Client"; break;
-        case VER_NT_DOMAIN_CONTROLLER:  b << "DomainController"; break;
-        case VER_NT_SERVER:             b << "Server"; break;
+        case VER_NT_WORKSTATION:        version += "Client"; break;
+        case VER_NT_DOMAIN_CONTROLLER:  version += "DomainController"; break;
+        case VER_NT_SERVER:             version += "Server"; break;
         default:
-            b << "product=" << info.wProductType; break;
+            version += std::format("product={}", info.wProductType); break;
     }
-    b << ' ';
-    b << "X64";
+    version += " X64";
     const auto dllVersion = [](const wchar_t *dllPath) -> std::string {
         try {
             const auto info = getFixedFileInfo(dllPath);
-            StringBuilder fb(64);
-            fb << utf8FromWide(dllPath) << ':';
-            fb << "F:" << versionToString(fileVersionFromInfo(info)) << '/'
-               << "P:" << versionToString(productVersionFromInfo(info));
-            return fb.str_moved();
+            return std::format("{}:F:{}/P:{}", utf8FromWide(dllPath),
+                versionToString(fileVersionFromInfo(info)),
+                versionToString(productVersionFromInfo(info)));
         } catch (const ModuleNotFound&) {
             return utf8FromWide(dllPath) + ":none";
-        } catch (const VT7PtyException &e) {
+        } catch (const Exception &e) {
             trace("Error getting %s version: %s",
                 utf8FromWide(dllPath).c_str(), utf8FromWide(e.what()).c_str());
             return utf8FromWide(dllPath) + ":error";
         }
     };
-    b << ' ' << dllVersion(L"kernel32.dll");
+    version += ' ' + dllVersion(L"kernel32.dll");
     // ConEmu provides a DLL that hooks many Windows APIs, especially console
     // APIs.  Its existence and version number could be useful in debugging.
-    b << ' ' << dllVersion(L"ConEmuHk64.dll");
-    trace("Windows version: %s", b.c_str());
+    version += ' ' + dllVersion(L"ConEmuHk64.dll");
+    trace("Windows version: %s", version.c_str());
 }

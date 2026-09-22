@@ -24,9 +24,10 @@
 #include <windows.h>
 
 #include <algorithm>
+#include <format>
 #include <string>
 
-#include "../shared/StringFormatting.h"
+#include "../shared/Narrow.h"
 #include "Coord.h"
 
 struct SmallRect : SMALL_RECT
@@ -40,33 +41,21 @@ struct SmallRect : SMALL_RECT
     {
         Left = x;
         Top = y;
-        Right = x + width - 1;
-        Bottom = y + height - 1;
+        Right = vt7pty::internal::checkedNarrow<SHORT>(x + width - 1);
+        Bottom = vt7pty::internal::checkedNarrow<SHORT>(y + height - 1);
     }
 
     SmallRect(const COORD &topLeft, const COORD &size)
     {
         Left = topLeft.X;
         Top = topLeft.Y;
-        Right = Left + size.X - 1;
-        Bottom = Top + size.Y - 1;
+        Right = vt7pty::internal::checkedNarrow<SHORT>(Left + size.X - 1);
+        Bottom = vt7pty::internal::checkedNarrow<SHORT>(Top + size.Y - 1);
     }
 
-    SmallRect(const SMALL_RECT &other)
-    {
-        *(SMALL_RECT*)this = other;
-    }
-
-    SmallRect(const SmallRect &other)
-    {
-        *(SMALL_RECT*)this = *(const SMALL_RECT*)&other;
-    }
-
-    SmallRect &operator=(const SmallRect &other)
-    {
-        *(SMALL_RECT*)this = *(const SMALL_RECT*)&other;
-        return *this;
-    }
+    SmallRect(const SMALL_RECT &other) : SMALL_RECT(other) {}
+    SmallRect(const SmallRect &) = default;
+    SmallRect &operator=(const SmallRect &) = default;
 
     bool contains(const SmallRect &other) const
     {
@@ -90,10 +79,11 @@ struct SmallRect : SMALL_RECT
         int x2 = std::min(Right, other.Right);
         int y1 = std::max(Top, other.Top);
         int y2 = std::min(Bottom, other.Bottom);
-        return SmallRect(x1,
-                         y1,
-                         std::max(0, x2 - x1 + 1),
-                         std::max(0, y2 - y1 + 1));
+        return SmallRect(
+            vt7pty::internal::checkedNarrow<SHORT>(x1),
+            vt7pty::internal::checkedNarrow<SHORT>(y1),
+            vt7pty::internal::checkedNarrow<SHORT>(std::max(0, x2 - x1 + 1)),
+            vt7pty::internal::checkedNarrow<SHORT>(std::max(0, y2 - y1 + 1)));
     }
 
     SmallRect ensureLineIncluded(SHORT line) const
@@ -102,7 +92,9 @@ struct SmallRect : SMALL_RECT
         if (line < Top) {
             return SmallRect(Left, line, width(), h);
         } else if (line > Bottom) {
-            return SmallRect(Left, line - h + 1, width(), h);
+            return SmallRect(Left,
+                vt7pty::internal::checkedNarrow<SHORT>(line - h + 1),
+                width(), h);
         } else {
             return *this;
         }
@@ -110,12 +102,12 @@ struct SmallRect : SMALL_RECT
 
     SHORT top() const               { return Top;                       }
     SHORT left() const              { return Left;                      }
-    SHORT width() const             { return Right - Left + 1;          }
-    SHORT height() const            { return Bottom - Top + 1;          }
+    SHORT width() const             { return vt7pty::internal::checkedNarrow<SHORT>(Right - Left + 1); }
+    SHORT height() const            { return vt7pty::internal::checkedNarrow<SHORT>(Bottom - Top + 1); }
     void setTop(SHORT top)          { Top = top;                        }
     void setLeft(SHORT left)        { Left = left;                      }
-    void setWidth(SHORT width)      { Right = Left + width - 1;         }
-    void setHeight(SHORT height)    { Bottom = Top + height - 1;        }
+    void setWidth(SHORT width)      { Right = vt7pty::internal::checkedNarrow<SHORT>(Left + width - 1); }
+    void setHeight(SHORT height)    { Bottom = vt7pty::internal::checkedNarrow<SHORT>(Top + height - 1); }
     Coord size() const              { return Coord(width(), height());  }
 
     bool operator==(const SmallRect &other) const
@@ -133,10 +125,8 @@ struct SmallRect : SMALL_RECT
 
     std::string toString() const
     {
-        char ret[64];
-        formatString(ret, "(x=%d,y=%d,w=%d,h=%d)",
-                        Left, Top, width(), height());
-        return std::string(ret);
+        return std::format("(x={},y={},w={},h={})",
+            Left, Top, width(), height());
     }
 };
 

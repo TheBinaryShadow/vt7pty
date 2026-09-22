@@ -24,13 +24,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <format>
 #include <string>
 
 #include "NamedPipe.h"
 #include "UnicodeEncoding.h"
 #include "../shared/DebugClient.h"
 #include "../shared/Assert.h"
-#include "../shared/StringFormatting.h"
+#include "../shared/Narrow.h"
 
 #define CSI "\x1b["
 
@@ -355,11 +356,13 @@ void Terminal::sendLine(int64_t line, const CHAR_INFO *lineData, int width,
     std::string &termLine = m_termLineWorkingBuffer;
     termLine.clear();
     size_t trimmedLineLength = 0;
-    int trimmedCellCount = m_lineData.size();
+    int trimmedCellCount =
+        vt7pty::internal::checkedNarrow<int>(m_lineData.size());
     bool alreadyErasedLine = false;
 
     int cellCount = 1;
-    for (int i = m_lineData.size(); i < width; i += cellCount) {
+    for (int i = vt7pty::internal::checkedNarrow<int>(m_lineData.size());
+            i < width; i += cellCount) {
         if (m_outputColor) {
             int color = lineData[i].Attributes & COLOR_ATTRIBUTE_MASK;
             if (color != m_remoteColor) {
@@ -429,9 +432,8 @@ void Terminal::showTerminalCursor(int column, int64_t line)
     moveTerminalToLine(line);
     if (!m_plainMode) {
         if (m_remoteColumn != column) {
-            char buffer[32];
-            formatString(buffer, CSI "%dG", column + 1);
-            m_output.write(buffer);
+            const auto command = std::format(CSI "{}G", column + 1);
+            m_output.write(command.c_str());
             m_lineDataValid = (column == 0);
             m_lineData.clear();
             m_remoteColumn = column;
@@ -475,10 +477,9 @@ void Terminal::moveTerminalToLine(int64_t line)
         } else {
             // Backtrack and overwrite previous lines.
             // CUrsor Up (CUU)
-            char buffer[32];
-            formatString(buffer, "\r" CSI "%uA",
-                static_cast<unsigned int>(m_remoteLine - line));
-            m_output.write(buffer);
+            const auto command = std::format(
+                "\r" CSI "{}A", m_remoteLine - line);
+            m_output.write(command.c_str());
             m_remoteLine = line;
         }
     } else if (line > m_remoteLine) {

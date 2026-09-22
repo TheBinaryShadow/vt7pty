@@ -23,13 +23,25 @@
 
 #include <windows.h>
 
-class VT7PtyException {
+#include <memory>
+#include <string>
+
+class Exception {
 public:
-    virtual const wchar_t *what() const noexcept = 0;
-    virtual ~VT7PtyException() {}
+    explicit Exception(std::wstring message) :
+        m_message(std::make_shared<const std::wstring>(std::move(message))) {}
+    virtual ~Exception() = default;
+
+    virtual const wchar_t *what() const noexcept { return m_message->c_str(); }
+    std::shared_ptr<const std::wstring> sharedMessage() const noexcept {
+        return m_message;
+    }
+
+private:
+    std::shared_ptr<const std::wstring> m_message;
 };
 
-void throwVT7PtyException(const wchar_t *what);
-void throwWindowsError(const wchar_t *prefix, DWORD error=GetLastError());
+[[noreturn]] void throwWindowsError(
+    const wchar_t *prefix, DWORD error = GetLastError());
 
 #endif // VT7PTY_EXCEPTION_H

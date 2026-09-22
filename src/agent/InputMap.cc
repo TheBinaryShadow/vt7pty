@@ -25,12 +25,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <format>
+
 #include "DebugShowInput.h"
 #include "SimplePool.h"
 #include "../shared/DebugClient.h"
 #include "../shared/ControlCharacters.h"
 #include "../shared/Assert.h"
-#include "../shared/StringFormatting.h"
+#include "../shared/Narrow.h"
 
 namespace {
 
@@ -115,7 +117,6 @@ static const char *getVirtualKeyString(int virtualKey)
 std::string InputMap::Key::toString() const {
     std::string ret;
     ret += controlKeyStatePrefix(keyState);
-    char buf[256];
     const char *vkString = getVirtualKeyString(virtualKey);
     if (vkString != NULL) {
         ret += vkString;
@@ -123,17 +124,13 @@ std::string InputMap::Key::toString() const {
                (virtualKey >= '0' && virtualKey <= '9')) {
         ret += static_cast<char>(virtualKey);
     } else {
-        formatString(buf, "%#x", virtualKey);
-        ret += buf;
+        ret += std::format("{:#x}", virtualKey);
     }
     if (unicodeChar >= 32 && unicodeChar <= 126) {
-        formatString(buf, " ch='%c'",
-                        static_cast<char>(unicodeChar));
+        ret += std::format(" ch='{}'", static_cast<char>(unicodeChar));
     } else {
-        formatString(buf, " ch=%#x",
-                        static_cast<unsigned int>(unicodeChar));
+        ret += std::format(" ch={:#x}", unicodeChar);
     }
-    ret += buf;
     return ret;
 }
 
@@ -224,13 +221,15 @@ void InputMap::dumpInputMapHelper(
             node.key.toString().c_str());
     }
     for (int i = 0; i < 256; ++i) {
-        const Node *child = getChild(node, i);
+        const Node *child = getChild(
+            node, vt7pty::internal::checkedNarrow<unsigned char>(i));
         if (child != NULL) {
             size_t oldSize = encoding.size();
             if (!encoding.empty()) {
                 encoding.push_back(' ');
             }
-            char ctrlChar = decodeControlCharacter(i);
+            char ctrlChar = decodeControlCharacter(
+                vt7pty::internal::checkedNarrow<char>(i));
             if (ctrlChar != '\0') {
                 encoding.push_back('^');
                 encoding.push_back(static_cast<char>(ctrlChar));

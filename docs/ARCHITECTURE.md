@@ -4,7 +4,7 @@ Status: current native architecture and planned boundaries. Updated:
 2026-09-22.
 
 This document describes the maintained native architecture through Roadmap
-Step 0.5. Source code remains authoritative when this overview and the
+Step 0.6. Source code remains authoritative when this overview and the
 implementation disagree.
 
 ## Purpose
@@ -25,11 +25,18 @@ output from the legacy console state.
 | `VT7Pty.dll` / `src/libvt7pty` | Client API, agent launch, versioned control RPC, process requests, pipe discovery | Retain and modernize; public redesign comes later |
 | `VT7Pty-Agent.exe` / `src/agent` | Owns the hidden console, launches the child, handles input, scrapes output, resizes, and manages session lifetime | Retain as the backend core |
 | `src/shared` | Shared handles, buffers, security, protocol, encoding, and diagnostics | Retain required native code |
-| `VT7Pty-DebugServer.exe` / `src/debugserver` | Collects timestamped diagnostic output | Retain and modernize |
-| `src/tests`, `tests`, and native probes | Existing smoke tests and focused console investigations | Retain useful coverage and integrate it with the permanent test system |
+| `VT7Pty-DebugServer.exe` / `tools/debug` | Collects timestamped diagnostic output | Retain and modernize |
+| `tests/unit`, `tests/integration`, `tests/fixtures`, and `tests/manual` | Unit, backend, child-process, and focused console investigations | Retain useful coverage and integrate it with the permanent test system |
 
 The Cygwin/MSYS `winpty.exe` adapter and its Unix-facing source have been
 removed. Active runtime and API identity is documented in [Technical Naming](NAMING.md).
+
+Reusable implementation facilities use the `vt7pty::internal` namespace.
+Component-local helpers stay in anonymous namespaces where possible, while the
+public C API remains in the global namespace for ABI clarity. Source is grouped
+by responsibility: product code under `src`, public headers under
+`src/include`, tests under `tests`, developer programs and scripts under
+`tools`, and design and validation records under `docs`.
 
 ## Current session flow
 

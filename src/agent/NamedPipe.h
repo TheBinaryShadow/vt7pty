@@ -36,8 +36,6 @@ class NamedPipe
 private:
     // The EventLoop uses these private members.
     friend class EventLoop;
-    NamedPipe() {}
-    ~NamedPipe() { closePipe(); }
     bool serviceIo(std::vector<HANDLE> *waitHandles);
     void startPipeWorkers();
 
@@ -58,8 +56,8 @@ private:
         DWORD m_currentIoSize = 0;
         OwnedHandle m_event;
         OVERLAPPED m_over = {};
-        enum { kIoSize = 64 * 1024 };
-        char m_buffer[kIoSize];
+        static constexpr DWORD kIoSize = 64 * 1024;
+        char m_buffer[kIoSize] = {};
         virtual void completeIo(DWORD size) = 0;
         virtual bool shouldIssueIo(DWORD *size, bool *isRead) = 0;
     };
@@ -84,15 +82,20 @@ private:
     };
 
 public:
-    struct OpenMode {
-        typedef int t;
-        enum { None = 0, Reading = 1, Writing = 2, Duplex = 3 };
+    NamedPipe() = default;
+    ~NamedPipe() { closePipe(); }
+
+    enum class OpenMode : uint8_t {
+        None = 0,
+        Reading = 1,
+        Writing = 2,
+        Duplex = 3,
     };
 
     std::wstring name() const { return m_name; }
-    void openServerPipe(LPCWSTR pipeName, OpenMode::t openMode,
+    void openServerPipe(LPCWSTR pipeName, OpenMode openMode,
                         int outBufferSize, int inBufferSize);
-    void connectToServer(LPCWSTR pipeName, OpenMode::t openMode);
+    void connectToServer(LPCWSTR pipeName, OpenMode openMode);
     size_t bytesToSend();
     void write(const void *data, size_t size);
     void write(const char *text);
@@ -113,7 +116,7 @@ private:
     std::wstring m_name;
     OVERLAPPED m_connectOver = {};
     OwnedHandle m_connectEvent;
-    OpenMode::t m_openMode = OpenMode::None;
+    OpenMode m_openMode = OpenMode::None;
     size_t m_readBufferSize = 64 * 1024;
     std::string m_inQueue;
     std::string m_outQueue;

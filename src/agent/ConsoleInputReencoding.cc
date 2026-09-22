@@ -20,6 +20,8 @@
 
 #include "ConsoleInputReencoding.h"
 
+#include "../shared/Narrow.h"
+
 #include "ConsoleInput.h"
 
 namespace {
@@ -37,44 +39,45 @@ void reencodeEscapedKeyPress(
         uint16_t keyState) {
 
     struct EscapedKey {
-        enum { None, Numeric, Letter } kind;
+        enum class Kind { None, Numeric, Letter };
+        Kind kind = Kind::None;
         wchar_t content[2];
     };
 
     EscapedKey escapeCode = {};
     switch (virtualKey) {
-        case VK_UP:     escapeCode = { EscapedKey::Letter, {'A'} }; break;
-        case VK_DOWN:   escapeCode = { EscapedKey::Letter, {'B'} }; break;
-        case VK_RIGHT:  escapeCode = { EscapedKey::Letter, {'C'} }; break;
-        case VK_LEFT:   escapeCode = { EscapedKey::Letter, {'D'} }; break;
-        case VK_CLEAR:  escapeCode = { EscapedKey::Letter, {'E'} }; break;
-        case VK_F1:     escapeCode = { EscapedKey::Numeric, {'1', '1'} }; break;
-        case VK_F2:     escapeCode = { EscapedKey::Numeric, {'1', '2'} }; break;
-        case VK_F3:     escapeCode = { EscapedKey::Numeric, {'1', '3'} }; break;
-        case VK_F4:     escapeCode = { EscapedKey::Numeric, {'1', '4'} }; break;
-        case VK_F5:     escapeCode = { EscapedKey::Numeric, {'1', '5'} }; break;
-        case VK_F6:     escapeCode = { EscapedKey::Numeric, {'1', '7'} }; break;
-        case VK_F7:     escapeCode = { EscapedKey::Numeric, {'1', '8'} }; break;
-        case VK_F8:     escapeCode = { EscapedKey::Numeric, {'1', '9'} }; break;
-        case VK_F9:     escapeCode = { EscapedKey::Numeric, {'2', '0'} }; break;
-        case VK_F10:    escapeCode = { EscapedKey::Numeric, {'2', '1'} }; break;
-        case VK_F11:    escapeCode = { EscapedKey::Numeric, {'2', '3'} }; break;
-        case VK_F12:    escapeCode = { EscapedKey::Numeric, {'2', '4'} }; break;
-        case VK_HOME:   escapeCode = { EscapedKey::Letter, {'H'} }; break;
-        case VK_INSERT: escapeCode = { EscapedKey::Numeric, {'2'} }; break;
-        case VK_DELETE: escapeCode = { EscapedKey::Numeric, {'3'} }; break;
-        case VK_END:    escapeCode = { EscapedKey::Letter, {'F'} }; break;
-        case VK_PRIOR:  escapeCode = { EscapedKey::Numeric, {'5'} }; break;
-        case VK_NEXT:   escapeCode = { EscapedKey::Numeric, {'6'} }; break;
+        case VK_UP:     escapeCode = { EscapedKey::Kind::Letter, {'A'} }; break;
+        case VK_DOWN:   escapeCode = { EscapedKey::Kind::Letter, {'B'} }; break;
+        case VK_RIGHT:  escapeCode = { EscapedKey::Kind::Letter, {'C'} }; break;
+        case VK_LEFT:   escapeCode = { EscapedKey::Kind::Letter, {'D'} }; break;
+        case VK_CLEAR:  escapeCode = { EscapedKey::Kind::Letter, {'E'} }; break;
+        case VK_F1:     escapeCode = { EscapedKey::Kind::Numeric, {'1', '1'} }; break;
+        case VK_F2:     escapeCode = { EscapedKey::Kind::Numeric, {'1', '2'} }; break;
+        case VK_F3:     escapeCode = { EscapedKey::Kind::Numeric, {'1', '3'} }; break;
+        case VK_F4:     escapeCode = { EscapedKey::Kind::Numeric, {'1', '4'} }; break;
+        case VK_F5:     escapeCode = { EscapedKey::Kind::Numeric, {'1', '5'} }; break;
+        case VK_F6:     escapeCode = { EscapedKey::Kind::Numeric, {'1', '7'} }; break;
+        case VK_F7:     escapeCode = { EscapedKey::Kind::Numeric, {'1', '8'} }; break;
+        case VK_F8:     escapeCode = { EscapedKey::Kind::Numeric, {'1', '9'} }; break;
+        case VK_F9:     escapeCode = { EscapedKey::Kind::Numeric, {'2', '0'} }; break;
+        case VK_F10:    escapeCode = { EscapedKey::Kind::Numeric, {'2', '1'} }; break;
+        case VK_F11:    escapeCode = { EscapedKey::Kind::Numeric, {'2', '3'} }; break;
+        case VK_F12:    escapeCode = { EscapedKey::Kind::Numeric, {'2', '4'} }; break;
+        case VK_HOME:   escapeCode = { EscapedKey::Kind::Letter, {'H'} }; break;
+        case VK_INSERT: escapeCode = { EscapedKey::Kind::Numeric, {'2'} }; break;
+        case VK_DELETE: escapeCode = { EscapedKey::Kind::Numeric, {'3'} }; break;
+        case VK_END:    escapeCode = { EscapedKey::Kind::Letter, {'F'} }; break;
+        case VK_PRIOR:  escapeCode = { EscapedKey::Kind::Numeric, {'5'} }; break;
+        case VK_NEXT:   escapeCode = { EscapedKey::Kind::Numeric, {'6'} }; break;
     }
-    if (escapeCode.kind != EscapedKey::None) {
+    if (escapeCode.kind != EscapedKey::Kind::None) {
         int flags = 0;
         if (keyState & SHIFT_PRESSED)       { flags |= 0x1; }
         if (keyState & LEFT_ALT_PRESSED)    { flags |= 0x2; }
         if (keyState & LEFT_CTRL_PRESSED)   { flags |= 0x4; }
         outch(out, L'\x1b');
         outch(out, L'[');
-        if (escapeCode.kind == EscapedKey::Numeric) {
+        if (escapeCode.kind == EscapedKey::Kind::Numeric) {
             for (wchar_t ch : escapeCode.content) {
                 if (ch != L'\0') {
                     outch(out, ch);
@@ -85,9 +88,9 @@ void reencodeEscapedKeyPress(
         }
         if (flags != 0) {
             outch(out, L';');
-            outch(out, L'1' + flags);
+            outch(out, vt7pty::internal::checkedNarrow<wchar_t>(L'1' + flags));
         }
-        if (escapeCode.kind == EscapedKey::Numeric) {
+        if (escapeCode.kind == EscapedKey::Kind::Numeric) {
             outch(out, L'~');
         } else {
             outch(out, escapeCode.content[0]);

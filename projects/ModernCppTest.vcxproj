@@ -7,15 +7,22 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AC6481D4-5DB7-4939-A337-6119517A0BB1}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>StringBuilderTest</RootNamespace>
+    <RootNamespace>ModernCppTest</RootNamespace>
     <VT7PtyEnableAssertions>true</VT7PtyEnableAssertions>
-    <VT7PtyFileDescription>VT7Pty inherited string builder test</VT7PtyFileDescription>
+    <VT7PtyFileDescription>VT7Pty modern C++ utility test</VT7PtyFileDescription>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Label="Configuration"><ConfigurationType>Application</ConfigurationType></PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ItemDefinitionGroup><Link><SubSystem>Console</SubSystem></Link></ItemDefinitionGroup>
-  <ItemGroup><ClCompile Include="..\src\shared\StringBuilderTest.cc" /></ItemGroup>
-  <ItemGroup><ClInclude Include="..\src\shared\StringBuilder.h" /></ItemGroup>
+  <ItemGroup><ClCompile Include="..\tests\unit\ModernCppTest.cc" /></ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\shared\Assert.h" />
+    <ClInclude Include="..\src\shared\Narrow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\shared\Assert.cc" />
+    <ClCompile Include="..\src\shared\DebugClient.cc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

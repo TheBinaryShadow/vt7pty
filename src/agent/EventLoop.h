@@ -21,6 +21,7 @@
 #ifndef EVENTLOOP_H
 #define EVENTLOOP_H
 
+#include <memory>
 #include <vector>
 
 class NamedPipe;
@@ -35,12 +36,12 @@ protected:
     NamedPipe &createNamedPipe();
     void setPollInterval(int ms);
     void shutdown();
-    virtual void onPollTimeout()                    {}
-    virtual void onPipeIo(NamedPipe &namedPipe)     {}
+    virtual void onPollTimeout() {}
+    virtual void onPipeIo(NamedPipe &) {}
 
 private:
     bool m_exiting = false;
-    std::vector<NamedPipe*> m_pipes;
+    std::vector<std::unique_ptr<NamedPipe>> m_pipes;
     int m_pollInterval = 0;
 };
 

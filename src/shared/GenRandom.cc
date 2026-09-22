@@ -23,8 +23,10 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <format>
+
 #include "DebugClient.h"
-#include "StringBuilder.h"
+#include "Narrow.h"
 
 static volatile LONG g_pipeCounter;
 
@@ -69,18 +71,20 @@ bool GenRandom::fillBuffer(void *buffer, size_t size) {
     memset(buffer, 0, size);
     bool success = false;
     if (m_rtlGenRandom != nullptr) {
-        success = m_rtlGenRandom(buffer, size) != 0;
+        success = m_rtlGenRandom(
+            buffer, vt7pty::internal::checkedNarrow<ULONG>(size)) != 0;
         if (!success) {
             trace("GenRandom: RtlGenRandom/SystemFunction036 failed: %u",
                 static_cast<unsigned>(GetLastError()));
         }
     } else if (m_cryptProvIsValid) {
         success =
-            CryptGenRandom(m_cryptProv, size,
+            CryptGenRandom(m_cryptProv,
+                           vt7pty::internal::checkedNarrow<DWORD>(size),
                            reinterpret_cast<BYTE*>(buffer)) != 0;
         if (!success) {
             trace("GenRandom: CryptGenRandom failed, size=%d, lasterror=%u",
-                static_cast<int>(size),
+                vt7pty::internal::checkedNarrow<int>(size),
                 static_cast<unsigned>(GetLastError()));
         }
     }
@@ -124,16 +128,15 @@ std::wstring GenRandom::uniqueName() {
     // cooperative software.  This code assumes that a process won't die and
     // be replaced with a recycled PID within a single GetSystemTimeAsFileTime
     // interval.
-    WStringBuilder sb(64);
-    sb << GetCurrentProcessId()
-       << L'-' << InterlockedIncrement(&g_pipeCounter)
-       << L'-' << whexOfInt(systemTimeAsUInt64());
+    auto result = std::format(
+        L"{}-{}-{:x}", GetCurrentProcessId(),
+        InterlockedIncrement(&g_pipeCounter), systemTimeAsUInt64());
     // It isn't clear to me how the crypto APIs would fail.  It *probably*
     // doesn't matter that much anyway?  In principle, a predictable pipe name
     // is subject to a local denial-of-service attack.
     auto random = randomHexString(16);
     if (!random.empty()) {
-        sb << L'-' << random;
+        result += L'-' + random;
     }
-    return sb.str_moved();
+    return result;
 }

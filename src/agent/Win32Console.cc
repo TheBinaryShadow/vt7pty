@@ -26,6 +26,7 @@
 #include <string>
 
 #include "../shared/DebugClient.h"
+#include "../shared/Narrow.h"
 #include "../shared/Assert.h"
 
 Win32Console::Win32Console() : m_titleWorkBuf(16)
@@ -59,7 +60,7 @@ std::wstring Win32Console::title()
         // workaround until Windows 7 console-title coverage replaces it.
 
         DWORD count = GetConsoleTitleW(m_titleWorkBuf.data(),
-                                       m_titleWorkBuf.size());
+            vt7pty::internal::checkedNarrow<DWORD>(m_titleWorkBuf.size()));
         const size_t needed = (count + 1) * sizeof(wchar_t);
         if (m_titleWorkBuf.size() < needed) {
             m_titleWorkBuf.resize(needed);

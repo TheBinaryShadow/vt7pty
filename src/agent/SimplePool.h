@@ -21,11 +21,9 @@
 #ifndef SIMPLE_POOL_H
 #define SIMPLE_POOL_H
 
-#include <stdlib.h>
-
+#include <cstddef>
+#include <memory>
 #include <vector>
-
-#include "../shared/Assert.h"
 
 template <typename T, size_t chunkSize>
 class SimplePool {
@@ -36,7 +34,7 @@ public:
 private:
     struct Chunk {
         size_t count;
-        T *data;
+        std::unique_ptr<T[]> data;
     };
     std::vector<Chunk> m_chunks;
 };
@@ -48,28 +46,17 @@ SimplePool<T, chunkSize>::~SimplePool() {
 
 template <typename T, size_t chunkSize>
 void SimplePool<T, chunkSize>::clear() {
-    for (size_t ci = 0; ci < m_chunks.size(); ++ci) {
-        Chunk &chunk = m_chunks[ci];
-        for (size_t ti = 0; ti < chunk.count; ++ti) {
-            chunk.data[ti].~T();
-        }
-        free(chunk.data);
-    }
     m_chunks.clear();
 }
 
 template <typename T, size_t chunkSize>
 T *SimplePool<T, chunkSize>::alloc() {
     if (m_chunks.empty() || m_chunks.back().count == chunkSize) {
-        T *newData = reinterpret_cast<T*>(malloc(sizeof(T) * chunkSize));
-        ASSERT(newData != NULL);
-        Chunk newChunk = { 0, newData };
-        m_chunks.push_back(newChunk);
+        Chunk newChunk = { 0, std::make_unique<T[]>(chunkSize) };
+        m_chunks.push_back(std::move(newChunk));
     }
     Chunk &chunk = m_chunks.back();
-    T *ret = &chunk.data[chunk.count++];
-    new (ret) T();
-    return ret;
+    return &chunk.data[chunk.count++];
 }
 
 #endif // SIMPLE_POOL_H

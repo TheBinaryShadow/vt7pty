@@ -91,12 +91,12 @@ private:
     bool m_dsrSent = false;
     std::string m_byteQueue;
     InputMap m_inputMap;
-    DWORD m_lastWriteTick = 0;
+    ULONGLONG m_lastWriteTick = 0;
     DWORD m_mouseButtonState = 0;
     struct DoubleClickDetection {
         DWORD button = 0;
         Coord pos;
-        DWORD tick = 0;
+        ULONGLONG tick = 0;
         bool released = false;
     } m_doubleClick;
     bool m_enableExtendedEnabled = false;

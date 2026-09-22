@@ -20,38 +20,12 @@
 
 #include "Exception.h"
 
-#include <memory>
+#include <format>
 #include <string>
 
-#include "StringBuilder.h"
-
-namespace {
-
-class ExceptionImpl : public VT7PtyException {
-public:
-    ExceptionImpl(const wchar_t *what) :
-        m_what(std::make_shared<std::wstring>(what)) {}
-    virtual const wchar_t *what() const noexcept override {
-        return m_what->c_str();
-    }
-private:
-    // Using a shared_ptr ensures that copying the object raises no exception.
-    std::shared_ptr<std::wstring> m_what;
-};
-
-} // anonymous namespace
-
-void throwVT7PtyException(const wchar_t *what) {
-    throw ExceptionImpl(what);
-}
-
 void throwWindowsError(const wchar_t *prefix, DWORD errorCode) {
-    WStringBuilder sb(64);
-    if (prefix != nullptr) {
-        sb << prefix << L": ";
-    }
-    // It might make sense to use FormatMessage here, but IIRC, its API is hard
-    // to figure out.
-    sb << L"Windows error " << errorCode;
-    throwVT7PtyException(sb.c_str());
+    const auto message = prefix == nullptr
+        ? std::format(L"Windows error {}", errorCode)
+        : std::format(L"{}: Windows error {}", prefix, errorCode);
+    throw Exception(message);
 }

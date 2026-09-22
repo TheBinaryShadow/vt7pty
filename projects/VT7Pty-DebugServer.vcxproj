@@ -20,7 +20,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\debugserver\DebugServer.cc" />
+    <ClCompile Include="..\tools\debug\DebugServer.cc" />
     <ClCompile Include="..\src\shared\DebugClient.cc" />
     <ClCompile Include="..\src\shared\OwnedHandle.cc" />
     <ClCompile Include="..\src\shared\StringUtil.cc" />
@@ -33,11 +33,9 @@
     <ClInclude Include="..\src\shared\DebugClient.h" />
     <ClInclude Include="..\src\shared\OsModule.h" />
     <ClInclude Include="..\src\shared\OwnedHandle.h" />
-    <ClInclude Include="..\src\shared\StringBuilder.h" />
     <ClInclude Include="..\src\shared\StringUtil.h" />
     <ClInclude Include="..\src\shared\WindowsSecurity.h" />
     <ClInclude Include="..\src\shared\WindowsVersion.h" />
-    <ClInclude Include="..\src\shared\StringFormatting.h" />
     <ClInclude Include="..\src\shared\Assert.h" />
     <ClInclude Include="..\src\shared\Exception.h" />
   </ItemGroup>

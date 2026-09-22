@@ -33,12 +33,9 @@
 // client programs.
 
 struct vt7pty_error_s {
-    vt7pty_result_t code;
-    const wchar_t *msgStatic;
-    // Use a pointer to a std::shared_ptr so that the struct remains simple
-    // enough to statically initialize, for the benefit of static error
-    // objects like kOutOfMemory.
-    std::shared_ptr<std::wstring> *msgDynamic;
+    vt7pty_result_t code = VT7PTY_ERROR_SUCCESS;
+    const wchar_t *msgStatic = nullptr;
+    std::shared_ptr<const std::wstring> msgDynamic;
 };
 
 struct vt7pty_config_s {

@@ -28,7 +28,7 @@
 
 #include "ClientException.h"
 
-#define AGENT_EXE L"VT7Pty-Agent.exe"
+constexpr wchar_t kAgentExecutable[] = L"VT7Pty-Agent.exe";
 
 static HMODULE getCurrentModule() {
     HMODULE module;
@@ -65,7 +65,7 @@ static bool pathExists(const std::wstring &path) {
 
 std::wstring findAgentProgram() {
     std::wstring progDir = dirname(getModuleFileName(getCurrentModule()));
-    std::wstring ret = progDir + (L"\\" AGENT_EXE);
+    std::wstring ret = progDir + L"\\" + kAgentExecutable;
     if (!pathExists(ret)) {
         throw ClientException(
             VT7PTY_ERROR_AGENT_EXE_MISSING,

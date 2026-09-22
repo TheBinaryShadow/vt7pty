@@ -33,11 +33,8 @@ void agentAssertFail(const char *file, int line, const char *cond);
 // assert function instead sends the message to the DebugServer, then attempts
 // to close the console, then quietly exits.
 #define ASSERT(cond) \
-    do {                                                    \
-        if (!(cond)) {                                      \
-            agentAssertFail(__FILE__, __LINE__, #cond);     \
-        }                                                   \
-    } while(0)
+    ((cond) ? static_cast<void>(0) :                         \
+        agentAssertFail(__FILE__, __LINE__, #cond))
 
 #else
 
@@ -49,15 +46,10 @@ void assertTrace(const char *file, int line, const char *cond);
 // used much outside the agent.
 #include <assert.h>
 #include <stdlib.h>
-#define ASSERT_CONDITION(cond) (false && (cond))
 #define ASSERT(cond) \
-    do {                                            \
-        if (!(cond)) {                              \
-            assertTrace(__FILE__, __LINE__, #cond); \
-            assert(ASSERT_CONDITION(#cond));        \
-            abort();                                \
-        }                                           \
-    } while(0)
+    ((cond) ? static_cast<void>(0) :                 \
+        (assertTrace(__FILE__, __LINE__, #cond),     \
+         assert(false && #cond), abort()))
 
 #endif
 
