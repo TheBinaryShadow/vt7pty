@@ -278,6 +278,9 @@ modernization preserved the accepted backend behavior.
 The implementation, development-host verification, and exact portable package
 are recorded in the
 [Step 0.6 native modernization candidate](docs/validation/2026-09-22-step-0.6-candidate.md).
+The accepted physical results and owner-approved environment disposition are
+recorded in the
+[Step 0.6 completion evidence](docs/validation/2026-09-23-step-0.6-completion.md).
 
 ### Step 0.7: Modernize diagnostics and security boundaries
 
@@ -353,7 +356,7 @@ published manually with complete identity and acceptance evidence.
 - [x] Accept Step 0.3 with linked removal and regression evidence.
 - [x] Accept Step 0.4 with linked platform and physical-machine evidence.
 - [x] Accept Step 0.5 with linked naming, version, protocol, and package evidence.
-- [ ] Accept Step 0.6 with linked code-quality and regression evidence.
+- [x] Accept Step 0.6 with linked code-quality and regression evidence.
 - [ ] Accept Step 0.7 with linked diagnostics and security evidence.
 - [ ] Accept Step 0.8 with linked automated and physical test results.
 - [ ] Accept Step 0.9 with a reviewed release-candidate package.

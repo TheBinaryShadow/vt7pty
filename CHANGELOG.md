@@ -45,6 +45,9 @@ changes until implemented.
   utility test.
 - Resolved the inherited warning baseline, enabled `/W4 /WX`, and added a
   repeatable MSVC native static-analysis gate to Release verification.
+- Accepted the exact Step 0.6 candidate on both Windows 7 tiers, with the
+  owner-approved `NESSY` environment disposition recorded in the validation
+  evidence.
 
 - Established the `0.5.0-dev` VT7Pty technical identity across native
   artifacts, projects, headers, 19 exported C functions, constants,
