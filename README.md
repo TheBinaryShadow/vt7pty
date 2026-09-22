@@ -100,6 +100,7 @@ Useful starting points:
 - [Accepted Step 0.4 completion validation](docs/validation/2026-09-22-step-0.4-completion.md)
 - [Step 0.5 technical identity candidate](docs/validation/2026-09-22-step-0.5-candidate.md)
 - [Accepted Step 0.5 completion validation](docs/validation/2026-09-22-step-0.5-completion.md)
+- [Step 0.6 native modernization candidate](docs/validation/2026-09-22-step-0.6-candidate.md)
 - [Architecture and current data flows](docs/ARCHITECTURE.md)
 - [Testing strategy and evidence requirements](docs/TESTING.md)
 - [Windows 7 physical acceptance procedure](docs/WINDOWS7_ACCEPTANCE.md)

@@ -275,6 +275,10 @@ Exit criterion: no obsolete compiler compatibility layer remains, maintained
 targets build cleanly under the approved toolchain, and tests show that source
 modernization preserved the accepted backend behavior.
 
+The implementation, development-host verification, and exact portable package
+are recorded in the
+[Step 0.6 native modernization candidate](docs/validation/2026-09-22-step-0.6-candidate.md).
+
 ### Step 0.7: Modernize diagnostics and security boundaries
 
 Outcome: physical-machine failures are diagnosable and native trust boundaries
