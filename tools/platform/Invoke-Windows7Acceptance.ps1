@@ -144,6 +144,91 @@ function Invoke-IsolatedAgentFailureTest {
         -Arguments @('EXPECT_MISSING_AGENT')
 }
 
+function Invoke-DiagnosticTransportTest {
+    $stopwatch = [Diagnostics.Stopwatch]::StartNew()
+    $logPath = Join-Path $OutputDirectory ($resultBaseName + '-diagnostics.jsonl')
+    $record = [ordered]@{
+        Name = 'Structured diagnostic transport'
+        Executable = 'bin/VT7Pty-DebugServer.exe + tests/ProtocolTest.exe'
+        Arguments = @('--output', $logPath, '--max-bytes', '4096',
+            '--max-messages', '3')
+        Status = 'Fail'
+        DurationMilliseconds = 0
+        ExitCode = $null
+        TimedOut = $false
+        StandardOutput = ''
+        StandardError = ''
+        Failure = $null
+    }
+    try {
+        $serverInfo = New-Object Diagnostics.ProcessStartInfo
+        $serverInfo.FileName = Join-Path $binDirectory 'VT7Pty-DebugServer.exe'
+        $serverInfo.WorkingDirectory = $packageRoot
+        $serverInfo.UseShellExecute = $false
+        $serverInfo.CreateNoWindow = $true
+        $serverInfo.RedirectStandardOutput = $true
+        $serverInfo.RedirectStandardError = $true
+        $serverInfo.Arguments = '--output "' + $logPath +
+            '" --max-bytes 4096 --max-messages 3'
+        $server = New-Object Diagnostics.Process
+        $server.StartInfo = $serverInfo
+        if (-not $server.Start()) {
+            throw 'Could not start diagnostic server.'
+        }
+        $serverOutput = $server.StandardOutput.ReadToEndAsync()
+        $serverError = $server.StandardError.ReadToEndAsync()
+        Start-Sleep -Milliseconds 250
+        $emitter = Invoke-AcceptanceTest -Name 'Diagnostic emitter' `
+            -Executable (Join-Path $testDirectory 'ProtocolTest.exe') `
+            -Arguments @('EMIT_DIAGNOSTICS') `
+            -Environment @{ VT7PTY_DEBUG = 'trace' }
+        if ($emitter.Status -ne 'Pass') {
+            throw "Diagnostic emitter failed: $($emitter.Failure)"
+        }
+        if (-not $server.WaitForExit($TestTimeoutSeconds * 1000)) {
+            $record.TimedOut = $true
+            & taskkill.exe /PID $server.Id /T /F | Out-Null
+            $server.WaitForExit()
+            throw "Diagnostic server exceeded the $TestTimeoutSeconds-second timeout."
+        }
+        $record.ExitCode = $server.ExitCode
+        $record.StandardOutput = $serverOutput.Result.Trim()
+        $record.StandardError = $serverError.Result.Trim()
+        if ($record.ExitCode -ne 0) {
+            throw "Diagnostic server exited with code $($record.ExitCode)."
+        }
+        if (-not (Test-Path -LiteralPath $logPath -PathType Leaf)) {
+            throw 'Diagnostic server did not create its output file.'
+        }
+        if ((Get-Item -LiteralPath $logPath).Length -gt 4096) {
+            throw 'Diagnostic server exceeded its configured file bound.'
+        }
+        $records = @(Get-Content -LiteralPath $logPath | ForEach-Object {
+            $_ | ConvertFrom-Json
+        })
+        if ($records.Count -ne 3 -or
+                @($records | Where-Object {
+                    $_.product -ne 'VT7Pty' -or
+                    $_.version -ne $manifest.Version -or
+                    $_.commit -ne $manifest.SourceCommit -or
+                    $_.api -ne $manifest.ApiVersion -or
+                    [int]$_.protocol -ne [int]$manifest.ProtocolVersion -or
+                    $null -eq $_.timestamp -or $null -eq $_.severity -or
+                    $null -eq $_.subsystem -or $null -eq $_.pid -or
+                    $null -eq $_.tid
+                }).Count -ne 0) {
+            throw 'Diagnostic records lack required structured build identity.'
+        }
+        $record.Status = 'Pass'
+    } catch {
+        $record.Failure = $_.Exception.Message
+    } finally {
+        $stopwatch.Stop()
+        $record.DurationMilliseconds = $stopwatch.ElapsedMilliseconds
+    }
+    return [pscustomobject]$record
+}
+
 [IO.Directory]::CreateDirectory($OutputDirectory) | Out-Null
 $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $resultBaseName = "windows7-$($Tier.ToLowerInvariant())-$timestamp"
@@ -241,6 +326,7 @@ try {
                 "commit $($manifest.SourceCommit)",
                 "API version $($manifest.ApiVersion)",
                 "protocol version $($manifest.ProtocolVersion)")
+        Invoke-DiagnosticTransportTest
         Invoke-AcceptanceTest -Name 'Inherited lifecycle session' `
             -Executable (Join-Path $testDirectory 'BackendSmokeTest.exe')
         Invoke-AcceptanceTest -Name 'Command Prompt and Windows PowerShell sessions' `
