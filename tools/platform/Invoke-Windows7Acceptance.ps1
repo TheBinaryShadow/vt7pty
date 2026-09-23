@@ -16,6 +16,7 @@ $packageRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if (-not $OutputDirectory) {
     $OutputDirectory = Join-Path $packageRoot 'results'
 }
+$OutputDirectory = [IO.Path]::GetFullPath($OutputDirectory)
 $binDirectory = Join-Path $packageRoot 'bin'
 $testDirectory = Join-Path $packageRoot 'tests'
 $manifestPath = Join-Path $packageRoot 'manifest.json'
