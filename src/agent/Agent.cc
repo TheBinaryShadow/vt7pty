@@ -291,7 +291,15 @@ void Agent::pollControlPipe()
         if (amt1 < sizeof(packetSize)) {
             break;
         }
-        ASSERT(packetSize >= sizeof(packetSize) && packetSize <= SIZE_MAX);
+        if (packetSize < sizeof(packetSize) ||
+                packetSize > VT7PTY_MAX_CONTROL_PACKET_BYTES ||
+                packetSize > SIZE_MAX) {
+            TRACE_EVENT(TraceSeverity::Warning, TraceSubsystem::Security,
+                "Rejected malformed control packet size");
+            m_controlPipe->closePipe();
+            shutdown();
+            return;
+        }
         if (m_controlPipe->bytesAvailable() < packetSize) {
             if (m_controlPipe->readBufferSize() < packetSize) {
                 m_controlPipe->setReadBufferSize(packetSize);
@@ -307,7 +315,11 @@ void Agent::pollControlPipe()
             buffer.getRawValue<uint64_t>(); // Discard the size.
             handlePacket(buffer);
         } catch (const ReadBuffer::DecodeError&) {
-            ASSERT(false && "Decode error");
+            TRACE_EVENT(TraceSeverity::Warning, TraceSubsystem::Security,
+                "Rejected malformed control packet encoding");
+            m_controlPipe->closePipe();
+            shutdown();
+            return;
         }
     }
 }
@@ -331,25 +343,38 @@ void Agent::handlePacket(ReadBuffer &packet)
         handleGetConsoleProcessListPacket(packet);
         break;
     default:
-        trace("Unrecognized message, id:%d", type);
+        TRACE_EVENT(TraceSeverity::Warning, TraceSubsystem::Security,
+            "Rejected unknown control message type: %d", type);
+        throw ReadBuffer::DecodeError();
     }
 }
 
 void Agent::writePacket(WriteBuffer &packet)
 {
     const auto &bytes = packet.buf();
+    if (bytes.size() > VT7PTY_MAX_CONTROL_PACKET_BYTES) {
+        throw Exception(L"Control reply exceeds the protocol size limit");
+    }
     packet.replaceRawValue<uint64_t>(0, bytes.size());
     m_controlPipe->write(bytes.data(), bytes.size());
 }
 
 void Agent::handleStartProcessPacket(ReadBuffer &packet)
 {
-    ASSERT(m_childProcess == nullptr);
-    ASSERT(!m_closingOutputPipes);
+    if (m_childProcess != nullptr || m_closingOutputPipes) {
+        throw ReadBuffer::DecodeError();
+    }
 
     const uint64_t spawnFlags = packet.getInt64();
-    const bool wantProcessHandle = packet.getInt32() != 0;
-    const bool wantThreadHandle = packet.getInt32() != 0;
+    const int32_t processHandleValue = packet.getInt32();
+    const int32_t threadHandleValue = packet.getInt32();
+    if ((spawnFlags & VT7PTY_SPAWN_FLAG_MASK) != spawnFlags ||
+            (processHandleValue != 0 && processHandleValue != 1) ||
+            (threadHandleValue != 0 && threadHandleValue != 1)) {
+        throw ReadBuffer::DecodeError();
+    }
+    const bool wantProcessHandle = processHandleValue != 0;
+    const bool wantThreadHandle = threadHandleValue != 0;
     const auto program = packet.getWString();
     const auto cmdline = packet.getWString();
     const auto cwd = packet.getWString();
@@ -383,9 +408,10 @@ void Agent::handleStartProcessPacket(ReadBuffer &packet)
                        envArg, cwdArg, &sui, &pi);
     const int lastError = success ? 0 : GetLastError();
 
-    trace("CreateProcess: %s %u",
-          (success ? "success" : "fail"),
-          static_cast<unsigned int>(pi.dwProcessId));
+    TRACE_EVENT(success ? TraceSeverity::Info : TraceSeverity::Warning,
+        TraceSubsystem::Process, "CreateProcess: %s pid=%u error=%d",
+        success ? "success" : "failed",
+        static_cast<unsigned int>(pi.dwProcessId), lastError);
 
     auto reply = newPacket();
     if (success) {
@@ -416,6 +442,9 @@ void Agent::handleSetSizePacket(ReadBuffer &packet)
     const int cols = packet.getInt32();
     const int rows = packet.getInt32();
     packet.assertEof();
+    if (cols < 1 || rows < 1) {
+        throw ReadBuffer::DecodeError();
+    }
     resizeWindow(cols, rows);
     auto reply = newPacket();
     writePacket(reply);

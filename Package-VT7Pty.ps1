@@ -77,6 +77,8 @@ $directories = @(
     (Join-Path $stagingDirectory 'symbols'),
     (Join-Path $stagingDirectory 'symbols\tests'),
     (Join-Path $stagingDirectory 'tests'),
+    (Join-Path $stagingDirectory 'docs'),
+    (Join-Path $stagingDirectory 'tools\diagnostics'),
     (Join-Path $stagingDirectory 'tools\platform'),
     $packageRoot
 )
@@ -96,7 +98,10 @@ $copyPlan = [ordered]@{
     'symbols\VT7Pty-Agent.pdb' = (Join-Path $binaryDirectory 'VT7Pty-Agent.pdb')
     'symbols\VT7Pty-DebugServer.pdb' = (Join-Path $binaryDirectory 'VT7Pty-DebugServer.pdb')
     'RUN-WINDOWS7-ACCEPTANCE.cmd' = (Join-Path $repositoryRoot 'RUN-WINDOWS7-ACCEPTANCE.cmd')
+    'tools\diagnostics\New-VT7PtyDiagnosticBundle.ps1' = (Join-Path $repositoryRoot 'tools\diagnostics\New-VT7PtyDiagnosticBundle.ps1')
     'tools\platform\Invoke-Windows7Acceptance.ps1' = (Join-Path $repositoryRoot 'tools\platform\Invoke-Windows7Acceptance.ps1')
+    'docs\DIAGNOSTICS.md' = (Join-Path $repositoryRoot 'docs\DIAGNOSTICS.md')
+    'docs\SECURITY_REVIEW.md' = (Join-Path $repositoryRoot 'docs\SECURITY_REVIEW.md')
     'LICENSE.txt' = (Join-Path $repositoryRoot 'LICENSE')
     'CREDITS.md' = (Join-Path $repositoryRoot 'CREDITS.md')
     'UPSTREAM.md' = (Join-Path $repositoryRoot 'UPSTREAM.md')

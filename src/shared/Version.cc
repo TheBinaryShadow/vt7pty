@@ -41,7 +41,8 @@ void dumpVersionToStdout() {
 }
 
 void dumpVersionToTrace() {
-    trace("VT7Pty version %s (commit %s, API %d.%d, protocol %d)",
+    traceEvent(TraceSeverity::Info, TraceSubsystem::Platform,
+        "VT7Pty version %s (commit %s, API %d.%d, protocol %d)",
         GenVersion_Version,
         GenVersion_Commit,
         VT7PTY_API_VERSION_MAJOR,

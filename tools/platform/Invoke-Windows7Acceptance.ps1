@@ -229,6 +229,18 @@ try {
         Invoke-AcceptanceTest -Name 'Client-agent protocol unit test' `
             -Executable (Join-Path $testDirectory 'ProtocolTest.exe') `
             -ExpectedOutput 'VT7Pty protocol tests passed'
+        Invoke-AcceptanceTest -Name 'Diagnostic pipe security self-test' `
+            -Executable (Join-Path $binDirectory 'VT7Pty-DebugServer.exe') `
+            -Arguments @('--self-test') `
+            -ExpectedOutput 'diagnostic security self-test passed'
+        Invoke-AcceptanceTest -Name 'Diagnostic build identity' `
+            -Executable (Join-Path $binDirectory 'VT7Pty-DebugServer.exe') `
+            -Arguments @('--version') `
+            -ExpectedOutput @(
+                "VT7Pty version $($manifest.Version)",
+                "commit $($manifest.SourceCommit)",
+                "API version $($manifest.ApiVersion)",
+                "protocol version $($manifest.ProtocolVersion)")
         Invoke-AcceptanceTest -Name 'Inherited lifecycle session' `
             -Executable (Join-Path $testDirectory 'BackendSmokeTest.exe')
         Invoke-AcceptanceTest -Name 'Command Prompt and Windows PowerShell sessions' `

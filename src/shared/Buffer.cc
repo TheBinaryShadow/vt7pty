@@ -27,7 +27,8 @@
 #include "Narrow.h"
 
 [[noreturn]] static void throwDecodeError(const char *condition) {
-    trace("decode error: %s", condition);
+    TRACE_EVENT(TraceSeverity::Warning, TraceSubsystem::Ipc,
+        "RPC decode error: %s", condition);
     throw ReadBuffer::DecodeError();
 }
 

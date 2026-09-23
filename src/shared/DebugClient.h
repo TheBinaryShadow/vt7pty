@@ -1,4 +1,5 @@
 // Copyright (c) 2011-2012 Ryan Prichard
+// Copyright (c) 2026 VT7Pty contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -21,16 +22,35 @@
 #ifndef DEBUGCLIENT_H
 #define DEBUGCLIENT_H
 
+#include <cstddef>
+#include <string>
+
+enum class TraceSeverity { Debug, Info, Warning, Error };
+
+enum class TraceSubsystem {
+    General, Api, Agent, Console, Ipc, Platform, Process, Security,
+};
+
+constexpr size_t VT7PTY_MAX_TRACE_RECORD_BYTES = 4096;
+
 bool isTracingEnabled();
 bool hasDebugFlag(const char *flag);
+std::string makeTraceRecord(
+    TraceSeverity severity, TraceSubsystem subsystem, const char *message);
+void traceEvent(
+    TraceSeverity severity, TraceSubsystem subsystem, const char *format, ...);
 void trace(const char *format, ...);
 
-// This macro calls trace without evaluating the arguments.
-#define TRACE(format, ...)                          \
-    do {                                            \
-        if (isTracingEnabled()) {                   \
-            trace((format) __VA_OPT__(,) __VA_ARGS__); \
-        }                                           \
+#define TRACE_EVENT(severity, subsystem, format, ...)                 \
+    do {                                                              \
+        if (isTracingEnabled()) {                                     \
+            traceEvent((severity), (subsystem), (format)              \
+                __VA_OPT__(,) __VA_ARGS__);                           \
+        }                                                             \
     } while (false)
+
+#define TRACE(format, ...)                                            \
+    TRACE_EVENT(TraceSeverity::Debug, TraceSubsystem::General,        \
+        (format) __VA_OPT__(,) __VA_ARGS__)
 
 #endif // DEBUGCLIENT_H

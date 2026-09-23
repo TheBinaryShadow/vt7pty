@@ -24,6 +24,10 @@ security-boundary modernization proceeds in Step 0.7.
 
 The [development foundation](docs/FOUNDATION.md) and
 [roadmap](ROADMAP.md) record the approved product and engineering direction.
+The [diagnostic collection guide](docs/DIAGNOSTICS.md) and
+[native boundary review](docs/SECURITY_REVIEW.md) define the Step 0.7 support
+and security baseline.
+
 Milestone 0 will replace the complete inherited toolchain, remove the Unix
 adapter and pre-Windows 7 compatibility, establish the native VT7Pty 0.5.x
 identity, modernize the retained C++ code, and create the permanent local build,

@@ -82,10 +82,8 @@ Sid wellKnownSid(
     DWORD subAuthority1=0);
 Sid builtinAdminsSid();
 Sid localSystemSid();
-Sid everyoneSid();
 
 SecurityDescriptor createPipeSecurityDescriptorOwnerFullControl();
-SecurityDescriptor createPipeSecurityDescriptorOwnerFullControlEveryoneWrite();
 SecurityDescriptor getObjectSecurityDescriptor(HANDLE handle);
 
 std::wstring sidToString(PSID sid);

@@ -175,6 +175,83 @@ if (-not $NoBuild) {
     }
 }
 
+function Invoke-DiagnosticTransportTest {
+    param(
+        [Parameter(Mandatory = $true)][string]$BinaryDirectory,
+        [Parameter(Mandatory = $true)][string]$ResultDirectory
+    )
+
+    $logPath = Join-Path $ResultDirectory 'diagnostic-transport.jsonl'
+    if (Test-Path -LiteralPath $logPath) {
+        Remove-Item -LiteralPath $logPath -Force
+    }
+    $startInfo = New-Object Diagnostics.ProcessStartInfo
+    $startInfo.FileName = Join-Path $BinaryDirectory 'VT7Pty-DebugServer.exe'
+    $startInfo.WorkingDirectory = $BinaryDirectory
+    $startInfo.UseShellExecute = $false
+    $startInfo.CreateNoWindow = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
+    $startInfo.Arguments = '--output "' + $logPath + '" --max-bytes 4096 --max-messages 3'
+    $server = New-Object Diagnostics.Process
+    $server.StartInfo = $startInfo
+    if (-not $server.Start()) {
+        throw 'Could not start diagnostic server.'
+    }
+    $serverOutput = $server.StandardOutput.ReadToEndAsync()
+    $serverError = $server.StandardError.ReadToEndAsync()
+    Start-Sleep -Milliseconds 250
+    $emitter = Invoke-NativeTest `
+        -Executable (Join-Path $BinaryDirectory 'ProtocolTest.exe') `
+        -WorkingDirectory $BinaryDirectory `
+        -Arguments @('EMIT_DIAGNOSTICS') `
+        -Environment @{ VT7PTY_DEBUG = 'trace' }
+    $timedOut = -not $server.WaitForExit($TestTimeoutSeconds * 1000)
+    if ($timedOut) {
+        & taskkill.exe /PID $server.Id /T /F | Out-Null
+        $server.WaitForExit()
+    }
+    $failure = $null
+    if ($emitter.TimedOut -or $emitter.ExitCode -ne 0) {
+        $failure = 'diagnostic emitter failed'
+    } elseif ($timedOut -or $server.ExitCode -ne 0) {
+        $failure = 'diagnostic server failed or timed out'
+    } elseif (-not (Test-Path -LiteralPath $logPath -PathType Leaf)) {
+        $failure = 'diagnostic server did not create its output file'
+    } elseif ((Get-Item -LiteralPath $logPath).Length -gt 4096) {
+        $failure = 'diagnostic server exceeded its configured file bound'
+    } else {
+        try {
+            $records = @(Get-Content -LiteralPath $logPath | ForEach-Object {
+                $_ | ConvertFrom-Json
+            })
+            if ($records.Count -ne 3 -or
+                    @($records | Where-Object {
+                        $_.product -ne 'VT7Pty' -or
+                        $_.version -ne $sourceVersion -or
+                        $_.commit -ne $sourceCommit -or
+                        $null -eq $_.timestamp -or
+                        $null -eq $_.severity -or
+                        $null -eq $_.subsystem -or
+                        $null -eq $_.pid -or
+                        $null -eq $_.tid
+                    }).Count -ne 0) {
+                $failure = 'diagnostic records lack required structured identity'
+            }
+        } catch {
+            $failure = 'diagnostic output is not valid JSON lines'
+        }
+    }
+    return [ordered]@{
+        Name = 'Structured diagnostic transport'
+        ExitCode = if ($null -eq $failure) { 0 } else { 1 }
+        TimedOut = $timedOut
+        StandardOutput = $serverOutput.Result.Trim()
+        StandardError = (@($serverError.Result.Trim(), $failure) |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) -join [Environment]::NewLine
+    }
+}
+
 $dumpbinPath = Find-Dumpbin
 $dumpbinVersion = (Get-Item -LiteralPath $dumpbinPath).VersionInfo.FileVersion
 $manifestToolPath = Find-ManifestTool
@@ -277,6 +354,9 @@ foreach ($configurationName in $configurations) {
     $tests = @(
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'ModernCppTest.exe') -WorkingDirectory $binaryDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'ProtocolTest.exe') -WorkingDirectory $binaryDirectory
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'VT7Pty-DebugServer.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'VT7Pty-DebugServer.exe') -WorkingDirectory $binaryDirectory -Arguments @('--version')
+        Invoke-DiagnosticTransportTest -BinaryDirectory $binaryDirectory -ResultDirectory $resultDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'BackendSmokeTest.exe') -WorkingDirectory $binaryDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'BackendSmokeTest.exe') -WorkingDirectory $binaryDirectory -Arguments @('APPLICATIONS')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'VT7Pty-Agent.exe') -WorkingDirectory $binaryDirectory -Arguments @('--version')
@@ -299,6 +379,20 @@ foreach ($configurationName in $configurations) {
     $protocolTest = $tests | Where-Object { $_.Name -eq 'ProtocolTest.exe' }
     if ($protocolTest.StandardOutput -notmatch 'VT7Pty protocol tests passed') {
         throw "$configurationName protocol test did not report a clean completion."
+    }
+    $diagnosticSelfTest = @($tests | Where-Object {
+        $_.Name -eq 'VT7Pty-DebugServer.exe' -and
+        $_.StandardOutput -match 'diagnostic security self-test passed'
+    })
+    if ($diagnosticSelfTest.Count -ne 1) {
+        throw "$configurationName diagnostic pipe security self-test did not pass."
+    }
+    $diagnosticVersion = @($tests | Where-Object {
+        $_.Name -eq 'VT7Pty-DebugServer.exe' -and
+        $_.StandardOutput -match [regex]::Escape("commit $sourceCommit")
+    })
+    if ($diagnosticVersion.Count -ne 1) {
+        throw "$configurationName diagnostic server did not report source commit $sourceCommit."
     }
     $applicationTest = @($tests | Where-Object {
         $_.Name -eq 'BackendSmokeTest.exe' -and

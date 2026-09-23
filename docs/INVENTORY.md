@@ -61,7 +61,7 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | `Protocol.h` | Client-agent identity, protocol version, handshake, message structures, and opcodes | Retain; explicit identity/version and negative tests added in Step 0.5 |
 | `BackgroundDesktop.*` | Formerly managed a hidden desktop for XP/Vista consoles | Removed in Step 0.4; the inherited runtime selected it only below Windows 7 |
 | `Buffer.*` | RPC message serialization and parsing | Uses `std::span`, byte views, typed sizes, and checked bounds after Step 0.6; malformed-message expansion remains later test work |
-| `DebugClient.*` | Native diagnostic transport | Uses bounded standard formatting and thread-safe static configuration after Step 0.6; structured logging remains Step 0.7 |
+| `DebugClient.*` | Native diagnostic transport | Emits bounded structured JSON records with severity, subsystem, build, process, and thread identity; bounded pipe waits and `OutputDebugString` fallback were added in Step 0.7 |
 | `GenRandom.*` | Random identifiers for pipes and objects | Uses checked size conversions after Step 0.6; failure-path expansion remains later test work |
 | `Mutex.h` | Mutex/lock shim for old MinGW | Replaced with `std::mutex` and removed in Step 0.3 |
 | `OsModule.h` | Dynamic module/symbol lookup | Move-only, null-safe module ownership retained for explicit Windows 7-safe capability detection |
@@ -71,7 +71,7 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | `StringUtil.*` | UTF-16 formatting and error strings | Uses standard formatting with explicit conversion and buffer bounds after Step 0.6 |
 | `TimeMeasurement.h` | Small timing helper | Rehomed to `tests/manual` in Step 0.3 |
 | `ControlCharacters.h` (formerly `UnixCtrlChars.h`) | Control-character decoding used by Windows input parsing | Retained under a platform-neutral name in Step 0.3 |
-| `WindowsSecurity.*` | Security descriptors, pipe/process identity, token data | Retained as a security boundary with stronger RAII and checked conversions; focused security review remains Step 0.7 |
+| `WindowsSecurity.*` | Security descriptors, pipe/process identity, token data | Retained with owner/System/administrators pipe ACLs, peer-PID support, and the broad Everyone-write descriptor removed in Step 0.7 |
 | `WindowsVersion.*` | OS detection and module-version diagnostics | Retained with `RtlGetVersion`-based detection and x64-only diagnostics in Step 0.4 |
 | `StringFormatting.h` (formerly replaced `vt7pty_snprintf.h`) | Former bounded diagnostic formatting shim | Removed in Step 0.6; maintained call sites use standard C++ or bounded CRT formatting directly |
 | `Assert.*` | Agent-aware assertion reporting | Retain responsibility; rebrand and integrate with diagnostics |
@@ -83,7 +83,8 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 
 | Path | Current responsibility | Classification and destination |
 | --- | --- | --- |
-| `tools/debug/DebugServer.cc` | Native timestamped diagnostic collector | Rehomed in Step 0.6 and retained as `VT7Pty-DebugServer.exe` |
+| `tools/debug/DebugServer.cc` | Native structured diagnostic collector | Retained as `VT7Pty-DebugServer.exe`; bounded file output, live ACL self-test, and exact version reporting were added in Step 0.7 |
+| `tools/diagnostics/New-VT7PtyDiagnosticBundle.ps1` | Physical-machine diagnostic bundle collector | Maintained support boundary; captures logs, exact build identity, host servicing data, and binary hashes without network access |
 | `tests/integration/BackendSmokeTest.cc` | Opens a session, connects pipes, spawns a child, validates output and exit code | Rehomed as the maintained integration test in Step 0.6 |
 | `tests/unit/ProtocolTest.cc`, `tests/unit/ModernCppTest.cc` | Protocol validation and standard-library/narrowing checks | Maintained unit-test boundary established in Step 0.6 |
 | `tests/fixtures/ProtocolTestAgent.cc` | Deliberately incompatible agent fixture | Rehomed with controlled child-process fixtures in Step 0.6 |

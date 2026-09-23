@@ -25,7 +25,6 @@
 #include "EventLoop.h"
 #include "NamedPipe.h"
 #include "../shared/DebugClient.h"
-#include "../shared/StringUtil.h"
 #include "../shared/WindowsSecurity.h"
 #include "../shared/Assert.h"
 #include "../shared/Narrow.h"
@@ -65,8 +64,8 @@ bool NamedPipe::serviceIo(std::vector<HANDLE> *waitHandles)
                 "Pended ConnectNamedPipe call failed");
             waitHandles->push_back(m_connectEvent.get());
         } else {
-            TRACE("Server pipe [%s] connected",
-                utf8FromWide(m_name).c_str());
+            TRACE_EVENT(TraceSeverity::Info, TraceSubsystem::Ipc,
+                "Server data pipe connected");
             m_connectEvent.close();
             startPipeWorkers();
             justConnected = true;
@@ -236,8 +235,8 @@ void NamedPipe::openServerPipe(LPCWSTR pipeName, OpenMode openMode,
         /*nInBufferSize=*/inBufferSize,
         /*nDefaultTimeOut=*/30000,
         &sa);
-    TRACE("opened server pipe [%s], handle == %p",
-        utf8FromWide(pipeName).c_str(), handle);
+    TRACE_EVENT(TraceSeverity::Debug, TraceSubsystem::Ipc,
+        "Opened local server data pipe");
     ASSERT(handle != INVALID_HANDLE_VALUE && "Could not open server pipe");
     m_name = pipeName;
     m_handle = handle;
@@ -253,7 +252,8 @@ void NamedPipe::openServerPipe(LPCWSTR pipeName, OpenMode openMode,
         success = TRUE;
     }
     if (success) {
-        TRACE("Server pipe [%s] connected", utf8FromWide(pipeName).c_str());
+        TRACE_EVENT(TraceSeverity::Info, TraceSubsystem::Ipc,
+            "Server data pipe connected synchronously");
         m_connectEvent.close();
         startPipeWorkers();
     } else if (err != ERROR_IO_PENDING) {
@@ -273,8 +273,8 @@ void NamedPipe::connectToServer(LPCWSTR pipeName, OpenMode openMode)
         OPEN_EXISTING,
         SECURITY_SQOS_PRESENT | SECURITY_IDENTIFICATION | FILE_FLAG_OVERLAPPED,
         NULL);
-    TRACE("connected to [%s], handle == %p",
-        utf8FromWide(pipeName).c_str(), handle);
+    TRACE_EVENT(TraceSeverity::Info, TraceSubsystem::Ipc,
+        "Connected to local data pipe");
     ASSERT(handle != INVALID_HANDLE_VALUE && "Could not connect to pipe");
     m_name = pipeName;
     m_handle = handle;

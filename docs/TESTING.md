@@ -1,6 +1,6 @@
 # VT7Pty Testing Strategy
 
-Status: approved Milestone 0 strategy. Updated: 2026-09-22.
+Status: approved Milestone 0 strategy. Updated: 2026-09-24.
 
 This document defines how VT7Pty distinguishes preserved WinPTY behavior, new
 regressions, inherited limitations, and accepted improvements. Results must
@@ -190,3 +190,14 @@ Each acceptance record includes:
 
 Reusable procedures remain here. Immutable results will live under
 `docs/validation/` and roadmap items will link to their evidence.
+
+Step 0.7 also validates structured diagnostic record bounds and escaping in
+`ProtocolTest.exe`, and validates the real debug-pipe ACL with:
+
+```powershell
+.\artifacts\bin\x64\Release\VT7Pty-DebugServer.exe --self-test
+```
+
+Physical failure collection follows [Diagnostics](DIAGNOSTICS.md). The
+[native boundary security review](SECURITY_REVIEW.md) records which properties
+are automated and which are architectural dispositions.

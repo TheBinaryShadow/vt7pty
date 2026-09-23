@@ -128,9 +128,8 @@ static void translateException(vt7pty_error_ptr_t *&err) {
     } catch (...) {
         ret = const_cast<vt7pty_error_ptr_t>(&kUncaughtException);
     }
-    trace("libvt7pty error: code=%u msg='%s'",
-        static_cast<unsigned>(ret->code),
-        utf8FromWide(vt7pty_error_msg(ret)).c_str());
+    TRACE_EVENT(TraceSeverity::Warning, TraceSubsystem::Api,
+        "API call failed: code=%u", static_cast<unsigned>(ret->code));
     if (err != nullptr) {
         *err = ret;
     } else {
@@ -321,6 +320,9 @@ static inline WriteBuffer newPacket() {
 
 static void writePacket(vt7pty_t &wp, WriteBuffer &packet) {
     const auto &buf = packet.buf();
+    if (buf.size() > VT7PTY_MAX_CONTROL_PACKET_BYTES) {
+        throw Exception(L"Agent RPC error: outgoing packet exceeds limit");
+    }
     packet.replaceRawValue<uint64_t>(0, buf.size());
     writeData(wp, buf.data(), buf.size());
 }
@@ -358,7 +360,9 @@ static uint64_t readUInt64(vt7pty_t &wp) {
 // Returns a reply packet's payload.
 static ReadBuffer readPacket(vt7pty_t &wp) {
     const uint64_t packetSize = readUInt64(wp);
-    if (packetSize < sizeof(packetSize) || packetSize > SIZE_MAX) {
+    if (packetSize < sizeof(packetSize) ||
+            packetSize > VT7PTY_MAX_CONTROL_PACKET_BYTES ||
+            packetSize > SIZE_MAX) {
         throw Exception(L"Agent RPC error: invalid packet size");
     }
     const size_t payloadSize = packetSize - sizeof(packetSize);
@@ -458,15 +462,15 @@ static OwnedHandle startAgentProcess(
     if (!success) {
         const DWORD lastError = GetLastError();
         const auto errStr = std::format(
-            L"VT7Pty-Agent CreateProcess failed: cmdline='{}' err=0x{:x}",
-            cmdline, lastError);
+            L"VT7Pty-Agent CreateProcess failed with error 0x{:x}",
+            lastError);
         throw ClientException(
             VT7PTY_ERROR_AGENT_CREATION_FAILED, errStr.c_str());
     }
     OwnedHandle thread(pi.hThread);
-    TRACE("Created agent successfully, pid=%u, cmdline=%s",
-          static_cast<unsigned int>(pi.dwProcessId),
-          utf8FromWide(cmdline).c_str());
+    TRACE_EVENT(TraceSeverity::Info, TraceSubsystem::Process,
+        "Created agent successfully, pid=%u",
+        static_cast<unsigned int>(pi.dwProcessId));
     agentPid = pi.dwProcessId;
     return OwnedHandle(pi.hProcess);
 }
@@ -639,34 +643,24 @@ private:
 // two NUL terminators.  (These two terminators are counted in size(), so
 // calling c_str() produces a triply-terminated string.)
 static std::wstring wstringFromEnvBlock(const wchar_t *env) {
-    std::wstring envStr;
-    if (env != NULL) {
-        const wchar_t *p = env;
-        while (*p != L'\0') {
-            p += wcslen(p) + 1;
-        }
-        p++;
-        envStr.assign(env, p);
+    if (env == nullptr) return {};
 
-        // Assuming the environment was non-empty, envStr now ends with two NUL
-        // terminators.
-        //
-        // If the environment were empty, though, then envStr would only be
-        // singly terminated, but the MSDN documentation thinks an env block is
-        // always doubly-terminated, so add an extra NUL just in case it
-        // matters.
-        const auto envStrSz = envStr.size();
-        if (envStrSz == 1) {
-            ASSERT(envStr[0] == L'\0');
-            envStr.push_back(L'\0');
-        } else {
-            ASSERT(envStrSz >= 3);
-            ASSERT(envStr[envStrSz - 3] != L'\0');
-            ASSERT(envStr[envStrSz - 2] == L'\0');
-            ASSERT(envStr[envStrSz - 1] == L'\0');
+    // CreateProcess limits a Unicode environment block to 32,767 characters.
+    // Bound our scan so a missing second terminator cannot create an
+    // unbounded IPC allocation. As with all C APIs, the caller must still
+    // supply a readable pointer.
+    constexpr size_t kMaximumEnvironmentCharacters = 32767;
+    if (env[0] == L'\0') {
+        return std::wstring(2, L'\0');
+    }
+    for (size_t length = 1; length < kMaximumEnvironmentCharacters; ++length) {
+        if (env[length - 1] == L'\0' && env[length] == L'\0') {
+            return std::wstring(env, env + length + 1);
         }
     }
-    return envStr;
+    throw ClientException(
+        VT7PTY_ERROR_UNSPECIFIED,
+        L"Environment block is not terminated within 32,767 characters");
 }
 
 VT7PTY_API vt7pty_spawn_config_t *

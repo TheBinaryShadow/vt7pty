@@ -164,14 +164,6 @@ Sid localSystemSid() {
             SECURITY_LOCAL_SYSTEM_RID);     // 18
 }
 
-Sid everyoneSid() {
-    // S-1-1-0
-    SID_IDENTIFIER_AUTHORITY authority = { SECURITY_WORLD_SID_AUTHORITY };
-    return wellKnownSid(L"Everyone account",
-            authority, 1,
-            SECURITY_WORLD_RID);            // 0
-}
-
 static SecurityDescriptor finishSecurityDescriptor(
         size_t daclEntryCount,
         EXPLICIT_ACCESSW *daclEntries,
@@ -241,56 +233,6 @@ createPipeSecurityDescriptorOwnerFullControl() {
         reinterpret_cast<LPWSTR>(impl->builtinAdmins.get());
     impl->daclEntries[2].Trustee.ptstrName =
         reinterpret_cast<LPWSTR>(impl->owner.get());
-
-    impl->value = finishSecurityDescriptor(
-        impl->daclEntries.size(),
-        impl->daclEntries.data(),
-        impl->dacl);
-
-    const auto retValue = impl->value.get();
-    return SecurityDescriptor(retValue, std::move(impl));
-}
-
-SecurityDescriptor
-createPipeSecurityDescriptorOwnerFullControlEveryoneWrite() {
-
-    struct Impl : SecurityDescriptor::Impl {
-        Sid localSystem;
-        Sid builtinAdmins;
-        Sid owner;
-        Sid everyone;
-        std::array<EXPLICIT_ACCESSW, 4> daclEntries = {};
-        Acl dacl;
-        SecurityDescriptor value;
-    };
-
-    auto impl = std::make_unique<Impl>();
-    impl->localSystem = localSystemSid();
-    impl->builtinAdmins = builtinAdminsSid();
-    impl->owner = getOwnerSid();
-    impl->everyone = everyoneSid();
-
-    for (auto &ea : impl->daclEntries) {
-        ea.grfAccessPermissions = GENERIC_ALL;
-        ea.grfAccessMode = SET_ACCESS;
-        ea.grfInheritance = NO_INHERITANCE;
-        ea.Trustee.TrusteeForm = TRUSTEE_IS_SID;
-    }
-    impl->daclEntries[0].Trustee.ptstrName =
-        reinterpret_cast<LPWSTR>(impl->localSystem.get());
-    impl->daclEntries[1].Trustee.ptstrName =
-        reinterpret_cast<LPWSTR>(impl->builtinAdmins.get());
-    impl->daclEntries[2].Trustee.ptstrName =
-        reinterpret_cast<LPWSTR>(impl->owner.get());
-    impl->daclEntries[3].Trustee.ptstrName =
-        reinterpret_cast<LPWSTR>(impl->everyone.get());
-    // Avoid using FILE_GENERIC_WRITE because it includes FILE_APPEND_DATA,
-    // which is equal to FILE_CREATE_PIPE_INSTANCE.  Instead, include all the
-    // flags that comprise FILE_GENERIC_WRITE, except for the one.
-    impl->daclEntries[3].grfAccessPermissions =
-        FILE_GENERIC_READ |
-        FILE_WRITE_ATTRIBUTES | FILE_WRITE_DATA | FILE_WRITE_EA |
-        STANDARD_RIGHTS_WRITE | SYNCHRONIZE;
 
     impl->value = finishSecurityDescriptor(
         impl->daclEntries.size(),

@@ -1,4 +1,5 @@
 // Copyright (c) 2011-2012 Ryan Prichard
+// Copyright (c) 2026 VT7Pty contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -21,24 +22,25 @@
 #include "DebugClient.h"
 
 #include <windows.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-#include <algorithm>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <iterator>
 #include <string>
 
+#include "GenVersion.h"
 #include "Narrow.h"
-
-const wchar_t *const kPipeName = L"\\\\.\\pipe\\VT7Pty-Debug-v1";
+#include "Protocol.h"
+#include "../include/vt7pty_version.h"
 
 namespace {
 
-// It would be easy to accidentally trample on the Windows LastError value
-// by adding logging/debugging code.  Ensure that can't happen by saving and
-// restoring the value.  This saving and restoring doesn't happen along the
-// fast path.
+constexpr wchar_t kPipeName[] = L"\\\\.\\pipe\\VT7Pty-Debug-v1";
+constexpr DWORD kPipeWaitMilliseconds = 100;
+constexpr size_t kFormattedMessageBytes = 1024;
+
 class PreserveLastError {
 public:
     PreserveLastError() : m_lastError(GetLastError()) {}
@@ -47,56 +49,110 @@ private:
     DWORD m_lastError;
 };
 
-} // anonymous namespace
+const char *severityName(TraceSeverity severity) {
+    switch (severity) {
+    case TraceSeverity::Debug: return "debug";
+    case TraceSeverity::Info: return "info";
+    case TraceSeverity::Warning: return "warning";
+    case TraceSeverity::Error: return "error";
+    }
+    return "unknown";
+}
 
-static void sendToDebugServer(const char *message)
-{
-    HANDLE tracePipe = INVALID_HANDLE_VALUE;
+const char *subsystemName(TraceSubsystem subsystem) {
+    switch (subsystem) {
+    case TraceSubsystem::General: return "general";
+    case TraceSubsystem::Api: return "api";
+    case TraceSubsystem::Agent: return "agent";
+    case TraceSubsystem::Console: return "console";
+    case TraceSubsystem::Ipc: return "ipc";
+    case TraceSubsystem::Platform: return "platform";
+    case TraceSubsystem::Process: return "process";
+    case TraceSubsystem::Security: return "security";
+    }
+    return "unknown";
+}
 
-    do {
-        // The default impersonation level is SECURITY_IMPERSONATION, which allows
-        // a sufficiently authorized named pipe server to impersonate the client.
-        // There's no need for impersonation in this debugging system, so reduce
-        // the impersonation level to SECURITY_IDENTIFICATION, which allows a
-        // server to merely identify us.
+std::string jsonEscape(const char *input, size_t maximumBytes) {
+    std::string result;
+    result.reserve(maximumBytes);
+    for (const unsigned char *p =
+            reinterpret_cast<const unsigned char *>(input);
+            *p != '\0' && result.size() < maximumBytes; ++p) {
+        const char *escape = nullptr;
+        switch (*p) {
+        case '\\': escape = "\\\\"; break;
+        case '"': escape = "\\\""; break;
+        case '\r': escape = "\\r"; break;
+        case '\n': escape = "\\n"; break;
+        case '\t': escape = "\\t"; break;
+        default: break;
+        }
+        if (escape != nullptr) {
+            if (result.size() + 2 > maximumBytes) break;
+            result.append(escape);
+        } else if (*p >= 0x20 && *p < 0x7f) {
+            result.push_back(static_cast<char>(*p));
+        } else {
+            if (result.size() + 6 > maximumBytes) break;
+            char encoded[7] = {};
+            std::snprintf(encoded, sizeof(encoded), "\\u%04x", *p);
+            result.append(encoded);
+        }
+    }
+    return result;
+}
+
+std::string moduleBaseName() {
+    char moduleName[MAX_PATH] = {};
+    const DWORD length = GetModuleFileNameA(
+        nullptr, moduleName, static_cast<DWORD>(std::size(moduleName)));
+    if (length == 0 || length >= std::size(moduleName)) return "unknown";
+    const char *baseName = std::strrchr(moduleName, '\\');
+    return baseName == nullptr ? moduleName : baseName + 1;
+}
+
+void sendToDebugServer(const char *message) {
+    OutputDebugStringA(message);
+    OutputDebugStringA("\n");
+
+    HANDLE tracePipe = CreateFileW(
+        kPipeName, GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING,
+        SECURITY_SQOS_PRESENT | SECURITY_IDENTIFICATION | FILE_FLAG_OVERLAPPED,
+        nullptr);
+    if (tracePipe == INVALID_HANDLE_VALUE && GetLastError() == ERROR_PIPE_BUSY &&
+            WaitNamedPipeW(kPipeName, kPipeWaitMilliseconds)) {
         tracePipe = CreateFileW(
-            kPipeName,
-            GENERIC_READ | GENERIC_WRITE,
-            0, NULL, OPEN_EXISTING,
-            SECURITY_SQOS_PRESENT | SECURITY_IDENTIFICATION,
-            NULL);
-    } while (tracePipe == INVALID_HANDLE_VALUE &&
-             GetLastError() == ERROR_PIPE_BUSY &&
-             WaitNamedPipeW(kPipeName, NMPWAIT_WAIT_FOREVER));
-
+            kPipeName, GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING,
+            SECURITY_SQOS_PRESENT | SECURITY_IDENTIFICATION |
+                FILE_FLAG_OVERLAPPED,
+            nullptr);
+    }
     if (tracePipe != INVALID_HANDLE_VALUE) {
         DWORD newMode = PIPE_READMODE_MESSAGE;
-        SetNamedPipeHandleState(tracePipe, &newMode, NULL, NULL);
-        char response[16];
-        DWORD actual = 0;
-        TransactNamedPipe(tracePipe,
-            const_cast<char*>(message),
-            vt7pty::internal::checkedNarrow<DWORD>(strlen(message)),
-            response, sizeof(response), &actual, NULL);
+        SetNamedPipeHandleState(tracePipe, &newMode, nullptr, nullptr);
+        OVERLAPPED operation = {};
+        operation.hEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+        if (operation.hEvent != nullptr) {
+            char response[16] = {};
+            DWORD actual = 0;
+            const BOOL complete = TransactNamedPipe(
+                tracePipe, const_cast<char *>(message),
+                vt7pty::internal::checkedNarrow<DWORD>(std::strlen(message)),
+                response, sizeof(response), &actual, &operation);
+            if (!complete && GetLastError() == ERROR_IO_PENDING &&
+                    WaitForSingleObject(operation.hEvent,
+                        kPipeWaitMilliseconds) != WAIT_OBJECT_0) {
+                CancelIo(tracePipe);
+                GetOverlappedResult(tracePipe, &operation, &actual, TRUE);
+            }
+            CloseHandle(operation.hEvent);
+        }
         CloseHandle(tracePipe);
     }
 }
 
-// Get the current UTC time as milliseconds from the epoch (ignoring leap
-// seconds).  Use the Unix epoch for consistency with DebugClient.py.  There
-// are 134774 days between 1601-01-01 (the Win32 epoch) and 1970-01-01 (the
-// Unix epoch).
-static long long unixTimeMillis()
-{
-    FILETIME fileTime;
-    GetSystemTimeAsFileTime(&fileTime);
-    long long msTime = (((long long)fileTime.dwHighDateTime << 32) +
-                       fileTime.dwLowDateTime) / 10000;
-    return msTime - 134774LL * 24 * 3600 * 1000;
-}
-
-static const char *getDebugConfig()
-{
+const char *getDebugConfig() {
     static const std::string config = [] {
         PreserveLastError preserve;
         char buffer[256] = {};
@@ -110,66 +166,82 @@ static const char *getDebugConfig()
     return config.c_str();
 }
 
-bool isTracingEnabled()
-{
-    static const bool enabled = [] {
-        // Accept "1" as a convenient shorthand for the trace flag.
-        PreserveLastError preserve;
-        return hasDebugFlag("trace") || hasDebugFlag("1");
-    }();
-    return enabled;
-}
-
-bool hasDebugFlag(const char *flag)
-{
-    if (strchr(flag, ',') != NULL) {
-        trace("INTERNAL ERROR: hasDebugFlag flag has comma: '%s'", flag);
-        abort();
-    }
-    const char *const configCStr = getDebugConfig();
-    if (configCStr[0] == '\0') {
-        return false;
-    }
+void traceV(TraceSeverity severity, TraceSubsystem subsystem,
+        const char *format, va_list arguments) {
+    if (!isTracingEnabled()) return;
     PreserveLastError preserve;
-    std::string config(configCStr);
-    std::string flagStr(flag);
-    config = "," + config + ",";
-    flagStr = "," + flagStr + ",";
-    return config.find(flagStr) != std::string::npos;
-}
-
-void trace(const char *format, ...)
-{
-    if (!isTracingEnabled())
-        return;
-
-    PreserveLastError preserve;
-    char message[1024];
-
-    va_list ap;
-    va_start(ap, format);
-    const int count = std::vsnprintf(message, sizeof(message), format, ap);
+    char message[kFormattedMessageBytes] = {};
+    const int count = std::vsnprintf(message, sizeof(message), format, arguments);
     if (count < 0 || static_cast<size_t>(count) >= sizeof(message)) {
         message[sizeof(message) - 1] = '\0';
     }
-    message[sizeof(message) - 1] = '\0';
-    va_end(ap);
+    const std::string record = makeTraceRecord(severity, subsystem, message);
+    sendToDebugServer(record.c_str());
+}
 
-    const int currentTime = (int)(unixTimeMillis() % (100000 * 1000));
+} // anonymous namespace
 
-    char moduleName[1024];
-    moduleName[0] = '\0';
-    GetModuleFileNameA(NULL, moduleName, sizeof(moduleName));
-    const char *baseName = strrchr(moduleName, '\\');
-    baseName = (baseName != NULL) ? baseName + 1 : moduleName;
+bool isTracingEnabled() {
+    static const bool enabled = hasDebugFlag("trace") || hasDebugFlag("1");
+    return enabled;
+}
 
-    char fullMessage[1024];
-    std::snprintf(fullMessage, sizeof(fullMessage),
-             "[%05d.%03d %s,p%04d,t%04d]: %s",
-             currentTime / 1000, currentTime % 1000,
-             baseName, (int)GetCurrentProcessId(), (int)GetCurrentThreadId(),
-             message);
-    fullMessage[sizeof(fullMessage) - 1] = '\0';
+bool hasDebugFlag(const char *flag) {
+    if (std::strchr(flag, ',') != nullptr) std::abort();
+    const char *const configCStr = getDebugConfig();
+    if (configCStr[0] == '\0') return false;
+    PreserveLastError preserve;
+    const std::string config = "," + std::string(configCStr) + ",";
+    const std::string flagStr = "," + std::string(flag) + ",";
+    return config.find(flagStr) != std::string::npos;
+}
 
-    sendToDebugServer(fullMessage);
+std::string makeTraceRecord(
+        TraceSeverity severity, TraceSubsystem subsystem, const char *message) {
+    SYSTEMTIME time = {};
+    GetSystemTime(&time);
+    char prefix[1536] = {};
+    const std::string process = jsonEscape(moduleBaseName().c_str(), 256);
+    std::snprintf(
+        prefix, sizeof(prefix),
+        "{\"timestamp\":\"%04u-%02u-%02uT%02u:%02u:%02u.%03uZ\","
+        "\"severity\":\"%s\",\"subsystem\":\"%s\","
+        "\"product\":\"VT7Pty\",\"version\":\"%s\","
+        "\"commit\":\"%s\",\"api\":\"%d.%d\",\"protocol\":%d,"
+        "\"process\":\"%s\",\"pid\":%lu,\"tid\":%lu,\"message\":\"",
+        static_cast<unsigned>(time.wYear), static_cast<unsigned>(time.wMonth),
+        static_cast<unsigned>(time.wDay), static_cast<unsigned>(time.wHour),
+        static_cast<unsigned>(time.wMinute), static_cast<unsigned>(time.wSecond),
+        static_cast<unsigned>(time.wMilliseconds), severityName(severity),
+        subsystemName(subsystem), GenVersion_Version, GenVersion_Commit,
+        VT7PTY_API_VERSION_MAJOR, VT7PTY_API_VERSION_MINOR,
+        VT7PTY_PROTOCOL_VERSION, process.c_str(),
+        static_cast<unsigned long>(GetCurrentProcessId()),
+        static_cast<unsigned long>(GetCurrentThreadId()));
+    prefix[sizeof(prefix) - 1] = '\0';
+
+    std::string result(prefix);
+    constexpr size_t suffixBytes = 2;
+    const size_t available = result.size() + suffixBytes <
+            VT7PTY_MAX_TRACE_RECORD_BYTES - 1
+        ? VT7PTY_MAX_TRACE_RECORD_BYTES - 1 - result.size() - suffixBytes
+        : 0;
+    result += jsonEscape(message == nullptr ? "" : message, available);
+    result += "\"}";
+    return result;
+}
+
+void traceEvent(TraceSeverity severity, TraceSubsystem subsystem,
+        const char *format, ...) {
+    va_list arguments;
+    va_start(arguments, format);
+    traceV(severity, subsystem, format, arguments);
+    va_end(arguments);
+}
+
+void trace(const char *format, ...) {
+    va_list arguments;
+    va_start(arguments, format);
+    traceV(TraceSeverity::Debug, TraceSubsystem::General, format, arguments);
+    va_end(arguments);
 }

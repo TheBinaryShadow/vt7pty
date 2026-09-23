@@ -25,7 +25,7 @@ output from the legacy console state.
 | `VT7Pty.dll` / `src/libvt7pty` | Client API, agent launch, versioned control RPC, process requests, pipe discovery | Retain and modernize; public redesign comes later |
 | `VT7Pty-Agent.exe` / `src/agent` | Owns the hidden console, launches the child, handles input, scrapes output, resizes, and manages session lifetime | Retain as the backend core |
 | `src/shared` | Shared handles, buffers, security, protocol, encoding, and diagnostics | Retain required native code |
-| `VT7Pty-DebugServer.exe` / `tools/debug` | Collects timestamped diagnostic output | Retain and modernize |
+| `VT7Pty-DebugServer.exe` / `tools/debug` | Collects bounded, structured, build-identified diagnostic output over a restricted local pipe | Retained and modernized in Step 0.7; see [Diagnostics](DIAGNOSTICS.md) |
 | `tests/unit`, `tests/integration`, `tests/fixtures`, and `tests/manual` | Unit, backend, child-process, and focused console investigations | Retain useful coverage and integrate it with the permanent test system |
 
 The Cygwin/MSYS `winpty.exe` adapter and its Unix-facing source have been
