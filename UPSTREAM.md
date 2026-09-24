@@ -17,19 +17,15 @@ in [docs/UPSTREAM_WINPTY_README.md](docs/UPSTREAM_WINPTY_README.md), and
 
 ## Current divergence
 
-The initial VT7Pty changes establish the project identity, goals, contributor
-guidance, community policies, and acknowledgements. They do not change source
-behavior, remove components, rename runtime artifacts, or change the inherited
-`VERSION.txt`. That version identifies the inherited source, not a new VT7Pty
-release.
-
-The approved [roadmap](ROADMAP.md) requires infrastructure modernization, audited
-component removal, technical rebranding, and a new 0.5.x version series in
-Milestone 0. The [development foundation](docs/FOUNDATION.md) records the
-approved Windows 7+ platform and engineering decisions. These are future
-divergence points; no runtime change or version bump is implied by the planning
-documents. Historical WinPTY names and notices remain part of the attribution
-record after technical renaming.
+VT7Pty now uses a Windows 7 SP1+ x64 platform contract, VS2022/MSBuild and
+C++20, a native-only source tree, a `0.5.0-dev` VT7Pty identity, and maintained
+local build, test, diagnostic, and packaging commands. The inherited Unix
+adapter, pre-Windows 7 paths, and obsolete build infrastructure were removed.
+The retained native implementation has been modernized without claiming
+ConPTY compatibility or complete terminal fidelity. The exact changes and
+Windows 7 acceptance evidence are linked from the [roadmap](ROADMAP.md) and
+[validation index](docs/validation/README.md). Historical WinPTY names and
+notices remain part of the provenance record.
 
 VT7Pty changes are recorded separately in [CHANGELOG.md](CHANGELOG.md), under
 the identity rules in [docs/VERSIONING.md](docs/VERSIONING.md).

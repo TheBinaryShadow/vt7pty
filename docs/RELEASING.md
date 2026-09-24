@@ -1,89 +1,96 @@
 # Releasing VT7Pty
 
-Status: approved process; transition tooling partially implemented. Updated:
-2026-09-21.
+Status: Step 0.9 manual release process under validation. Updated: 2026-09-24.
 
-VT7Pty uses local, repository-owned build, verification, and packaging commands
-followed by physical Windows 7 acceptance and a manual GitHub Release. The
-project does not use a hosted build or test service.
+VT7Pty uses local VS2022/MSBuild commands, physical Windows 7 acceptance, and a
+reviewed manual GitHub Release. There is no hosted build or test service.
+[CHANGELOG.md](../CHANGELOG.md) records VT7Pty changes; the inherited
+[WinPTY release history](../RELEASES.md) remains historical.
 
-The inherited [WinPTY release notes](../RELEASES.md) remain historical. VT7Pty
-release changes are recorded in [CHANGELOG.md](../CHANGELOG.md).
+## Build a candidate set
 
-## Candidate preparation
-
-The initial local commands now exist:
+From a clean source tree, run:
 
 ```powershell
-.\Build-VT7Pty.ps1 -Configuration Release
-.\Verify-VT7Pty.ps1 -Configuration Release
-.\Package-VT7Pty.ps1 -Configuration Release
+.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc1
 ```
 
-The current package is a single transition archive used to prove the local
-workflow. Roadmap Steps 0.8 and 0.9 must still implement the complete suite,
-physical acceptance bundle, final archive split, and final naming before a
-release candidate is valid.
+The command refuses a dirty tree. It performs a clean x64 Release rebuild,
+MSVC static-analysis rebuild, and the complete local Release verification. It
+checks the source commit and every test result before packaging. It extracts
+each produced archive and verifies every file against its own manifest. The
+package set is written under `artifacts/packages/`.
 
-A candidate must identify:
+The canonical candidate stem is
+`VT7Pty-{version}-win7-x64-release[-suffix]`. The command creates:
 
-- source commit and clean/dirty state,
-- VT7Pty package version,
-- API and client-agent protocol versions,
-- compiler, toolset, Windows SDK, architecture, and configuration,
-- artifact hashes and runtime imports/dependencies,
-- verification result and tool versions.
+| Asset | Contents |
+| --- | --- |
+| `-runtime.zip` | `VT7Pty.dll`, `VT7Pty-Agent.exe`, compatibility guidance, attribution, and manifest |
+| `-development.zip` | Public C headers, `VT7Pty.lib`, API/version guidance, attribution, and manifest |
+| `-symbols.zip` | Matching DLL, agent, debug-server, and test PDBs, diagnostics guidance, attribution, and manifest |
+| `-tests.zip` | Self-contained Windows 7 acceptance runner, runtime and debug-server binaries, controlled fixtures, tests, verification/inspection records, guidance, attribution, and manifest |
+| `-release-set.json` | Source, API, protocol, toolchain, local verification, archive sizes, counts, manifest hashes, and archive hashes |
+| `.sha256` | SHA-256 for all four archives and the release-set manifest |
 
-## Package set
+Every ZIP carries `README.md`, `VERSION.txt`, `CHANGELOG.md`, `LICENSE.txt`,
+`CREDITS.md`, and `UPSTREAM.md`. The native debug server belongs to the test
+bundle; its matching PDB belongs to symbols. The minimal runtime archive does
+not include debugging tools. Static runtime linking avoids a separate MSVC
+redistributable package, but the import and manifest inspection records in the
+test archive and execution on Windows 7 remain the dependency evidence.
 
-The initial release process will produce:
+Use a fresh suffix for every candidate whose bytes change. Never replace a
+candidate already sent for physical acceptance. Compare source commit, test
+manifest hash, and archive SHA-256 before testing or publishing.
 
-- a runtime archive with the DLL, agent, and required runtime material,
-- a development archive with public headers and import libraries,
-- a symbols archive with matching PDB files,
-- a physical Windows 7 test bundle with fixtures and instructions,
-- a component/build manifest,
-- license, attribution, and third-party notices,
-- a SHA-256 checksum file.
+## Physical acceptance and review
 
-The native debug server may be supplied with diagnostics or symbols instead of
-the minimal runtime archive. The final placement will be fixed with the package
-layout in Roadmap Step 0.9.
+Copy the same `-tests.zip` and the `.sha256` file to both accepted Windows 7
+tiers. Follow [Windows 7 platform acceptance](WINDOWS7_ACCEPTANCE.md); the
+ordinary runner performs all 30 cases, including the 120-minute soak. Preserve
+each machine's complete `results` directory and review logs, failures, skips,
+dumps, update inventories, and the recorded environment disposition.
 
-## Acceptance sequence
+After both runs, validate the exact release set and result pair:
 
-1. Confirm the source tree and intended version.
-2. Run a clean x64 Release build.
-3. Run the complete local verification suite.
-4. Inspect exports, imports, resources, manifests, symbols, and package contents.
-5. Create an immutable candidate package and checksum record.
-6. Run the candidate on physical non-ESU Windows 7 SP1 x64.
-7. Run milestone and release candidates on physical ESU Windows 7 SP1 x64.
-8. Review failures, skips, logs, dumps, and differences from the previous
-   accepted candidate.
-9. Update the changelog, compatibility claims, and release notes.
-10. Review the exact tag target and all release assets.
-11. Create and push the release tag.
-12. Publish the GitHub Release and verify every uploaded checksum.
+```powershell
+.\tools\release\Review-VT7PtyRelease.ps1 `
+    -ReleaseSetPath .\artifacts\packages\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc1-release-set.json `
+    -NonEsuResult C:\path\to\nonesu\results\windows7-nonesu-<run>.json `
+    -EsuResult C:\path\to\esu\results\windows7-esu-<run>.json
+```
 
-A local pass cannot replace either required physical release-candidate run.
-Every exception or skipped case must have an explicit disposition before
+The review checks the four archive hashes, the checksum file, test-manifest
+identity, source/version/API/protocol identity, distinct machine records, all
+30 passing cases, the full soak, and absence of preflight failures, inventory
+warnings, and crash artifacts. It writes a machine-readable review under
+`artifacts/release-review/`. A passing automated review does not replace a
+human assessment of the logs, hardware inventory, compatibility claim,
+changelog, and release notes. The review record explicitly does not authorize
 publication.
 
-## Version and tag rules
+## Version, tag, and publication
 
-`0.5.0-dev` is the first VT7Pty development identity. It does not become
-`0.5.0` until all Milestone 0 acceptance items are complete and the release has
-received a separate review.
+`0.5.0-dev` remains the development identity until Milestone 0 acceptance.
+The Step 0.9 tooling candidate may use that identity. Changing `VERSION.txt`
+to `0.5.0` changes the exact binaries and requires a new clean package set and
+both physical acceptance runs; earlier `0.5.0-dev` evidence cannot qualify it.
 
-The `milestone-0-start` tag marks the approved planning foundation. It is not a
-release tag and must not be attached to release assets.
+For an accepted version `X.Y.Z`, the canonical tag is `vX.Y.Z`, the GitHub
+Release title is `VT7Pty X.Y.Z`, and the unsuffixed asset stem is
+`VT7Pty-X.Y.Z-win7-x64-release`. Candidate suffixes such as `m0-rc1` are
+omitted from the final published filenames only after the final bytes and
+checksums have been reviewed. Renaming an archive after testing changes its
+name but not its bytes; the published checksum file and release-set manifest
+must name the final assets and be reviewed again.
 
-Release tags, names, and archive filenames will use one canonical form fixed by
-Roadmap Step 0.9 before the first release candidate is published.
+Before publication, review the exact clean commit/tag target, local verification
+and physical records, exports/imports/resources/manifests/symbols, license and
+attribution, changelog, release notes, and every final archive/checksum. Tag
+and GitHub publication are separate user decisions after a concrete reviewable
+result exists. Once authorized, push the tag, upload the four ZIPs, release-set
+manifest, and checksum file, then verify the hosted downloads against SHA-256.
 
-## Deferred distribution work
-
-An installer and code signing are not initial release requirements. They may be
-added later when concrete distribution and trust requirements justify their
-maintenance and testing cost.
+The `milestone-0-start` tag is a planning marker, not a release tag. Installers
+and code signing remain outside the initial release process.

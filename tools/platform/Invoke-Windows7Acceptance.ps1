@@ -339,7 +339,7 @@ if ($manifest.SourceTreeClean -ne $true) {
 }
 $preflightFailures += $integrityFailures
 if ($SoakMinutes -ne 120) {
-    $preflightFailures += 'Step 0.8 milestone acceptance requires the 120-minute soak profile.'
+    $preflightFailures += 'Milestone and release acceptance require the 120-minute soak profile.'
 }
 
 $previousPath = $env:PATH

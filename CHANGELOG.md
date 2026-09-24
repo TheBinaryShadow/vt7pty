@@ -28,6 +28,10 @@ changes until implemented.
 - Added maintained local build, verification, and transition-package commands;
   verification preserves the inherited export/import boundary and runs the
   inherited native lifecycle tests.
+- Documented the 30-case permanent test system and its acceptance on both
+  Windows 7 tiers, including a 120-minute soak on each machine.
+- Defined the manual release archive layout, exact package identity, physical
+  evidence review, and separate publication decision.
 - Preserved the original WinPTY README and release history as historical
   documentation.
 
@@ -71,3 +75,9 @@ changes until implemented.
   input role and enabled MSVC's conforming preprocessor.
 - Preserved the inherited runtime behavior, 19-function DLL boundary, direct
   dependency sets, and source-level debugging through the cleanup.
+- Added controlled console fixtures and component tests for input, Unicode,
+  output, resize under load, repeated sessions, shutdown, concurrent sessions,
+  soak, resource stability, and deliberate failures.
+- Split the clean Release packaging workflow into runtime, development,
+  symbols, and self-contained Windows 7 test archives with per-file manifests,
+  extracted-archive verification, a release-set manifest, and checksums.

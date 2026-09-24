@@ -91,7 +91,7 @@ failures and tests, with proven behavior retained where it meets our needs.
 ## Building and exploring
 
 See [Building](BUILDING.md) for the supported local build, verify, and package
-commands and the remaining transition limitations. The
+commands. The
 [original WinPTY README](docs/UPSTREAM_WINPTY_README.md) is preserved for
 historical build, adapter, embedding, and debugging details.
 
@@ -110,6 +110,7 @@ Useful starting points:
 - [Accepted Step 0.5 completion validation](docs/validation/2026-09-22-step-0.5-completion.md)
 - [Step 0.6 native modernization candidate](docs/validation/2026-09-22-step-0.6-candidate.md)
 - [Accepted Step 0.6 completion validation](docs/validation/2026-09-23-step-0.6-completion.md)
+- [Accepted Step 0.8 permanent test system](docs/validation/2026-09-24-step-0.8-completion.md)
 - [Architecture and current data flows](docs/ARCHITECTURE.md)
 - [Testing strategy and evidence requirements](docs/TESTING.md)
 - [Windows 7 physical acceptance procedure](docs/WINDOWS7_ACCEPTANCE.md)

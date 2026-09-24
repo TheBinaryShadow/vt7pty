@@ -148,8 +148,9 @@ previous accepted result.
 
 The portable, Windows PowerShell 5.1-compatible procedure is documented in
 [Windows 7 Platform Acceptance](WINDOWS7_ACCEPTANCE.md). A clean-tree package
-contains the runner, runtime binaries, native tests, fixtures, symbols, and a
-hash manifest. The same candidate ZIP is run on both tiers.
+contains the runner, runtime binaries, native tests, fixtures, and a hash
+manifest. Matching symbols are in the separate symbols archive. The same test
+ZIP is run on both tiers.
 
 ## Initial stress profiles
 

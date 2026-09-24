@@ -7,15 +7,17 @@ development-host verification.
 
 ## Candidate preparation
 
-Produce one clean-tree Release candidate and its checksum:
+Produce a clean-tree Release package set and its checksum:
 
 ```powershell
-.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix step-0.8-candidate
+.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc1
 ```
 
-Use the same ZIP on both machines. Copy the adjacent `.sha256` file with it
-and verify the ZIP before extraction. The package manifest records the source
-commit and hashes every file used by the acceptance runner.
+Use the same `-tests.zip` on both machines. Copy the package-set `.sha256` file
+with it and verify the ZIP before extraction. The test-archive manifest records
+the source commit and hashes every file used by the acceptance runner. Runtime,
+development, and symbols archives are reviewed separately on the build host;
+they are not needed to run this acceptance procedure.
 
 ## Target procedure
 
@@ -36,7 +38,8 @@ commit and hashes every file used by the acceptance runner.
 
 5. Allow the 120-minute idle/active soak to finish on each machine. A fast
    diagnostic run can use `-SoakMinutes 0` when invoking the PowerShell script
-   directly, but it records `NotRun` and does not qualify Step 0.8.
+   directly, but it records `NotRun` and does not qualify a milestone or
+   release candidate.
 6. Preserve and return the complete `results` directory from each machine.
    It includes the `.json` and `.txt` result pair plus any step-specific
    diagnostic logs and bundles.
@@ -69,7 +72,9 @@ The candidate performs these bounded checks:
 Any failed preflight, timeout, nonzero exit, missing expected output, missing
 file, malformed diagnostic record, bundle mismatch, or hash mismatch makes the
 run fail. The two target records must both pass before the corresponding
-roadmap step can use them as physical Windows 7 evidence.
+roadmap step can use them as physical Windows 7 evidence. For Step 0.9, run
+`tools/release/Review-VT7PtyRelease.ps1` on the build host with the release-set
+manifest and both returned JSON records.
 
 The target JSON and text records include per-case status and duration, package
 and OS/update identity, and any dump or WER files found in the results

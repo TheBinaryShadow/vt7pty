@@ -36,8 +36,8 @@ Installer if the required native workload or SDK is missing.
 ```
 
 All commands default to the configurations appropriate to their job. Build and
-verify accept `-Configuration Debug`, `Release`, or `All`; package defaults to
-Release. Outputs are written below ignored `artifacts`, with intermediates
+verify accept `-Configuration Debug`, `Release`, or `All`; package accepts only
+Release and requires a clean source tree. Outputs are written below ignored `artifacts`, with intermediates
 below ignored `build`.
 
 The solution contains projects for the client DLL, console-owning agent,
@@ -75,9 +75,11 @@ Release static-analysis pass. Its
 development-host result is transition evidence and is not physical Windows 7
 acceptance.
 
-`Package-VT7Pty.ps1` currently creates one transition ZIP with binaries,
-headers, the import library, symbols, attribution, a manifest, and a SHA-256
-sidecar. Roadmap Step 0.9 will fix the final release archive split and naming.
+`Package-VT7Pty.ps1` performs a clean Release rebuild, static analysis, and
+local verification, then creates runtime, development, symbols, and standalone
+Windows 7 test archives. It verifies extracted contents against their manifests
+and writes a release-set manifest and SHA-256 file. See
+[Releasing](docs/RELEASING.md) for archive layout and the physical review gate.
 The accepted build boundary and completed developer workflow are recorded in
 the [MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
 and [Step 0.2 completion validation](docs/validation/2026-09-22-step-0.2-completion.md).
