@@ -28,6 +28,22 @@ $manifestPath = Join-Path $packageRoot 'manifest.json'
 $utf8NoBom = New-Object Text.UTF8Encoding($false)
 $runStartedAt = (Get-Date).ToUniversalTime().ToString('o')
 
+function Stop-VT7ProcessTree {
+    param([Diagnostics.Process]$Process)
+    & taskkill.exe /PID $Process.Id /T /F | Out-Null
+    $terminationCode = $LASTEXITCODE
+    if ($terminationCode -ne 0) {
+        if (-not $Process.HasExited) {
+            try { $Process.Kill() } catch { }
+        }
+        [void]$Process.WaitForExit(5000)
+        throw "Process-tree cleanup failed: taskkill exit code $terminationCode."
+    }
+    if (-not $Process.WaitForExit(5000)) {
+        throw 'Process-tree cleanup failed: the process did not exit.'
+    }
+}
+
 function Invoke-AcceptanceTest {
     param(
         [Parameter(Mandatory = $true)][string]$Name,
@@ -115,8 +131,7 @@ function Invoke-AcceptanceTest {
         $process.BeginErrorReadLine()
         if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
             $record.TimedOut = $true
-            & taskkill.exe /PID $process.Id /T /F | Out-Null
-            $process.WaitForExit()
+            Stop-VT7ProcessTree $process
         } else {
             $record.ExitCode = $process.ExitCode
         }
@@ -271,8 +286,7 @@ function Invoke-DiagnosticTransportTest {
         }
         if (-not $server.WaitForExit($TestTimeoutSeconds * 1000)) {
             $record.TimedOut = $true
-            & taskkill.exe /PID $server.Id /T /F | Out-Null
-            $server.WaitForExit()
+            Stop-VT7ProcessTree $server
             throw "Diagnostic server exceeded the $TestTimeoutSeconds-second timeout."
         }
         $record.ExitCode = $server.ExitCode
