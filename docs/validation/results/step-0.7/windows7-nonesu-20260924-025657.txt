@@ -1,0 +1,28 @@
+VT7Pty Windows 7 acceptance: Pass
+Tier: NonESU
+Machine: NESSY (VMware, Inc. VMware20,1)
+OS: Microsoft Windows 7 Ultimate , version 6.1.7601.65536, SP1
+Package: VT7Pty 0.5.0-dev, commit acbb28edb3b1d5d476780646971db533386113ad
+Manifest SHA-256: 694b717fbb3b3af9085029e0eed8c69093fe616a2c716472cf0bad1676dfffe3
+
+Preflight failures:
+  None
+
+Tests:
+  Pass: Modern C++ utility unit test (132 ms)
+  Pass: Client-agent protocol unit test (60 ms)
+  Pass: Diagnostic pipe security self-test (71 ms)
+  Pass: Diagnostic build identity (50 ms)
+  Pass: Structured diagnostic transport and bundle (11092 ms)
+  Pass: Inherited lifecycle session (203 ms)
+  Pass: Command Prompt and Windows PowerShell sessions (794 ms)
+  Pass: Agent source identity (56 ms)
+  Pass: Argument quoting fixture (39 ms)
+  Pass: Bounded output fixture (44 ms)
+  Pass: Agent rejection: missing (106 ms)
+  Pass: Agent rejection: malformed (184 ms)
+  Pass: Agent rejection: wrong-identity (192 ms)
+  Pass: Agent rejection: older-protocol (202 ms)
+  Pass: Agent rejection: newer-protocol (196 ms)
+
+Machine-readable result: C:\Users\Binary\Desktop\VT7Pty-0.5.0-dev-win7-x64-release-step-0.7-candidate\results\windows7-nonesu-20260924-025657.json

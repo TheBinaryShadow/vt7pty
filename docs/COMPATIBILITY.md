@@ -1,7 +1,7 @@
 # VT7Pty Compatibility Contract
 
-Status: approved target contract; Step 0.6 native modernization qualified.
-Updated: 2026-09-23.
+Status: approved target contract; Step 0.7 diagnostics and security qualified.
+Updated: 2026-09-24.
 
 This document separates approved targets from verified support. A target is not
 a compatibility claim until an identified build passes the required procedure.
@@ -12,7 +12,7 @@ a compatibility claim until an identified build passes the required procedure.
 | --- | --- |
 | Source baseline | WinPTY `0.4.4-dev` at upstream commit `7e59fe2` |
 | Development host | Maintained x64 Debug/Release workflow verified and source-debugged on Windows 10 build 19044 |
-| Windows 7 runtime | Steps 0.4 through 0.6 accepted on Windows 7 SP1 x64; recorded evidence dispositions apply |
+| Windows 7 runtime | Steps 0.4 through 0.7 accepted on Windows 7 SP1 x64; recorded evidence dispositions apply |
 | Architectures | x64 is the approved product architecture; inherited x64 smoke tests passed locally |
 | Build interface | VS2022/MSBuild and repository PowerShell entry points; inherited build and packaging paths removed |
 | API and binaries | VT7Pty `0.5.0-dev` technical identity accepted; API 1.0 and client-agent protocol 1 |
@@ -62,10 +62,10 @@ Routine candidates run on Tier A. Milestone and release candidates run on both
 tiers. Results from one tier ordinarily do not stand in for the other. Step
 0.4 has a documented owner-approved exception for two declared-tier runs on
 one recorded installation; Step 0.5 has a documented owner-approved temporary
-two-machine treatment despite identical recorded machine metadata. Step 0.6
-has an owner-approved instruction to treat the VMware-reported `NESSY`
-environment as a full-fledged physical machine. Later milestone and release
-gates retain the normal rule.
+two-machine treatment despite identical recorded machine metadata. Steps 0.6
+and 0.7 have an owner-approved instruction to treat the VMware-reported
+`NESSY` environment as a full-fledged physical machine. Later milestone and
+release gates retain the normal rule.
 
 ## Development and build hosts
 

@@ -306,7 +306,9 @@ review with resolved blockers or explicit dispositions.
 The implementation, security dispositions, development-host verification,
 and exact portable package are recorded in the
 [Step 0.7 diagnostics and security candidate](docs/validation/2026-09-24-step-0.7-candidate.md).
-Physical Windows 7 Tier A and Tier B acceptance remains pending.
+Both physical Windows 7 tiers passed the exact candidate; the results and
+accepted environment disposition are recorded in the
+[Step 0.7 completion evidence](docs/validation/2026-09-24-step-0.7-completion.md).
 
 ### Step 0.8: Establish the permanent test system
 
@@ -362,7 +364,7 @@ published manually with complete identity and acceptance evidence.
 - [x] Accept Step 0.4 with linked platform and physical-machine evidence.
 - [x] Accept Step 0.5 with linked naming, version, protocol, and package evidence.
 - [x] Accept Step 0.6 with linked code-quality and regression evidence.
-- [ ] Accept Step 0.7 with linked diagnostics and security evidence.
+- [x] Accept Step 0.7 with linked diagnostics and security evidence.
 - [ ] Accept Step 0.8 with linked automated and physical test results.
 - [ ] Accept Step 0.9 with a reviewed release-candidate package.
 
