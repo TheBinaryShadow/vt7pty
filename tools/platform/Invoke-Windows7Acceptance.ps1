@@ -149,8 +149,8 @@ function Invoke-DiagnosticTransportTest {
     $stopwatch = [Diagnostics.Stopwatch]::StartNew()
     $logPath = Join-Path $OutputDirectory ($resultBaseName + '-diagnostics.jsonl')
     $record = [ordered]@{
-        Name = 'Structured diagnostic transport'
-        Executable = 'bin/VT7Pty-DebugServer.exe + tests/ProtocolTest.exe'
+        Name = 'Structured diagnostic transport and bundle'
+        Executable = 'VT7Pty-DebugServer.exe + ProtocolTest.exe + New-VT7PtyDiagnosticBundle.ps1'
         Arguments = @('--output', $logPath, '--max-bytes', '4096',
             '--max-messages', '3')
         Status = 'Fail'
@@ -219,6 +219,27 @@ function Invoke-DiagnosticTransportTest {
                     $null -eq $_.tid
                 }).Count -ne 0) {
             throw 'Diagnostic records lack required structured build identity.'
+        }
+        $bundleDirectory = Join-Path $OutputDirectory (
+            $resultBaseName + '-diagnostic-bundle')
+        & (Join-Path $packageRoot `
+            'tools\diagnostics\New-VT7PtyDiagnosticBundle.ps1') `
+            -LogPath $logPath `
+            -PackageDirectory $packageRoot `
+            -OutputDirectory $bundleDirectory `
+            -NoArchive
+        $bundleManifestPath = Join-Path $bundleDirectory `
+            'diagnostic-manifest.json'
+        if (-not (Test-Path -LiteralPath $bundleManifestPath -PathType Leaf)) {
+            throw 'Diagnostic bundle manifest was not created.'
+        }
+        $bundleManifest = Get-Content -LiteralPath $bundleManifestPath -Raw |
+            ConvertFrom-Json
+        if ($bundleManifest.Package.SourceCommit -ne $manifest.SourceCommit -or
+                [int]$bundleManifest.Diagnostics.RecordCount -ne 3 -or
+                [int]$bundleManifest.Diagnostics.InvalidLineCount -ne 0 -or
+                $bundleManifest.Diagnostics.ContainsOptInInputRecords -ne $false) {
+            throw 'Diagnostic bundle did not preserve the expected clean identity.'
         }
         $record.Status = 'Pass'
     } catch {
