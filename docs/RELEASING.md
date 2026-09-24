@@ -12,7 +12,7 @@ reviewed manual GitHub Release. There is no hosted build or test service.
 From a clean source tree, run:
 
 ```powershell
-.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc4
+.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc5
 ```
 
 The command refuses a dirty tree. It performs a clean x64 Release rebuild,
@@ -57,7 +57,7 @@ After all three runs, validate the exact release set and result records:
 
 ```powershell
 .\tools\release\Review-VT7PtyRelease.ps1 `
-    -ReleaseSetPath .\artifacts\packages\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc4-release-set.json `
+    -ReleaseSetPath .\artifacts\packages\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc5-release-set.json `
     -NonEsuResult C:\path\to\nonesu\results\windows7-nonesu-<run>.json `
     -EsuResult C:\path\to\esu\results\windows7-esu-<run>.json `
     -LegacyResult C:\path\to\legacy\results\windows7-legacy-<run>.json
@@ -81,7 +81,7 @@ three physical acceptance runs; earlier `0.5.0-dev` evidence cannot qualify it.
 
 For an accepted version `X.Y.Z`, the canonical tag is `vX.Y.Z`, the GitHub
 Release title is `VT7Pty X.Y.Z`, and the unsuffixed asset stem is
-`VT7Pty-X.Y.Z-win7-x64-release`. Candidate suffixes such as `m0-rc4` identify
+`VT7Pty-X.Y.Z-win7-x64-release`. Candidate suffixes such as `m0-rc5` identify
 trial package sets and are never removed by renaming their files. Build the
 final unsuffixed `X.Y.Z` set from its exact clean source commit, run all three
 physical tiers on that exact test ZIP, and review its own release-set manifest

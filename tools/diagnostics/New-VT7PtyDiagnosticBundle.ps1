@@ -1,6 +1,4 @@
-[CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [string]$LogPath,
 
@@ -14,6 +12,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
+if (-not $LogPath) { throw 'A diagnostic log path is required.' }
 $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 . (Join-Path (Split-Path -Parent $scriptDirectory) 'platform\Windows7Compat.ps1')
 if (-not $PackageDirectory) {

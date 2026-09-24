@@ -1,6 +1,4 @@
-[CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)]
     [ValidateSet('NonESU', 'ESU', 'Legacy')]
     [string]$Tier,
 
@@ -15,6 +13,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
 trap { Write-Host "Acceptance runner failed: $($_.Exception.Message)"; exit 1 }
+if (-not $Tier) { Write-Host 'A Windows 7 acceptance tier is required.'; exit 2 }
 
 $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 . (Join-Path $scriptDirectory 'Windows7Compat.ps1')
