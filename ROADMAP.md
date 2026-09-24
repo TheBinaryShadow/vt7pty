@@ -367,7 +367,7 @@ published manually with complete identity and acceptance evidence.
 
 The clean-source archive set, development-host checks, and exact physical
 acceptance dependency are recorded in the
-[Step 0.9 manual release candidate](docs/validation/2026-09-24-step-0.9-candidate.md).
+[Step 0.9 three-machine release candidate](docs/validation/2026-09-24-step-0.9-rc7-candidate.md).
 
 ### Milestone 0 acceptance
 

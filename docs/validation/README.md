@@ -26,3 +26,4 @@ Current records:
 - [2026-09-24 Step 0.8 permanent test system candidate](2026-09-24-step-0.8-candidate.md)
 - [2026-09-24 Step 0.8 completion](2026-09-24-step-0.8-completion.md)
 - [2026-09-24 Step 0.9 manual release candidate](2026-09-24-step-0.9-candidate.md)
+- [2026-09-24 Step 0.9 three-machine rc7 candidate](2026-09-24-step-0.9-rc7-candidate.md)
