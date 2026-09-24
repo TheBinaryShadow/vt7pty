@@ -75,7 +75,7 @@ recorded separately by the checked items below.
 
 | Milestone | Outcome | Status |
 | --- | --- | --- |
-| 0 | Fully modernized, native VT7Pty 0.5.x foundation | In progress; Steps 0.1-0.7 accepted, Step 0.8 candidate in preparation |
+| 0 | Fully modernized, native VT7Pty 0.5.x foundation | In progress; Steps 0.1-0.7 accepted, Step 0.8 candidate prepared |
 | 1 | Measured backend fidelity and reliability improvements | Direction approved; detailed scope follows Milestone 0 evidence |
 | 2 | Documented VT7Pty API and standalone integration host | Direction approved; detailed scope follows Milestone 1 |
 | 3 | Versioned backend handoff ready for separately authorized VT7 integration | Direction approved; detailed scope follows Milestone 2 |
@@ -324,7 +324,7 @@ same accepted cases on either physical Windows 7 tier.
 - [x] Add negative controls that prove incorrect output, status, ordering,
   timeout, incompatible agents, and leaked state are detected.
 - [x] Produce machine-readable results and a concise human-readable summary.
-- [ ] Build a portable Windows 7 acceptance bundle with instructions and all
+- [x] Build a portable Windows 7 acceptance bundle with instructions and all
   required fixtures.
 - [ ] Record exact OS/update state, architecture, package identity, per-case
   result, timing, logs, and crash artifacts for every physical run.
@@ -336,6 +336,10 @@ same accepted cases on either physical Windows 7 tier.
 Exit criterion: all required cases report pass, fail, skipped, or not run; no
 unexplained crash, hang, data loss, orphan, or material resource regression
 remains; and both Windows 7 tiers accept the milestone candidate.
+
+The implementation and development-host checks are recorded in the
+[Step 0.8 permanent test system candidate](docs/validation/2026-09-24-step-0.8-candidate.md).
+Physical acceptance on both Windows 7 tiers and the full soak remain pending.
 
 ### Step 0.9: Establish the manual release process
 
