@@ -75,7 +75,7 @@ recorded separately by the checked items below.
 
 | Milestone | Outcome | Status |
 | --- | --- | --- |
-| 0 | Fully modernized, native VT7Pty 0.5.x foundation | In progress; Steps 0.1-0.8 accepted, Step 0.9 next |
+| 0 | Fully modernized, native VT7Pty 0.5.x foundation | In progress; Steps 0.1-0.8 accepted, Step 0.9 candidate prepared |
 | 1 | Measured backend fidelity and reliability improvements | Direction approved; detailed scope follows Milestone 0 evidence |
 | 2 | Documented VT7Pty API and standalone integration host | Direction approved; detailed scope follows Milestone 1 |
 | 3 | Versioned backend handoff ready for separately authorized VT7 integration | Direction approved; detailed scope follows Milestone 2 |
@@ -348,19 +348,24 @@ Both tiers passed the exact candidate, including all 30 cases and the full
 Outcome: an identified, reviewed release can be reproduced locally and
 published without retired upstream infrastructure or hosted automation.
 
-- [ ] Make `Package-VT7Pty.ps1` produce runtime, development, symbols, and test
+- [x] Make `Package-VT7Pty.ps1` produce runtime, development, symbols, and test
   archives from an accepted Release build.
-- [ ] Include headers, import libraries, PDBs, licenses, notices, build/component
+- [x] Include headers, import libraries, PDBs, licenses, notices, build/component
   manifest, source revision, toolchain identity, and SHA-256 checksums.
-- [ ] Require a clean local build and verification result before packaging.
-- [ ] Require non-ESU and ESU physical acceptance records for a release.
-- [ ] Document changelog, version, tag, archive, checksum, and GitHub Release
+- [x] Require a clean local build and verification result before packaging.
+- [x] Require non-ESU and ESU physical acceptance records for a release.
+- [ ] Obtain and review both Windows 7 tier records for the exact candidate set.
+- [x] Document changelog, version, tag, archive, checksum, and GitHub Release
   preparation and review.
-- [ ] Keep installers and code signing outside the initial release process until
+- [x] Keep installers and code signing outside the initial release process until
   distribution needs justify them.
 
 Exit criterion: VT7Pty `0.5.0` can be built, tested, packaged, reviewed, and
 published manually with complete identity and acceptance evidence.
+
+The clean-source archive set, development-host checks, and exact physical
+acceptance dependency are recorded in the
+[Step 0.9 manual release candidate](docs/validation/2026-09-24-step-0.9-candidate.md).
 
 ### Milestone 0 acceptance
 
