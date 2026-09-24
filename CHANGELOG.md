@@ -32,6 +32,8 @@ changes until implemented.
   Windows 7 tiers, including a 120-minute soak on each machine.
 - Defined the manual release archive layout, exact package identity, physical
   evidence review, and separate publication decision.
+- Extended release-candidate acceptance to a third Windows 7 SP1 machine using
+  PowerShell 2.0 without KB3191566, with a shared 30-case target suite.
 - Preserved the original WinPTY README and release history as historical
   documentation.
 

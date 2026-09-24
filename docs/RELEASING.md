@@ -12,7 +12,7 @@ reviewed manual GitHub Release. There is no hosted build or test service.
 From a clean source tree, run:
 
 ```powershell
-.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc3
+.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc4
 ```
 
 The command refuses a dirty tree. It performs a clean x64 Release rebuild,
@@ -47,23 +47,24 @@ manifest hash, and archive SHA-256 before testing or publishing.
 
 ## Physical acceptance and review
 
-Copy the same `-tests.zip` and the `.sha256` file to both accepted Windows 7
+Copy the same `-tests.zip` and the `.sha256` file to all three Windows 7
 tiers. Follow [Windows 7 platform acceptance](WINDOWS7_ACCEPTANCE.md); the
 ordinary runner performs all 30 cases, including the 120-minute soak. Preserve
 each machine's complete `results` directory and review logs, failures, skips,
 dumps, update inventories, and the recorded environment disposition.
 
-After both runs, validate the exact release set and result pair:
+After all three runs, validate the exact release set and result records:
 
 ```powershell
 .\tools\release\Review-VT7PtyRelease.ps1 `
-    -ReleaseSetPath .\artifacts\packages\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc3-release-set.json `
+    -ReleaseSetPath .\artifacts\packages\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc4-release-set.json `
     -NonEsuResult C:\path\to\nonesu\results\windows7-nonesu-<run>.json `
-    -EsuResult C:\path\to\esu\results\windows7-esu-<run>.json
+    -EsuResult C:\path\to\esu\results\windows7-esu-<run>.json `
+    -LegacyResult C:\path\to\legacy\results\windows7-legacy-<run>.json
 ```
 
 The review checks the four archive hashes, the checksum file, test-manifest
-identity, source/version/API/protocol identity, distinct machine records, all
+identity, source/version/API/protocol identity, three distinct machine records, all
 30 passing cases, the full soak, and absence of preflight failures, inventory
 warnings, and crash artifacts. It writes a machine-readable review under
 `artifacts/release-review/`. A passing automated review does not replace a
@@ -76,13 +77,13 @@ publication.
 `0.5.0-dev` remains the development identity until Milestone 0 acceptance.
 The Step 0.9 tooling candidate may use that identity. Changing `VERSION.txt`
 to `0.5.0` changes the exact binaries and requires a new clean package set and
-both physical acceptance runs; earlier `0.5.0-dev` evidence cannot qualify it.
+three physical acceptance runs; earlier `0.5.0-dev` evidence cannot qualify it.
 
 For an accepted version `X.Y.Z`, the canonical tag is `vX.Y.Z`, the GitHub
 Release title is `VT7Pty X.Y.Z`, and the unsuffixed asset stem is
-`VT7Pty-X.Y.Z-win7-x64-release`. Candidate suffixes such as `m0-rc3` identify
+`VT7Pty-X.Y.Z-win7-x64-release`. Candidate suffixes such as `m0-rc4` identify
 trial package sets and are never removed by renaming their files. Build the
-final unsuffixed `X.Y.Z` set from its exact clean source commit, run both
+final unsuffixed `X.Y.Z` set from its exact clean source commit, run all three
 physical tiers on that exact test ZIP, and review its own release-set manifest
 and checksums before publication.
 

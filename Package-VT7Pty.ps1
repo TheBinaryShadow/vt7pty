@@ -162,10 +162,13 @@ foreach ($testProgram in $testPrograms) {
     $plans.tests["tests\$testProgram.exe"] = Join-Path $binaryDirectory "$testProgram.exe"
 }
 $plans.tests['RUN-WINDOWS7-ACCEPTANCE.cmd'] = Join-Path $repositoryRoot 'RUN-WINDOWS7-ACCEPTANCE.cmd'
+$plans.tests['RUN-WINDOWS7-LEGACY-ACCEPTANCE.cmd'] = Join-Path $repositoryRoot 'RUN-WINDOWS7-LEGACY-ACCEPTANCE.cmd'
 $plans.tests['tools\diagnostics\New-VT7PtyDiagnosticBundle.ps1'] =
     Join-Path $repositoryRoot 'tools\diagnostics\New-VT7PtyDiagnosticBundle.ps1'
 $plans.tests['tools\platform\Invoke-Windows7Acceptance.ps1'] =
     Join-Path $repositoryRoot 'tools\platform\Invoke-Windows7Acceptance.ps1'
+$plans.tests['tools\platform\Windows7Compat.ps1'] =
+    Join-Path $repositoryRoot 'tools\platform\Windows7Compat.ps1'
 foreach ($doc in @('COMPATIBILITY', 'DIAGNOSTICS', 'SECURITY_REVIEW', 'TESTING',
         'WINDOWS7_ACCEPTANCE', 'SSH_BASELINE', 'RELEASING')) {
     $plans.tests["docs\$doc.md"] = Join-Path $repositoryRoot "docs\$doc.md"

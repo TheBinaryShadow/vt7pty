@@ -26,8 +26,10 @@ Verification uses repository-owned native executables and Windows PowerShell
 scripts. There is no hosted build or test service.
 
 The maintained entry point is `Verify-VT7Pty.ps1`. Tests that must run
-on Windows 7 will work from a portable package without Visual Studio. Their
-orchestration will remain compatible with Windows PowerShell 5.1.
+on Windows 7 will work from a portable package without Visual Studio. The
+target-side acceptance and diagnostic scripts are designed for the PowerShell
+2.0 version included with Windows 7 SP1; development-host build tools retain their
+modern PowerShell requirements.
 
 | Layer | Purpose | Expected execution |
 | --- | --- | --- |
@@ -136,21 +138,21 @@ resource budgets are deliverables of the relevant implementation step.
 
 ## Physical Windows 7 matrix
 
-| Candidate | Non-ESU Windows 7 SP1 x64 | ESU Windows 7 SP1 x64 |
-| --- | --- | --- |
-| Routine development candidate | Required when target behavior or dependencies change | As needed for diagnosis |
-| Milestone candidate | Required | Required |
-| Release candidate | Required | Required |
+| Candidate | Non-ESU Windows 7 SP1 x64 | ESU Windows 7 SP1 x64 | Legacy PowerShell 2.0 Windows 7 SP1 x64 |
+| --- | --- | --- | --- |
+| Routine development candidate | Required when target behavior or dependencies change | As needed for diagnosis | As needed for diagnosis |
+| Milestone candidate from Step 0.9 | Required | Required | Required |
+| Release candidate | Required | Required | Required |
 
 Each run records hardware, OS build, installed-update state, package identity,
 commands, per-case results, durations, logs, dumps, and deviations from the
 previous accepted result.
 
-The portable, Windows PowerShell 5.1-compatible procedure is documented in
+The portable procedure for both current and PowerShell 2.0 installations is documented in
 [Windows 7 Platform Acceptance](WINDOWS7_ACCEPTANCE.md). A clean-tree package
 contains the runner, runtime binaries, native tests, fixtures, and a hash
 manifest. Matching symbols are in the separate symbols archive. The same test
-ZIP is run on both tiers.
+ZIP is run on all three machines.
 
 ## Initial stress profiles
 

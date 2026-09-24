@@ -19,7 +19,8 @@ Milestone 1 regression gate, fix and record all of the following:
 - credential-safe setup, host-key verification, and a disposable test account;
 - terminal geometry, input sequence, observable screen-state expectations,
   resize sequence, cancellation, exit, and cleanup criteria; and
-- matching non-ESU and ESU Windows 7 result records for the same candidate.
+- matching non-ESU, ESU, and legacy PowerShell 2.0 Windows 7 result records for
+  the same candidate.
 
 Until these dependencies are fixed, the remote baseline is **NotRun**, not a
 backend pass or failure. Local full-screen fixture behavior can be added to

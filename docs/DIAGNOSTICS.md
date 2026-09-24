@@ -59,6 +59,9 @@ host version, installed hotfix inventory, package identity, and SHA-256 hashes
 for shipped binaries. The script reports invalid JSON lines or mixed build
 identities rather than silently treating them as a single run.
 
+On the PowerShell 2.0 machine, add `-NoArchive` to the bundle command and copy
+the resulting diagnostic directory. The acceptance runner uses this mode.
+
 Run the collection independently on each physical target. Name the returned
 archive with the machine and Windows 7 servicing state before copying it into
 the validation results. The debug pipe rejects remote connections; the

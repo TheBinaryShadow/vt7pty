@@ -1,6 +1,6 @@
 # Windows 7 Platform Acceptance
 
-This procedure validates a specific VT7Pty candidate on the two physical
+This procedure validates a specific VT7Pty candidate on the three physical
 Windows 7 SP1 x64 tiers defined in [COMPATIBILITY.md](COMPATIBILITY.md). It is
 the target-side gate for Milestone 0 candidates and remains separate from
 development-host verification.
@@ -10,21 +10,29 @@ development-host verification.
 Produce a clean-tree Release package set and its checksum:
 
 ```powershell
-.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc3
+.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc4
 ```
 
-Use the same `-tests.zip` on both machines. Copy the package-set `.sha256` file
+Use the same `-tests.zip` on all three machines. Copy the package-set `.sha256` file
 with it and verify the ZIP before extraction. The test-archive manifest records
 the source commit and hashes every file used by the acceptance runner. Runtime,
 development, and symbols archives are reviewed separately on the build host;
 they are not needed to run this acceptance procedure.
 
-On either machine, compare the test ZIP hash with its line in the `.sha256`
+On each machine, compare the test ZIP hash with its line in the `.sha256`
 file before extraction:
 
 ```powershell
-(Get-FileHash .\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc3-tests.zip -Algorithm SHA256).Hash
+(Get-FileHash .\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc4-tests.zip -Algorithm SHA256).Hash
 ```
+
+On the PowerShell 2.0 machine, use the Windows 7 `certutil` utility instead:
+
+```bat
+certutil -hashfile VT7Pty-0.5.0-dev-win7-x64-release-m0-rc4-tests.zip SHA256
+```
+
+Compare the reported digest with the tests ZIP line in the `.sha256` file.
 
 ## Target procedure
 
@@ -43,15 +51,26 @@ file before extraction:
    RUN-WINDOWS7-ACCEPTANCE.cmd ESU
    ```
 
-5. Allow the 120-minute idle/active soak to finish on each machine. A fast
+5. On the Windows 7 SP1 machine with PowerShell 2.0 and without KB3191566, run:
+
+   ```bat
+   RUN-WINDOWS7-LEGACY-ACCEPTANCE.cmd
+   ```
+
+6. Allow the 120-minute idle/active soak to finish on each machine. A fast
    diagnostic run can use `-SoakMinutes 0` when invoking the PowerShell script
    directly, but it records `NotRun` and does not qualify a milestone or
    release candidate.
-6. Preserve and return the complete `results` directory from each machine.
+7. Preserve and return the complete `results` directory from each machine.
    It includes the `.json` and `.txt` result pair plus any step-specific
    diagnostic logs and bundles.
 
-The runner requires 64-bit Windows PowerShell on Windows 7 SP1. It verifies
+The runner requires 64-bit Windows PowerShell on Windows 7 SP1 and uses only
+PowerShell 2.0-compatible target-side facilities. The legacy launcher declares
+the `Legacy` tier and checks that PowerShell 2.0 is running and KB3191566 is
+absent. Manifest parsing in the test harness uses the .NET Framework 3.5.1
+component included with Windows 7; VT7Pty's runtime binaries do not depend
+on it. The runner verifies
 the package manifest and every packaged file before running the native cases.
 It records the declared tier, hardware, OS and service-pack identity,
 PowerShell version, installed hotfixes, package identity, duration, output,
@@ -78,10 +97,10 @@ The candidate performs these bounded checks:
 
 Any failed preflight, timeout, nonzero exit, missing expected output, missing
 file, malformed diagnostic record, bundle mismatch, or hash mismatch makes the
-run fail. The two target records must both pass before the corresponding
+run fail. The three target records must all pass before the corresponding
 roadmap step can use them as physical Windows 7 evidence. For Step 0.9, run
 `tools/release/Review-VT7PtyRelease.ps1` on the build host with the release-set
-manifest and both returned JSON records.
+manifest and all three returned JSON records.
 
 The target JSON and text records include per-case status and duration, package
 and OS/update identity, and any dump or WER files found in the results

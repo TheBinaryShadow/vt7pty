@@ -59,6 +59,10 @@ Every result records the actual OS build and installed-update state. The first
 acceptance work will establish the precise runtime prerequisite floor instead
 of inferring it from compiler settings.
 
+Step 0.9 later added a third Windows 7 SP1 x64 acceptance machine with
+PowerShell 2.0 and without KB3191566. The current candidate matrix is in
+[Compatibility](COMPATIBILITY.md) and [Testing](TESTING.md).
+
 Windows XP and Vista compatibility code, toolsets, workarounds, public flags,
 and claims will be removed after the baseline is captured. Later Windows
 versions remain supported targets, and useful version-specific behavior is
@@ -94,6 +98,9 @@ marker. Local x64 Debug and Release verification precedes every candidate.
 Routine candidates run on the non-ESU machine tier. Milestone and release
 candidates run on both physical Windows 7 tiers. Results are attached to exact
 source and package identities.
+
+The Step 0.9 release gate supersedes this original two-tier plan and requires
+the legacy third machine as well.
 
 Publishing a release follows the [manual release process](RELEASING.md) and
 remains a deliberate maintainer action after the package,

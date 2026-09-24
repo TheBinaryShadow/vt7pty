@@ -4,7 +4,7 @@ param(
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
     [string]$LogPath,
 
-    [string]$PackageDirectory = (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)),
+    [string]$PackageDirectory,
 
     [string]$OutputDirectory = (Join-Path (Get-Location) (
         'VT7Pty-diagnostics-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))),
@@ -14,6 +14,11 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
+$scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
+. (Join-Path (Split-Path -Parent $scriptDirectory) 'platform\Windows7Compat.ps1')
+if (-not $PackageDirectory) {
+    $PackageDirectory = Split-Path -Parent (Split-Path -Parent $scriptDirectory)
+}
 $utf8NoBom = New-Object Text.UTF8Encoding($false)
 $packageDirectory = [IO.Path]::GetFullPath($PackageDirectory)
 $outputDirectory = [IO.Path]::GetFullPath($OutputDirectory)
@@ -26,7 +31,7 @@ if (Test-Path -LiteralPath $outputDirectory) {
 
 $manifestPath = Join-Path $packageDirectory 'manifest.json'
 $manifest = if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
-    Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+    Read-VT7Json $manifestPath
 } else {
     $null
 }
@@ -36,9 +41,9 @@ Copy-Item -LiteralPath $logPath -Destination $logCopy
 $records = @()
 $invalidLineCount = 0
 foreach ($line in @(Get-Content -LiteralPath $logCopy)) {
-    if ([string]::IsNullOrWhiteSpace($line)) { continue }
+    if ($null -eq $line -or $line.Trim().Length -eq 0) { continue }
     try {
-        $records += $line | ConvertFrom-Json
+        $records += $script:vt7Json.DeserializeObject($line)
     } catch {
         $invalidLineCount++
     }
@@ -63,20 +68,21 @@ $servicePack = if ($null -eq $servicePackProperty) {
 $hotFixes = @()
 try {
     $hotFixes = @(Get-HotFix | Sort-Object HotFixID | ForEach-Object {
-        [ordered]@{ HotFixId = $_.HotFixID; InstalledOn = [string]$_.InstalledOn }
+        @{ HotFixId = $_.HotFixID; InstalledOn = [string]$_.InstalledOn }
     })
 } catch {
-    $hotFixes = @([ordered]@{ CollectionError = $_.Exception.Message })
+    $hotFixes = @(@{ CollectionError = $_.Exception.Message })
 }
 
 $binaryRecords = @()
 $binDirectory = Join-Path $packageDirectory 'bin'
 if (Test-Path -LiteralPath $binDirectory -PathType Container) {
-    foreach ($file in @(Get-ChildItem -LiteralPath $binDirectory -File | Sort-Object Name)) {
-        $binaryRecords += [ordered]@{
+    foreach ($file in @(Get-ChildItem -LiteralPath $binDirectory |
+            Where-Object { -not $_.PSIsContainer } | Sort-Object Name)) {
+        $binaryRecords += @{
             Name = $file.Name
             Bytes = $file.Length
-            Sha256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            Sha256 = [string](Get-VT7Sha256 $file.FullName)
             FileVersion = $file.VersionInfo.FileVersion
             ProductVersion = $file.VersionInfo.ProductVersion
         }
@@ -86,19 +92,27 @@ if (Test-Path -LiteralPath $binDirectory -PathType Container) {
 $identities = @($records | ForEach-Object {
     "$($_.version)|$($_.commit)|$($_.api)|$($_.protocol)"
 } | Sort-Object -Unique)
-$severityCounts = [ordered]@{}
-foreach ($group in @($records | Group-Object severity | Sort-Object Name)) {
-    $severityCounts[$group.Name] = $group.Count
-}
-$subsystemCounts = [ordered]@{}
-foreach ($group in @($records | Group-Object subsystem | Sort-Object Name)) {
-    $subsystemCounts[$group.Name] = $group.Count
+$severityCounts = @{}
+$subsystemCounts = @{}
+foreach ($entry in $records) {
+    $severity = [string]$entry['severity']
+    $subsystem = [string]$entry['subsystem']
+    if ($severityCounts.ContainsKey($severity)) {
+        $severityCounts[$severity]++
+    } else {
+        $severityCounts[$severity] = 1
+    }
+    if ($subsystemCounts.ContainsKey($subsystem)) {
+        $subsystemCounts[$subsystem]++
+    } else {
+        $subsystemCounts[$subsystem] = 1
+    }
 }
 
-$bundle = [ordered]@{
+$bundle = @{
     SchemaVersion = 1
     CollectedUtc = (Get-Date).ToUniversalTime().ToString('o')
-    Package = if ($null -eq $manifest) { $null } else { [ordered]@{
+    Package = if ($null -eq $manifest) { $null } else { @{
         Product = $manifest.Product
         Version = $manifest.Version
         ApiVersion = $manifest.ApiVersion
@@ -106,7 +120,7 @@ $bundle = [ordered]@{
         SourceCommit = $manifest.SourceCommit
         SourceTreeClean = $manifest.SourceTreeClean
     }}
-    Host = [ordered]@{
+    Host = @{
         ComputerName = $env:COMPUTERNAME
         ProductName = $windowsKey.ProductName
         CurrentVersion = $windowsKey.CurrentVersion
@@ -115,22 +129,21 @@ $bundle = [ordered]@{
         Architecture = $env:PROCESSOR_ARCHITECTURE
         PowerShellVersion = $PSVersionTable.PSVersion.ToString()
     }
-    Diagnostics = [ordered]@{
+    Diagnostics = @{
         RecordCount = $records.Count
         InvalidLineCount = $invalidLineCount
-        BuildIdentities = $identities
+        BuildIdentities = [string[]]$identities
         SeverityCounts = $severityCounts
         SubsystemCounts = $subsystemCounts
         ContainsOptInInputRecords = $containsOptInInput
         LogBytes = (Get-Item -LiteralPath $logCopy).Length
-        LogSha256 = (Get-FileHash -LiteralPath $logCopy -Algorithm SHA256).Hash.ToLowerInvariant()
+        LogSha256 = [string](Get-VT7Sha256 $logCopy)
     }
     Binaries = $binaryRecords
     HotFixes = $hotFixes
 }
 $bundlePath = Join-Path $outputDirectory 'diagnostic-manifest.json'
-[IO.File]::WriteAllText(
-    $bundlePath, ($bundle | ConvertTo-Json -Depth 8), $utf8NoBom)
+Write-VT7Json $bundlePath $bundle
 
 $readme = @"
 VT7Pty diagnostic bundle
@@ -144,6 +157,9 @@ explicit VT7PTY_DEBUG=input option captured keyboard or mouse details.
     (Join-Path $outputDirectory 'README.txt'), $readme, $utf8NoBom)
 
 if (-not $NoArchive) {
+    if ($PSVersionTable.PSVersion.Major -lt 5) {
+        throw 'Use -NoArchive on Windows PowerShell 2.0; copy the diagnostic directory.'
+    }
     $archivePath = $outputDirectory + '.zip'
     if (Test-Path -LiteralPath $archivePath) {
         throw "Archive already exists: $archivePath"

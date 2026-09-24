@@ -46,7 +46,7 @@ VT7Pty targets x64 Windows 7 SP1 and later. Windows XP, Windows Vista, and x86
 are outside the maintained product. Historical WinPTY support claims and
 release notes describe upstream behavior; they are not acceptance results for
 future VT7Pty builds. Milestone and release candidates will be validated on
-physical non-ESU and ESU Windows 7 SP1 x64 machines.
+physical non-ESU, ESU, and PowerShell 2.0 Windows 7 SP1 x64 machines.
 
 ## What we are working toward
 

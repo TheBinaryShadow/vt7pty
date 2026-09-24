@@ -353,8 +353,10 @@ published without retired upstream infrastructure or hosted automation.
 - [x] Include headers, import libraries, PDBs, licenses, notices, build/component
   manifest, source revision, toolchain identity, and SHA-256 checksums.
 - [x] Require a clean local build and verification result before packaging.
-- [x] Require non-ESU and ESU physical acceptance records for a release.
-- [ ] Obtain and review both Windows 7 tier records for the exact candidate set.
+- [x] Add a PowerShell 2.0-compatible target runner for the legacy Windows 7
+  machine and preserve the same 30-case acceptance matrix.
+- [x] Require non-ESU, ESU, and PowerShell 2.0 physical acceptance records for a release.
+- [ ] Obtain and review all three Windows 7 tier records for the exact candidate set.
 - [x] Document changelog, version, tag, archive, checksum, and GitHub Release
   preparation and review.
 - [x] Keep installers and code signing outside the initial release process until

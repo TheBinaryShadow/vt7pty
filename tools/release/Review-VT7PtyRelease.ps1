@@ -3,6 +3,7 @@ param(
     [Parameter(Mandatory = $true)][string]$ReleaseSetPath,
     [Parameter(Mandatory = $true)][string]$NonEsuResult,
     [Parameter(Mandatory = $true)][string]$EsuResult,
+    [Parameter(Mandatory = $true)][string]$LegacyResult,
     [string]$OutputPath
 )
 
@@ -89,7 +90,8 @@ if (Test-Path -LiteralPath $testPath -PathType Leaf) {
 $records = @()
 foreach ($target in @(
         @{ Tier = 'NonESU'; Path = $NonEsuResult },
-        @{ Tier = 'ESU'; Path = $EsuResult })) {
+        @{ Tier = 'ESU'; Path = $EsuResult },
+        @{ Tier = 'Legacy'; Path = $LegacyResult })) {
     $path = [IO.Path]::GetFullPath($target.Path)
     $result = Get-Content -LiteralPath $path -Raw | ConvertFrom-Json
     $issues = @()
@@ -108,6 +110,11 @@ foreach ($target in @(
             $result.OperatingSystem.ServicePackMajorVersion -ne 1 -or
             $result.OperatingSystem.Architecture -ne '64-bit') {
         $issues += 'The target is not recorded as Windows 7 SP1 x64.'
+    }
+    if ($target.Tier -eq 'Legacy' -and
+            ($result.OperatingSystem.PowerShellVersion -notmatch '^2\.' -or
+                @($result.OperatingSystem.Hotfixes | Where-Object HotFixId -eq 'KB3191566').Count -ne 0)) {
+        $issues += 'The legacy target must report PowerShell 2.0 without KB3191566.'
     }
     if (@($result.PreflightFailures).Count -ne 0 -or
             @($result.InventoryWarnings).Count -ne 0 -or
@@ -140,6 +147,7 @@ foreach ($target in @(
         Manufacturer = $result.Machine.Manufacturer
         Model = $result.Machine.Model
         OperatingSystem = $result.OperatingSystem.Version
+        PowerShellVersion = $result.OperatingSystem.PowerShellVersion
         StartedAt = $result.StartedAt
         CompletedAt = $result.CompletedAt
         ResultFile = $path
@@ -149,17 +157,17 @@ foreach ($target in @(
         Issues = $issues
     }
 }
-if ($records[0].Machine -eq $records[1].Machine) {
-    $failures += 'The two declared tiers do not identify distinct test machines.'
+if (@($records | ForEach-Object Machine | Sort-Object -Unique).Count -ne 3) {
+    $failures += 'The three declared tiers do not identify distinct test machines.'
 }
-$nonEsuNames = @(($NonEsuResult | ForEach-Object {
-    (Get-Content -LiteralPath $_ -Raw | ConvertFrom-Json).Tests.Name
-}) | Sort-Object)
-$esuNames = @(($EsuResult | ForEach-Object {
-    (Get-Content -LiteralPath $_ -Raw | ConvertFrom-Json).Tests.Name
-}) | Sort-Object)
-if (@(Compare-Object $nonEsuNames $esuNames).Count -ne 0) {
-    $failures += 'The two target records do not contain the same case names.'
+$baselineNames = @((Get-Content -LiteralPath $NonEsuResult -Raw |
+        ConvertFrom-Json).Tests.Name | Sort-Object)
+foreach ($path in @($EsuResult, $LegacyResult)) {
+    $names = @((Get-Content -LiteralPath $path -Raw |
+        ConvertFrom-Json).Tests.Name | Sort-Object)
+    if (@(Compare-Object $baselineNames $names).Count -ne 0) {
+        $failures += "The target record does not contain the same case names: $path"
+    }
 }
 
 if (-not $OutputPath) {

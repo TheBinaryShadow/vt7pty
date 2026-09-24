@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('NonESU', 'ESU')]
+    [ValidateSet('NonESU', 'ESU', 'Legacy')]
     [string]$Tier,
 
     [string]$OutputDirectory,
@@ -14,8 +14,11 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
+trap { Write-Host "Acceptance runner failed: $($_.Exception.Message)"; exit 1 }
 
-$packageRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
+. (Join-Path $scriptDirectory 'Windows7Compat.ps1')
+$packageRoot = Split-Path -Parent (Split-Path -Parent $scriptDirectory)
 if (-not $OutputDirectory) {
     $OutputDirectory = Join-Path $packageRoot 'results'
 }
@@ -47,7 +50,7 @@ function Invoke-AcceptanceTest {
     } else {
         $Executable
     }
-    $record = [ordered]@{
+    $record = @{
         Name = $Name
         Executable = $displayExecutable
         Arguments = $Arguments
@@ -60,6 +63,11 @@ function Invoke-AcceptanceTest {
         Failure = $null
     }
 
+    $process = $null
+    $stdoutSubscription = $null
+    $stderrSubscription = $null
+    $stdoutSource = 'vt7pty.stdout.' + [guid]::NewGuid().ToString('N')
+    $stderrSource = 'vt7pty.stderr.' + [guid]::NewGuid().ToString('N')
     try {
         if (-not (Test-Path -LiteralPath $Executable -PathType Leaf)) {
             throw "Executable is missing: $Executable"
@@ -84,8 +92,28 @@ function Invoke-AcceptanceTest {
         if (-not $process.Start()) {
             throw "Could not start $Executable"
         }
-        $stdoutTask = $process.StandardOutput.ReadToEndAsync()
-        $stderrTask = $process.StandardError.ReadToEndAsync()
+        $stdout = @{ Text = (New-Object Text.StringBuilder); Done = $false }
+        $stderr = @{ Text = (New-Object Text.StringBuilder); Done = $false }
+        $stdoutSubscription = Register-ObjectEvent -InputObject $process `
+            -EventName OutputDataReceived -SourceIdentifier $stdoutSource `
+            -MessageData $stdout -Action {
+                if ($null -eq $EventArgs.Data) {
+                    $Event.MessageData.Done = $true
+                } else {
+                    [void]$Event.MessageData.Text.AppendLine($EventArgs.Data)
+                }
+            }
+        $stderrSubscription = Register-ObjectEvent -InputObject $process `
+            -EventName ErrorDataReceived -SourceIdentifier $stderrSource `
+            -MessageData $stderr -Action {
+                if ($null -eq $EventArgs.Data) {
+                    $Event.MessageData.Done = $true
+                } else {
+                    [void]$Event.MessageData.Text.AppendLine($EventArgs.Data)
+                }
+            }
+        $process.BeginOutputReadLine()
+        $process.BeginErrorReadLine()
         if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
             $record.TimedOut = $true
             & taskkill.exe /PID $process.Id /T /F | Out-Null
@@ -93,8 +121,17 @@ function Invoke-AcceptanceTest {
         } else {
             $record.ExitCode = $process.ExitCode
         }
-        $record.StandardOutput = $stdoutTask.Result.Trim()
-        $record.StandardError = $stderrTask.Result.Trim()
+        $process.WaitForExit()
+        $drain = [Diagnostics.Stopwatch]::StartNew()
+        while ((-not $stdout.Done -or -not $stderr.Done) -and
+                $drain.ElapsedMilliseconds -lt 10000) {
+            Start-Sleep -Milliseconds 10
+        }
+        if (-not $stdout.Done -or -not $stderr.Done) {
+            throw 'Process output capture did not complete.'
+        }
+        $record.StandardOutput = $stdout.Text.ToString().Trim()
+        $record.StandardError = $stderr.Text.ToString().Trim()
 
         if ($ExpectTimeout) {
             if (-not $record.TimedOut) {
@@ -121,10 +158,19 @@ function Invoke-AcceptanceTest {
     } catch {
         $record.Failure = $_.Exception.Message
     } finally {
+        if ($null -ne $stdoutSubscription) {
+            Unregister-Event -SourceIdentifier $stdoutSource
+            Remove-Job -Job $stdoutSubscription -Force
+        }
+        if ($null -ne $stderrSubscription) {
+            Unregister-Event -SourceIdentifier $stderrSource
+            Remove-Job -Job $stderrSubscription -Force
+        }
+        if ($null -ne $process) { $process.Close() }
         $stopwatch.Stop()
         $record.DurationMilliseconds = $stopwatch.ElapsedMilliseconds
     }
-    return [pscustomobject]$record
+    return $record
 }
 
 function Invoke-IsolatedAgentFailureTest {
@@ -161,10 +207,10 @@ function Invoke-IsolatedAgentFailureTest {
 function Invoke-DiagnosticTransportTest {
     $stopwatch = [Diagnostics.Stopwatch]::StartNew()
     $logPath = Join-Path $OutputDirectory ($resultBaseName + '-diagnostics.jsonl')
-    $record = [ordered]@{
+    $record = @{
         Name = 'Structured diagnostic transport and bundle'
         Executable = 'VT7Pty-DebugServer.exe + ProtocolTest.exe + New-VT7PtyDiagnosticBundle.ps1'
-        Arguments = @('--output', $logPath, '--max-bytes', '4096',
+        Arguments = [string[]]@('--output', $logPath, '--max-bytes', '4096',
             '--max-messages', '3')
         Status = 'Fail'
         DurationMilliseconds = 0
@@ -174,6 +220,11 @@ function Invoke-DiagnosticTransportTest {
         StandardError = ''
         Failure = $null
     }
+    $server = $null
+    $serverOutSubscription = $null
+    $serverErrSubscription = $null
+    $serverOutSource = 'vt7pty.serverout.' + [guid]::NewGuid().ToString('N')
+    $serverErrSource = 'vt7pty.servererr.' + [guid]::NewGuid().ToString('N')
     try {
         $serverInfo = New-Object Diagnostics.ProcessStartInfo
         $serverInfo.FileName = Join-Path $binDirectory 'VT7Pty-DebugServer.exe'
@@ -189,8 +240,28 @@ function Invoke-DiagnosticTransportTest {
         if (-not $server.Start()) {
             throw 'Could not start diagnostic server.'
         }
-        $serverOutput = $server.StandardOutput.ReadToEndAsync()
-        $serverError = $server.StandardError.ReadToEndAsync()
+        $serverOutput = @{ Text = (New-Object Text.StringBuilder); Done = $false }
+        $serverError = @{ Text = (New-Object Text.StringBuilder); Done = $false }
+        $serverOutSubscription = Register-ObjectEvent -InputObject $server `
+            -EventName OutputDataReceived -SourceIdentifier $serverOutSource `
+            -MessageData $serverOutput -Action {
+                if ($null -eq $EventArgs.Data) {
+                    $Event.MessageData.Done = $true
+                } else {
+                    [void]$Event.MessageData.Text.AppendLine($EventArgs.Data)
+                }
+            }
+        $serverErrSubscription = Register-ObjectEvent -InputObject $server `
+            -EventName ErrorDataReceived -SourceIdentifier $serverErrSource `
+            -MessageData $serverError -Action {
+                if ($null -eq $EventArgs.Data) {
+                    $Event.MessageData.Done = $true
+                } else {
+                    [void]$Event.MessageData.Text.AppendLine($EventArgs.Data)
+                }
+            }
+        $server.BeginOutputReadLine()
+        $server.BeginErrorReadLine()
         Start-Sleep -Milliseconds 250
         $emitter = Invoke-AcceptanceTest -Name 'Diagnostic emitter' `
             -Executable (Join-Path $testDirectory 'ProtocolTest.exe') `
@@ -206,8 +277,17 @@ function Invoke-DiagnosticTransportTest {
             throw "Diagnostic server exceeded the $TestTimeoutSeconds-second timeout."
         }
         $record.ExitCode = $server.ExitCode
-        $record.StandardOutput = $serverOutput.Result.Trim()
-        $record.StandardError = $serverError.Result.Trim()
+        $server.WaitForExit()
+        $drain = [Diagnostics.Stopwatch]::StartNew()
+        while ((-not $serverOutput.Done -or -not $serverError.Done) -and
+                $drain.ElapsedMilliseconds -lt 10000) {
+            Start-Sleep -Milliseconds 10
+        }
+        if (-not $serverOutput.Done -or -not $serverError.Done) {
+            throw 'Diagnostic server output capture did not complete.'
+        }
+        $record.StandardOutput = $serverOutput.Text.ToString().Trim()
+        $record.StandardError = $serverError.Text.ToString().Trim()
         if ($record.ExitCode -ne 0) {
             throw "Diagnostic server exited with code $($record.ExitCode)."
         }
@@ -218,7 +298,7 @@ function Invoke-DiagnosticTransportTest {
             throw 'Diagnostic server exceeded its configured file bound.'
         }
         $records = @(Get-Content -LiteralPath $logPath | ForEach-Object {
-            $_ | ConvertFrom-Json
+            $script:vt7Json.DeserializeObject($_)
         })
         if ($records.Count -ne 3 -or
                 @($records | Where-Object {
@@ -246,8 +326,7 @@ function Invoke-DiagnosticTransportTest {
         if (-not (Test-Path -LiteralPath $bundleManifestPath -PathType Leaf)) {
             throw 'Diagnostic bundle manifest was not created.'
         }
-        $bundleManifest = Get-Content -LiteralPath $bundleManifestPath -Raw |
-            ConvertFrom-Json
+        $bundleManifest = Read-VT7Json $bundleManifestPath
         if ($bundleManifest.Package.SourceCommit -ne $manifest.SourceCommit -or
                 [int]$bundleManifest.Diagnostics.RecordCount -ne 3 -or
                 [int]$bundleManifest.Diagnostics.InvalidLineCount -ne 0 -or
@@ -258,10 +337,19 @@ function Invoke-DiagnosticTransportTest {
     } catch {
         $record.Failure = $_.Exception.Message
     } finally {
+        if ($null -ne $serverOutSubscription) {
+            Unregister-Event -SourceIdentifier $serverOutSource
+            Remove-Job -Job $serverOutSubscription -Force
+        }
+        if ($null -ne $serverErrSubscription) {
+            Unregister-Event -SourceIdentifier $serverErrSource
+            Remove-Job -Job $serverErrSubscription -Force
+        }
+        if ($null -ne $server) { $server.Close() }
         $stopwatch.Stop()
         $record.DurationMilliseconds = $stopwatch.ElapsedMilliseconds
     }
-    return [pscustomobject]$record
+    return $record
 }
 
 [IO.Directory]::CreateDirectory($OutputDirectory) | Out-Null
@@ -270,14 +358,14 @@ $resultBaseName = "windows7-$($Tier.ToLowerInvariant())-$timestamp"
 $jsonPath = Join-Path $OutputDirectory ($resultBaseName + '.json')
 $textPath = Join-Path $OutputDirectory ($resultBaseName + '.txt')
 
-$manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+$manifest = Read-VT7Json $manifestPath
 $integrityFailures = @()
 foreach ($file in $manifest.Files) {
     $filePath = Join-Path $packageRoot ($file.Path.Replace('/', '\'))
     if (-not (Test-Path -LiteralPath $filePath -PathType Leaf)) {
         $integrityFailures += "Missing: $($file.Path)"
     } else {
-        $actualHash = (Get-FileHash -LiteralPath $filePath -Algorithm SHA256).Hash.ToLowerInvariant()
+        $actualHash = Get-VT7Sha256 $filePath
         if ($actualHash -ne $file.Sha256) {
             $integrityFailures += "Hash mismatch: $($file.Path)"
         }
@@ -288,7 +376,7 @@ $osVersion = [Environment]::OSVersion.Version
 $windowsRegistry = Get-ItemProperty -LiteralPath 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion'
 $inventoryWarnings = @()
 try {
-    $operatingSystem = Get-CimInstance -ClassName Win32_OperatingSystem
+    $operatingSystem = Get-WmiObject -Class Win32_OperatingSystem
 } catch {
     $inventoryWarnings += "Win32_OperatingSystem inventory was unavailable: $($_.Exception.Message)"
     $servicePackMajor = 0
@@ -296,27 +384,27 @@ try {
     if ($null -ne $servicePackText -and $servicePackText.Value -match '(\d+)') {
         $servicePackMajor = [int]$Matches[1]
     }
-    $operatingSystem = [pscustomobject]@{
+    $operatingSystem = New-Object PSObject -Property @{
         Caption = $windowsRegistry.ProductName
         BuildNumber = $windowsRegistry.CurrentBuildNumber
         ServicePackMajorVersion = $servicePackMajor
         ServicePackMinorVersion = 0
-        OSArchitecture = if ([Environment]::Is64BitOperatingSystem) { '64-bit' } else { '32-bit' }
+        OSArchitecture = if ($env:PROCESSOR_ARCHITECTURE -eq 'AMD64') { '64-bit' } else { '32-bit' }
     }
 }
 try {
-    $computerSystem = Get-CimInstance -ClassName Win32_ComputerSystem
+    $computerSystem = Get-WmiObject -Class Win32_ComputerSystem
 } catch {
     $inventoryWarnings += "Win32_ComputerSystem inventory was unavailable: $($_.Exception.Message)"
     $bios = Get-ItemProperty -LiteralPath 'HKLM:\HARDWARE\DESCRIPTION\System\BIOS'
-    $computerSystem = [pscustomobject]@{
+    $computerSystem = New-Object PSObject -Property @{
         Manufacturer = $bios.SystemManufacturer
         Model = $bios.SystemProductName
         TotalPhysicalMemory = $null
     }
 }
 try {
-    $processors = @(Get-CimInstance -ClassName Win32_Processor | ForEach-Object { $_.Name.Trim() })
+    $processors = @(Get-WmiObject -Class Win32_Processor | ForEach-Object { $_.Name.Trim() })
 } catch {
     $inventoryWarnings += "Win32_Processor inventory was unavailable: $($_.Exception.Message)"
     $processors = @($env:PROCESSOR_IDENTIFIER)
@@ -328,7 +416,7 @@ if ($osVersion.Major -ne 6 -or $osVersion.Minor -ne 1) {
 if ([int]$operatingSystem.ServicePackMajorVersion -lt 1) {
     $preflightFailures += 'Windows 7 Service Pack 1 is required.'
 }
-if (-not [Environment]::Is64BitOperatingSystem -or -not [Environment]::Is64BitProcess) {
+if ($operatingSystem.OSArchitecture -ne '64-bit' -or [IntPtr]::Size -ne 8) {
     $preflightFailures += 'The acceptance run requires 64-bit Windows and 64-bit Windows PowerShell.'
 }
 if ($manifest.Architecture -ne 'x64' -or $manifest.MinimumOperatingSystem -ne 'Windows 7 SP1') {
@@ -336,6 +424,9 @@ if ($manifest.Architecture -ne 'x64' -or $manifest.MinimumOperatingSystem -ne 'W
 }
 if ($manifest.SourceTreeClean -ne $true) {
     $preflightFailures += 'The candidate was not produced from a clean source tree.'
+}
+if ($Tier -eq 'Legacy' -and $PSVersionTable.PSVersion.Major -ne 2) {
+    $preflightFailures += 'The legacy tier requires the installed Windows PowerShell 2.0 engine.'
 }
 $preflightFailures += $integrityFailures
 if ($SoakMinutes -ne 120) {
@@ -385,7 +476,7 @@ try {
                 -TimeoutSeconds ($SoakMinutes * 60 + 120) `
                 -ExpectedOutput 'Session contract SOAK passed.'
         } else {
-            [pscustomobject][ordered]@{
+            @{
                 Name = 'Session contract: SOAK 120 minutes'
                 Executable = 'tests/SessionContractTest.exe'
                 Arguments = @('SOAK', '120')
@@ -442,7 +533,7 @@ $hotfixes = @()
 try {
     $hotfixes = @(
         Get-HotFix | Sort-Object HotFixID | ForEach-Object {
-            [ordered]@{
+            @{
                 HotFixId = $_.HotFixID
                 Description = $_.Description
                 InstalledOn = if ($null -eq $_.InstalledOn) { $null } else { ([datetime]$_.InstalledOn).ToString('yyyy-MM-dd') }
@@ -456,7 +547,7 @@ try {
         $hotfixes = @(
             Get-ChildItem -LiteralPath $cbsRoot | ForEach-Object {
                 if ($_.PSChildName -match 'KB\d+') {
-                    [ordered]@{
+                    @{
                         HotFixId = $Matches[0]
                         Description = 'CBS package'
                         InstalledOn = $null
@@ -468,28 +559,33 @@ try {
         $preflightFailures += "Installed-update inventory failed: $($_.Exception.Message)"
     }
 }
+if ($Tier -eq 'Legacy' -and
+        @($hotfixes | Where-Object { $_.HotFixId -eq 'KB3191566' }).Count -ne 0) {
+    $preflightFailures += 'The legacy tier must not have KB3191566 installed.'
+}
 $failedTests = @($tests | Where-Object { $_.Status -ne 'Pass' })
 $overallStatus = if ($preflightFailures.Count -eq 0 -and $failedTests.Count -eq 0) { 'Pass' } else { 'Fail' }
 $crashArtifacts = @(
-    Get-ChildItem -LiteralPath $OutputDirectory -Recurse -File |
+    Get-ChildItem -LiteralPath $OutputDirectory -Recurse |
         Where-Object {
-            $_.Extension -in @('.dmp', '.wer') -and
+            -not $_.PSIsContainer -and
+            @('.dmp', '.wer') -contains $_.Extension -and
             $_.LastWriteTimeUtc -ge [datetime]$runStartedAt
         } | ForEach-Object {
-            [ordered]@{
+            @{
                 Path = $_.FullName.Substring($OutputDirectory.Length + 1).Replace('\', '/')
                 Bytes = $_.Length
-                Sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+                Sha256 = [string](Get-VT7Sha256 $_.FullName)
             }
         }
 )
-$record = [ordered]@{
+$record = @{
     SchemaVersion = 1
     Status = $overallStatus
     DeclaredTier = $Tier
     StartedAt = $runStartedAt
     CompletedAt = (Get-Date).ToUniversalTime().ToString('o')
-    Package = [ordered]@{
+    Package = @{
         Product = $manifest.Product
         Version = $manifest.Version
         ApiVersion = $manifest.ApiVersion
@@ -498,10 +594,10 @@ $record = [ordered]@{
         Architecture = $manifest.Architecture
         MinimumOperatingSystem = $manifest.MinimumOperatingSystem
         SourceCommit = $manifest.SourceCommit
-        ManifestSha256 = (Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        ManifestSha256 = [string](Get-VT7Sha256 $manifestPath)
         Toolchain = $manifest.Toolchain
     }
-    Machine = [ordered]@{
+    Machine = @{
         ComputerName = $env:COMPUTERNAME
         Manufacturer = $computerSystem.Manufacturer
         Model = $computerSystem.Model
@@ -512,7 +608,7 @@ $record = [ordered]@{
         }
         Processors = $processors
     }
-    OperatingSystem = [ordered]@{
+    OperatingSystem = @{
         ProductName = $windowsRegistry.ProductName
         Caption = $operatingSystem.Caption
         Version = $osVersion.ToString()
@@ -521,14 +617,14 @@ $record = [ordered]@{
         ServicePackMinorVersion = $operatingSystem.ServicePackMinorVersion
         Architecture = $operatingSystem.OSArchitecture
         PowerShellVersion = $PSVersionTable.PSVersion.ToString()
-        Hotfixes = $hotfixes
+        Hotfixes = [hashtable[]]$hotfixes
     }
     InventoryWarnings = $inventoryWarnings
     PreflightFailures = $preflightFailures
     CrashArtifacts = $crashArtifacts
-    Tests = $tests
+    Tests = [hashtable[]]$tests
 }
-$record | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $jsonPath -Encoding UTF8
+Write-VT7Json $jsonPath $record
 
 $summary = @(
     "VT7Pty Windows 7 acceptance: $overallStatus"
@@ -536,7 +632,7 @@ $summary = @(
     "Machine: $($env:COMPUTERNAME) ($($computerSystem.Manufacturer) $($computerSystem.Model))"
     "OS: $($operatingSystem.Caption), version $osVersion, SP$($operatingSystem.ServicePackMajorVersion)"
     "Package: $($manifest.Product) $($manifest.Version), commit $($manifest.SourceCommit)"
-    "Manifest SHA-256: $((Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant())"
+    "Manifest SHA-256: $(Get-VT7Sha256 $manifestPath)"
     ""
     "Preflight failures:"
     $(if ($preflightFailures.Count -eq 0) { '  None' } else { $preflightFailures | ForEach-Object { "  $_" } })

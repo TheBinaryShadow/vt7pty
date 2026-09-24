@@ -52,14 +52,18 @@ VT7Pty uses the same physical environment available for VT7:
 | --- | --- | --- |
 | A | Windows 7 SP1 x64, fully updated with the available non-ESU public update set | Routine target iteration and minimum-floor acceptance |
 | B | Windows 7 SP1 x64, fully updated through ESU | Additional milestone and release-candidate acceptance |
+| C | Windows 7 SP1 x64 with Windows PowerShell 2.0 and without KB3191566 | Legacy update-floor acceptance for release candidates |
 
 Every run records the exact OS build and installed-update state. The initial
 acceptance work will determine and document required loader/runtime updates.
 VT7 graphics or managed-runtime prerequisites are not automatically VT7Pty
 prerequisites.
 
-Routine candidates run on Tier A. Milestone and release candidates run on both
-tiers. Results from one tier ordinarily do not stand in for the other. Step
+Routine candidates run on Tier A. Milestone and release candidates run on all
+three tiers from the Step 0.9 candidate onward. Tier C is pending its first
+physical acceptance; Windows PowerShell 5.1 and KB3191566 are not product
+prerequisites unless target evidence establishes a dependency. Results from one
+tier ordinarily do not stand in for another. Step
 0.4 has a documented owner-approved exception for two declared-tier runs on
 one recorded installation; Step 0.5 has a documented owner-approved temporary
 two-machine treatment despite identical recorded machine metadata. Steps 0.6
