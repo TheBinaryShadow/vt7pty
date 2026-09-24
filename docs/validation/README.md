@@ -21,3 +21,5 @@ Current records:
 - [2026-09-22 Step 0.5 completion](2026-09-22-step-0.5-completion.md)
 - [2026-09-22 Step 0.6 native modernization candidate](2026-09-22-step-0.6-candidate.md)
 - [2026-09-23 Step 0.6 completion](2026-09-23-step-0.6-completion.md)
+- [2026-09-24 Step 0.7 diagnostics candidate](2026-09-24-step-0.7-candidate.md)
+- [2026-09-24 Step 0.7 completion](2026-09-24-step-0.7-completion.md)

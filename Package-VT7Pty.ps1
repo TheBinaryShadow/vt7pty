@@ -102,12 +102,16 @@ $copyPlan = [ordered]@{
     'tools\platform\Invoke-Windows7Acceptance.ps1' = (Join-Path $repositoryRoot 'tools\platform\Invoke-Windows7Acceptance.ps1')
     'docs\DIAGNOSTICS.md' = (Join-Path $repositoryRoot 'docs\DIAGNOSTICS.md')
     'docs\SECURITY_REVIEW.md' = (Join-Path $repositoryRoot 'docs\SECURITY_REVIEW.md')
+    'docs\TESTING.md' = (Join-Path $repositoryRoot 'docs\TESTING.md')
+    'docs\WINDOWS7_ACCEPTANCE.md' = (Join-Path $repositoryRoot 'docs\WINDOWS7_ACCEPTANCE.md')
+    'docs\SSH_BASELINE.md' = (Join-Path $repositoryRoot 'docs\SSH_BASELINE.md')
     'LICENSE.txt' = (Join-Path $repositoryRoot 'LICENSE')
     'CREDITS.md' = (Join-Path $repositoryRoot 'CREDITS.md')
     'UPSTREAM.md' = (Join-Path $repositoryRoot 'UPSTREAM.md')
 }
 $testPrograms = @(
     'ModernCppTest', 'ProtocolTest', 'ProtocolTestAgent', 'BackendSmokeTest',
+    'SessionContractTest', 'SessionFixture',
     'fixture-console-color-grid', 'fixture-output-lines', 'fixture-show-argv',
     'fixture-show-console-input', 'fixture-utf16-echo', 'fixture-win32-echo1',
     'fixture-win32-echo2', 'fixture-win32-write1', 'fixture-write-console',
@@ -133,6 +137,21 @@ $sourceChanges = @(& git -C $repositoryRoot status --porcelain=v1 2>&1)
 if ($LASTEXITCODE -ne 0) {
     throw "Could not inspect source state: $($sourceChanges -join [Environment]::NewLine)"
 }
+$vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+$installationPath = (& $vswherePath -latest -products * -version '[17.0,18.0)' `
+    -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+    -property installationPath).Trim()
+if (-not $installationPath) {
+    throw 'Could not identify the Visual Studio C++ toolchain used for packaging.'
+}
+$msvcDirectory = Get-ChildItem -LiteralPath (Join-Path $installationPath 'VC\Tools\MSVC') -Directory |
+    Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
+$compilerPath = Join-Path $msvcDirectory.FullName 'bin\Hostx64\x64\cl.exe'
+$sdkSettings = [IO.File]::ReadAllText((Join-Path $repositoryRoot 'Directory.Build.props'))
+$sdkMatch = [regex]::Match($sdkSettings, '<WindowsTargetPlatformVersion>(?<value>[^<]+)</WindowsTargetPlatformVersion>')
+if (-not (Test-Path -LiteralPath $compilerPath -PathType Leaf) -or -not $sdkMatch.Success) {
+    throw 'Could not identify the compiler or Windows SDK version.'
+}
 $files = @(
     Get-ChildItem -LiteralPath $stagingDirectory -File -Recurse |
         Sort-Object FullName |
@@ -157,6 +176,13 @@ $manifest = [ordered]@{
     SourceCommit = $sourceCommit
     SourceTreeClean = ($sourceChanges.Count -eq 0)
     SourceTreeChanges = $sourceChanges
+    Toolchain = [ordered]@{
+        VisualStudio = '2022'
+        MSVCDirectoryVersion = $msvcDirectory.Name
+        CompilerFileVersion = (Get-Item -LiteralPath $compilerPath).VersionInfo.FileVersion
+        WindowsSDKVersion = $sdkMatch.Groups['value'].Value
+        PowerShellVersion = $PSVersionTable.PSVersion.ToString()
+    }
     Files = $files
 }
 $manifest | ConvertTo-Json -Depth 8 |

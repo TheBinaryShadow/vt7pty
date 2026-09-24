@@ -10,7 +10,7 @@ development-host verification.
 Produce one clean-tree Release candidate and its checksum:
 
 ```powershell
-.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix step-0.7-candidate
+.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix step-0.8-candidate
 ```
 
 Use the same ZIP on both machines. Copy the adjacent `.sha256` file with it
@@ -34,7 +34,10 @@ commit and hashes every file used by the acceptance runner.
    RUN-WINDOWS7-ACCEPTANCE.cmd ESU
    ```
 
-5. Preserve and return the complete `results` directory from each machine.
+5. Allow the 120-minute idle/active soak to finish on each machine. A fast
+   diagnostic run can use `-SoakMinutes 0` when invoking the PowerShell script
+   directly, but it records `NotRun` and does not qualify Step 0.8.
+6. Preserve and return the complete `results` directory from each machine.
    It includes the `.json` and `.txt` result pair plus any step-specific
    diagnostic logs and bundles.
 
@@ -55,12 +58,24 @@ The candidate performs these bounded checks:
 - debug-pipe ACL validation and diagnostic build identity;
 - bounded structured diagnostic transport and target-side bundle creation;
 - argument quoting; and
-- deterministic bounded output.
+- deterministic bounded output;
+- input and Unicode output, 100 resizes under load, 500 repeated sessions,
+  20 live shutdowns, failed child creation, four concurrent sessions, and
+  agent/child exit and handle-growth checks;
+- deliberate faults in output, status, order, truncation, timeout, and handle
+  state that the runner must detect; and
+- a 120-minute idle/active soak with bounded per-cycle cleanup.
 
 Any failed preflight, timeout, nonzero exit, missing expected output, missing
 file, malformed diagnostic record, bundle mismatch, or hash mismatch makes the
 run fail. The two target records must both pass before the corresponding
 roadmap step can use them as physical Windows 7 evidence.
+
+The target JSON and text records include per-case status and duration, package
+and OS/update identity, and any dump or WER files found in the results
+directory. Preserve generated diagnostic logs and bundles alongside the result
+pair. The remote SSH/full-screen application baseline remains [an explicit
+dependency](SSH_BASELINE.md) for Milestone 1.
 
 ## Result handling
 

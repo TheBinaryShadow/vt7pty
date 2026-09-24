@@ -5,7 +5,10 @@ param(
 
     [switch]$NoBuild,
 
-    [int]$TestTimeoutSeconds = 60
+    [int]$TestTimeoutSeconds = 60,
+
+    [ValidateRange(0, 120)]
+    [int]$SoakMinutes = 0
 )
 
 $ErrorActionPreference = 'Stop'
@@ -86,7 +89,8 @@ function Invoke-NativeTest {
         [Parameter(Mandatory = $true)][string]$Executable,
         [Parameter(Mandatory = $true)][string]$WorkingDirectory,
         [string[]]$Arguments = @(),
-        [hashtable]$Environment = @{}
+        [hashtable]$Environment = @{},
+        [int]$TimeoutSeconds = $TestTimeoutSeconds
     )
 
     $startInfo = New-Object Diagnostics.ProcessStartInfo
@@ -109,7 +113,7 @@ function Invoke-NativeTest {
 
     $stdoutTask = $process.StandardOutput.ReadToEndAsync()
     $stderrTask = $process.StandardError.ReadToEndAsync()
-    $timedOut = -not $process.WaitForExit($TestTimeoutSeconds * 1000)
+    $timedOut = -not $process.WaitForExit($TimeoutSeconds * 1000)
     if ($timedOut) {
         & taskkill.exe /PID $process.Id /T /F | Out-Null
         $process.WaitForExit()
@@ -121,6 +125,34 @@ function Invoke-NativeTest {
         TimedOut = $timedOut
         StandardOutput = $stdoutTask.Result.Trim()
         StandardError = $stderrTask.Result.Trim()
+    }
+}
+
+function Invoke-NegativeControl {
+    param(
+        [Parameter(Mandatory = $true)][string]$BinaryDirectory,
+        [Parameter(Mandatory = $true)][string]$Mode,
+        [string]$ExpectedError,
+        [switch]$ExpectTimeout
+    )
+
+    $result = Invoke-NativeTest `
+        -Executable (Join-Path $BinaryDirectory 'SessionContractTest.exe') `
+        -WorkingDirectory $BinaryDirectory `
+        -Arguments @($Mode) `
+        -TimeoutSeconds $(if ($ExpectTimeout) { 2 } else { $TestTimeoutSeconds })
+    $detected = if ($ExpectTimeout) {
+        $result.TimedOut
+    } else {
+        -not $result.TimedOut -and $result.ExitCode -eq 1 -and
+            $result.StandardError.Contains($ExpectedError)
+    }
+    return [ordered]@{
+        Name = "Negative control: $Mode"
+        ExitCode = if ($detected) { 0 } else { 1 }
+        TimedOut = $false
+        StandardOutput = "Observed exit=$($result.ExitCode), timeout=$($result.TimedOut)"
+        StandardError = if ($detected) { '' } else { $result.StandardError }
     }
 }
 
@@ -271,6 +303,8 @@ $expectedImports = [ordered]@{
     'VT7Pty-Agent.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'SHELL32.dll', 'USER32.dll')
     'VT7Pty-DebugServer.exe' = @('ADVAPI32.dll', 'KERNEL32.dll')
     'BackendSmokeTest.exe' = @('KERNEL32.dll', 'VT7Pty.dll')
+    'SessionContractTest.exe' = @('KERNEL32.dll', 'VT7Pty.dll')
+    'SessionFixture.exe' = @('KERNEL32.dll')
     'ProtocolTest.exe' = @('KERNEL32.dll')
     'ProtocolTestAgent.exe' = @('KERNEL32.dll')
     'ModernCppTest.exe' = @('KERNEL32.dll')
@@ -330,6 +364,8 @@ foreach ($configurationName in $configurations) {
         'VT7Pty-DebugServer.exe', 'VT7Pty-DebugServer.pdb',
         'ModernCppTest.exe', 'ModernCppTest.pdb',
         'BackendSmokeTest.exe', 'BackendSmokeTest.pdb',
+        'SessionContractTest.exe', 'SessionContractTest.pdb',
+        'SessionFixture.exe', 'SessionFixture.pdb',
         'ProtocolTest.exe', 'ProtocolTest.pdb',
         'ProtocolTestAgent.exe', 'ProtocolTestAgent.pdb',
         'fixture-console-color-grid.exe', 'fixture-console-color-grid.pdb',
@@ -359,6 +395,25 @@ foreach ($configurationName in $configurations) {
         Invoke-DiagnosticTransportTest -BinaryDirectory $binaryDirectory -ResultDirectory $resultDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'BackendSmokeTest.exe') -WorkingDirectory $binaryDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'BackendSmokeTest.exe') -WorkingDirectory $binaryDirectory -Arguments @('APPLICATIONS')
+        foreach ($mode in @('OUTPUT', 'UNICODE', 'INPUT', 'RESIZE', 'REPEAT', 'SHUTDOWN', 'SPAWN_FAILURE', 'CONCURRENT')) {
+            $result = Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'SessionContractTest.exe') -WorkingDirectory $binaryDirectory -Arguments @($mode) -TimeoutSeconds $(if ($mode -eq 'REPEAT') { 300 } else { $TestTimeoutSeconds })
+            $result.Name = "Session contract: $mode"
+            $result
+        }
+        if ($SoakMinutes -gt 0) {
+            $result = Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'SessionContractTest.exe') -WorkingDirectory $binaryDirectory -Arguments @('SOAK', [string]$SoakMinutes) -TimeoutSeconds ($SoakMinutes * 60 + 120)
+            $result.Name = "Session contract: SOAK $SoakMinutes minutes"
+            $result
+        }
+        foreach ($control in @(
+                @('NEGATIVE_OUTPUT', 'missing or truncated output marker'),
+                @('NEGATIVE_STATUS', 'wrong fixture exit status'),
+                @('NEGATIVE_ORDER', 'output markers were reordered'),
+                @('NEGATIVE_TRUNCATION', 'missing or truncated output marker'),
+                @('NEGATIVE_LEAK', 'deliberate handle leak detected'))) {
+            Invoke-NegativeControl -BinaryDirectory $binaryDirectory -Mode $control[0] -ExpectedError $control[1]
+        }
+        Invoke-NegativeControl -BinaryDirectory $binaryDirectory -Mode 'NEGATIVE_TIMEOUT' -ExpectTimeout
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'VT7Pty-Agent.exe') -WorkingDirectory $binaryDirectory -Arguments @('--version')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'fixture-show-argv.exe') -WorkingDirectory $binaryDirectory -Arguments @('alpha', 'two words')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'fixture-output-lines.exe') -WorkingDirectory $binaryDirectory -Arguments @('3', '5')
@@ -368,6 +423,26 @@ foreach ($configurationName in $configurations) {
         Invoke-IsolatedAgentFailureTest -BinaryDirectory $binaryDirectory -ResultDirectory $resultDirectory -Case 'older-protocol' -ProtocolMode 'older'
         Invoke-IsolatedAgentFailureTest -BinaryDirectory $binaryDirectory -ResultDirectory $resultDirectory -Case 'newer-protocol' -ProtocolMode 'newer'
     )
+    $testSummary = @(
+        $tests | ForEach-Object {
+            [ordered]@{
+                Name = $_.Name
+                Status = if ($_.TimedOut -or $_.ExitCode -ne 0) { 'Fail' } else { 'Pass' }
+                ExitCode = $_.ExitCode
+                TimedOut = $_.TimedOut
+                StandardOutput = $_.StandardOutput
+                StandardError = $_.StandardError
+            }
+        }
+    )
+    $testSummary | ConvertTo-Json -Depth 5 |
+        Set-Content -LiteralPath (Join-Path $resultDirectory 'tests.json') -Encoding UTF8
+    [IO.File]::WriteAllLines(
+        (Join-Path $resultDirectory 'tests.txt'),
+        [string[]]@($testSummary | ForEach-Object {
+            "$($_.Status): $($_.Name)"
+        }),
+        $utf8NoBom)
     foreach ($test in $tests) {
         Assert-NativeTestPassed -Result $test
     }

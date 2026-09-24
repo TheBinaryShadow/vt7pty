@@ -86,6 +86,8 @@ The inherited DLL exports 19 functions. The complete baseline is recorded in
 | `tools/debug/DebugServer.cc` | Native structured diagnostic collector | Retained as `VT7Pty-DebugServer.exe`; bounded file output, live ACL self-test, and exact version reporting were added in Step 0.7 |
 | `tools/diagnostics/New-VT7PtyDiagnosticBundle.ps1` | Physical-machine diagnostic bundle collector | Maintained support boundary; captures logs, exact build identity, host servicing data, and binary hashes without network access |
 | `tests/integration/BackendSmokeTest.cc` | Opens a session, connects pipes, spawns a child, validates output and exit code | Rehomed as the maintained integration test in Step 0.6 |
+| `tests/component/SessionContractTest.cc` | Exercises input, Unicode output, resize/load, repeat, shutdown, spawn failure, concurrency, soak, and negative controls | Standalone Step 0.8 component and lifecycle test |
+| `tests/fixtures/SessionFixture.cc` | Controlled child output, input, Unicode, load, idle, and deliberately broken behaviors | Standalone Step 0.8 console fixture |
 | `tests/unit/ProtocolTest.cc`, `tests/unit/ModernCppTest.cc` | Protocol validation and standard-library/narrowing checks | Maintained unit-test boundary established in Step 0.6 |
 | `tests/fixtures/ProtocolTestAgent.cc` | Deliberately incompatible agent fixture | Rehomed with controlled child-process fixtures in Step 0.6 |
 | `src/unix-adapter/*` | Cygwin/MSYS terminal frontend, POSIX input/output, wakeup FD, utility wrappers | Removed in Step 0.3 after the native MSBuild baseline was reproduced |
@@ -132,7 +134,7 @@ discarded experiments and obsolete scripts.
 | `OutputLines.cc`, `ConsoleColorGrid.cc` | Added as native replacements for the useful deterministic output and color patterns |
 | `ConinMode.cc`, `ConoutMode.cc`, `IdentifyConsoleWindow.ps1` | Rehomed under `tools/console` |
 | Remaining native console, resize, screen-buffer, Unicode, font, platform, and bug probes | Rehomed individually under `tests/manual`; disruptive cases are explicitly documented |
-| `TestUtil.cc`, `TimeMeasurement.h`, `UnicodeEncodingTest.cc` | Rehomed under `tests/manual`; permanent test integration remains Step 0.8 |
+| `TestUtil.cc`, `TimeMeasurement.h`, `UnicodeEncodingTest.cc` | Rehomed under `tests/manual`; retained as focused manual and research probes outside the deterministic acceptance suite |
 
 ## Removal gates
 

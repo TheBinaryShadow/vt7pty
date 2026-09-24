@@ -75,7 +75,7 @@ recorded separately by the checked items below.
 
 | Milestone | Outcome | Status |
 | --- | --- | --- |
-| 0 | Fully modernized, native VT7Pty 0.5.x foundation | In progress; Steps 0.1-0.3 complete |
+| 0 | Fully modernized, native VT7Pty 0.5.x foundation | In progress; Steps 0.1-0.7 accepted, Step 0.8 candidate in preparation |
 | 1 | Measured backend fidelity and reliability improvements | Direction approved; detailed scope follows Milestone 0 evidence |
 | 2 | Documented VT7Pty API and standalone integration host | Direction approved; detailed scope follows Milestone 1 |
 | 3 | Versioned backend handoff ready for separately authorized VT7 integration | Direction approved; detailed scope follows Milestone 2 |
@@ -315,22 +315,22 @@ accepted environment disposition are recorded in the
 Outcome: one local command verifies the project, and a portable bundle runs the
 same accepted cases on either physical Windows 7 tier.
 
-- [ ] Implement standalone unit, component, and integration test executables.
-- [ ] Add controlled child-process and console behavior fixtures.
-- [ ] Cover build/package identity, startup, spawn, input, output, Unicode,
+- [x] Implement standalone unit, component, and integration test executables.
+- [x] Add controlled child-process and console behavior fixtures.
+- [x] Cover build/package identity, startup, spawn, input, output, Unicode,
   resize, lifecycle, interactive applications, diagnostics, and failures.
 - [ ] Cover handle/process leaks, output drain, agent/client failure, shutdown
   races, repeated sessions, resize under load, and bounded long-running use.
-- [ ] Add negative controls that prove incorrect output, status, ordering,
+- [x] Add negative controls that prove incorrect output, status, ordering,
   timeout, incompatible agents, and leaked state are detected.
-- [ ] Produce machine-readable results and a concise human-readable summary.
+- [x] Produce machine-readable results and a concise human-readable summary.
 - [ ] Build a portable Windows 7 acceptance bundle with instructions and all
   required fixtures.
 - [ ] Record exact OS/update state, architecture, package identity, per-case
   result, timing, logs, and crash artifacts for every physical run.
 - [ ] Run routine candidates on non-ESU Windows 7 and milestone/release
   candidates on both non-ESU and ESU Windows 7.
-- [ ] Record a defined SSH/full-screen baseline or the exact unresolved
+- [x] Record a defined SSH/full-screen baseline or the exact unresolved
   dependency for Milestone 1.
 
 Exit criterion: all required cases report pass, fail, skipped, or not run; no

@@ -6,7 +6,10 @@ param(
 
     [string]$OutputDirectory,
 
-    [int]$TestTimeoutSeconds = 90
+    [int]$TestTimeoutSeconds = 90,
+
+    [ValidateRange(0, 120)]
+    [int]$SoakMinutes = 120
 )
 
 $ErrorActionPreference = 'Stop'
@@ -30,6 +33,9 @@ function Invoke-AcceptanceTest {
         [string[]]$Arguments = @(),
         [string[]]$ExpectedOutput,
         [hashtable]$Environment = @{},
+        [int]$TimeoutSeconds = $TestTimeoutSeconds,
+        [int]$ExpectedExitCode = 0,
+        [switch]$ExpectTimeout,
         [ValidateSet('StandardOutput', 'StandardError')]
         [string]$ExpectedStream = 'StandardOutput'
     )
@@ -80,7 +86,7 @@ function Invoke-AcceptanceTest {
         }
         $stdoutTask = $process.StandardOutput.ReadToEndAsync()
         $stderrTask = $process.StandardError.ReadToEndAsync()
-        if (-not $process.WaitForExit($TestTimeoutSeconds * 1000)) {
+        if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
             $record.TimedOut = $true
             & taskkill.exe /PID $process.Id /T /F | Out-Null
             $process.WaitForExit()
@@ -90,21 +96,28 @@ function Invoke-AcceptanceTest {
         $record.StandardOutput = $stdoutTask.Result.Trim()
         $record.StandardError = $stderrTask.Result.Trim()
 
-        if ($record.TimedOut) {
-            throw "Exceeded the $TestTimeoutSeconds-second timeout."
-        }
-        if ($record.ExitCode -ne 0) {
-            throw "Exited with code $($record.ExitCode)."
-        }
-        if ($ExpectedOutput) {
-            $actualOutput = $record[$ExpectedStream]
-            foreach ($expectedText in $ExpectedOutput) {
-                if ($actualOutput -notmatch [regex]::Escape($expectedText)) {
-                    throw "$ExpectedStream did not contain '$expectedText'."
+        if ($ExpectTimeout) {
+            if (-not $record.TimedOut) {
+                throw "Expected timeout after $TimeoutSeconds seconds was not detected."
+            }
+            $record.Status = 'Pass'
+        } else {
+            if ($record.TimedOut) {
+                throw "Exceeded the $TimeoutSeconds-second timeout."
+            }
+            if ($record.ExitCode -ne $ExpectedExitCode) {
+                throw "Exited with code $($record.ExitCode); expected $ExpectedExitCode."
+            }
+            if ($ExpectedOutput) {
+                $actualOutput = $record[$ExpectedStream]
+                foreach ($expectedText in $ExpectedOutput) {
+                    if ($actualOutput -notmatch [regex]::Escape($expectedText)) {
+                        throw "$ExpectedStream did not contain '$expectedText'."
+                    }
                 }
             }
+            $record.Status = 'Pass'
         }
-        $record.Status = 'Pass'
     } catch {
         $record.Failure = $_.Exception.Message
     } finally {
@@ -325,6 +338,9 @@ if ($manifest.SourceTreeClean -ne $true) {
     $preflightFailures += 'The candidate was not produced from a clean source tree.'
 }
 $preflightFailures += $integrityFailures
+if ($SoakMinutes -ne 120) {
+    $preflightFailures += 'Step 0.8 milestone acceptance requires the 120-minute soak profile.'
+}
 
 $previousPath = $env:PATH
 $env:PATH = $binDirectory + ';' + $env:PATH
@@ -355,6 +371,47 @@ try {
             -Executable (Join-Path $testDirectory 'BackendSmokeTest.exe') `
             -Arguments @('APPLICATIONS') `
             -ExpectedOutput 'Command Prompt and Windows PowerShell sessions passed.'
+        foreach ($mode in @('OUTPUT', 'UNICODE', 'INPUT', 'RESIZE', 'REPEAT', 'SHUTDOWN', 'SPAWN_FAILURE', 'CONCURRENT')) {
+            Invoke-AcceptanceTest -Name "Session contract: $mode" `
+                -Executable (Join-Path $testDirectory 'SessionContractTest.exe') `
+                -Arguments @($mode) `
+                -TimeoutSeconds $(if ($mode -eq 'REPEAT') { 300 } else { $TestTimeoutSeconds }) `
+                -ExpectedOutput "Session contract $mode passed."
+        }
+        if ($SoakMinutes -gt 0) {
+            Invoke-AcceptanceTest -Name "Session contract: SOAK $SoakMinutes minutes" `
+                -Executable (Join-Path $testDirectory 'SessionContractTest.exe') `
+                -Arguments @('SOAK', [string]$SoakMinutes) `
+                -TimeoutSeconds ($SoakMinutes * 60 + 120) `
+                -ExpectedOutput 'Session contract SOAK passed.'
+        } else {
+            [pscustomobject][ordered]@{
+                Name = 'Session contract: SOAK 120 minutes'
+                Executable = 'tests/SessionContractTest.exe'
+                Arguments = @('SOAK', '120')
+                Status = 'NotRun'
+                DurationMilliseconds = 0
+                ExitCode = $null
+                TimedOut = $false
+                StandardOutput = ''
+                StandardError = ''
+                Failure = 'SoakMinutes was set to 0.'
+            }
+        }
+        foreach ($control in @(
+                @('NEGATIVE_OUTPUT', 'missing or truncated output marker'),
+                @('NEGATIVE_STATUS', 'wrong fixture exit status'),
+                @('NEGATIVE_ORDER', 'output markers were reordered'),
+                @('NEGATIVE_TRUNCATION', 'missing or truncated output marker'),
+                @('NEGATIVE_LEAK', 'deliberate handle leak detected'))) {
+            Invoke-AcceptanceTest -Name "Negative control: $($control[0])" `
+                -Executable (Join-Path $testDirectory 'SessionContractTest.exe') `
+                -Arguments @($control[0]) -ExpectedExitCode 1 `
+                -ExpectedStream StandardError -ExpectedOutput $control[1]
+        }
+        Invoke-AcceptanceTest -Name 'Negative control: timeout' `
+            -Executable (Join-Path $testDirectory 'SessionContractTest.exe') `
+            -Arguments @('NEGATIVE_TIMEOUT') -TimeoutSeconds 2 -ExpectTimeout
         Invoke-AcceptanceTest -Name 'Agent source identity' `
             -Executable (Join-Path $binDirectory 'VT7Pty-Agent.exe') `
             -Arguments @('--version') `
@@ -413,6 +470,19 @@ try {
 }
 $failedTests = @($tests | Where-Object { $_.Status -ne 'Pass' })
 $overallStatus = if ($preflightFailures.Count -eq 0 -and $failedTests.Count -eq 0) { 'Pass' } else { 'Fail' }
+$crashArtifacts = @(
+    Get-ChildItem -LiteralPath $OutputDirectory -Recurse -File |
+        Where-Object {
+            $_.Extension -in @('.dmp', '.wer') -and
+            $_.LastWriteTimeUtc -ge [datetime]$runStartedAt
+        } | ForEach-Object {
+            [ordered]@{
+                Path = $_.FullName.Substring($OutputDirectory.Length + 1).Replace('\', '/')
+                Bytes = $_.Length
+                Sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            }
+        }
+)
 $record = [ordered]@{
     SchemaVersion = 1
     Status = $overallStatus
@@ -429,6 +499,7 @@ $record = [ordered]@{
         MinimumOperatingSystem = $manifest.MinimumOperatingSystem
         SourceCommit = $manifest.SourceCommit
         ManifestSha256 = (Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        Toolchain = $manifest.Toolchain
     }
     Machine = [ordered]@{
         ComputerName = $env:COMPUTERNAME
@@ -454,6 +525,7 @@ $record = [ordered]@{
     }
     InventoryWarnings = $inventoryWarnings
     PreflightFailures = $preflightFailures
+    CrashArtifacts = $crashArtifacts
     Tests = $tests
 }
 $record | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $jsonPath -Encoding UTF8

@@ -1,6 +1,7 @@
 # VT7Pty Testing Strategy
 
-Status: approved Milestone 0 strategy. Updated: 2026-09-24.
+Status: approved Milestone 0 strategy; Step 0.8 candidate implemented.
+Updated: 2026-09-24.
 
 This document defines how VT7Pty distinguishes preserved WinPTY behavior, new
 regressions, inherited limitations, and accepted improvements. Results must
@@ -99,6 +100,19 @@ were removed, as recorded in the
 [2026-09-22 Step 0.3 completion record](validation/2026-09-22-step-0.3-completion.md).
 Step 0.6 adds the warning-clean compiler/analyzer gate and a focused
 `ModernCppTest` for the standard formatting and checked-narrowing replacements.
+Step 0.8 adds `SessionFixture` and `SessionContractTest` as separate controlled
+child and component executables. The default local command runs both Debug and
+Release suites. A one-minute soak can be exercised locally with
+`./Verify-VT7Pty.ps1 -Configuration Release -SoakMinutes 1`.
+
+The normal suite verifies exact output order and exit status, console input,
+Unicode output, 100 resizes under load, 500 repeated sessions after five warm-up
+sessions, 20 live-session shutdowns, failed child creation, and four concurrent
+sessions. It also verifies that deliberate output, status, order, truncation,
+timeout, and handle-leak faults are detected. The agent compatibility controls
+remain separate. `artifacts/verification/x64/<configuration>/tests.json` and
+`tests.txt` retain each local case status even if a case fails before binary
+inspection completes.
 
 ## Coverage matrix
 
@@ -142,13 +156,19 @@ hash manifest. The same candidate ZIP is run on both tiers.
 These are starting acceptance workloads and may be revised with recorded
 evidence:
 
-- at least 500 create, minimally interact, and close cycles,
-- at least 100 alternating small/large resize cycles under activity,
-- a two-hour Windows 7 session with defined idle and active intervals,
+- 500 output-checked create and close cycles following five warm-up sessions;
+- 100 alternating 80x25 and 120x40 resizes during 200 numbered output rows;
+- a 120-minute Windows 7 soak with five-second idle intervals, repeated resize,
+  active output, agent/child exit checks, and a four-handle post-warm-up budget;
 - bounded output-heavy runs for throughput and memory observation.
 
-Define warm-up treatment, sampling intervals, cleanup, timeouts, and acceptable
-resource growth before treating a profile as an acceptance gate.
+The portable milestone runner includes the 120-minute soak by default. Setting
+`-SoakMinutes 0` provides a fast diagnostic run but records the soak as
+`NotRun` and fails the Step 0.8 milestone preflight. A per-case timeout exceeds
+the requested soak duration by two minutes. Output is bounded to one MiB per
+session; the fixture load is 200 rows and the runner kills timed-out process
+trees. The four-handle budget follows warm-up to exclude one-time runtime
+initialization.
 
 ## Application and remote scenarios
 
@@ -156,11 +176,9 @@ Command Prompt and Windows PowerShell are required local acceptance cases.
 Record exact versions and relevant configuration such as profiles or line-editing
 modules.
 
-SSH, Vim, and htop remain useful fidelity scenarios. Milestone 0 will either
-record a reproducible baseline or document the missing dependency, including
-the Windows 7-compatible SSH client, data path, remote OS and shell, `TERM`,
-locale, application versions, geometry, and credential-safe setup. End-to-end
-remote fidelity becomes a Milestone 1 gate once that path is fixed.
+SSH, Vim, and htop remain useful fidelity scenarios. The exact unresolved
+dependency and the criteria for a Milestone 1 baseline are recorded in
+[SSH and full-screen baseline dependency](SSH_BASELINE.md).
 
 ## Negative controls
 
