@@ -10,7 +10,7 @@ development-host verification.
 Produce a clean-tree Release package set and its checksum:
 
 ```powershell
-.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc6
+.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc7
 ```
 
 Use the same `-tests.zip` on all three machines. Copy the package-set `.sha256` file
@@ -23,13 +23,13 @@ On each machine, compare the test ZIP hash with its line in the `.sha256`
 file before extraction:
 
 ```powershell
-(Get-FileHash .\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc6-tests.zip -Algorithm SHA256).Hash
+(Get-FileHash .\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc7-tests.zip -Algorithm SHA256).Hash
 ```
 
 On the PowerShell 2.0 machine, use the Windows 7 `certutil` utility instead:
 
 ```bat
-certutil -hashfile VT7Pty-0.5.0-dev-win7-x64-release-m0-rc6-tests.zip SHA256
+certutil -hashfile VT7Pty-0.5.0-dev-win7-x64-release-m0-rc7-tests.zip SHA256
 ```
 
 Compare the reported digest with the tests ZIP line in the `.sha256` file.

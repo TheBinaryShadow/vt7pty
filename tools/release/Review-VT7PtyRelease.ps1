@@ -74,7 +74,12 @@ if (Test-Path -LiteralPath $testPath -PathType Leaf) {
         $sha = [Security.Cryptography.SHA256]::Create()
         try { $manifestHash = ([BitConverter]::ToString($sha.ComputeHash($bytes))).Replace('-', '').ToLowerInvariant() }
         finally { $sha.Dispose() }
-        $testManifest = [Text.Encoding]::UTF8.GetString($bytes) | ConvertFrom-Json
+        $manifestText = [Text.Encoding]::UTF8.GetString($bytes)
+        if ($manifestText.Length -gt 0 -and
+                $manifestText[0] -eq [char]0xFEFF) {
+            $manifestText = $manifestText.Substring(1)
+        }
+        $testManifest = $manifestText | ConvertFrom-Json
         if ($manifestHash -ne $testArchive.ManifestSha256 -or
                 $testManifest.PackageKind -ne 'tests' -or
                 $testManifest.SourceCommit -ne $releaseSet.SourceCommit -or
