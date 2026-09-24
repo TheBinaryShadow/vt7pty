@@ -12,13 +12,14 @@ reviewed manual GitHub Release. There is no hosted build or test service.
 From a clean source tree, run:
 
 ```powershell
-.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc1
+.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc2
 ```
 
 The command refuses a dirty tree. It performs a clean x64 Release rebuild,
 MSVC static-analysis rebuild, and the complete local Release verification. It
-checks the source commit and every test result before packaging. It extracts
-each produced archive and verifies every file against its own manifest. The
+checks the source commit and every test result before packaging. It refuses to
+overwrite any existing candidate asset, extracts each produced archive, and
+verifies every file against its own manifest. The
 package set is written under `artifacts/packages/`.
 
 The canonical candidate stem is
@@ -56,7 +57,7 @@ After both runs, validate the exact release set and result pair:
 
 ```powershell
 .\tools\release\Review-VT7PtyRelease.ps1 `
-    -ReleaseSetPath .\artifacts\packages\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc1-release-set.json `
+    -ReleaseSetPath .\artifacts\packages\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc2-release-set.json `
     -NonEsuResult C:\path\to\nonesu\results\windows7-nonesu-<run>.json `
     -EsuResult C:\path\to\esu\results\windows7-esu-<run>.json
 ```
@@ -79,7 +80,7 @@ both physical acceptance runs; earlier `0.5.0-dev` evidence cannot qualify it.
 
 For an accepted version `X.Y.Z`, the canonical tag is `vX.Y.Z`, the GitHub
 Release title is `VT7Pty X.Y.Z`, and the unsuffixed asset stem is
-`VT7Pty-X.Y.Z-win7-x64-release`. Candidate suffixes such as `m0-rc1` are
+`VT7Pty-X.Y.Z-win7-x64-release`. Candidate suffixes such as `m0-rc2` are
 omitted from the final published filenames only after the final bytes and
 checksums have been reviewed. Renaming an archive after testing changes its
 name but not its bytes; the published checksum file and release-set manifest

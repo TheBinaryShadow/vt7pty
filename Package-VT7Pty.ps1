@@ -32,6 +32,18 @@ $apiVersion = "$($apiMajor.Groups['v'].Value).$($apiMinor.Groups['v'].Value)"
 $protocolVersion = [int]$protocol.Groups['v'].Value
 $packageStem = "VT7Pty-$version-win7-x64-release"
 if ($PackageSuffix) { $packageStem += "-$PackageSuffix" }
+$issuedPaths = @(
+    foreach ($kind in @('runtime', 'development', 'symbols', 'tests')) {
+        Join-Path $packageRoot "$packageStem-$kind.zip"
+    }
+    Join-Path $packageRoot "$packageStem-release-set.json"
+    Join-Path $packageRoot "$packageStem.sha256"
+)
+foreach ($path in $issuedPaths) {
+    if (Test-Path -LiteralPath $path) {
+        throw "Candidate output already exists; choose a fresh suffix: $path"
+    }
+}
 
 function Assert-ChildPath {
     param([string]$Parent, [string]$Child)
@@ -185,10 +197,6 @@ foreach ($kind in $plans.Keys) {
         }
         [IO.Directory]::CreateDirectory($directory) | Out-Null
     }
-    if (Test-Path -LiteralPath $archivePath) {
-        Remove-Item -LiteralPath $archivePath -Force
-    }
-
     $files = @()
     foreach ($relativePath in @($plans[$kind].Keys | Sort-Object)) {
         $sourcePath = $plans[$kind][$relativePath]
