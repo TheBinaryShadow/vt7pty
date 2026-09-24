@@ -12,7 +12,7 @@ reviewed manual GitHub Release. There is no hosted build or test service.
 From a clean source tree, run:
 
 ```powershell
-.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc2
+.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc3
 ```
 
 The command refuses a dirty tree. It performs a clean x64 Release rebuild,
@@ -57,7 +57,7 @@ After both runs, validate the exact release set and result pair:
 
 ```powershell
 .\tools\release\Review-VT7PtyRelease.ps1 `
-    -ReleaseSetPath .\artifacts\packages\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc2-release-set.json `
+    -ReleaseSetPath .\artifacts\packages\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc3-release-set.json `
     -NonEsuResult C:\path\to\nonesu\results\windows7-nonesu-<run>.json `
     -EsuResult C:\path\to\esu\results\windows7-esu-<run>.json
 ```
@@ -80,11 +80,11 @@ both physical acceptance runs; earlier `0.5.0-dev` evidence cannot qualify it.
 
 For an accepted version `X.Y.Z`, the canonical tag is `vX.Y.Z`, the GitHub
 Release title is `VT7Pty X.Y.Z`, and the unsuffixed asset stem is
-`VT7Pty-X.Y.Z-win7-x64-release`. Candidate suffixes such as `m0-rc2` are
-omitted from the final published filenames only after the final bytes and
-checksums have been reviewed. Renaming an archive after testing changes its
-name but not its bytes; the published checksum file and release-set manifest
-must name the final assets and be reviewed again.
+`VT7Pty-X.Y.Z-win7-x64-release`. Candidate suffixes such as `m0-rc3` identify
+trial package sets and are never removed by renaming their files. Build the
+final unsuffixed `X.Y.Z` set from its exact clean source commit, run both
+physical tiers on that exact test ZIP, and review its own release-set manifest
+and checksums before publication.
 
 Before publication, review the exact clean commit/tag target, local verification
 and physical records, exports/imports/resources/manifests/symbols, license and

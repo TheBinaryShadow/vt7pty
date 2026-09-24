@@ -10,7 +10,7 @@ development-host verification.
 Produce a clean-tree Release package set and its checksum:
 
 ```powershell
-.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc2
+.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix m0-rc3
 ```
 
 Use the same `-tests.zip` on both machines. Copy the package-set `.sha256` file
@@ -23,7 +23,7 @@ On either machine, compare the test ZIP hash with its line in the `.sha256`
 file before extraction:
 
 ```powershell
-(Get-FileHash .\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc2-tests.zip -Algorithm SHA256).Hash
+(Get-FileHash .\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc3-tests.zip -Algorithm SHA256).Hash
 ```
 
 ## Target procedure
