@@ -265,16 +265,20 @@ void soakCase(int minutes) {
 void shutdownOnce() {
     Session session;
     session.spawn("WAIT");
-    Sleep(100);
     const DWORD childPid = GetProcessId(session.child);
-    int processIds[16] = {};
-    vt7pty_error_ptr_t listError = nullptr;
-    const int processCount = vt7pty_get_console_process_list(session.pty,
-        processIds, 16, &listError);
-    if (listError != nullptr) vt7pty_error_free(listError);
-    require(processCount > 0 && processCount <= 16 &&
-        std::find(processIds, processIds + processCount,
-            static_cast<int>(childPid)) != processIds + processCount,
+    bool childAttached = false;
+    for (int attempt = 0; attempt < 50 && !childAttached; ++attempt) {
+        int processIds[16] = {};
+        vt7pty_error_ptr_t listError = nullptr;
+        const int processCount = vt7pty_get_console_process_list(session.pty,
+            processIds, 16, &listError);
+        if (listError != nullptr) vt7pty_error_free(listError);
+        childAttached = processCount > 0 && processCount <= 16 &&
+            std::find(processIds, processIds + processCount,
+                static_cast<int>(childPid)) != processIds + processCount;
+        if (!childAttached) Sleep(100);
+    }
+    require(childAttached,
         "child absent from console process list");
     HANDLE agent = nullptr;
     require(DuplicateHandle(GetCurrentProcess(), vt7pty_agent_process(session.pty),

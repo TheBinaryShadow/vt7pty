@@ -93,6 +93,7 @@ function Invoke-NativeTest {
         [int]$TimeoutSeconds = $TestTimeoutSeconds
     )
 
+    $stopwatch = [Diagnostics.Stopwatch]::StartNew()
     $startInfo = New-Object Diagnostics.ProcessStartInfo
     $startInfo.FileName = $Executable
     $startInfo.WorkingDirectory = $WorkingDirectory
@@ -119,8 +120,10 @@ function Invoke-NativeTest {
         $process.WaitForExit()
     }
 
+    $stopwatch.Stop()
     return [ordered]@{
         Name = [IO.Path]::GetFileName($Executable)
+        DurationMilliseconds = $stopwatch.ElapsedMilliseconds
         ExitCode = if ($timedOut) { $null } else { $process.ExitCode }
         TimedOut = $timedOut
         StandardOutput = $stdoutTask.Result.Trim()
@@ -149,6 +152,7 @@ function Invoke-NegativeControl {
     }
     return [ordered]@{
         Name = "Negative control: $Mode"
+        DurationMilliseconds = $result.DurationMilliseconds
         ExitCode = if ($detected) { 0 } else { 1 }
         TimedOut = $false
         StandardOutput = "Observed exit=$($result.ExitCode), timeout=$($result.TimedOut)"
@@ -213,6 +217,7 @@ function Invoke-DiagnosticTransportTest {
         [Parameter(Mandatory = $true)][string]$ResultDirectory
     )
 
+    $stopwatch = [Diagnostics.Stopwatch]::StartNew()
     $logPath = Join-Path $ResultDirectory 'diagnostic-transport.jsonl'
     if (Test-Path -LiteralPath $logPath) {
         Remove-Item -LiteralPath $logPath -Force
@@ -274,8 +279,10 @@ function Invoke-DiagnosticTransportTest {
             $failure = 'diagnostic output is not valid JSON lines'
         }
     }
+    $stopwatch.Stop()
     return [ordered]@{
         Name = 'Structured diagnostic transport'
+        DurationMilliseconds = $stopwatch.ElapsedMilliseconds
         ExitCode = if ($null -eq $failure) { 0 } else { 1 }
         TimedOut = $timedOut
         StandardOutput = $serverOutput.Result.Trim()
@@ -428,6 +435,7 @@ foreach ($configurationName in $configurations) {
             [ordered]@{
                 Name = $_.Name
                 Status = if ($_.TimedOut -or $_.ExitCode -ne 0) { 'Fail' } else { 'Pass' }
+                DurationMilliseconds = $_.DurationMilliseconds
                 ExitCode = $_.ExitCode
                 TimedOut = $_.TimedOut
                 StandardOutput = $_.StandardOutput
