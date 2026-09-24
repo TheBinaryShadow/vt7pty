@@ -287,21 +287,26 @@ recorded in the
 Outcome: physical-machine failures are diagnosable and native trust boundaries
 have explicit validation.
 
-- [ ] Retain and rebrand the native debug server while removing obsolete Python
+- [x] Retain and rebrand the native debug server while removing obsolete Python
   debug helpers.
-- [ ] Add structured severity and subsystem categories, timestamps, process and
+- [x] Add structured severity and subsystem categories, timestamps, process and
   thread IDs, version identity, and bounded debugger/file output.
-- [ ] Document diagnostic collection for remote physical Windows 7 machines.
-- [ ] Audit named-pipe permissions and peer validation.
-- [ ] Audit handle inheritance, process creation, command-line quoting,
+- [x] Document diagnostic collection for remote physical Windows 7 machines.
+- [x] Audit named-pipe permissions and peer validation.
+- [x] Audit handle inheritance, process creation, command-line quoting,
   executable and DLL lookup, temporary paths, and environment parsing.
-- [ ] Audit IPC message sizes, integer conversions, buffer boundaries, shutdown
+- [x] Audit IPC message sizes, integer conversions, buffer boundaries, shutdown
   races, and malformed-client behavior.
-- [ ] Verify that default logs exclude credentials and private session content.
+- [x] Verify that default logs exclude credentials and private session content.
 
 Exit criterion: diagnostic bundles identify the exact build and failure, and
 the application-facing and client-agent boundaries have a documented security
 review with resolved blockers or explicit dispositions.
+
+The implementation, security dispositions, development-host verification,
+and exact portable package are recorded in the
+[Step 0.7 diagnostics and security candidate](docs/validation/2026-09-24-step-0.7-candidate.md).
+Physical Windows 7 Tier A and Tier B acceptance remains pending.
 
 ### Step 0.8: Establish the permanent test system
 

@@ -19,8 +19,9 @@ through 0.4 established the inherited baseline, the supported VS2022/MSBuild
 workflow, a native-only active tree, and the accepted Windows 7+ platform
 implementation. Step 0.5 established and physically accepted the technical
 VT7Pty identity. Step 0.6 modernized and physically accepted the retained
-native code with warning-clean C++20 build and analysis gates. Diagnostics and
-security-boundary modernization proceeds in Step 0.7.
+native code with warning-clean C++20 build and analysis gates. Step 0.7 has a
+verified diagnostics and security-boundary candidate pending physical Windows
+7 acceptance.
 
 The [development foundation](docs/FOUNDATION.md) and
 [roadmap](ROADMAP.md) record the approved product and engineering direction.

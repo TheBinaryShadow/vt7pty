@@ -2,7 +2,7 @@
 
 This procedure validates a specific VT7Pty candidate on the two physical
 Windows 7 SP1 x64 tiers defined in [COMPATIBILITY.md](COMPATIBILITY.md). It is
-the target-side gate for Roadmap Step 0.4 and remains separate from
+the target-side gate for Milestone 0 candidates and remains separate from
 development-host verification.
 
 ## Candidate preparation
@@ -10,7 +10,7 @@ development-host verification.
 Produce one clean-tree Release candidate and its checksum:
 
 ```powershell
-.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix step-0.4-candidate
+.\Package-VT7Pty.ps1 -Configuration Release -PackageSuffix step-0.7-candidate
 ```
 
 Use the same ZIP on both machines. Copy the adjacent `.sha256` file with it
@@ -34,8 +34,9 @@ commit and hashes every file used by the acceptance runner.
    RUN-WINDOWS7-ACCEPTANCE.cmd ESU
    ```
 
-5. Preserve the complete `results` directory from each machine and return
-   both the `.json` and `.txt` files for repository validation evidence.
+5. Preserve and return the complete `results` directory from each machine.
+   It includes the `.json` and `.txt` result pair plus any step-specific
+   diagnostic logs and bundles.
 
 The runner requires 64-bit Windows PowerShell on Windows 7 SP1. It verifies
 the package manifest and every packaged file before running the native cases.
@@ -43,20 +44,23 @@ It records the declared tier, hardware, OS and service-pack identity,
 PowerShell version, installed hotfixes, package identity, duration, output,
 and result of each case.
 
-## Step 0.4 cases
+## Maintained cases
 
 The candidate performs these bounded checks:
 
-- modern C++ formatting and checked-narrowing unit coverage;
+- modern C++ formatting, checked-narrowing, protocol, and buffer unit coverage;
 - client, agent, pipe, child-process, output, exit-status, and teardown flow;
 - resize followed by real Command Prompt and Windows PowerShell sessions;
 - embedded version and source-commit identity;
+- debug-pipe ACL validation and diagnostic build identity;
+- bounded structured diagnostic transport and target-side bundle creation;
 - argument quoting; and
 - deterministic bounded output.
 
 Any failed preflight, timeout, nonzero exit, missing expected output, missing
-file, or hash mismatch makes the run fail. The two target records must both
-pass before Step 0.4 can claim Windows 7 SP1 x64 as its demonstrated minimum.
+file, malformed diagnostic record, bundle mismatch, or hash mismatch makes the
+run fail. The two target records must both pass before the corresponding
+roadmap step can use them as physical Windows 7 evidence.
 
 ## Result handling
 
