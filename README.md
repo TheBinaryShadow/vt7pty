@@ -21,8 +21,9 @@ implementation. Step 0.5 established and physically accepted the technical
 VT7Pty identity. Step 0.6 modernized and physically accepted the retained
 native code with warning-clean C++20 build and analysis gates. Step 0.7
 modernized and physically accepted the diagnostic and security boundaries on
-both Windows 7 tiers. The permanent test system proceeds in Step 0.8.
-Its expanded local and portable test candidate awaits both Windows 7 results.
+both Windows 7 tiers. Step 0.8 established the permanent test system and passed
+all 30 cases, including the 120-minute soak, on both accepted Windows 7 tiers.
+Milestone 0 continues with the manual release process in Step 0.9.
 
 The [development foundation](docs/FOUNDATION.md) and
 [roadmap](ROADMAP.md) record the approved product and engineering direction.

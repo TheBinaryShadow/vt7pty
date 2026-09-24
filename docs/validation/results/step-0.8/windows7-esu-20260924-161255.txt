@@ -1,0 +1,43 @@
+VT7Pty Windows 7 acceptance: Pass
+Tier: ESU
+Machine: TURTLE (Micro-Star International Co., Ltd. MS-7C35)
+OS: Microsoft Windows 7 Ultimate , version 6.1.7601.65536, SP1
+Package: VT7Pty 0.5.0-dev, commit fff58a3415140ea10bdc6a73f18e37d31b56606c
+Manifest SHA-256: 7556a23a1faacd0b17dfc70342036de9c8e88d7bf76ed050fb5842d556d09243
+
+Preflight failures:
+  None
+
+Tests:
+  Pass: Modern C++ utility unit test (231 ms)
+  Pass: Client-agent protocol unit test (38 ms)
+  Pass: Diagnostic pipe security self-test (37 ms)
+  Pass: Diagnostic build identity (11 ms)
+  Pass: Structured diagnostic transport and bundle (3779 ms)
+  Pass: Inherited lifecycle session (72 ms)
+  Pass: Command Prompt and Windows PowerShell sessions (171 ms)
+  Pass: Session contract: OUTPUT (109 ms)
+  Pass: Session contract: UNICODE (44 ms)
+  Pass: Session contract: INPUT (46 ms)
+  Pass: Session contract: RESIZE (3166 ms)
+  Pass: Session contract: REPEAT (15772 ms)
+  Pass: Session contract: SHUTDOWN (2230 ms)
+  Pass: Session contract: SPAWN_FAILURE (23 ms)
+  Pass: Session contract: CONCURRENT (84 ms)
+  Pass: Session contract: SOAK 120 minutes (7202547 ms)
+  Pass: Negative control: NEGATIVE_OUTPUT (43 ms)
+  Pass: Negative control: NEGATIVE_STATUS (46 ms)
+  Pass: Negative control: NEGATIVE_ORDER (46 ms)
+  Pass: Negative control: NEGATIVE_TRUNCATION (46 ms)
+  Pass: Negative control: NEGATIVE_LEAK (8 ms)
+  Pass: Negative control: timeout (2038 ms)
+  Pass: Agent source identity (13 ms)
+  Pass: Argument quoting fixture (7 ms)
+  Pass: Bounded output fixture (7 ms)
+  Pass: Agent rejection: missing (22 ms)
+  Pass: Agent rejection: malformed (35 ms)
+  Pass: Agent rejection: wrong-identity (77 ms)
+  Pass: Agent rejection: older-protocol (131 ms)
+  Pass: Agent rejection: newer-protocol (133 ms)
+
+Machine-readable result: C:\Users\Binary\Desktop\VT7Pty-0.5.0-dev-win7-x64-release-step-0.8-candidate\results\windows7-esu-20260924-161255.json

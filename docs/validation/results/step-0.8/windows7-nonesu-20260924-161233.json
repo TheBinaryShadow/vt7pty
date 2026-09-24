@@ -1,0 +1,1435 @@
+﻿{
+    "SchemaVersion":  1,
+    "Status":  "Pass",
+    "DeclaredTier":  "NonESU",
+    "StartedAt":  "2026-09-24T14:12:33.2298503Z",
+    "CompletedAt":  "2026-09-24T16:14:15.3686758Z",
+    "Package":  {
+                    "Product":  "VT7Pty",
+                    "Version":  "0.5.0-dev",
+                    "ApiVersion":  "1.0",
+                    "ProtocolVersion":  1,
+                    "Configuration":  "Release",
+                    "Architecture":  "x64",
+                    "MinimumOperatingSystem":  "Windows 7 SP1",
+                    "SourceCommit":  "fff58a3415140ea10bdc6a73f18e37d31b56606c",
+                    "ManifestSha256":  "7556a23a1faacd0b17dfc70342036de9c8e88d7bf76ed050fb5842d556d09243",
+                    "Toolchain":  {
+                                      "VisualStudio":  "2022",
+                                      "MSVCDirectoryVersion":  "14.44.35207",
+                                      "CompilerFileVersion":  "19.44.35228.0",
+                                      "WindowsSDKVersion":  "10.0.26100.0",
+                                      "PowerShellVersion":  "7.6.5"
+                                  }
+                },
+    "Machine":  {
+                    "ComputerName":  "NESSY",
+                    "Manufacturer":  "VMware, Inc.",
+                    "Model":  "VMware20,1",
+                    "TotalPhysicalMemory":  34358726656,
+                    "Processors":  [
+                                       "AMD Ryzen 9 9950X3D 16-Core Processor"
+                                   ]
+                },
+    "OperatingSystem":  {
+                            "ProductName":  "Windows 7 Ultimate",
+                            "Caption":  "Microsoft Windows 7 Ultimate ",
+                            "Version":  "6.1.7601.65536",
+                            "BuildNumber":  "7601",
+                            "ServicePackMajorVersion":  1,
+                            "ServicePackMinorVersion":  0,
+                            "Architecture":  "64-bit",
+                            "PowerShellVersion":  "5.1.14409.1018",
+                            "Hotfixes":  [
+                                             {
+                                                 "HotFixId":  "KB2462137",
+                                                 "Description":  "Hotfix",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2479943",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2491683",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2506014",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2506212",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2506928",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2533552",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2534366",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2539513",
+                                                 "Description":  "Hotfix",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2545698",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2547666",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2552343",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2560656",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2564958",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2574819",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2579686",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2589154",
+                                                 "Description":  "Hotfix",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2592687",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2603229",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2604115",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2620704",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2621440",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2631813",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2639308",
+                                                 "Description":  "Hotfix",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2640148",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2647644",
+                                                 "Description":  "Hotfix",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2654428",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2660075",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2667402",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2670838",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2676562",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2685811",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2685813",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2690533",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2698365",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2705219",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2719857",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2726535",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2727528",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2729094",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2732059",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2736422",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2742599",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2750841",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2761217",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2770660",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2773072",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2786081",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2790338",
+                                                 "Description":  "Hotfix",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2791765",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2799926",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2800095",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2807986",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2808679",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2809215",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2813347",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2813430",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2818604",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2830477",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2834140",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2840631",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2841134",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2843630",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2847927",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2849696",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2849697",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2852386",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2853952",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2857650",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2861698",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2862330",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2864202",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2868038",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2871997",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2872035",
+                                                 "Description":  "Hotfix",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2884256",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2891804",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2893294",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2893519",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2894844",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2900986",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2908783",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2911501",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2912390",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2918077",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2919469",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2923545",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2931356",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2937610",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2943357",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2952664",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2959936",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2968294",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2970228",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2972100",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2973201",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2977292",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2978742",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2984972",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2985461",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2991963",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB2992611",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3004375",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3006121",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3006137",
+                                                 "Description":  "Hotfix",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3010788",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3011780",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3012660",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3013531",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3020370",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3020388",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3021674",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3021917",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3023215",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3030377",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3035126",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3037574",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3045685",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3046017",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3046269",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3046480",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3054476",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3059317",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3060716",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3064209",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3067903",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3068708",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3071756",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3072305",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3074543",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3075226",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3078667",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3080149",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3086255",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3093513",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3097989",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3102429",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3102810",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3107998",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3108371",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3108664",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3109103",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3109560",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3110329",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3118401",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3123479",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3125574",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3126587",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3127220",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3133977",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3137061",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3138378",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3138612",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3138910",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3139398",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3139914",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3140245",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3147071",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3150513",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3156016",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3159398",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3161102",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3161949",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3172605",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3177467",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3179573",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3184143",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3184471",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2026-09-24"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3185319",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB3191566",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4019990",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4040980",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4072650",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4344152",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4474419",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4490628",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4493132",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4524752",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4532945",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4536952",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4539601",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4567409",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB4578847",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB5071810",
+                                                 "Description":  "Security Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB917607",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB971033",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB974405",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB975541",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2026-09-22"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB976902",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2010-11-21"
+                                             },
+                                             {
+                                                 "HotFixId":  "KB982018",
+                                                 "Description":  "Update",
+                                                 "InstalledOn":  "2018-08-15"
+                                             }
+                                         ]
+                        },
+    "InventoryWarnings":  [
+
+                          ],
+    "PreflightFailures":  [
+
+                          ],
+    "CrashArtifacts":  [
+
+                       ],
+    "Tests":  [
+                  {
+                      "Name":  "Modern C++ utility unit test",
+                      "Executable":  "tests/ModernCppTest.exe",
+                      "Arguments":  [
+
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  122,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "VT7Pty modern C++ utility tests passed.",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Client-agent protocol unit test",
+                      "Executable":  "tests/ProtocolTest.exe",
+                      "Arguments":  [
+
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  58,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "VT7Pty protocol tests passed",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Diagnostic pipe security self-test",
+                      "Executable":  "bin/VT7Pty-DebugServer.exe",
+                      "Arguments":  [
+                                        "--self-test"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  61,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "VT7Pty diagnostic security self-test passed.",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Diagnostic build identity",
+                      "Executable":  "bin/VT7Pty-DebugServer.exe",
+                      "Arguments":  [
+                                        "--version"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  43,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "VT7Pty version 0.5.0-dev\r\ncommit fff58a3415140ea10bdc6a73f18e37d31b56606c\r\nAPI version 1.0\r\nprotocol version 1",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Structured diagnostic transport and bundle",
+                      "Executable":  "VT7Pty-DebugServer.exe + ProtocolTest.exe + New-VT7PtyDiagnosticBundle.ps1",
+                      "Arguments":  [
+                                        "--output",
+                                        "C:\\Users\\Binary\\Desktop\\VT7Pty-0.5.0-dev-win7-x64-release-step-0.8-candidate\\results\\windows7-nonesu-20260924-161233-diagnostics.jsonl",
+                                        "--max-bytes",
+                                        "4096",
+                                        "--max-messages",
+                                        "3"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  6149,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "{\"timestamp\":\"2026-09-24T14:12:37.176Z\",\"severity\":\"info\",\"subsystem\":\"general\",\"product\":\"VT7Pty\",\"version\":\"0.5.0-dev\",\"commit\":\"fff58a3415140ea10bdc6a73f18e37d31b56606c\",\"api\":\"1.0\",\"protocol\":1,\"process\":\"ProtocolTest.exe\",\"pid\":3896,\"tid\":3040,\"message\":\"diagnostic transport test 1\"}\r\n{\"timestamp\":\"2026-09-24T14:12:37.176Z\",\"severity\":\"warning\",\"subsystem\":\"ipc\",\"product\":\"VT7Pty\",\"version\":\"0.5.0-dev\",\"commit\":\"fff58a3415140ea10bdc6a73f18e37d31b56606c\",\"api\":\"1.0\",\"protocol\":1,\"process\":\"ProtocolTest.exe\",\"pid\":3896,\"tid\":3040,\"message\":\"diagnostic transport test 2\"}\r\n{\"timestamp\":\"2026-09-24T14:12:37.176Z\",\"severity\":\"error\",\"subsystem\":\"security\",\"product\":\"VT7Pty\",\"version\":\"0.5.0-dev\",\"commit\":\"fff58a3415140ea10bdc6a73f18e37d31b56606c\",\"api\":\"1.0\",\"protocol\":1,\"process\":\"ProtocolTest.exe\",\"pid\":3896,\"tid\":3040,\"message\":\"diagnostic transport test 3\"}",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Inherited lifecycle session",
+                      "Executable":  "tests/BackendSmokeTest.exe",
+                      "Arguments":  [
+
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  184,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Command Prompt and Windows PowerShell sessions",
+                      "Executable":  "tests/BackendSmokeTest.exe",
+                      "Arguments":  [
+                                        "APPLICATIONS"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  722,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Command Prompt and Windows PowerShell sessions passed.",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Session contract: OUTPUT",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "OUTPUT"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  216,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Session contract OUTPUT passed.",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Session contract: UNICODE",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "UNICODE"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  147,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Session contract UNICODE passed.",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Session contract: INPUT",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "INPUT"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  157,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Session contract INPUT passed.",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Session contract: RESIZE",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "RESIZE"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  3312,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Session contract RESIZE passed.",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Session contract: REPEAT",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "REPEAT"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  71685,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Session contract REPEAT passed.",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Session contract: SHUTDOWN",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "SHUTDOWN"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  3909,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Session contract SHUTDOWN passed.",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Session contract: SPAWN_FAILURE",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "SPAWN_FAILURE"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  159,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Session contract SPAWN_FAILURE passed.",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Session contract: CONCURRENT",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "CONCURRENT"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  500,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Session contract CONCURRENT passed.",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Session contract: SOAK 120 minutes",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "SOAK",
+                                        "120"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  7202744,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Soak cycles: 1366\r\nSession contract SOAK passed.",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Negative control: NEGATIVE_OUTPUT",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "NEGATIVE_OUTPUT"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  99,
+                      "ExitCode":  1,
+                      "TimedOut":  false,
+                      "StandardOutput":  "",
+                      "StandardError":  "Session contract NEGATIVE_OUTPUT failed: missing or truncated output marker",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Negative control: NEGATIVE_STATUS",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "NEGATIVE_STATUS"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  93,
+                      "ExitCode":  1,
+                      "TimedOut":  false,
+                      "StandardOutput":  "",
+                      "StandardError":  "Session contract NEGATIVE_STATUS failed: wrong fixture exit status",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Negative control: NEGATIVE_ORDER",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "NEGATIVE_ORDER"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  92,
+                      "ExitCode":  1,
+                      "TimedOut":  false,
+                      "StandardOutput":  "",
+                      "StandardError":  "Session contract NEGATIVE_ORDER failed: output markers were reordered",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Negative control: NEGATIVE_TRUNCATION",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "NEGATIVE_TRUNCATION"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  93,
+                      "ExitCode":  1,
+                      "TimedOut":  false,
+                      "StandardOutput":  "",
+                      "StandardError":  "Session contract NEGATIVE_TRUNCATION failed: missing or truncated output marker",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Negative control: NEGATIVE_LEAK",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "NEGATIVE_LEAK"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  37,
+                      "ExitCode":  1,
+                      "TimedOut":  false,
+                      "StandardOutput":  "",
+                      "StandardError":  "Session contract NEGATIVE_LEAK failed: deliberate handle leak detected",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Negative control: timeout",
+                      "Executable":  "tests/SessionContractTest.exe",
+                      "Arguments":  [
+                                        "NEGATIVE_TIMEOUT"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  2156,
+                      "ExitCode":  null,
+                      "TimedOut":  true,
+                      "StandardOutput":  "",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Agent source identity",
+                      "Executable":  "bin/VT7Pty-Agent.exe",
+                      "Arguments":  [
+                                        "--version"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  39,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "VT7Pty version 0.5.0-dev\r\ncommit fff58a3415140ea10bdc6a73f18e37d31b56606c\r\nAPI version 1.0\r\nprotocol version 1",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Argument quoting fixture",
+                      "Executable":  "tests/fixture-show-argv.exe",
+                      "Arguments":  [
+                                        "alpha",
+                                        "two words"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  27,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "cmdline = [\"C:\\Users\\Binary\\Desktop\\VT7Pty-0.5.0-dev-win7-x64-release-step-0.8-candidate\\tests\\fixture-show-argv.exe\" \"alpha\" \"two words\"]\r\n[C:\\Users\\Binary\\Desktop\\VT7Pty-0.5.0-dev-win7-x64-release-step-0.8-candidate\\tests\\fixture-show-argv.exe]\r\n[alpha]\r\n[two words]",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Bounded output fixture",
+                      "Executable":  "tests/fixture-output-lines.exe",
+                      "Arguments":  [
+                                        "3",
+                                        "5"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  28,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "1 XXXXX\r\n2 XXXXX\r\n3 XXXXX",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Agent rejection: missing",
+                      "Executable":  "results/windows7-nonesu-20260924-161233-agent-missing/BackendSmokeTest.exe",
+                      "Arguments":  [
+                                        "EXPECT_MISSING_AGENT"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  100,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Expected VT7Pty failure: VT7Pty agent executable is missing: \u0027C:\\Users\\Binary\\Desktop\\VT7Pty-0.5.0-dev-win7-x64-release-step-0.8-candidate\\results\\windows7-nonesu-20260924-161233-agent-missing\\VT7Pty-Agent.exe\u0027",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Agent rejection: malformed",
+                      "Executable":  "results/windows7-nonesu-20260924-161233-agent-malformed/BackendSmokeTest.exe",
+                      "Arguments":  [
+                                        "EXPECT_INCOMPATIBLE_AGENT"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  153,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Expected VT7Pty failure: VT7Pty agent handshake is missing or malformed",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Agent rejection: wrong-identity",
+                      "Executable":  "results/windows7-nonesu-20260924-161233-agent-wrong-identity/BackendSmokeTest.exe",
+                      "Arguments":  [
+                                        "EXPECT_INCOMPATIBLE_AGENT"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  135,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Expected VT7Pty failure: VT7Pty agent identity mismatch: expected \u0027VT7Pty-Agent\u0027, received \u0027Not-VT7Pty-Agent\u0027",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Agent rejection: older-protocol",
+                      "Executable":  "results/windows7-nonesu-20260924-161233-agent-older-protocol/BackendSmokeTest.exe",
+                      "Arguments":  [
+                                        "EXPECT_INCOMPATIBLE_AGENT"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  142,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Expected VT7Pty failure: VT7Pty agent protocol mismatch: client=1, agent=0",
+                      "StandardError":  "",
+                      "Failure":  null
+                  },
+                  {
+                      "Name":  "Agent rejection: newer-protocol",
+                      "Executable":  "results/windows7-nonesu-20260924-161233-agent-newer-protocol/BackendSmokeTest.exe",
+                      "Arguments":  [
+                                        "EXPECT_INCOMPATIBLE_AGENT"
+                                    ],
+                      "Status":  "Pass",
+                      "DurationMilliseconds":  127,
+                      "ExitCode":  0,
+                      "TimedOut":  false,
+                      "StandardOutput":  "Expected VT7Pty failure: VT7Pty agent protocol mismatch: client=1, agent=2",
+                      "StandardError":  "",
+                      "Failure":  null
+                  }
+              ]
+}

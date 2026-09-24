@@ -75,7 +75,7 @@ recorded separately by the checked items below.
 
 | Milestone | Outcome | Status |
 | --- | --- | --- |
-| 0 | Fully modernized, native VT7Pty 0.5.x foundation | In progress; Steps 0.1-0.7 accepted, Step 0.8 candidate prepared |
+| 0 | Fully modernized, native VT7Pty 0.5.x foundation | In progress; Steps 0.1-0.8 accepted, Step 0.9 next |
 | 1 | Measured backend fidelity and reliability improvements | Direction approved; detailed scope follows Milestone 0 evidence |
 | 2 | Documented VT7Pty API and standalone integration host | Direction approved; detailed scope follows Milestone 1 |
 | 3 | Versioned backend handoff ready for separately authorized VT7 integration | Direction approved; detailed scope follows Milestone 2 |
@@ -319,16 +319,16 @@ same accepted cases on either physical Windows 7 tier.
 - [x] Add controlled child-process and console behavior fixtures.
 - [x] Cover build/package identity, startup, spawn, input, output, Unicode,
   resize, lifecycle, interactive applications, diagnostics, and failures.
-- [ ] Cover handle/process leaks, output drain, agent/client failure, shutdown
+- [x] Cover handle/process leaks, output drain, agent/client failure, shutdown
   races, repeated sessions, resize under load, and bounded long-running use.
 - [x] Add negative controls that prove incorrect output, status, ordering,
   timeout, incompatible agents, and leaked state are detected.
 - [x] Produce machine-readable results and a concise human-readable summary.
 - [x] Build a portable Windows 7 acceptance bundle with instructions and all
   required fixtures.
-- [ ] Record exact OS/update state, architecture, package identity, per-case
+- [x] Record exact OS/update state, architecture, package identity, per-case
   result, timing, logs, and crash artifacts for every physical run.
-- [ ] Run routine candidates on non-ESU Windows 7 and milestone/release
+- [x] Run routine candidates on non-ESU Windows 7 and milestone/release
   candidates on both non-ESU and ESU Windows 7.
 - [x] Record a defined SSH/full-screen baseline or the exact unresolved
   dependency for Milestone 1.
@@ -339,7 +339,9 @@ remains; and both Windows 7 tiers accept the milestone candidate.
 
 The implementation and development-host checks are recorded in the
 [Step 0.8 permanent test system candidate](docs/validation/2026-09-24-step-0.8-candidate.md).
-Physical acceptance on both Windows 7 tiers and the full soak remain pending.
+Both tiers passed the exact candidate, including all 30 cases and the full
+120-minute soak. The raw records and environment disposition are linked in the
+[Step 0.8 completion evidence](docs/validation/2026-09-24-step-0.8-completion.md).
 
 ### Step 0.9: Establish the manual release process
 
@@ -369,7 +371,7 @@ published manually with complete identity and acceptance evidence.
 - [x] Accept Step 0.5 with linked naming, version, protocol, and package evidence.
 - [x] Accept Step 0.6 with linked code-quality and regression evidence.
 - [x] Accept Step 0.7 with linked diagnostics and security evidence.
-- [ ] Accept Step 0.8 with linked automated and physical test results.
+- [x] Accept Step 0.8 with linked automated and physical test results.
 - [ ] Accept Step 0.9 with a reviewed release-candidate package.
 
 `0.5.0-dev` remains a development identity until acceptance. Creating a

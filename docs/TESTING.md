@@ -1,6 +1,6 @@
 # VT7Pty Testing Strategy
 
-Status: approved Milestone 0 strategy; Step 0.8 candidate implemented.
+Status: approved Milestone 0 strategy; Step 0.8 accepted on both Windows 7 tiers.
 Updated: 2026-09-24.
 
 This document defines how VT7Pty distinguishes preserved WinPTY behavior, new
