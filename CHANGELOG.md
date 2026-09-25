@@ -34,6 +34,9 @@ changes until implemented.
   evidence review, and separate publication decision.
 - Extended release-candidate acceptance to a third Windows 7 SP1 machine using
   PowerShell 2.0 without KB3191566, with a shared 30-case target suite.
+- Accepted the exact `0.5.0-dev` rc7 manual release-process candidate after
+  30/30 passing cases and a full 120-minute soak on each of three Windows 7
+  tiers, including the PowerShell 2.0 legacy tier.
 - Preserved the original WinPTY README and release history as historical
   documentation.
 

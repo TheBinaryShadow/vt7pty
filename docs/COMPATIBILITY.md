@@ -1,7 +1,7 @@
 # VT7Pty Compatibility Contract
 
-Status: approved target contract; Step 0.8 permanent tests accepted on both tiers.
-Updated: 2026-09-24.
+Status: approved target contract; Step 0.9 candidate accepted on all three tiers.
+Updated: 2026-09-25.
 
 This document separates approved targets from verified support. A target is not
 a compatibility claim until an identified build passes the required procedure.
@@ -12,7 +12,7 @@ a compatibility claim until an identified build passes the required procedure.
 | --- | --- |
 | Source baseline | WinPTY `0.4.4-dev` at upstream commit `7e59fe2` |
 | Development host | Maintained x64 Debug/Release workflow verified and source-debugged on Windows 10 build 19044 |
-| Windows 7 runtime | Steps 0.4 through 0.8 accepted on Windows 7 SP1 x64; recorded evidence dispositions apply |
+| Windows 7 runtime | Steps 0.4 through 0.9 accepted on Windows 7 SP1 x64; recorded evidence dispositions apply |
 | Architectures | x64 is the approved product architecture; inherited x64 smoke tests passed locally |
 | Build interface | VS2022/MSBuild and repository PowerShell entry points; inherited build and packaging paths removed |
 | API and binaries | VT7Pty `0.5.0-dev` technical identity accepted; API 1.0 and client-agent protocol 1 |
@@ -60,17 +60,18 @@ VT7 graphics or managed-runtime prerequisites are not automatically VT7Pty
 prerequisites.
 
 Routine candidates run on Tier A. Milestone and release candidates run on all
-three tiers from the Step 0.9 candidate onward. Tier C is pending its first
-physical acceptance; Windows PowerShell 5.1 and KB3191566 are not product
-prerequisites unless target evidence establishes a dependency. Results from one
+three tiers from the Step 0.9 candidate onward. Tier C passed its first
+accepted run on the `0.5.0-dev` rc7 candidate with PowerShell 2.0 and without
+KB3191566; these are not prerequisites of the tested native runtime. Results from one
 tier ordinarily do not stand in for another. Step
 0.4 has a documented owner-approved exception for two declared-tier runs on
 one recorded installation; Step 0.5 has a documented owner-approved temporary
 two-machine treatment despite identical recorded machine metadata. Steps 0.6
-through 0.8 apply the owner's instruction to treat the VMware-reported
+through 0.9 apply the owner's instruction to treat the VMware-reported
 `NESSY` environment as a full-fledged acceptance machine while recording its
-actual inventory. Later release gates require an explicit recorded environment
-disposition with the exact candidate results.
+actual inventory. The owner also approved VMware-reported `LEOPARD` as the
+third acceptance machine for Step 0.9. The exact-candidate environment
+disposition is in the [completion record](validation/2026-09-25-step-0.9-completion.md).
 
 ## Development and build hosts
 

@@ -1,0 +1,58 @@
+{
+  "SchemaVersion": 1,
+  "Status": "Pass",
+  "ReleaseSet": "D:\\Git\\vt7pty\\artifacts\\packages\\VT7Pty-0.5.0-dev-win7-x64-release-m0-rc7-release-set.json",
+  "ReleaseSetSha256": "0fb7e985955706eb7f078d25f2751c02ac302ede37ce06920fbc9e627f7f2543",
+  "SourceCommit": "5f41fac04b7f60f0034ad83293b039c8b9175e60",
+  "PackageVersion": "0.5.0-dev",
+  "Records": [
+    {
+      "Tier": "NonESU",
+      "Machine": "NESSY",
+      "Manufacturer": "VMware, Inc.",
+      "Model": "VMware20,1",
+      "OperatingSystem": "6.1.7601.65536",
+      "PowerShellVersion": "5.1.14409.1018",
+      "StartedAt": "2026-09-24T21:43:42.3836429Z",
+      "CompletedAt": "2026-09-24T23:44:50.2960084Z",
+      "ResultFile": "D:\\Git\\vt7pty\\docs\\validation\\results\\step-0.9\\windows7-nonesu-20260924-234342.json",
+      "ResultSha256": "4b40d048b9763753c986afad221974ca52c7cd53883a855c9e2f88520d5ba28e",
+      "CaseCount": 30,
+      "SoakDurationMilliseconds": 7201734,
+      "Issues": []
+    },
+    {
+      "Tier": "ESU",
+      "Machine": "TURTLE",
+      "Manufacturer": "Micro-Star International Co., Ltd.",
+      "Model": "MS-7C35",
+      "OperatingSystem": "6.1.7601.65536",
+      "PowerShellVersion": "5.1.14409.1005",
+      "StartedAt": "2026-09-24T21:45:29.2338231Z",
+      "CompletedAt": "2026-09-24T23:46:02.8426355Z",
+      "ResultFile": "D:\\Git\\vt7pty\\docs\\validation\\results\\step-0.9\\windows7-esu-20260924-234529.json",
+      "ResultSha256": "e9d30560e4a92559ef0684cac9545696db55def5957336368051eaa76d23a2a1",
+      "CaseCount": 30,
+      "SoakDurationMilliseconds": 7200407,
+      "Issues": []
+    },
+    {
+      "Tier": "Legacy",
+      "Machine": "LEOPARD",
+      "Manufacturer": "VMware, Inc.",
+      "Model": "VMware Virtual Platform",
+      "OperatingSystem": "6.1.7601.65536",
+      "PowerShellVersion": "2.0",
+      "StartedAt": "2026-09-24T21:44:51.0369002Z",
+      "CompletedAt": "2026-09-24T23:45:51.0500804Z",
+      "ResultFile": "D:\\Git\\vt7pty\\docs\\validation\\results\\step-0.9\\windows7-legacy-20260924-234451.json",
+      "ResultSha256": "46d18ad24324bbb172eb1bf6ec0142ad3324a8187de2d13ef01ad1dadc9d93f4",
+      "CaseCount": 30,
+      "SoakDurationMilliseconds": 7201289,
+      "Issues": []
+    }
+  ],
+  "Failures": [],
+  "EnvironmentDisposition": "Review the recorded hardware against the project owner-approved tier policy.",
+  "PublicationApproved": false
+}

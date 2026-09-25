@@ -15,15 +15,12 @@ behavior. We are building on years of engineering by both communities.
 ## Project status
 
 VT7Pty is in early development at version `0.5.0-dev`. Milestone 0 Steps 0.1
-through 0.4 established the inherited baseline, the supported VS2022/MSBuild
-workflow, a native-only active tree, and the accepted Windows 7+ platform
-implementation. Step 0.5 established and physically accepted the technical
-VT7Pty identity. Step 0.6 modernized and physically accepted the retained
-native code with warning-clean C++20 build and analysis gates. Step 0.7
-modernized and physically accepted the diagnostic and security boundaries on
-both Windows 7 tiers. Step 0.8 established the permanent test system and passed
-all 30 cases, including the 120-minute soak, on both accepted Windows 7 tiers.
-Milestone 0 continues with the manual release process in Step 0.9.
+through 0.8 established the WinPTY baseline, modern VS2022/MSBuild and C++20
+native foundation, VT7Pty identity, diagnostic and security boundaries, and
+permanent test system. Step 0.9 validated the manual release process: the
+exact rc7 candidate passed all 30 cases and the full 120-minute soak on three
+accepted Windows 7 SP1 x64 tiers, including a PowerShell 2.0 installation
+without KB3191566. No VT7Pty release has been published.
 
 The [development foundation](docs/FOUNDATION.md) and
 [roadmap](ROADMAP.md) record the approved product and engineering direction.
@@ -31,10 +28,10 @@ The [diagnostic collection guide](docs/DIAGNOSTICS.md) and
 [native boundary review](docs/SECURITY_REVIEW.md) define the Step 0.7 support
 and security baseline.
 
-Milestone 0 will replace the complete inherited toolchain, remove the Unix
-adapter and pre-Windows 7 compatibility, establish the native VT7Pty 0.5.x
-identity, modernize the retained C++ code, and create the permanent local build,
-test, diagnostic, and release systems.
+Milestone 0 replaced the inherited toolchain, removed the Unix adapter and
+pre-Windows 7 compatibility, established the VT7Pty 0.5.x identity, modernized
+the retained C++ code, and created the permanent local build, test,
+diagnostic, and manual release systems.
 
 The Cygwin/MSYS adapter and superseded GYP, GNU Make, Python 2 packaging, and
 hosted-build infrastructure have been removed. Active binaries, headers,
@@ -45,8 +42,9 @@ intentional compatibility break.
 VT7Pty targets x64 Windows 7 SP1 and later. Windows XP, Windows Vista, and x86
 are outside the maintained product. Historical WinPTY support claims and
 release notes describe upstream behavior; they are not acceptance results for
-future VT7Pty builds. Milestone and release candidates will be validated on
-physical non-ESU, ESU, and PowerShell 2.0 Windows 7 SP1 x64 machines.
+future VT7Pty builds. Milestone and release candidates are validated on
+non-ESU, ESU, and PowerShell 2.0 Windows 7 SP1 x64 machines, with the recorded
+machine-environment dispositions in the validation evidence.
 
 ## What we are working toward
 
@@ -111,6 +109,7 @@ Useful starting points:
 - [Step 0.6 native modernization candidate](docs/validation/2026-09-22-step-0.6-candidate.md)
 - [Accepted Step 0.6 completion validation](docs/validation/2026-09-23-step-0.6-completion.md)
 - [Accepted Step 0.8 permanent test system](docs/validation/2026-09-24-step-0.8-completion.md)
+- [Accepted Step 0.9 manual release process](docs/validation/2026-09-25-step-0.9-completion.md)
 - [Architecture and current data flows](docs/ARCHITECTURE.md)
 - [Testing strategy and evidence requirements](docs/TESTING.md)
 - [Windows 7 physical acceptance procedure](docs/WINDOWS7_ACCEPTANCE.md)

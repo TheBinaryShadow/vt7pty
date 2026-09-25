@@ -1,6 +1,7 @@
 # Releasing VT7Pty
 
-Status: Step 0.9 manual release process under validation. Updated: 2026-09-24.
+Status: Step 0.9 manual release process accepted with the `0.5.0-dev` rc7
+candidate. Updated: 2026-09-25.
 
 VT7Pty uses local VS2022/MSBuild commands, physical Windows 7 acceptance, and a
 reviewed manual GitHub Release. There is no hosted build or test service.
@@ -72,9 +73,14 @@ human assessment of the logs, hardware inventory, compatibility claim,
 changelog, and release notes. The review record explicitly does not authorize
 publication.
 
+The [rc7 completion record](validation/2026-09-25-step-0.9-completion.md)
+documents the passing review and all three accepted target runs, including the
+owner's machine-environment disposition. It validates this manual process; a
+final `0.5.0` build still needs its own exact-package acceptance.
+
 ## Version, tag, and publication
 
-`0.5.0-dev` remains the development identity until Milestone 0 acceptance.
+`0.5.0-dev` remains the development identity after Milestone 0 acceptance.
 The Step 0.9 tooling candidate may use that identity. Changing `VERSION.txt`
 to `0.5.0` changes the exact binaries and requires a new clean package set and
 three physical acceptance runs; earlier `0.5.0-dev` evidence cannot qualify it.

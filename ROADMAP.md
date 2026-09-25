@@ -75,7 +75,7 @@ recorded separately by the checked items below.
 
 | Milestone | Outcome | Status |
 | --- | --- | --- |
-| 0 | Fully modernized, native VT7Pty 0.5.x foundation | In progress; Steps 0.1-0.8 accepted, Step 0.9 candidate prepared |
+| 0 | Fully modernized, native VT7Pty 0.5.x foundation | Accepted through Step 0.9; `0.5.0-dev` release process validated, publication separate |
 | 1 | Measured backend fidelity and reliability improvements | Direction approved; detailed scope follows Milestone 0 evidence |
 | 2 | Documented VT7Pty API and standalone integration host | Direction approved; detailed scope follows Milestone 1 |
 | 3 | Versioned backend handoff ready for separately authorized VT7 integration | Direction approved; detailed scope follows Milestone 2 |
@@ -356,7 +356,7 @@ published without retired upstream infrastructure or hosted automation.
 - [x] Add a PowerShell 2.0-compatible target runner for the legacy Windows 7
   machine and preserve the same 30-case acceptance matrix.
 - [x] Require non-ESU, ESU, and PowerShell 2.0 physical acceptance records for a release.
-- [ ] Obtain and review all three Windows 7 tier records for the exact candidate set.
+- [x] Obtain and review all three Windows 7 tier records for the exact candidate set.
 - [x] Document changelog, version, tag, archive, checksum, and GitHub Release
   preparation and review.
 - [x] Keep installers and code signing outside the initial release process until
@@ -365,9 +365,12 @@ published without retired upstream infrastructure or hosted automation.
 Exit criterion: VT7Pty `0.5.0` can be built, tested, packaged, reviewed, and
 published manually with complete identity and acceptance evidence.
 
-The clean-source archive set, development-host checks, and exact physical
-acceptance dependency are recorded in the
+The clean-source archive set and development-host checks are recorded in the
 [Step 0.9 three-machine release candidate](docs/validation/2026-09-24-step-0.9-rc7-candidate.md).
+The [Step 0.9 completion record](docs/validation/2026-09-25-step-0.9-completion.md)
+reviews the three exact-candidate tier runs, the automated release review, and
+the owner-approved environment disposition. A final `0.5.0` package still
+requires its own exact-build acceptance before publication.
 
 ### Milestone 0 acceptance
 
@@ -379,10 +382,10 @@ acceptance dependency are recorded in the
 - [x] Accept Step 0.6 with linked code-quality and regression evidence.
 - [x] Accept Step 0.7 with linked diagnostics and security evidence.
 - [x] Accept Step 0.8 with linked automated and physical test results.
-- [ ] Accept Step 0.9 with a reviewed release-candidate package.
+- [x] Accept Step 0.9 with a reviewed release-candidate package.
 
-`0.5.0-dev` remains a development identity until acceptance. Creating a
-`0.5.0` tag or GitHub Release is a separate publication decision. Milestone 0
+`0.5.0-dev` remains a development identity after Step 0.9 acceptance. Creating
+a `0.5.0` tag or GitHub Release is a separate publication decision. Milestone 0
 does not claim complete terminal fidelity, VT7 integration, or ConPTY
 compatibility.
 
