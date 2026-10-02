@@ -28,3 +28,4 @@ Current records:
 - [2026-09-24 Step 0.9 manual release candidate](2026-09-24-step-0.9-candidate.md)
 - [2026-09-24 Step 0.9 three-machine rc7 candidate](2026-09-24-step-0.9-rc7-candidate.md)
 - [2026-09-25 Step 0.9 completion](2026-09-25-step-0.9-completion.md)
+- [2026-10-02 VT7Pty 0.5.0 release candidate](2026-10-02-0.5.0-release-candidate.md)
