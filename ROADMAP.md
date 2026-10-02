@@ -47,8 +47,9 @@ either project.
 - The inherited source is WinPTY `0.4.4-dev` at
   [`7e59fe2`](https://github.com/rprichard/winpty/commit/7e59fe2d09adf0fa2aa606492e7ca98efbc5184e).
 - Active runtime names, public APIs, endpoints, diagnostics, and version
-  metadata use the VT7Pty `0.5.0-dev` identity. The Unix adapter and superseded
-  build, package, and compiler-compatibility paths have been removed.
+  metadata use the VT7Pty identity. `VERSION.txt` carries the `0.5.0` baseline.
+  The Unix adapter and superseded build, package, and compiler-compatibility
+  paths have been removed.
 - The maintained VS2022/MSBuild workflow builds, verifies, packages, and
   source-debugs the renamed x64 native boundary. This is development-host
   evidence, not Windows 7 acceptance.
@@ -384,9 +385,9 @@ requires its own exact-build acceptance before publication.
 - [x] Accept Step 0.8 with linked automated and physical test results.
 - [x] Accept Step 0.9 with a reviewed release-candidate package.
 
-`0.5.0-dev` remains a development identity after Step 0.9 acceptance. Creating
-a `0.5.0` tag or GitHub Release is a separate publication decision. Milestone 0
-does not claim complete terminal fidelity, VT7 integration, or ConPTY
+The Step 0.9 candidate retains its `0.5.0-dev` development identity. A final
+`0.5.0` package requires its own exact-build acceptance before a tag or GitHub
+Release. Milestone 0 does not claim complete terminal fidelity, VT7 integration, or ConPTY
 compatibility.
 
 ## Milestone 1: Improve backend fidelity and reliability

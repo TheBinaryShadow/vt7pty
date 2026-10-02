@@ -15,10 +15,10 @@ a compatibility claim until an identified build passes the required procedure.
 | Windows 7 runtime | Steps 0.4 through 0.9 accepted on Windows 7 SP1 x64; recorded evidence dispositions apply |
 | Architectures | x64 is the approved product architecture; inherited x64 smoke tests passed locally |
 | Build interface | VS2022/MSBuild and repository PowerShell entry points; inherited build and packaging paths removed |
-| API and binaries | VT7Pty `0.5.0-dev` technical identity accepted; API 1.0 and client-agent protocol 1 |
+| API and binaries | VT7Pty `0.5.0` baseline source; API 1.0 and client-agent protocol 1; release qualification requires exact-package target runs |
 | ConPTY compatibility | Not implemented; ConPTY is a design and behavioral reference |
 | VT7 integration | Planned; no integration claim |
-| Releases | No VT7Pty release has been published |
+| Releases | See [GitHub Releases](https://github.com/TheBinaryShadow/vt7pty/releases) and exact-build validation records for published assets |
 
 Historical WinPTY support statements describe upstream releases and do not
 qualify future VT7Pty builds.

@@ -3,10 +3,16 @@
 This file records VT7Pty changes after the WinPTY `0.4.4-dev` baseline. It does
 not replace or rewrite the preserved [WinPTY release history](RELEASES.md).
 
-VT7Pty has not published a release. Planned roadmap items are not listed as
-changes until implemented.
+The 0.5.x line is pre-stable. Planned roadmap items are not listed as changes
+until implemented.
 
-## Unreleased
+## 0.5.0
+
+First VT7Pty baseline release. It establishes the modern Windows 7 SP1+ x64
+native foundation and manual release process; terminal fidelity improvements
+and the VT7 integration API remain future milestones. The public C API is 1.0
+and the client-agent protocol is 1. No WinPTY or ConPTY binary compatibility is
+claimed.
 
 ### Documentation
 

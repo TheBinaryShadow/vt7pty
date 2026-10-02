@@ -39,7 +39,7 @@ upper 16 bits and the minor component in the lower 16 bits.
 
 The identities evolve independently:
 
-- Package version: `0.5.0-dev`, sourced only from `VERSION.txt`.
+- Package version: initially `0.5.0-dev`, now `0.5.0`; sourced only from `VERSION.txt`.
 - Public C API version: `1.0`, sourced from `src/include/vt7pty_version.h`.
 - Client-agent protocol version: `1`, sourced from `src/shared/Protocol.h`.
 - Source identity: the Git commit embedded at build time.

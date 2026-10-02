@@ -14,13 +14,17 @@ behavior. We are building on years of engineering by both communities.
 
 ## Project status
 
-VT7Pty is in early development at version `0.5.0-dev`. Milestone 0 Steps 0.1
+VT7Pty's first baseline version is `0.5.0`. Milestone 0 Steps 0.1
 through 0.8 established the WinPTY baseline, modern VS2022/MSBuild and C++20
 native foundation, VT7Pty identity, diagnostic and security boundaries, and
 permanent test system. Step 0.9 validated the manual release process: the
 exact rc7 candidate passed all 30 cases and the full 120-minute soak on three
 accepted Windows 7 SP1 x64 tiers, including a PowerShell 2.0 installation
-without KB3191566. No VT7Pty release has been published.
+without KB3191566. Each release build must pass its own exact-package
+Windows 7 acceptance before publication. See the
+[release page](https://github.com/TheBinaryShadow/vt7pty/releases) for published
+assets and the [compatibility contract](docs/COMPATIBILITY.md) for their tested
+scope.
 
 The [development foundation](docs/FOUNDATION.md) and
 [roadmap](ROADMAP.md) record the approved product and engineering direction.
@@ -124,6 +128,7 @@ Useful starting points:
 - [Historical WinPTY release notes](RELEASES.md)
 - [VT7Pty changelog](CHANGELOG.md)
 - [Manual release process](docs/RELEASING.md)
+- [0.5.0 release notes](docs/releases/0.5.0.md)
 
 ## Contributing and community
 

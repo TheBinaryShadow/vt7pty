@@ -31,7 +31,7 @@ not to be named.
 
 ## Supported versions
 
-VT7Pty is in early development and has no supported stable release series.
+VT7Pty is in its pre-stable 0.5.x line and has no supported stable release series.
 The inherited `0.4.4-dev` version identifies the WinPTY baseline; it is not a
 VT7Pty security-support commitment.
 
@@ -41,11 +41,11 @@ does not provide operating-system vendor support.
 
 | Version | Status |
 | --- | --- |
-| Current VT7Pty development branch | Reports welcome; no stability or response-time guarantee |
+| VT7Pty 0.5.x and current development branch | Reports welcome; best-effort triage, without a stability or response-time guarantee |
 | Historical upstream WinPTY versions | No separate VT7Pty maintenance commitment; report issues affecting our baseline |
 | Third-party or modified builds | Reproduction against identifiable repository source may be needed |
 
-This policy will be revised when VT7Pty publishes a supported release.
+This policy will be revised if the release support commitment changes.
 Current platform and application claims are tracked separately in the
 [compatibility contract](docs/COMPATIBILITY.md).
 
