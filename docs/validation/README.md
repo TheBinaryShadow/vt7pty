@@ -30,3 +30,4 @@ Current records:
 - [2026-09-25 Step 0.9 completion](2026-09-25-step-0.9-completion.md)
 - [2026-10-02 VT7Pty 0.5.0 release candidate](2026-10-02-0.5.0-release-candidate.md)
 - [2026-10-02 VT7Pty 0.5.0 release acceptance](2026-10-02-0.5.0-release-acceptance.md)
+- [2026-10-02 VT7Pty 0.5.0 publication](2026-10-02-0.5.0-publication.md)

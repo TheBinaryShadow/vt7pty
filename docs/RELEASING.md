@@ -1,6 +1,6 @@
 # Releasing VT7Pty
 
-Status: the exact `0.5.0` package passed all three Windows 7 tiers. Updated: 2026-10-02.
+Status: the exact `0.5.0` package passed all three Windows 7 tiers and was [published](validation/2026-10-02-0.5.0-publication.md). Updated: 2026-10-02.
 
 VT7Pty uses local VS2022/MSBuild commands, physical Windows 7 acceptance, and a
 reviewed manual GitHub Release. There is no hosted build or test service.
