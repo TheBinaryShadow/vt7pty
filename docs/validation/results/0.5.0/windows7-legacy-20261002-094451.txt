@@ -1,0 +1,43 @@
+VT7Pty Windows 7 acceptance: Pass
+Tier: Legacy
+Machine: LEOPARD (VMware, Inc. VMware Virtual Platform)
+OS: Microsoft Windows 7 Ultimate , version 6.1.7601.65536, SP1
+Package: VT7Pty 0.5.0, commit cbd17727b3c8af21e5afd4499b8dca7d2140ed9d
+Manifest SHA-256: b9d8aacbd3b5c9dc8d2ac7b8fa259c6003a19ec613bf694243f505bcc314f467
+
+Preflight failures:
+  None
+
+Tests:
+  Pass: Modern C++ utility unit test (105 ms)
+  Pass: Client-agent protocol unit test (45 ms)
+  Pass: Diagnostic pipe security self-test (49 ms)
+  Pass: Diagnostic build identity (35 ms)
+  Pass: Structured diagnostic transport and bundle (14063 ms)
+  Pass: Inherited lifecycle session (151 ms)
+  Pass: Command Prompt and Windows PowerShell sessions (671 ms)
+  Pass: Session contract: OUTPUT (144 ms)
+  Pass: Session contract: UNICODE (132 ms)
+  Pass: Session contract: INPUT (155 ms)
+  Pass: Session contract: RESIZE (3257 ms)
+  Pass: Session contract: REPEAT (51246 ms)
+  Pass: Session contract: SHUTDOWN (3273 ms)
+  Pass: Session contract: SPAWN_FAILURE (79 ms)
+  Pass: Session contract: CONCURRENT (293 ms)
+  Pass: Session contract: SOAK 120 minutes (7205479 ms)
+  Pass: Negative control: NEGATIVE_OUTPUT (77 ms)
+  Pass: Negative control: NEGATIVE_STATUS (77 ms)
+  Pass: Negative control: NEGATIVE_ORDER (76 ms)
+  Pass: Negative control: NEGATIVE_TRUNCATION (76 ms)
+  Pass: Negative control: NEGATIVE_LEAK (22 ms)
+  Pass: Negative control: timeout (2092 ms)
+  Pass: Agent source identity (25 ms)
+  Pass: Argument quoting fixture (15 ms)
+  Pass: Bounded output fixture (16 ms)
+  Pass: Agent rejection: missing (44 ms)
+  Pass: Agent rejection: malformed (49 ms)
+  Pass: Agent rejection: wrong-identity (39 ms)
+  Pass: Agent rejection: older-protocol (36 ms)
+  Pass: Agent rejection: newer-protocol (40 ms)
+
+Machine-readable result: C:\Users\Binary\Desktop\VT7Pty-0.5.0-win7-x64-release-tests\results\windows7-legacy-20261002-094451.json

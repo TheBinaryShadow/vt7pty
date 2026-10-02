@@ -20,8 +20,10 @@ native foundation, VT7Pty identity, diagnostic and security boundaries, and
 permanent test system. Step 0.9 validated the manual release process: the
 exact rc7 candidate passed all 30 cases and the full 120-minute soak on three
 accepted Windows 7 SP1 x64 tiers, including a PowerShell 2.0 installation
-without KB3191566. Each release build must pass its own exact-package
-Windows 7 acceptance before publication. See the
+without KB3191566. The exact `0.5.0` package also passed
+[three-tier release acceptance](docs/validation/2026-10-02-0.5.0-release-acceptance.md).
+Each future release build must pass its own exact-package Windows 7
+acceptance before publication. See the
 [release page](https://github.com/TheBinaryShadow/vt7pty/releases) for published
 assets and the [compatibility contract](docs/COMPATIBILITY.md) for their tested
 scope.

@@ -1,7 +1,7 @@
 # VT7Pty Compatibility Contract
 
-Status: approved target contract; Step 0.9 candidate accepted on all three tiers.
-Updated: 2026-09-25.
+Status: approved target contract; exact 0.5.0 release package accepted on all three tiers.
+Updated: 2026-10-02.
 
 This document separates approved targets from verified support. A target is not
 a compatibility claim until an identified build passes the required procedure.
@@ -15,7 +15,7 @@ a compatibility claim until an identified build passes the required procedure.
 | Windows 7 runtime | Steps 0.4 through 0.9 accepted on Windows 7 SP1 x64; recorded evidence dispositions apply |
 | Architectures | x64 is the approved product architecture; inherited x64 smoke tests passed locally |
 | Build interface | VS2022/MSBuild and repository PowerShell entry points; inherited build and packaging paths removed |
-| API and binaries | VT7Pty `0.5.0` baseline source; API 1.0 and client-agent protocol 1; release qualification requires exact-package target runs |
+| API and binaries | VT7Pty `0.5.0` exact package accepted on three Windows 7 tiers; API 1.0 and client-agent protocol 1 |
 | ConPTY compatibility | Not implemented; ConPTY is a design and behavioral reference |
 | VT7 integration | Planned; no integration claim |
 | Releases | See [GitHub Releases](https://github.com/TheBinaryShadow/vt7pty/releases) and exact-build validation records for published assets |

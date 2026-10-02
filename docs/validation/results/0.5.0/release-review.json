@@ -1,0 +1,58 @@
+{
+  "SchemaVersion": 1,
+  "Status": "Pass",
+  "ReleaseSet": "D:\\Git\\vt7pty\\artifacts\\packages\\VT7Pty-0.5.0-win7-x64-release-release-set.json",
+  "ReleaseSetSha256": "ea9f079d750e5bb2ed3dd8a092832b3bc95d610a49a18d5e19aa51a57a9e3e77",
+  "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+  "PackageVersion": "0.5.0",
+  "Records": [
+    {
+      "Tier": "NonESU",
+      "Machine": "NESSY",
+      "Manufacturer": "VMware, Inc.",
+      "Model": "VMware20,1",
+      "OperatingSystem": "6.1.7601.65536",
+      "PowerShellVersion": "5.1.14409.1018",
+      "StartedAt": "2026-10-02T07:44:36.3914687Z",
+      "CompletedAt": "2026-10-02T09:46:14.6458874Z",
+      "ResultFile": "D:\\Git\\vt7pty\\docs\\validation\\results\\0.5.0\\windows7-nonesu-20261002-094436.json",
+      "ResultSha256": "19dacbdb52e00a1ff1a35bf60023f5a709bd11a13b776990fc70a955c3cb9e2a",
+      "CaseCount": 30,
+      "SoakDurationMilliseconds": 7205196,
+      "Issues": []
+    },
+    {
+      "Tier": "ESU",
+      "Machine": "TURTLE",
+      "Manufacturer": "System manufacturer",
+      "Model": "System Product Name",
+      "OperatingSystem": "6.1.7601.65536",
+      "PowerShellVersion": "5.1.14409.1005",
+      "StartedAt": "2026-10-02T07:48:53.1917283Z",
+      "CompletedAt": "2026-10-02T09:49:42.0665676Z",
+      "ResultFile": "D:\\Git\\vt7pty\\docs\\validation\\results\\0.5.0\\windows7-esu-20261002-094853.json",
+      "ResultSha256": "e19a93221664e100b1fdf039636380395ec88ce18a2e3e4e7522965d9d00d368",
+      "CaseCount": 30,
+      "SoakDurationMilliseconds": 7204417,
+      "Issues": []
+    },
+    {
+      "Tier": "Legacy",
+      "Machine": "LEOPARD",
+      "Manufacturer": "VMware, Inc.",
+      "Model": "VMware Virtual Platform",
+      "OperatingSystem": "6.1.7601.65536",
+      "PowerShellVersion": "2.0",
+      "StartedAt": "2026-10-02T07:44:51.6396779Z",
+      "CompletedAt": "2026-10-02T09:46:22.0004827Z",
+      "ResultFile": "D:\\Git\\vt7pty\\docs\\validation\\results\\0.5.0\\windows7-legacy-20261002-094451.json",
+      "ResultSha256": "f24bd96c144b5c7c62ebbd47aca636ba7f474f29a7e32fb55dd3224abf48683e",
+      "CaseCount": 30,
+      "SoakDurationMilliseconds": 7205479,
+      "Issues": []
+    }
+  ],
+  "Failures": [],
+  "EnvironmentDisposition": "Review the recorded hardware against the project owner-approved tier policy.",
+  "PublicationApproved": false
+}
