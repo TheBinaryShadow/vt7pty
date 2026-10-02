@@ -14,19 +14,18 @@ behavior. We are building on years of engineering by both communities.
 
 ## Project status
 
-VT7Pty's first baseline version is `0.5.0`. Milestone 0 Steps 0.1
-through 0.8 established the WinPTY baseline, modern VS2022/MSBuild and C++20
-native foundation, VT7Pty identity, diagnostic and security boundaries, and
-permanent test system. Step 0.9 validated the manual release process: the
-exact rc7 candidate passed all 30 cases and the full 120-minute soak on three
-accepted Windows 7 SP1 x64 tiers, including a PowerShell 2.0 installation
-without KB3191566. The exact `0.5.0` package also passed
-[three-tier release acceptance](docs/validation/2026-10-02-0.5.0-release-acceptance.md).
-Each future release build must pass its own exact-package Windows 7
-acceptance before publication. See the
-[release page](https://github.com/TheBinaryShadow/vt7pty/releases) for published
-assets and the [compatibility contract](docs/COMPATIBILITY.md) for their tested
-scope.
+Milestone 0 is complete. The first baseline,
+[VT7Pty 0.5.0](https://github.com/TheBinaryShadow/vt7pty/releases/tag/v0.5.0),
+is published. It established the WinPTY baseline, modern VS2022/MSBuild and
+C++20 native foundation, VT7Pty identity, diagnostic and security boundaries,
+permanent test system, and manual release process. The exact `0.5.0` package
+passed [three-tier release acceptance](docs/validation/2026-10-02-0.5.0-release-acceptance.md):
+all 30 cases and the full 120-minute soak on each accepted Windows 7 SP1 x64
+machine, including a PowerShell 2.0 installation without KB3191566. The
+[publication record](docs/validation/2026-10-02-0.5.0-publication.md) verifies
+the published tag and assets. Each future release build must pass its own
+exact-package Windows 7 acceptance before publication. See the
+[compatibility contract](docs/COMPATIBILITY.md) for the tested scope.
 
 The [development foundation](docs/FOUNDATION.md) and
 [roadmap](ROADMAP.md) record the approved product and engineering direction.
@@ -38,6 +37,11 @@ Milestone 0 replaced the inherited toolchain, removed the Unix adapter and
 pre-Windows 7 compatibility, established the VT7Pty 0.5.x identity, modernized
 the retained C++ code, and created the permanent local build, test,
 diagnostic, and manual release systems.
+
+Milestone 1 is next: measure and improve application-facing fidelity against a
+defined corpus. The VT7-facing API and standalone integration host follow in
+Milestone 2, then a versioned handoff in Milestone 3. No VT7 integration or
+ConPTY compatibility is claimed by the `0.5.0` release.
 
 The Cygwin/MSYS adapter and superseded GYP, GNU Make, Python 2 packaging, and
 hosted-build infrastructure have been removed. Active binaries, headers,

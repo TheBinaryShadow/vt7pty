@@ -1,6 +1,6 @@
 # VT7Pty Roadmap
 
-Status: approved. Updated: 2026-09-22.
+Status: Milestone 0 complete; Milestone 1 next. Updated: 2026-10-02.
 
 This file owns milestone scope and completion. It records intended work, not
 implemented capability. Milestones follow technical dependencies rather than
@@ -51,8 +51,11 @@ either project.
   The Unix adapter and superseded build, package, and compiler-compatibility
   paths have been removed.
 - The maintained VS2022/MSBuild workflow builds, verifies, packages, and
-  source-debugs the renamed x64 native boundary. This is development-host
-  evidence, not Windows 7 acceptance.
+  source-debugs the renamed x64 native boundary. The exact `0.5.0` package
+  passed the 30-case suite and 120-minute soak on each of three accepted
+  Windows 7 SP1 x64 machines and was
+  [published](https://github.com/TheBinaryShadow/vt7pty/releases/tag/v0.5.0)
+  with [independently verified assets](docs/validation/2026-10-02-0.5.0-publication.md).
 
 Completed project foundation:
 
@@ -76,10 +79,10 @@ recorded separately by the checked items below.
 
 | Milestone | Outcome | Status |
 | --- | --- | --- |
-| 0 | Fully modernized, native VT7Pty 0.5.x foundation | Accepted through Step 0.9; `0.5.0-dev` release process validated, publication separate |
-| 1 | Measured backend fidelity and reliability improvements | Direction approved; detailed scope follows Milestone 0 evidence |
-| 2 | Documented VT7Pty API and standalone integration host | Direction approved; detailed scope follows Milestone 1 |
-| 3 | Versioned backend handoff ready for separately authorized VT7 integration | Direction approved; detailed scope follows Milestone 2 |
+| 0 | Fully modernized, native VT7Pty 0.5.x foundation | Complete; exact `0.5.0` release accepted and published |
+| 1 | Measured backend fidelity and reliability improvements | Next; application corpus and acceptance criteria to be fixed from baseline evidence |
+| 2 | Documented VT7Pty API and standalone integration host | Planned after proven backend behavior |
+| 3 | Versioned backend handoff ready for separately authorized VT7 integration | Planned after API and standalone-host validation |
 | Later | Other consumers and optional ConPTY user-mode compatibility | Deferred |
 
 ## Milestone 0: Establish the modern VT7Pty foundation
@@ -370,8 +373,9 @@ The clean-source archive set and development-host checks are recorded in the
 [Step 0.9 three-machine release candidate](docs/validation/2026-09-24-step-0.9-rc7-candidate.md).
 The [Step 0.9 completion record](docs/validation/2026-09-25-step-0.9-completion.md)
 reviews the three exact-candidate tier runs, the automated release review, and
-the owner-approved environment disposition. A final `0.5.0` package still
-requires its own exact-build acceptance before publication.
+the owner-approved environment disposition. The later exact `0.5.0` package
+passed its own [three-machine release acceptance](docs/validation/2026-10-02-0.5.0-release-acceptance.md)
+and was [published](docs/validation/2026-10-02-0.5.0-publication.md).
 
 ### Milestone 0 acceptance
 
@@ -385,12 +389,25 @@ requires its own exact-build acceptance before publication.
 - [x] Accept Step 0.8 with linked automated and physical test results.
 - [x] Accept Step 0.9 with a reviewed release-candidate package.
 
-The Step 0.9 candidate retains its `0.5.0-dev` development identity. A final
-`0.5.0` package requires its own exact-build acceptance before a tag or GitHub
-Release. Milestone 0 does not claim complete terminal fidelity, VT7 integration, or ConPTY
-compatibility.
+The Step 0.9 candidate retains its historical `0.5.0-dev` development identity.
+The final `0.5.0` release has separate exact-build acceptance and a tag at its
+source commit. Milestone 0 does not claim complete terminal fidelity, VT7
+integration, or ConPTY compatibility.
 
 ## Milestone 1: Improve backend fidelity and reliability
+
+The first work is to define a reproducible application corpus and pass/fail
+criteria, using the released `0.5.0` behavior as the comparison point. Local
+shells, native child programs, full-screen applications, input/control handling,
+Unicode, resize, screen restoration, and teardown are candidate measurements,
+not accepted fidelity claims. The console-SSH/full-screen path has an
+[unresolved baseline dependency](docs/SSH_BASELINE.md); VT7's direct SSH
+transport does not exercise this backend.
+
+VT7's current WinPTY transport is reference material for required consumer
+behavior. An early integration proof can follow a narrow API contract and a
+standalone host in this repository; it is not the production handoff or an
+authorization to edit VT7.
 
 - [ ] Define the application corpus and measurable fidelity criteria from the
   Milestone 0 baseline, including local shells and the identified SSH path.

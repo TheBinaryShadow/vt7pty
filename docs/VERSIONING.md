@@ -24,8 +24,8 @@ and Windows version resources derive from them.
 VT7Pty uses `MAJOR.MINOR.PATCH` for published versions and a clear development
 suffix between releases. The 0.5.x line is pre-stable: no general source, API,
 ABI, or protocol compatibility is promised unless release notes explicitly say
-otherwise. `0.5.0` will be published only after Milestone 0 acceptance and a
-separate release review.
+otherwise. `0.5.0` was published after Milestone 0 acceptance and a separate
+[release review](validation/2026-10-02-0.5.0-publication.md).
 
 Advancing the package version records project evolution. It does not alone
 prove compatibility or milestone completion.

@@ -1,10 +1,10 @@
 # VT7Pty Architecture
 
-Status: current native architecture and planned boundaries. Updated:
-2026-09-22.
+Status: released 0.5.0 native architecture and planned boundaries. Updated:
+2026-10-02.
 
 This document describes the maintained native architecture through Roadmap
-Step 0.6. Source code remains authoritative when this overview and the
+Milestone 0. Source code remains authoritative when this overview and the
 implementation disagree.
 
 ## Purpose
@@ -20,13 +20,13 @@ output from the legacy console state.
 
 ## Current components
 
-| Component | Current role | Milestone 0 direction |
+| Component | Current role | Disposition and next boundary |
 | --- | --- | --- |
-| `VT7Pty.dll` / `src/libvt7pty` | Client API, agent launch, versioned control RPC, process requests, pipe discovery | Retain and modernize; public redesign comes later |
-| `VT7Pty-Agent.exe` / `src/agent` | Owns the hidden console, launches the child, handles input, scrapes output, resizes, and manages session lifetime | Retain as the backend core |
-| `src/shared` | Shared handles, buffers, security, protocol, encoding, and diagnostics | Retain required native code |
+| `VT7Pty.dll` / `src/libvt7pty` | Client API, agent launch, versioned control RPC, process requests, pipe discovery | Retained and modernized; VT7-facing contract is Milestone 2 |
+| `VT7Pty-Agent.exe` / `src/agent` | Owns the hidden console, launches the child, handles input, scrapes output, resizes, and manages session lifetime | Retained as the backend core; fidelity work is Milestone 1 |
+| `src/shared` | Shared handles, buffers, security, protocol, encoding, and diagnostics | Retained and modernized for the native runtime |
 | `VT7Pty-DebugServer.exe` / `tools/debug` | Collects bounded, structured, build-identified diagnostic output over a restricted local pipe | Retained and modernized in Step 0.7; see [Diagnostics](DIAGNOSTICS.md) |
-| `tests/unit`, `tests/integration`, `tests/fixtures`, and `tests/manual` | Unit, backend, child-process, and focused console investigations | Retain useful coverage and integrate it with the permanent test system |
+| `tests/unit`, `tests/integration`, `tests/fixtures`, and `tests/manual` | Unit, backend, child-process, and focused console investigations | Integrated into the permanent local and Windows 7 test system |
 
 The Cygwin/MSYS `winpty.exe` adapter and its Unix-facing source have been
 removed. Active runtime and API identity is documented in [Technical Naming](NAMING.md).
@@ -133,9 +133,10 @@ and parent failure require explicit tests.
 
 ## Planned boundaries
 
-Milestone 0 has replaced the build system, removed adapter-only and pre-Windows
-7 code, and renamed the runtime. It continues by modernizing the retained C++
-implementation without changing backend semantics without evidence.
+Milestone 0 replaced the build system, removed adapter-only and pre-Windows 7
+code, renamed the runtime, modernized the retained C++ implementation, and
+established Windows 7 release acceptance. The exact 0.5.0 baseline is
+[published](validation/2026-10-02-0.5.0-publication.md).
 
 Milestone 1 improves observable backend behavior against a tested application
 corpus. Milestone 2 defines the VT7Pty integration API around the proven
