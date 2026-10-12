@@ -185,8 +185,11 @@ The existing marker checks do not establish complete screen/cursor/attribute
 fidelity. The initial [fidelity baseline bundle](FIDELITY_BASELINE.md) now runs
 bounded state/input/shell observations and fault controls against the unchanged
 0.5.0 runtime. Remaining coverage is explicitly NotRun in its case manifest;
-Windows 7 qualification remains pending. Preserve the existing 30-case regression
-suite and review the new binary imports through the maintained verifier.
+the [initial Windows 7 review](validation/2026-10-12-step-1.1-windows7-baseline.md)
+preserves all three target runs and their four prompt-cancellation failures per
+machine. Initial characterization is complete; broader Step 1.1 coverage and
+milestone acceptance remain open. Preserve the existing 30-case regression suite
+and review the new binary imports through the maintained verifier.
 
 Console-SSH and remote Vim/htop are deferred optional scenarios, with
 [setup prerequisites](SSH_BASELINE.md) retained for later use. They do not

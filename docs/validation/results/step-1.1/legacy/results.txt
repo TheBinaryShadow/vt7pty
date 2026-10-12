@@ -1,0 +1,26 @@
+VT7Pty 0.5.0 fidelity characterization: Legacy
+Harness healthy: True; workflow failures: 4; not run: 0
+ORACLE: Pass 
+STATE: Pass 
+INPUT: Pass 
+PROCESSED_CTRL_C: Pass 
+UNPROCESSED_CTRL_C: Pass 
+UNICODE: Pass 
+ALTERNATE: Pass 
+RESIZE: Pass 
+DRAIN: Pass 
+CMD_EMPTY: Fail shell prompt cancellation workflow failed
+CMD_PARTIAL: Fail shell prompt cancellation workflow failed
+PS_EMPTY: Fail shell prompt cancellation workflow failed
+PS_PARTIAL: Fail shell prompt cancellation workflow failed
+PS7_EMPTY: NotApplicable Pinned PowerShell 7 is optional on the legacy tier.
+PS7_PARTIAL: NotApplicable Pinned PowerShell 7 is optional on the legacy tier.
+NEGATIVE_CELL: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_ATTRIBUTE: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_CURSOR: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_PACKET: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_DUPLICATE: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_DRAIN: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_TIMEOUT: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_ORPHAN: Pass Injected fault detected; native failure is intentional.
+Pending coverage remains listed in results.json. This run does not accept Milestone 1.

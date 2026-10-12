@@ -1,15 +1,32 @@
-# Step 1.1 Initial Development-Host Evidence
+# Step 1.1 Initial Fidelity Baseline Evidence
 
-Date: 2026-10-12. Platform: Windows 10 development host, not Windows 7 acceptance.
+Date: 2026-10-12. Initial step-1.1-rc1 corpus only; Step 1.1 remains open.
 
-The developmenthost directory preserves the complete results from the independently
-extracted step-1.1-rc1 archive, including case JSON, controlled streams and fixture
-snapshots. The report records 19 Pass / 4 Fail, all eight fault controls detected,
-stable application hashes and successful native owned-process cleanup.
+| Directory | Platform / machine | Original run ID | Pass / Fail / NotApplicable |
+| --- | --- | --- | --- |
+| [developmenthost](developmenthost/results.json) | Windows 10 / WOLF | developmenthost-20261012-063941-ce3d4f34 | 19 / 4 / 0 |
+| [nonesu](nonesu/results.json) | Windows 7 / NESSY | nonesu-20261012-065639-a57d666f | 19 / 4 / 0 |
+| [esu](esu/results.json) | Windows 7 / TURTLE | esu-20261012-065725-26823e40 | 19 / 4 / 0 |
+| [legacy](legacy/results.json) | Windows 7, PowerShell 2.0 / LEOPARD | legacy-20261012-065613-d5a1b44b | 17 / 4 / 2 |
 
-Verification records for the final clean harness source are stored as
-debug-verification.json and release-verification.json. Their existing 29 local
-entries pass; the 120-minute Windows 7 soak was not rerun for this local comparison.
+Each directory preserves complete returned results, case JSON, controlled streams,
+console snapshots, shell identities and command-execution markers. The Windows 7
+copies contain 214 files, all checked byte-for-byte against K:\VT7_work\results.
+[windows7-evidence-review.json](windows7-evidence-review.json) records those
+SHA-256 values and identity/case/cleanup checks. Target prompt-cancellation
+failures remain Fail; they are different from the development host's Unicode/
+resize mismatches. No run has missing required initial cases or harness failures.
+All eight fault controls pass and application hashes remain stable on every host.
 
-These records support the [candidate review](../../2026-10-12-step-1.1-candidate.md).
-They do not close Step 1.1. Named Windows 7 tier evidence remains pending.
+[candidate-manifest.json](candidate-manifest.json) and
+[candidate-cases.json](candidate-cases.json) preserve the exact extracted
+candidate metadata without modification. Verification records for the final
+clean harness source are stored as debug-verification.json and
+release-verification.json. Their existing 29 local entries pass; these short
+comparisons did not rerun or replace the 120-minute Windows 7 release soak.
+
+These records support the
+[candidate review](../../2026-10-12-step-1.1-candidate.md) and
+[Windows 7 baseline review](../../2026-10-12-step-1.1-windows7-baseline.md).
+CharacterizationComplete covers the implemented initial corpus; the eight
+PendingCoverage groups remain NotRun and MilestoneAccepted remains false.

@@ -61,6 +61,20 @@ Ordinary profiles, full key/mouse/layout coverage, distinct Ctrl+Break, the
 broader code-page matrix, automatic buffer restoration and target performance
 budgets remain listed in PendingCoverage.
 
+## Recorded initial baseline
+
+The [candidate review](validation/2026-10-12-step-1.1-candidate.md) identifies
+step-1.1-rc1 and its development-host observations. The
+[Windows 7 review](validation/2026-10-12-step-1.1-windows7-baseline.md) preserves
+the same candidate's three target runs: NESSY and TURTLE each report 19 Pass /
+4 Fail; LEOPARD reports 17 Pass / 4 Fail / 2 NotApplicable. All four failures
+concern Command Prompt and installed Windows PowerShell prompt cancellation.
+The controlled Unicode and resize cases pass on all three targets; PowerShell 7
+passes on A/B. Oracles and fault controls pass, with no harness failures.
+
+These are initial characterization results. Step 1.1 remains open for the
+PendingCoverage recipes, and failing workflows have not been accepted.
+
 ## Development commands
 
 From a clean checkout, build/verify and create an identified candidate:

@@ -1,6 +1,6 @@
 # Milestone 1 Fidelity Plan
 
-Status: initial Step 1.1 harness implemented and exercised locally; Windows 7 characterization and broader recipes pending.
+Status: initial Step 1.1 corpus characterized on the development host and all three Windows 7 tiers; broader recipes pending.
 Updated: 2026-10-12.
 
 The [roadmap](../ROADMAP.md) owns completion. This document defines the local
@@ -41,8 +41,12 @@ profiles, execution policy, console settings, or installed code pages.
 These IDs define scenario groups rather than one completed test each. The
 initial [baseline bundle](FIDELITY_BASELINE.md) implements 14 bounded workflow
 observations, an independent oracle unit suite and eight fault controls.
-Its case manifest lists remaining coverage as NotRun. The existing 30-case
-suite remains a required regression gate.
+Its case manifest lists remaining coverage as NotRun. The
+[initial Windows 7 baseline](validation/2026-10-12-step-1.1-windows7-baseline.md)
+pins application identities and records four prompt-cancellation failures per
+tier, passing controlled Unicode/resize and passing A/B PowerShell 7 cases.
+Step 1.1 remains open for active-child interruption and broader recipes.
+The existing 30-case suite remains a required regression gate.
 
 | ID | Scenario | Required observable result |
 | --- | --- | --- |

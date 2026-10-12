@@ -142,8 +142,11 @@ Milestone 1 improves observable backend behavior against the local corpus and
 state measurements in the [fidelity plan](FIDELITY.md). The initial independent
 reader and controlled fixtures are implemented in tests/fidelity, tests/unit
 and tests/fixtures; the [baseline bundle](FIDELITY_BASELINE.md) characterizes
-unchanged 0.5.0 binaries. Broader coverage and Windows 7 validation remain open. Milestone 2 defines the VT7Pty
-integration API around the proven backend. That API will borrow useful ConPTY
+unchanged 0.5.0 binaries. The
+[initial Windows 7 review](validation/2026-10-12-step-1.1-windows7-baseline.md)
+records target observations and retained prompt-cancellation failures. Broader
+Step 1.1 coverage remains open. Milestone 2 defines the VT7Pty integration API
+around the proven backend. That API will borrow useful ConPTY
 conventions but must specify an
 explicit Windows 7 process-launch operation and complete ownership, concurrency,
 and shutdown semantics.
