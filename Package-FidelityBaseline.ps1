@@ -31,7 +31,7 @@ $stem='VT7Pty-fidelity-baseline-0.5.0-'+$Suffix
 $stage=Join-Path $parent $stem
 $zip=Join-Path $parent ($stem+'.zip')
 $runtime=Join-Path $parent ($stem+'-runtime-extracted')
-foreach($path in @($stage,$zip,$runtime,$zip+'.sha256')) {
+foreach($path in @($stage,$zip,$runtime,($zip+'.sha256'))) {
     if (Test-Path -LiteralPath $path) { throw "Candidate already exists; use a fresh suffix: $path" }
 }
 Add-Type -AssemblyName System.IO.Compression.FileSystem
