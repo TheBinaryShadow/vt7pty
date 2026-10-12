@@ -40,8 +40,8 @@ profiles, execution policy, console settings, or installed code pages.
 
 These IDs define scenario groups rather than one completed test each. The
 initial [baseline bundle](FIDELITY_BASELINE.md) implements 14 bounded workflow
-observations in harness version 1. Version 2 extends this to 25 workflow
-observations, the independent state/child-oracle suite and ten fault controls,
+observations in harness version 1. Version 3 extends this to 25 workflow
+observations, independent state/child and portable JSON oracles, and ten fault controls,
 including active children under each shell and two cooked-read probes.
 Its case manifest lists remaining coverage as NotRun. The
 [initial Windows 7 baseline](validation/2026-10-12-step-1.1-windows7-baseline.md)

@@ -48,12 +48,14 @@ function Add-VT7JsonValue {
     } elseif ($Value -is [System.Collections.IDictionary]) {
         [void]$Builder.Append('{')
         $first = $true
-        foreach ($key in $Value.Keys) {
+        # JSON may contain a member named Keys/Values/Count. Use the native
+        # enumerator so those members cannot shadow dictionary properties.
+        foreach ($entry in $Value.GetEnumerator()) {
             if (-not $first) { [void]$Builder.Append(',') }
             $first = $false
-            Add-VT7JsonString $Builder ([string]$key)
+            Add-VT7JsonString $Builder ([string]$entry.Key)
             [void]$Builder.Append(':')
-            Add-VT7JsonValue $Builder $Value[$key]
+            Add-VT7JsonValue $Builder $entry.Value
         }
         [void]$Builder.Append('}')
     } elseif ($Value -is [System.Collections.IEnumerable]) {

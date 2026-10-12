@@ -2,7 +2,7 @@
 param(
     [ValidateLength(1,49)]
     [ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')]
-    [string]$Suffix='step-1.1-rc2',
+    [string]$Suffix='step-1.1-rc3',
     [string]$RuntimeArchive='',
     [switch]$NoBuild
 )
@@ -57,6 +57,7 @@ $plan=[ordered]@{
     'cases.json'='tools\fidelity\cases.json'
     'tools\fidelity\Invoke-FidelityBaseline.ps1'='tools\fidelity\Invoke-FidelityBaseline.ps1'
     'tools\platform\Windows7Compat.ps1'='tools\platform\Windows7Compat.ps1'
+    'tools\fidelity\Test-PortableJson.ps1'='tools\fidelity\Test-PortableJson.ps1'
     'RUN-FIDELITY-NONESU.cmd'='RUN-FIDELITY-NONESU.cmd'
     'RUN-FIDELITY-ESU.cmd'='RUN-FIDELITY-ESU.cmd'
     'RUN-FIDELITY-LEGACY.cmd'='RUN-FIDELITY-LEGACY.cmd'
@@ -85,7 +86,7 @@ $files=@(Get-ChildItem -LiteralPath $stage -File -Recurse | ForEach-Object {
 $manifest=[ordered]@{
     SchemaVersion=1;Kind='VT7PtyFidelityBaseline'
     Runtime=[ordered]@{Version='0.5.0';SourceCommit='cbd17727b3c8af21e5afd4499b8dca7d2140ed9d';ArchiveSha256=$archiveHash;Files=$runtimeFiles}
-    Harness=[ordered]@{Version='2';SourceCommit=$sourceCommit;SourceTreeClean=$true;Configuration='Release';Architecture='x64';
+    Harness=[ordered]@{Version='3';SourceCommit=$sourceCommit;SourceTreeClean=$true;Configuration='Release';Architecture='x64';
         VerificationSha256=(Get-FileHash -LiteralPath (Join-Path $root 'artifacts\verification\x64\Release\verification.json') -Algorithm SHA256).Hash.ToLowerInvariant();
         Toolchain=$verification.InspectionTool}
     Files=$files

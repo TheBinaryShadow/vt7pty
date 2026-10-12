@@ -13,6 +13,17 @@
       "OptionalOnLegacy": false
     },
     {
+      "Name": "JSON_ORACLE",
+      "Area": "Oracle",
+      "Kind": "Oracle",
+      "Executable": "powershell.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "VT7Pty portable JSON oracle passed.",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
       "Name": "STATE",
       "Area": "F05",
       "Kind": "Characterization",

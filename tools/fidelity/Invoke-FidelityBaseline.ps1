@@ -58,7 +58,11 @@ function Invoke-FidelityCase {
     [IO.Directory]::CreateDirectory($caseDirectory) | Out-Null
     if ($preflight.Count) { $record.Reason=($preflight -join ' '); return $record }
     $arguments=@()
-    if ($Case.Name -ne 'ORACLE') { $arguments=@($Case.Name,$caseDirectory) }
+    if ($Case.Kind -ne 'Oracle') { $arguments=@($Case.Name,$caseDirectory) }
+    if ($Case.Name -eq 'JSON_ORACLE') {
+        $arguments=@('-Version',$PSVersionTable.PSVersion.Major.ToString(),'-NoProfile','-NonInteractive',
+            '-File',(Join-Path $PackageRoot 'tools\fidelity\Test-PortableJson.ps1'),'-OutputDirectory',$caseDirectory)
+    }
     if ($Case.Name.StartsWith('PS7')) {
         if ($Tier -eq 'Legacy') {
             $record.Status='NotApplicable'; $record.Reason='Pinned PowerShell 7 is optional on the legacy tier.'; return $record
@@ -73,7 +77,9 @@ function Invoke-FidelityCase {
     $started=$false
     try {
         $start=New-Object Diagnostics.ProcessStartInfo
-        $start.FileName=Join-Path $bin $Case.Executable
+        if ($Case.Name -eq 'JSON_ORACLE') {
+            $start.FileName=Join-Path ([Environment]::SystemDirectory) 'WindowsPowerShell\v1.0\powershell.exe'
+        } else { $start.FileName=Join-Path $bin $Case.Executable }
         $start.WorkingDirectory=$bin
         $start.UseShellExecute=$false; $start.CreateNoWindow=$true
         $start.RedirectStandardOutput=$true; $start.RedirectStandardError=$true
@@ -93,9 +99,9 @@ function Invoke-FidelityCase {
         $watch.Stop(); $record.DurationMilliseconds=$watch.ElapsedMilliseconds
         $record.Status='Fail'
         if ($record.TimedOut) { $record.Reason='Native harness outer deadline.'; return $record }
-        if ($Case.Name -eq 'ORACLE') {
+        if ($Case.Kind -eq 'Oracle') {
             if ($record.ExitCode -eq 0 -and $record.StandardOutput -eq $Case.ExpectedOutput) { $record.Status='Pass' }
-            else { $record.Reason='Independent oracle unit tests failed.' }
+            else { $record.Reason='Independent native/portable oracle tests failed.' }
             return $record
         }
         $casePath=Join-Path $caseDirectory 'case.json'

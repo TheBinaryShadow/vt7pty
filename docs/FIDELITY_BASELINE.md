@@ -30,8 +30,8 @@ packaging commands use the existing development tools and modern PowerShell.
 
 ## Interpreting results
 
-Harness version 2 has 36 entries: the state/child-oracle unit suite, 25 workflow
-observations and ten deliberate negative controls. Controls pass only when
+Harness version 3 has 37 entries: the state/child-oracle unit suite, a portable
+JSON round-trip oracle, 25 workflow observations and ten deliberate negative controls. Controls pass only when
 their exact injected failure is detected and owned processes are cleaned up.
 The native control record therefore says Fail while the containing control
 entry says Pass; both remain visible.
@@ -66,7 +66,7 @@ budgets remain listed in PendingCoverage.
 
 ## Active-child and cooked-read recipes
 
-Harness version 2 adds nine F02 cases, three for each shell:
+Harness version 3 includes nine F02 cases, three for each shell:
 
 | Suffix | Child input/control policy | Expected native completion |
 | --- | --- | --- |
@@ -105,6 +105,11 @@ The seven remaining PendingCoverage groups still need broader recipes. This
 extension does not claim Ctrl+Break, ordinary profiles, keyboard-layout coverage,
 general Unicode width, sustained full-screen resize or performance qualification.
 
+The JSON_ORACLE case runs under the same Windows PowerShell major version as
+the target runner. It proves that nested dictionaries, Keys/Values/Count/Item
+members, arrays, booleans, null, Unicode and unsigned control values survive the
+portable report serializer. The source and round-trip JSON are preserved.
+
 ## Recorded initial baseline
 
 The [candidate review](validation/2026-10-12-step-1.1-candidate.md) identifies
@@ -123,7 +128,7 @@ PendingCoverage recipes, and failing workflows have not been accepted.
 
 From a clean checkout, build/verify and create an identified candidate:
 
-    powershell.exe -NoProfile -File .\Package-FidelityBaseline.ps1 -Suffix step-1.1-rc2
+    powershell.exe -NoProfile -File .\Package-FidelityBaseline.ps1 -Suffix step-1.1-rc3
 
 The command verifies the existing regression suite and new binary imports,
 runs the independent oracle tests, and refuses to replace an existing candidate
