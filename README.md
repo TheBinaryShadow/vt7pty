@@ -46,7 +46,11 @@ records the same four prompt-cancellation failures on all three tiers, passing
 controlled Unicode/resize comparisons, and passing PowerShell 7 cases on A/B.
 Broader recipes remain pending; Step 1.1 stays open. The
 [initial candidate review](docs/validation/2026-10-12-step-1.1-candidate.md)
-retains the separate development-host evidence. Input, output/Unicode,
+retains the separate development-host evidence. The
+[rc3 extension](docs/validation/2026-10-12-step-1.1-rc3-candidate.md) adds active-child
+and cooked-read recipes, portable JSON verification and explicit native ConsoleHost
+editing for installed Windows PowerShell. It is locally verified; its three
+Windows 7 runs remain pending. Input, output/Unicode,
 resize, full-screen state and lifecycle improvements follow the measurements.
 Console-SSH testing is deferred optional work. The VT7-facing API and standalone
 consumer follow in Milestone 2, then a versioned handoff in Milestone 3.

@@ -1,6 +1,6 @@
 # Milestone 1 Fidelity Plan
 
-Status: initial Step 1.1 corpus characterized on the development host and all three Windows 7 tiers; broader recipes pending.
+Status: initial three-tier Step 1.1 baseline recorded; rc3 extension locally verified, Windows 7 extension and broader coverage pending.
 Updated: 2026-10-12.
 
 The [roadmap](../ROADMAP.md) owns completion. This document defines the local
@@ -49,6 +49,8 @@ pins application identities and records four prompt-cancellation failures per
 tier, passing controlled Unicode/resize and passing A/B PowerShell 7 cases.
 Step 1.1 remains open for target validation of the new active-child/cooked-read
 recipes and broader coverage.
+The [rc3 candidate record](validation/2026-10-12-step-1.1-rc3-candidate.md) links
+local active-child results, cooked-read diagnosis and exact target handoff.
 The existing 30-case suite remains a required regression gate.
 
 | ID | Scenario | Required observable result |

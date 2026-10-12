@@ -1,0 +1,456 @@
+{
+  "SchemaVersion": 1,
+  "Cases": [
+    {
+      "Name": "ORACLE",
+      "Area": "Oracle",
+      "Kind": "Oracle",
+      "Executable": "VtStateTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "VT7Pty VT state oracle tests passed.",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "JSON_ORACLE",
+      "Area": "Oracle",
+      "Kind": "Oracle",
+      "Executable": "powershell.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "VT7Pty portable JSON oracle passed.",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "STATE",
+      "Area": "F05",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "INPUT",
+      "Area": "F03",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "PROCESSED_CTRL_C",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "UNPROCESSED_CTRL_C",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "UNICODE",
+      "Area": "F04",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "ALTERNATE",
+      "Area": "F06",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "RESIZE",
+      "Area": "F07",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "DRAIN",
+      "Area": "F08",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "CMD_EMPTY",
+      "Area": "F01",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "CMD_PARTIAL",
+      "Area": "F01",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "PS_EMPTY",
+      "Area": "F01",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "PS_PARTIAL",
+      "Area": "F01",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "PS7_EMPTY",
+      "Area": "F01",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": true
+    },
+    {
+      "Name": "PS7_PARTIAL",
+      "Area": "F01",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": true
+    },
+    {
+      "Name": "NEGATIVE_CELL",
+      "Area": "Oracle",
+      "Kind": "NegativeControl",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 1,
+      "ExpectedOutput": "",
+      "ExpectedError": "screen/cursor/attribute mismatch",
+      "TimeoutSeconds": 30,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "NEGATIVE_ATTRIBUTE",
+      "Area": "Oracle",
+      "Kind": "NegativeControl",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 1,
+      "ExpectedOutput": "",
+      "ExpectedError": "screen/cursor/attribute mismatch",
+      "TimeoutSeconds": 30,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "NEGATIVE_CURSOR",
+      "Area": "Oracle",
+      "Kind": "NegativeControl",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 1,
+      "ExpectedOutput": "",
+      "ExpectedError": "screen/cursor/attribute mismatch",
+      "TimeoutSeconds": 30,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "NEGATIVE_PACKET",
+      "Area": "Oracle",
+      "Kind": "NegativeControl",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 2,
+      "ExpectedOutput": "",
+      "ExpectedError": "malformed fixture packet",
+      "TimeoutSeconds": 30,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "NEGATIVE_DUPLICATE",
+      "Area": "Oracle",
+      "Kind": "NegativeControl",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 1,
+      "ExpectedOutput": "",
+      "ExpectedError": "input/control count or record mismatch",
+      "TimeoutSeconds": 30,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "NEGATIVE_DRAIN",
+      "Area": "Oracle",
+      "Kind": "NegativeControl",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 1,
+      "ExpectedOutput": "",
+      "ExpectedError": "final marker missing from decoded output",
+      "TimeoutSeconds": 30,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "NEGATIVE_TIMEOUT",
+      "Area": "Oracle",
+      "Kind": "NegativeControl",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 1,
+      "ExpectedOutput": "",
+      "ExpectedError": "deliberate readiness deadline",
+      "TimeoutSeconds": 30,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "NEGATIVE_ORPHAN",
+      "Area": "Oracle",
+      "Kind": "NegativeControl",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 1,
+      "ExpectedOutput": "",
+      "ExpectedError": "deliberately live child detected before cleanup",
+      "TimeoutSeconds": 30,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "CMD_CHILD_HANDLED",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "CMD_CHILD_DEFAULT",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "CMD_CHILD_UNPROCESSED",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "PS_CHILD_HANDLED",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "PS_CHILD_DEFAULT",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "PS_CHILD_UNPROCESSED",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "PS7_CHILD_HANDLED",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": true
+    },
+    {
+      "Name": "PS7_CHILD_DEFAULT",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": true
+    },
+    {
+      "Name": "PS7_CHILD_UNPROCESSED",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": true
+    },
+    {
+      "Name": "READCONSOLE_TRANSPORT",
+      "Area": "F01",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "READCONSOLE_EVENT",
+      "Area": "F01",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "NEGATIVE_CHILD_CONTROL",
+      "Area": "Oracle",
+      "Kind": "NegativeControl",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 1,
+      "ExpectedOutput": "",
+      "ExpectedError": "active child interruption workflow failed",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "NEGATIVE_CHILD_EXIT",
+      "Area": "Oracle",
+      "Kind": "NegativeControl",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 1,
+      "ExpectedOutput": "",
+      "ExpectedError": "active child interruption workflow failed",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    }
+  ],
+  "PendingCoverage": [
+    {
+      "Area": "F02",
+      "Scenario": "Distinct Ctrl+Break transport representation",
+      "Status": "NotRun",
+      "Reason": "API 1.0 supplies a VT input stream; a distinct supported encoding must be established before claiming Ctrl+Break coverage."
+    },
+    {
+      "Area": "F03",
+      "Scenario": "Full key/mouse/layout and ordinary-profile matrix",
+      "Status": "NotRun",
+      "Reason": "The initial fixture checks ordered ASCII/Latin/navigation records and clean shells. Further recipes belong to Steps 1.1/1.2."
+    },
+    {
+      "Area": "F04",
+      "Scenario": "Code-page and malformed-input matrix",
+      "Status": "NotRun",
+      "Reason": "Initial Unicode comparison uses actual default pages and the declared sample; additional controlled encodings are not yet implemented."
+    },
+    {
+      "Area": "F06",
+      "Scenario": "Automatic restoration on uncooperative application exit",
+      "Status": "NotRun",
+      "Reason": "The first buffer case restores explicitly; automatic restoration needs its own fixture."
+    },
+    {
+      "Area": "F07",
+      "Scenario": "Full-screen editing under sustained output and resize",
+      "Status": "NotRun",
+      "Reason": "The initial case measures four synchronized redraws. Existing stress results do not qualify application fidelity."
+    },
+    {
+      "Area": "F09",
+      "Scenario": "Target CPU/memory/input-latency budgets",
+      "Status": "NotRun",
+      "Reason": "The initial bundle records case/observation timings; target performance workloads and budgets are not yet established."
+    },
+    {
+      "Area": "F05",
+      "Scenario": "Application erase, wrapping and scrolling transitions",
+      "Status": "NotRun",
+      "Reason": "The reader unit suite covers these primitives; initial live comparison covers positioned state and attributes."
+    }
+  ]
+}

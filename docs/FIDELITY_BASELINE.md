@@ -124,6 +124,19 @@ passes on A/B. Oracles and fault controls pass, with no harness failures.
 These are initial characterization results. Step 1.1 remains open for the
 PendingCoverage recipes, and failing workflows have not been accepted.
 
+## Current extension candidate
+
+Use [step-1.1-rc3](validation/2026-10-12-step-1.1-rc3-candidate.md) for the new
+Windows 7 extension runs. Its 37-entry development-host comparison reports
+29 Pass / 8 Fail with both oracles and all fault controls passing. All nine
+active-child cases pass locally. Both cooked-read probes deliver one Ctrl+C
+event but leave ReadConsole pending with retained typed text.
+
+Rc2 was stopped before handoff because its aggregate serializer lost nested
+child metadata. Rc3 corrects that and verifies all native/aggregate observations.
+Return complete failed records as baseline evidence; the seven remaining
+coverage groups and Windows 7 extension validation keep Step 1.1 open.
+
 ## Development commands
 
 From a clean checkout, build/verify and create an identified candidate:

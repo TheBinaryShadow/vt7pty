@@ -29,4 +29,13 @@ These records support the
 [candidate review](../../2026-10-12-step-1.1-candidate.md) and
 [Windows 7 baseline review](../../2026-10-12-step-1.1-windows7-baseline.md).
 CharacterizationComplete covers the implemented initial corpus; the eight
-PendingCoverage groups remain NotRun and MilestoneAccepted remains false.
+PendingCoverage groups remain NotRun and MilestoneAccepted remains false for rc1.
+
+## Later extension evidence
+
+[rc3/README.md](rc3/README.md) indexes the separately qualified 37-entry
+development-host extension, exact metadata and clean verification reports.
+It records 29 Pass / 8 Fail, including nine passing active-child cases and
+two failed cooked-read probes. Seven broader groups remain pending in rc3.
+The original directories above retain the unchanged rc1 records; they do not
+qualify the extension.
