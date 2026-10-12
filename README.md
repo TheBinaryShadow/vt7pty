@@ -41,7 +41,9 @@ diagnostic, and manual release systems.
 Milestone 1 follows the [fidelity execution plan](docs/FIDELITY.md) and numbered
 roadmap Steps 1.1-1.6. The initial Step 1.1 [baseline harness](docs/FIDELITY_BASELINE.md)
 now measures bounded local workflows against unchanged 0.5.0 binaries. Its
-Windows 7 results and broader recipes remain pending. Input, output/Unicode,
+Windows 7 results and broader recipes remain pending; the
+[initial candidate review](docs/validation/2026-10-12-step-1.1-candidate.md)
+records the local evidence and retained failures. Input, output/Unicode,
 resize, full-screen state and lifecycle improvements follow the measurements.
 Console-SSH testing is deferred optional work. The VT7-facing API and standalone
 consumer follow in Milestone 2, then a versioned handoff in Milestone 3.

@@ -423,6 +423,11 @@ Exit criterion: the harness detects incorrect state and input, and each required
 baseline workflow has identified application/runtime/harness evidence or an
 explicit unresolved prerequisite. Required missing evidence keeps this step open.
 
+The [initial candidate review](docs/validation/2026-10-12-step-1.1-candidate.md)
+links the clean harness, unchanged runtime, local oracles/fault controls and
+preserved development-host mismatches. Windows 7 runs and broader recipes
+remain pending; Step 1.1 is not complete.
+
 ### Step 1.2: Improve input and control semantics
 
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, active-child

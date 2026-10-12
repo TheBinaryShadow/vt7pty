@@ -31,3 +31,4 @@ Current records:
 - [2026-10-02 VT7Pty 0.5.0 release candidate](2026-10-02-0.5.0-release-candidate.md)
 - [2026-10-02 VT7Pty 0.5.0 release acceptance](2026-10-02-0.5.0-release-acceptance.md)
 - [2026-10-02 VT7Pty 0.5.0 publication](2026-10-02-0.5.0-publication.md)
+- [2026-10-12 Step 1.1 initial fidelity candidate](2026-10-12-step-1.1-candidate.md)

@@ -1,0 +1,26 @@
+VT7Pty 0.5.0 fidelity characterization: DevelopmentHost
+Harness healthy: True; workflow failures: 4; not run: 0
+ORACLE: Pass 
+STATE: Pass 
+INPUT: Pass 
+PROCESSED_CTRL_C: Pass 
+UNPROCESSED_CTRL_C: Pass 
+UNICODE: Fail Unicode text/cursor width differs from backing console
+ALTERNATE: Pass 
+RESIZE: Fail resized screen mismatch
+DRAIN: Pass 
+CMD_EMPTY: Fail shell prompt cancellation workflow failed
+CMD_PARTIAL: Fail shell prompt cancellation workflow failed
+PS_EMPTY: Pass 
+PS_PARTIAL: Pass 
+PS7_EMPTY: Pass 
+PS7_PARTIAL: Pass 
+NEGATIVE_CELL: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_ATTRIBUTE: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_CURSOR: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_PACKET: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_DUPLICATE: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_DRAIN: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_TIMEOUT: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_ORPHAN: Pass Injected fault detected; native failure is intentional.
+Pending coverage remains listed in results.json. This run does not accept Milestone 1.
