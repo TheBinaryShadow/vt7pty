@@ -165,11 +165,13 @@ for($index=0;$index -lt $applications.Count;++$index) {
     elseif ($before.ContainsKey('Sha256') -and $before.Sha256 -ne $after.Sha256) { $applicationsStable=$false }
 }
 if (-not $applicationsStable) { $preflight+='Application/module files changed during the run.' }
-$harnessFailures=@($records | Where-Object { $_.Kind -eq 'Characterization' -and $_.Status -eq 'Fail' -and
-    ($null -eq $_.Observation -or $_.Observation.Category -eq 'HarnessOrPrerequisiteError') }).Count
+$harnessFailures=@($records | Where-Object { ($_.Kind -eq 'Characterization' -or $_.Kind -eq 'MechanismProbe') -and $_.Status -eq 'Fail' -and
+    ($null -eq $_.Observation -or $_.Observation.Category -ne 'BehaviorMismatch' -or $_.Observation.OwnedProcessesCleaned -ne $true) }).Count
 $harnessHealthy=$harnessFailures -eq 0 -and @($records | Where-Object { ($_.Kind -eq 'Oracle' -or $_.Kind -eq 'NegativeControl') -and $_.Status -ne 'Pass' }).Count -eq 0
 $missing=@($records | Where-Object { $_.Status -eq 'NotRun' }).Count
 $workflowFailures=@($records | Where-Object { $_.Kind -eq 'Characterization' -and $_.Status -eq 'Fail' -and
+    $null -ne $_.Observation -and $_.Observation.Category -eq 'BehaviorMismatch' }).Count
+$mechanismFailures=@($records | Where-Object { $_.Kind -eq 'MechanismProbe' -and $_.Status -eq 'Fail' -and
     $null -ne $_.Observation -and $_.Observation.Category -eq 'BehaviorMismatch' }).Count
 $report=@{SchemaVersion=1;Kind='VT7PtyFidelityBaselineResults';Tier=$Tier;RunId=$runId;Runtime=$manifest.Runtime;Harness=$manifest.Harness;
     PackageManifestSha256=(Get-VT7Sha256 (Join-Path $PackageRoot 'manifest.json'));Preflight=$preflight;
@@ -179,15 +181,15 @@ $report=@{SchemaVersion=1;Kind='VT7PtyFidelityBaselineResults';Tier=$Tier;RunId=
     Applications=$applications;ApplicationsAfter=$applicationsAfter;ApplicationsStable=$applicationsStable;
     StartedUtc=$startedUtc;FinishedUtc=[DateTime]::UtcNow.ToString('o');Cases=$records;PendingCoverage=$caseManifest.PendingCoverage;
     HarnessHealthy=$harnessHealthy;CharacterizationComplete=($preflight.Count -eq 0 -and $harnessHealthy -and $missing -eq 0);
-    WorkflowFailures=$workflowFailures;HarnessFailures=$harnessFailures;MilestoneAccepted=$false}
+    WorkflowFailures=$workflowFailures;MechanismFailures=$mechanismFailures;HarnessFailures=$harnessFailures;MilestoneAccepted=$false}
 Write-VT7Json (Join-Path $resultRoot 'results.json') $report
 $summary=New-Object Text.StringBuilder
 [void]$summary.AppendLine('VT7Pty 0.5.0 fidelity characterization: '+$Tier)
-[void]$summary.AppendLine('Harness healthy: '+$harnessHealthy+'; workflow failures: '+$workflowFailures+'; not run: '+$missing)
+[void]$summary.AppendLine('Harness healthy: '+$harnessHealthy+'; workflow failures: '+$workflowFailures+'; mechanism failures: '+$mechanismFailures+'; not run: '+$missing)
 foreach($record in $records) { [void]$summary.AppendLine($record.Name+': '+$record.Status+' '+$record.Reason) }
 [void]$summary.AppendLine('Pending coverage remains listed in results.json. This run does not accept Milestone 1.')
 [IO.File]::WriteAllText((Join-Path $resultRoot 'results.txt'),$summary.ToString(),$script:vt7Utf8)
 Write-Host $summary.ToString()
 Write-Host ('Results: '+$resultRoot)
-if (-not $harnessHealthy -or $missing -ne 0 -or $workflowFailures -ne 0 -or $preflight.Count -ne 0) { exit 1 }
+if (-not $harnessHealthy -or $missing -ne 0 -or $workflowFailures -ne 0 -or $mechanismFailures -ne 0 -or $preflight.Count -ne 0) { exit 1 }
 exit 0

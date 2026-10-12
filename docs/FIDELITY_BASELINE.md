@@ -1,6 +1,7 @@
 # Running the VT7Pty 0.5.0 Fidelity Baseline
 
-This is a characterization bundle for Roadmap Step 1.1. It combines the unchanged,
+This is a characterization bundle for Roadmap Step 1.1 and controlled mechanism
+research for Step 1.2. It combines the unchanged,
 accepted 0.5.0 DLL/agent with a separately identified new harness, fixture and
 independent VT state reader. Its manifest records both source identities and
 hashes. It is not a new runtime release or Milestone 1 acceptance.
@@ -110,6 +111,38 @@ the target runner. It proves that nested dictionaries, Keys/Values/Count/Item
 members, arrays, booleans, null, Unicode and unsigned control values survive the
 portable report serializer. The source and round-trip JSON are preserved.
 
+## Version 4 cancellation mechanism probes
+
+Version 4 retains the 37 version 3 entries and adds two MechanismProbe entries,
+for 39 total. These are experiments inside the owned fixture, not backend fixes.
+
+READCONSOLE_RECORD_EVENT writes C down/up records with character 0x03 and
+LEFT_CTRL_PRESSED, then generates one Ctrl+C control event. It records API
+success/error and number of records written as well as the pending read result.
+A later boundary Enter is recovery evidence if cancellation fails.
+
+READCONSOLE_OWNED_CANCEL calls CancelSynchronousIo on the exact pending
+ReadConsoleW worker owned by the fixture, then generates one Ctrl+C event.
+The first read must return zero text with ERROR_OPERATION_ABORTED (995); its
+BOOL result is recorded separately and may be TRUE. The test then joins that
+worker and explicitly starts a second read. NEXT_PROBE followed by Enter must
+produce exactly NEXT_PROBE plus CRLF, with no extra control event. The next
+read has a five-second deadline and another five seconds for boundary Enter
+recovery. The initial cancellation deadline remains two seconds and the outer
+case deadline remains 60 seconds.
+
+The fixture has no later operation on the canceled worker, and keeps all buffers
+alive until join. It does not discover or cancel real shell threads. API success
+or an empty first read cannot qualify the mechanism if the next line is lost.
+Preserved metadata and binary snapshots distinguish the initial cancellation,
+second-read readiness, normal completion and recovery.
+
+The [cancellation investigation](INPUT_CANCELLATION.md) records mechanism
+constraints and development findings. MechanismFailures is recorded separately from WorkflowFailures; a failing probe
+also makes the runner return exit code 1. Harness/prerequisite errors and cleanup
+failures in these probes make HarnessHealthy false. Both probes still require
+Windows 7 measurement. Their results do not replace the rc3 target baseline or resolve F01.
+
 ## Recorded initial baseline
 
 The [candidate review](validation/2026-10-12-step-1.1-candidate.md) identifies
@@ -148,7 +181,7 @@ retain actual failures and obtain their own applicable target evidence.
 
 From a clean checkout, build/verify and create an identified candidate:
 
-    powershell.exe -NoProfile -File .\Package-FidelityBaseline.ps1 -Suffix step-1.1-rc3
+    powershell.exe -NoProfile -File .\Package-FidelityBaseline.ps1 -Suffix step-1.2-mechanism-rc1
 
 The command verifies the existing regression suite and new binary imports,
 runs the independent oracle tests, and refuses to replace an existing candidate

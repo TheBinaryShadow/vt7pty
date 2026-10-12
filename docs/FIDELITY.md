@@ -56,6 +56,12 @@ The [rc3 candidate record](validation/2026-10-12-step-1.1-rc3-candidate.md) reta
 the separate development-host results and exact bundle identity.
 The existing 30-case suite remains a required regression gate.
 
+[Step 1.2 cancellation research](INPUT_CANCELLATION.md) retains the version 3
+corpus and adds two version 4 public-API mechanism probes, for 39 entries.
+An empty canceled read is checked separately from reuse of the same input
+buffer. Target results for these experiments are pending; the product runtime
+remains unchanged and the measured F01 failures remain unresolved.
+
 | ID | Scenario | Required observable result |
 | --- | --- | --- |
 | F01 | Ctrl+C at empty and partially typed shell prompts | Typed line canceled, canceled text never executed, fresh prompt accepts the next command, shell remains alive |

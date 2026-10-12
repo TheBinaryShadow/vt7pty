@@ -514,10 +514,22 @@ void cookedCase(const std::wstring &name,const std::wstring &resultDirectory,Obs
         check(!packet.readReturned && !packet.controlCount,"cooked pending read barrier");
         saveChild(resultDirectory,L"child-ready.bin",packet);
         observations.fields+=",\"ChildReady\":"+childJson(packet);
-        const bool direct=name == L"READCONSOLE_EVENT";
-        observations.fields+=",\"ControlDelivery\":"+json(direct ? "FixtureGenerateConsoleCtrlEvent" : "VTByte03");
-        if (direct) { char generate='G'; transfer(pipe.value,&generate,1,true); }
-        else session.input("\x03");
+        const bool recordProbe=name == L"READCONSOLE_RECORD_EVENT", ownedCancel=name == L"READCONSOLE_OWNED_CANCEL";
+        const bool mechanism=recordProbe || ownedCancel, direct=name == L"READCONSOLE_EVENT" || mechanism;
+        observations.fields+=",\"ControlDelivery\":"+json(recordProbe ? "WriteConsoleInputThenGenerateEvent" :
+            ownedCancel ? "CancelOwnedReaderThenGenerateEvent" : direct ? "FixtureGenerateConsoleCtrlEvent" : "VTByte03");
+        DWORD mechanismReply[3]={};
+        if (direct) {
+            char command=recordProbe ? 'R' : ownedCancel ? 'K' : 'G'; transfer(pipe.value,&command,1,true);
+            if (mechanism) {
+                transfer(pipe.value,mechanismReply,sizeof(mechanismReply),false);
+                check(mechanismReply[0] <= 1 && (!mechanismReply[0] || mechanismReply[1] == ERROR_SUCCESS) &&
+                    (ownedCancel ? mechanismReply[2] == 0 : mechanismReply[2] <= 2),"mechanism reply bounds");
+                observations.add("MechanismSucceeded",mechanismReply[0] == 1);
+                observations.fields+=",\"MechanismError\":"+std::to_string(mechanismReply[1])+
+                    ",\"MechanismRecordsWritten\":"+std::to_string(mechanismReply[2]);
+            }
+        } else session.input("\x03");
         const bool completed=session.until([&] {
             while (receiveChild(pipe.value,packet)) {}
             return packet.stage == 2;
@@ -528,7 +540,8 @@ void cookedCase(const std::wstring &name,const std::wstring &resultDirectory,Obs
         saveChild(resultDirectory,L"child-observation.bin",packet);
         observations.fields+=",\"ChildObservation\":"+childJson(packet);
         const bool signal=packet.controlCount == 1 && packet.controlType == CTRL_C_EVENT;
-        const bool canceled=completed && packet.readReturned && packet.textCount == 0;
+        const bool canceled=completed && packet.readReturned && packet.textCount == 0 &&
+            (!ownedCancel || packet.readError == ERROR_OPERATION_ABORTED);
         observations.add("ControlSignalMatches",signal); observations.add("CookedReadCanceled",canceled);
         if (!completed) {
             session.input("\r");
@@ -537,6 +550,36 @@ void cookedCase(const std::wstring &name,const std::wstring &resultDirectory,Obs
             observations.fields+=",\"BoundaryEnterRead\":"+childJson(packet);
             saveChild(resultDirectory,L"boundary-enter-read.bin",packet);
         }
+        bool reusable=true;
+        if (ownedCancel) {
+            char next='N'; transfer(pipe.value,&next,1,true);
+            transfer(pipe.value,&packet,sizeof(packet),false); validateChild(packet);
+            check(packet.stage == 1 && !packet.readReturned,"next cooked read readiness");
+            saveChild(resultDirectory,L"child-next-ready.bin",packet);
+            observations.fields+=",\"ChildNextReady\":"+childJson(packet);
+            session.input("NEXT_PROBE\r");
+            const bool nextCompleted=session.until([&] { while (receiveChild(pipe.value,packet)) {} return packet.stage == 2; },5000);
+            saveChild(resultDirectory,L"child-next-read.bin",packet);
+            observations.fields+=",\"ChildNextRead\":"+childJson(packet);
+            reusable=nextCompleted && packet.readReturned && packet.readSucceeded &&
+                packet.readError == ERROR_SUCCESS && std::wstring_view(packet.text,packet.textCount) == L"NEXT_PROBE\r\n" &&
+                packet.controlCount == 1 && packet.controlType == CTRL_C_EVENT;
+            observations.add("NextCookedReadMatches",reusable);
+            if (!nextCompleted) {
+                // Preserve the failed next read before recovery. A canceled
+                // client call alone must not qualify console-side cancellation.
+                char sampleNext='S'; transfer(pipe.value,&sampleNext,1,true);
+                transfer(pipe.value,&packet,sizeof(packet),false); validateChild(packet);
+                saveChild(resultDirectory,L"child-next-pending.bin",packet);
+                observations.fields+=",\"ChildNextPending\":"+childJson(packet);
+                session.input("\r");
+                const bool recovered=session.until([&] { while (receiveChild(pipe.value,packet)) {} return packet.stage == 2; },5000);
+                saveChild(resultDirectory,L"next-boundary-enter-read.bin",packet);
+                observations.fields+=",\"NextBoundaryEnterRead\":"+childJson(packet);
+                observations.add("NextBoundaryEnterRecovered",recovered);
+                if (!recovered) throw Mismatch("next cooked read recovery deadline");
+            }
+        }
         if (!session.until([&] { return WaitForSingleObject(session.child.value,0) == WAIT_OBJECT_0 && session.state.contains(U"CHILD_FINAL_DRAIN"); }))
             throw Mismatch("cooked fixture drain/exit deadline");
         DWORD status=0; check(GetExitCodeProcess(session.child.value,&status),"cooked child exit status");
@@ -544,7 +587,8 @@ void cookedCase(const std::wstring &name,const std::wstring &resultDirectory,Obs
         // Drain through EOF while accepting the fixture's deliberate exit 37.
         if (status == 37) session.finish(37);
         observations.raw=session.raw; observations.cleanup=session.cleanup();
-        if (!signal || !canceled || status != 37) throw Mismatch("cooked console read cancellation workflow failed");
+        if (!signal || !canceled || !reusable || status != 37 ||
+            (mechanism && (!mechanismReply[0] || (recordProbe && mechanismReply[2] != 2)))) throw Mismatch("cooked console read cancellation workflow failed");
     } catch (...) { observations.raw=session.raw; observations.cleanup=session.cleanup(); throw; }
 }
 
@@ -593,7 +637,7 @@ int wmain(int argc,wchar_t **argv) {
     std::string status="Pass", category="Observed", error;
     int result=0;
     try {
-        const std::vector<std::wstring> cases={L"STATE",L"UNICODE",L"ALTERNATE",L"RESIZE",L"INPUT",L"PROCESSED_CTRL_C",L"UNPROCESSED_CTRL_C",L"DRAIN",L"NEGATIVE_CELL",L"NEGATIVE_ATTRIBUTE",L"NEGATIVE_CURSOR",L"NEGATIVE_PACKET",L"NEGATIVE_DUPLICATE",L"NEGATIVE_DRAIN",L"NEGATIVE_TIMEOUT",L"NEGATIVE_ORPHAN",L"CMD_EMPTY",L"CMD_PARTIAL",L"PS_EMPTY",L"PS_PARTIAL",L"PS7_EMPTY",L"PS7_PARTIAL",L"CMD_CHILD_HANDLED",L"CMD_CHILD_DEFAULT",L"CMD_CHILD_UNPROCESSED",L"PS_CHILD_HANDLED",L"PS_CHILD_DEFAULT",L"PS_CHILD_UNPROCESSED",L"PS7_CHILD_HANDLED",L"PS7_CHILD_DEFAULT",L"PS7_CHILD_UNPROCESSED",L"NEGATIVE_CHILD_CONTROL",L"NEGATIVE_CHILD_EXIT",L"READCONSOLE_TRANSPORT",L"READCONSOLE_EVENT"};
+        const std::vector<std::wstring> cases={L"STATE",L"UNICODE",L"ALTERNATE",L"RESIZE",L"INPUT",L"PROCESSED_CTRL_C",L"UNPROCESSED_CTRL_C",L"DRAIN",L"NEGATIVE_CELL",L"NEGATIVE_ATTRIBUTE",L"NEGATIVE_CURSOR",L"NEGATIVE_PACKET",L"NEGATIVE_DUPLICATE",L"NEGATIVE_DRAIN",L"NEGATIVE_TIMEOUT",L"NEGATIVE_ORPHAN",L"CMD_EMPTY",L"CMD_PARTIAL",L"PS_EMPTY",L"PS_PARTIAL",L"PS7_EMPTY",L"PS7_PARTIAL",L"CMD_CHILD_HANDLED",L"CMD_CHILD_DEFAULT",L"CMD_CHILD_UNPROCESSED",L"PS_CHILD_HANDLED",L"PS_CHILD_DEFAULT",L"PS_CHILD_UNPROCESSED",L"PS7_CHILD_HANDLED",L"PS7_CHILD_DEFAULT",L"PS7_CHILD_UNPROCESSED",L"NEGATIVE_CHILD_CONTROL",L"NEGATIVE_CHILD_EXIT",L"READCONSOLE_TRANSPORT",L"READCONSOLE_EVENT",L"READCONSOLE_RECORD_EVENT",L"READCONSOLE_OWNED_CANCEL"};
         check(std::find(cases.begin(),cases.end(),name) != cases.end(),"unknown case");
         if (name.find(L"_CHILD_") != std::wstring::npos) childCase(name,outputDirectory,program,observations);
         else if (name.starts_with(L"READCONSOLE_")) cookedCase(name,outputDirectory,observations);

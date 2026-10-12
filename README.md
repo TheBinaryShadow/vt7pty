@@ -54,6 +54,9 @@ editing for installed Windows PowerShell. Its
 records six cancellation failures per machine, every applicable active-child
 case passing, and successful native/portable JSON oracles, including PowerShell 2.0.
 The target probes confirm retained cooked input after control-handler delivery.
+[Step 1.2 cancellation research](docs/INPUT_CANCELLATION.md) adds controlled
+public-API mechanism probes with a second-read check; Windows 7 results are
+pending. There is no production cancellation fix yet.
 Input, output/Unicode,
 resize, full-screen state and lifecycle improvements follow the measurements.
 Console-SSH testing is deferred optional work. The VT7-facing API and standalone

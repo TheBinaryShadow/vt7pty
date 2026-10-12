@@ -70,6 +70,7 @@ int childFixture(const std::wstring &mode,HANDLE pipe) {
     packet.processId=GetCurrentProcessId(); packet.parentId=parentProcessId(packet.processId);
     DWORD actualMode=0; check(GetConsoleMode(input,&actualMode),"actual child mode"); packet.inputMode=actualMode;
     CookedThread reader;
+    bool reuseRequested=false, awaitingNext=false;
     if (cooked) { childMarker(L"\r\nCOOKED_INPUT>"); reader.start(); }
     else childMarker(L"\r\nCHILD_READY\r\n");
     auto snapshot=[&] {
@@ -101,16 +102,56 @@ int childFixture(const std::wstring &mode,HANDLE pipe) {
             }
         }
         snapshot();
-        if ((!cooked && !defaultHandler && (packet.controlCount || packet.keyCount >= 2)) || (cooked && packet.readReturned && packet.controlCount)) {
+        if ((!cooked && !defaultHandler && (packet.controlCount || packet.keyCount >= 2)) || (cooked && !awaitingNext && packet.readReturned && packet.controlCount)) {
             packet.stage=2; transfer(pipe,&packet,sizeof(packet),true);
-            childMarker(L"\r\nCHILD_FINAL_DRAIN\r\n");
-            return 37;
+            if (reuseRequested) {
+                // Keep the completed read observable until the test explicitly
+                // requests another read. No later I/O can race the cancellation.
+                reader.join(); reuseRequested=false; awaitingNext=true;
+            } else {
+                childMarker(L"\r\nCHILD_FINAL_DRAIN\r\n");
+                return 37;
+            }
         }
         DWORD available=0; check(PeekNamedPipe(pipe,nullptr,0,nullptr,&available,nullptr),"child command peek");
         if (available) {
             char command=0; transfer(pipe,&command,1,false);
             if (command == 'Q') { reader.join(); return 38; }
+            if (command == 'N') {
+                check(cooked && awaitingNext,"next cooked read barrier");
+                reader.read=CookedRead{};
+                packet.stage=1; packet.readReturned=0; packet.readSucceeded=0; packet.readError=0; packet.textCount=0;
+                std::fill_n(packet.text,256,L'\0');
+                childMarker(L"\r\nNEXT_INPUT>"); reader.start(); awaitingNext=false;
+                snapshot(); transfer(pipe,&packet,sizeof(packet),true); continue;
+            }
             if (command == 'G') { check(cooked && GenerateConsoleCtrlEvent(CTRL_C_EVENT,0),"direct fixture Ctrl+C event"); continue; }
+            if (command == 'R' || command == 'K') {
+                check(cooked,"cancellation mechanism probe mode");
+                // Test-only reply: API success, last error, records written.
+                // K targets this fixture's exact pending reader, never a
+                // discovered application thread or another synchronous call.
+                DWORD reply[3]={};
+                SetLastError(ERROR_SUCCESS);
+                if (command == 'K') {
+                    reuseRequested=true;
+                    reply[0]=CancelSynchronousIo(reader.thread.value) ? 1u : 0u;
+                    reply[1]=reply[0] ? ERROR_SUCCESS : GetLastError();
+                } else {
+                    INPUT_RECORD records[2]={};
+                    for (int index=0;index<2;++index) {
+                        records[index].EventType=KEY_EVENT;
+                        auto &key=records[index].Event.KeyEvent;
+                        key.bKeyDown=index == 0; key.wRepeatCount=1; key.wVirtualKeyCode='C';
+                        key.wVirtualScanCode=0x2e; key.uChar.UnicodeChar=L'\x03'; key.dwControlKeyState=LEFT_CTRL_PRESSED;
+                    }
+                    reply[0]=WriteConsoleInputW(input,records,2,&reply[2]) ? 1u : 0u;
+                    reply[1]=reply[0] ? ERROR_SUCCESS : GetLastError();
+                }
+                transfer(pipe,reply,sizeof(reply),true);
+                check(GenerateConsoleCtrlEvent(CTRL_C_EVENT,0),"mechanism probe control event");
+                continue;
+            }
             check(command == 'S',"child fixture command");
             transfer(pipe,&packet,sizeof(packet),true);
         }

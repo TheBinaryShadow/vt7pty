@@ -198,6 +198,12 @@ and review the new binary imports through the maintained verifier. The
 [rc3 review](validation/2026-10-12-step-1.1-rc3-candidate.md) preserves complete local
 extension evidence and verifies native/aggregate metadata equality before handoff.
 
+The [input cancellation investigation](INPUT_CANCELLATION.md) adds two
+test-only mechanism probes in harness version 4. They record API results,
+pending-read cancellation and a second read before considering runtime changes.
+The fixture owns the canceled thread and does not enumerate application readers.
+Windows 7 mechanism measurements are pending.
+
 Console-SSH and remote Vim/htop are deferred optional scenarios, with
 [setup prerequisites](SSH_BASELINE.md) retained for later use. They do not
 block local Milestone 1 acceptance. VT7's direct SSH transport bypasses this

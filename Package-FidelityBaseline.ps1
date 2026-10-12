@@ -2,7 +2,7 @@
 param(
     [ValidateLength(1,49)]
     [ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')]
-    [string]$Suffix='step-1.1-rc3',
+    [string]$Suffix='step-1.2-mechanism-rc1',
     [string]$RuntimeArchive='',
     [switch]$NoBuild
 )
@@ -55,6 +55,7 @@ foreach($name in @('VtStateTest','FidelityFixture','FidelityTest')) {
 $plan=[ordered]@{
     'README.md'='docs\FIDELITY_BASELINE.md'
     'cases.json'='tools\fidelity\cases.json'
+    'INPUT_CANCELLATION.md'='docs\INPUT_CANCELLATION.md'
     'tools\fidelity\Invoke-FidelityBaseline.ps1'='tools\fidelity\Invoke-FidelityBaseline.ps1'
     'tools\platform\Windows7Compat.ps1'='tools\platform\Windows7Compat.ps1'
     'tools\fidelity\Test-PortableJson.ps1'='tools\fidelity\Test-PortableJson.ps1'
@@ -77,6 +78,11 @@ $readmeText=[IO.File]::ReadAllText($portableReadme)
 $readmeText=[regex]::Replace($readmeText,'\]\(validation/([^)]+)\)',
     '](https://github.com/TheBinaryShadow/vt7pty/blob/'+$sourceCommit+'/docs/validation/$1)')
 [IO.File]::WriteAllText($portableReadme,$readmeText,[Text.UTF8Encoding]::new($false))
+$portableDesign=Join-Path $stage 'INPUT_CANCELLATION.md'
+$designText=[IO.File]::ReadAllText($portableDesign)
+$designText=[regex]::Replace($designText,'\]\((validation/[^)]+|FIDELITY_BASELINE.md)\)',
+    '](https://github.com/TheBinaryShadow/vt7pty/blob/'+$sourceCommit+'/docs/$1)')
+[IO.File]::WriteAllText($portableDesign,$designText,[Text.UTF8Encoding]::new($false))
 # Keep the product's original manifest/resources distinct from the new harness.
 Copy-Item -LiteralPath (Join-Path $runtime 'manifest.json') -Destination (Join-Path $stage 'runtime-manifest.json')
 $files=@(Get-ChildItem -LiteralPath $stage -File -Recurse | ForEach-Object {
@@ -86,7 +92,7 @@ $files=@(Get-ChildItem -LiteralPath $stage -File -Recurse | ForEach-Object {
 $manifest=[ordered]@{
     SchemaVersion=1;Kind='VT7PtyFidelityBaseline'
     Runtime=[ordered]@{Version='0.5.0';SourceCommit='cbd17727b3c8af21e5afd4499b8dca7d2140ed9d';ArchiveSha256=$archiveHash;Files=$runtimeFiles}
-    Harness=[ordered]@{Version='3';SourceCommit=$sourceCommit;SourceTreeClean=$true;Configuration='Release';Architecture='x64';
+    Harness=[ordered]@{Version='4';SourceCommit=$sourceCommit;SourceTreeClean=$true;Configuration='Release';Architecture='x64';
         VerificationSha256=(Get-FileHash -LiteralPath (Join-Path $root 'artifacts\verification\x64\Release\verification.json') -Algorithm SHA256).Hash.ToLowerInvariant();
         Toolchain=$verification.InspectionTool}
     Files=$files

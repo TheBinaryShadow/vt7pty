@@ -448,6 +448,11 @@ PowerShell 2.0 as well as 5.1. Broader recipes remain pending; Step 1.1 is not c
 
 ### Step 1.2: Improve input and control semantics
 
+The [cancellation investigation](docs/INPUT_CANCELLATION.md) starts with the
+measured F01 failures and passing child guards. Harness version 4 adds two
+controlled public-API probes; Windows 7 measurement is pending. No production
+fix or completion is claimed.
+
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, active-child
   interrupts, processed/unprocessed input, editing, modifiers, text and paste.
 - [ ] Add focused regressions and validate actual US/Croatian layout behavior
