@@ -5,6 +5,10 @@
 #include <cstdio>
 #include <functional>
 using fidelity::VtState;
+using fidelity::ChildPacket;
+using fidelity::validateChild;
+using fidelity::childInputMatches;
+using fidelity::expectedChildExit;
 static void require(bool value, const char *label) { if (!value) throw std::runtime_error(label); }
 static void rejected(const std::function<void()> &test) {
     try { test(); } catch (const std::runtime_error &) { return; }
@@ -71,6 +75,29 @@ int main() {
         require(correct.at(0,0) != wrongCell.at(0,0), "cell negative control");
         require(correct.at(0,0).attributes != wrongAttr.at(0,0).attributes, "attribute negative control");
         require(correct.x() != wrongCursor.x(), "cursor negative control");
+        ChildPacket child;
+        child.processId=1; child.parentId=2; child.inputMode=ENABLE_PROCESSED_INPUT;
+        validateChild(child);
+        require(childInputMatches(child,true,false), "default child readiness oracle");
+        child.stage=2; child.controlCount=1; child.controlType=CTRL_C_EVENT;
+        require(childInputMatches(child,false,false), "handled child Ctrl+C oracle");
+        child.controlCount=2; require(!childInputMatches(child,false,false), "duplicate child control rejected");
+        child.controlCount=1; child.controlType=CTRL_BREAK_EVENT;
+        require(!childInputMatches(child,false,false), "Ctrl+Break is not Ctrl+C");
+        child.controlCount=0; child.controlType=0xffffffffu; child.inputMode=ENABLE_EXTENDED_FLAGS;
+        child.keyCount=2; child.keys[0]={3,'C',LEFT_CTRL_PRESSED,1}; child.keys[1]={'z','Z',0,1};
+        require(childInputMatches(child,false,true), "unprocessed child ordered keys oracle");
+        child.keys[1].modifiers=LEFT_CTRL_PRESSED;
+        require(!childInputMatches(child,false,true), "child modifier release oracle");
+        child.keys[1].modifiers=0; child.keys[0].repeat=2;
+        require(!childInputMatches(child,false,true), "child repeat duplication oracle");
+        child.keys[0].repeat=1; child.keyCount=3;
+        require(!childInputMatches(child,false,true), "extra child input rejected");
+        child.keyCount=17; rejected([&] { validateChild(child); });
+        child.keyCount=0; child.textCount=256; rejected([&] { validateChild(child); });
+        child.textCount=0; child.stage=3; rejected([&] { validateChild(child); });
+        child.stage=1; child.magic=0; rejected([&] { validateChild(child); });
+        require(expectedChildExit(false) == 37 && expectedChildExit(true) == 0xc000013au, "native exit contract");
         puts("VT7Pty VT state oracle tests passed.");
         return 0;
     } catch (const std::exception &e) { fprintf(stderr,"%s\n",e.what()); return 1; }

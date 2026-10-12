@@ -35,7 +35,7 @@ public:
     std::string raw;
     uint64_t lineFeeds=0;
     bool dropOutput=false;
-    Handle child, agent;
+    Handle child, agent, descendant;
     Session() {
         vt7pty_error_ptr_t error=nullptr;
         auto *config=vt7pty_config_new(0,&error);
@@ -99,11 +99,11 @@ public:
         check(vt7pty_set_size(pty_,columns,rows,nullptr) != FALSE,"resize");
         state.resize(columns,rows);
     }
-    void finish() {
+    void finish(DWORD expectedStatus=0) {
         if (!until([&] { return eof_ && WaitForSingleObject(child.value,0) == WAIT_OBJECT_0; },10000))
             throw Mismatch("final output/child completion deadline");
         DWORD status=0; check(GetExitCodeProcess(child.value,&status),"child status");
-        if (status != 0) throw std::runtime_error("fixture/controlled shell exit "+std::to_string(status));
+        if (status != expectedStatus) throw std::runtime_error("fixture/controlled shell exit "+std::to_string(status));
         if (!cleanup()) throw Mismatch("owned process survived shutdown");
     }
     bool cleanup() noexcept {
@@ -112,7 +112,7 @@ public:
         input_.reset();
         if (pty_) { vt7pty_free(pty_); pty_=nullptr; }
         cleanupOkay_=true;
-        for (HANDLE process : {child.value,agent.value}) {
+        for (HANDLE process : {descendant.value,child.value,agent.value}) {
             if (process == INVALID_HANDLE_VALUE || process == nullptr) continue;
             if (WaitForSingleObject(process,5000) != WAIT_OBJECT_0) {
                 cleanupOkay_=false;
@@ -317,13 +317,15 @@ void fixtureCase(const std::wstring &name,const std::wstring &resultDirectory,Ob
     }
     observations.raw=session.raw; observations.cleanup=session.cleanup();
 }
-void shellCase(const std::wstring &name,const std::wstring &directoryPath,const std::wstring &program,Observations &observations) {
-    const bool cmd=name.starts_with(L"CMD"), partial=name.ends_with(L"PARTIAL");
+std::u32string startShell(const std::wstring &name,const std::wstring &directoryPath,const std::wstring &program,
+    Session &session,Observations &observations) {
+    const bool cmd=name.starts_with(L"CMD");
     const std::wstring executable=cmd ? systemProgram(L"cmd.exe") :
         (name.starts_with(L"PS7") ? program : systemProgram(L"WindowsPowerShell\\v1.0\\powershell.exe"));
     check(!executable.empty(),"shell executable path");
     const std::u32string expectedPrompt=cmd ? U"FIDELITY_CMD_PROMPT>" : U"FIDELITY_PS_PROMPT>";
-    std::wstring boot=L"function global:prompt { 'FIDELITY_PS_PROMPT>' }";
+    std::wstring boot=name.starts_with(L"PS7") ? L"function global:prompt { 'FIDELITY_PS_PROMPT>' }" :
+        L"Remove-Module PSReadLine -ErrorAction SilentlyContinue; function global:prompt { 'FIDELITY_PS_PROMPT>' }";
     if (name.starts_with(L"PS7")) {
         const std::wstring module=(std::filesystem::path(executable).parent_path()/L"Modules"/L"PSReadLine"/L"PSReadLine.psd1").wstring();
         check(GetFileAttributesW(module.c_str()) != INVALID_FILE_ATTRIBUTES,"PowerShell 7 case requires bundled PSReadLine");
@@ -333,26 +335,225 @@ void shellCase(const std::wstring &name,const std::wstring &directoryPath,const 
     }
     const std::wstring command=cmd ? quote(executable)+L" /D /Q /K \"prompt FIDELITY_CMD_PROMPT$G\"" :
         quote(executable)+L" -NoLogo -NoProfile -NoExit -Command "+quote(boot);
+    session.spawn(executable,command);
+    auto atPrompt=[&] { return trimmed(session.state.row(session.state.y())) == expectedPrompt; };
+    if (!session.until(atPrompt,20000)) throw std::runtime_error("controlled shell prompt unavailable");
+    if (!cmd) {
+        const std::wstring identityCommand=L"$m=Get-Module PSReadLine; $mv='none'; $cfg='native-ConsoleHost'; if($m){$mv=$m.Version.ToString(); $o=Get-PSReadLineOption; $cfg=$m.Path+'|'+$o.EditMode.ToString()+'|'+$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAllText("+
+            psLiteral(directoryPath+L"\\shell-identity.txt")+L",$PSVersionTable.PSVersion.ToString()+'|'+$mv+'|'+$Host.Name+'|'+$cfg)";
+        const uint64_t lines=session.lineFeeds;
+        session.input(utf8(identityCommand+L"\r"));
+        if (!session.until([&] { return session.lineFeeds>lines && atPrompt() &&
+            GetFileAttributesW((directoryPath+L"\\shell-identity.txt").c_str()) != INVALID_FILE_ATTRIBUTES; },10000))
+            throw std::runtime_error("shell identity barrier");
+        std::ifstream identity(std::filesystem::path(directoryPath+L"\\shell-identity.txt"));
+        std::string metadata; std::getline(identity,metadata);
+        check(!metadata.empty(),"shell metadata");
+        observations.fields+=",\"ShellIdentity\":"+json(metadata);
+        if (name.starts_with(L"PS7") && (!metadata.starts_with("7.2.24|") || metadata.find("|none|") != std::string::npos))
+            throw std::runtime_error("PowerShell 7 case requires engine 7.2.24 and loaded PSReadLine");
+        if (name.starts_with(L"PS_") && metadata.find("|none|ConsoleHost|native-ConsoleHost") == std::string::npos)
+            throw std::runtime_error("Windows PowerShell case requires native ConsoleHost editing");
+    }
+    return expectedPrompt;
+}
+
+std::string childJson(const ChildPacket &p) {
+    std::string keys="[";
+    for (uint32_t i=0;i<p.keyCount;++i) {
+        if (i) keys+=",";
+        keys+="{\"Character\":"+std::to_string(p.keys[i].character)+",\"VirtualKey\":"+std::to_string(p.keys[i].virtualKey)+
+            ",\"Modifiers\":"+std::to_string(p.keys[i].modifiers)+",\"Repeat\":"+std::to_string(p.keys[i].repeat)+"}";
+    }
+    return "{\"Stage\":"+std::to_string(p.stage)+",\"ProcessId\":"+std::to_string(p.processId)+
+        ",\"ParentId\":"+std::to_string(p.parentId)+",\"InputMode\":"+std::to_string(p.inputMode)+
+        ",\"ControlCount\":"+std::to_string(p.controlCount)+",\"ControlType\":"+std::to_string(p.controlType)+
+        ",\"ReadReturned\":"+std::to_string(p.readReturned)+",\"ReadSucceeded\":"+std::to_string(p.readSucceeded)+
+        ",\"ReadError\":"+std::to_string(p.readError)+",\"Text\":"+json(utf8(std::wstring_view(p.text,p.textCount)))+
+        ",\"Keys\":"+keys+"]}";
+}
+bool receiveChild(HANDLE pipe,ChildPacket &packet) {
+    DWORD available=0;
+    if (!PeekNamedPipe(pipe,nullptr,0,nullptr,&available,nullptr)) {
+        const DWORD error=GetLastError();
+        check(error == ERROR_BROKEN_PIPE || error == ERROR_PIPE_NOT_CONNECTED,"child observation peek");
+        return false;
+    }
+    if (available<sizeof(packet)) return false;
+    transfer(pipe,&packet,sizeof(packet),false); validateChild(packet); return true;
+}
+void saveChild(const std::wstring &directoryPath,const wchar_t *name,const ChildPacket &packet) {
+    writeFile(directoryPath+L"\\"+name,std::string_view(reinterpret_cast<const char *>(&packet),sizeof(packet)));
+}
+std::string fileText(const std::wstring &path) {
+    std::ifstream file{std::filesystem::path(path)};
+    std::string text; std::getline(file,text);
+    while (!text.empty() && (text.back() == '\r' || text.back() == '\n' || text.back() == ' ')) text.pop_back();
+    return text;
+}
+void childCase(const std::wstring &name,const std::wstring &resultDirectory,const std::wstring &program,Observations &observations) {
+    const bool negative=name.starts_with(L"NEGATIVE_CHILD");
+    const bool cmd=negative || name.starts_with(L"CMD");
+    const std::wstring shellName=negative ? L"CMD_CHILD_HANDLED" : name;
+    const bool defaultHandler=name.ends_with(L"DEFAULT"), unprocessed=name.ends_with(L"UNPROCESSED");
+    const std::wstring mode=defaultHandler ? L"CHILD_DEFAULT" : (unprocessed ? L"CHILD_UNPROCESSED" : L"CHILD_HANDLED");
+    Session session;
+    Handle pipe;
+    bool connected=false;
+    try {
+        const auto expectedPrompt=startShell(shellName,resultDirectory,program,session,observations);
+        auto atPrompt=[&] { return trimmed(session.state.row(session.state.y())) == expectedPrompt; };
+        const std::wstring pipeName=L"\\\\.\\pipe\\VT7Pty.Child."+std::to_wstring(GetCurrentProcessId())+L"."+std::to_wstring(GetTickCount64());
+        pipe.reset(privateServer(pipeName));
+        const std::wstring fixture=directory()+L"\\FidelityFixture.exe";
+        const std::wstring serverId=std::to_wstring(GetCurrentProcessId());
+        const std::wstring command=cmd ? quote(fixture)+L" "+mode+L" "+quote(pipeName)+L" "+serverId :
+            L"& "+psLiteral(fixture)+L" "+psLiteral(mode)+L" "+psLiteral(pipeName)+L" "+serverId;
+        session.input(utf8(command+L"\r"));
+        connect(pipe.value); connected=true;
+        ULONG peer=0; check(GetNamedPipeClientProcessId(pipe.value,&peer),"child peer PID");
+        Handle candidate(OpenProcess(SYNCHRONIZE|PROCESS_QUERY_LIMITED_INFORMATION|PROCESS_TERMINATE,FALSE,peer));
+        const HANDLE nativeChild=candidate.value;
+        if (nativeChild == nullptr) throw std::runtime_error("cannot open child process (Win32 "+std::to_string(GetLastError())+")");
+        check(parentProcessId(peer) == GetProcessId(session.child.value),"fixture parent is tested shell");
+        std::vector<wchar_t> image(32768); DWORD length=static_cast<DWORD>(image.size());
+        check(QueryFullProcessImageNameW(nativeChild,0,image.data(),&length) && _wcsicmp(image.data(),fixture.c_str()) == 0,"child fixture image");
+        // Adopt teardown ownership only after both ancestry and image validation.
+        session.descendant.reset(candidate.value); candidate.value=INVALID_HANDLE_VALUE;
+        ChildPacket packet;
+        transfer(pipe.value,&packet,sizeof(packet),false); validateChild(packet);
+        check(packet.stage == 1 && packet.processId == peer && packet.parentId == GetProcessId(session.child.value) &&
+            packet.controlCount == 0 && packet.keyCount == 0 &&
+            ((packet.inputMode&ENABLE_PROCESSED_INPUT) != 0) == !unprocessed,"child readiness identity and mode");
+        saveChild(resultDirectory,L"child-ready.bin",packet);
+        observations.fields+=",\"ChildReady\":"+childJson(packet);
+        session.input(unprocessed ? "\x03z" : "\x03");
+        bool finalPacket=false;
+        const bool exited=session.until([&] {
+            while (receiveChild(pipe.value,packet)) { finalPacket=packet.stage == 2; }
+            return WaitForSingleObject(session.descendant.value,0) == WAIT_OBJECT_0;
+        },5000);
+        observations.add("ChildExitedAfterCtrlC",exited);
+        // A missed interruption remains a workflow failure. Ask only this owned
+        // fixture to stop before tearing down its shell and console.
+        if (!exited) { char quit='Q'; transfer(pipe.value,&quit,1,true); }
+        if (!session.until([&] { return WaitForSingleObject(session.descendant.value,0) == WAIT_OBJECT_0; },5000))
+            throw Mismatch("owned native child shutdown deadline");
+        while (receiveChild(pipe.value,packet)) { finalPacket=packet.stage == 2; }
+        DWORD status=0; check(GetExitCodeProcess(session.descendant.value,&status),"native child exit status");
+        saveChild(resultDirectory,L"child-observation.bin",packet);
+        observations.fields+=",\"ChildObservation\":"+childJson(packet)+",\"ChildExitCode\":"+std::to_string(status);
+        observations.add("ChildFinalPacketReceived",finalPacket);
+        ChildPacket oraclePacket=packet;
+        DWORD oracleStatus=status;
+        if (name == L"NEGATIVE_CHILD_CONTROL") {
+            ++oraclePacket.controlCount;
+            observations.fields+=",\"InjectedFault\":\"duplicate child control count\"";
+        }
+        if (name == L"NEGATIVE_CHILD_EXIT") {
+            ++oracleStatus;
+            observations.fields+=",\"InjectedFault\":\"wrong native child exit status\"";
+        }
+        const bool control=(defaultHandler || finalPacket) && childInputMatches(oraclePacket,defaultHandler,unprocessed);
+        const DWORD expectedStatus=expectedChildExit(defaultHandler);
+        const bool statusMatches=oracleStatus == expectedStatus;
+        observations.add("ChildControlMatches",control);
+        observations.add("ChildExitMatches",statusMatches);
+        const bool returned=session.until(atPrompt,5000);
+        observations.add("ReturnedToShellPrompt",returned);
+        const bool drained=defaultHandler || session.state.contains(U"CHILD_FINAL_DRAIN");
+        observations.add("ChildFinalOutputMatches",drained);
+        const std::wstring statusPath=resultDirectory+L"\\child-exit-code.txt";
+        const std::wstring continuedPath=resultDirectory+L"\\continued-command.txt";
+        const std::wstring next=cmd ? L"echo %errorlevel%>"+quote(statusPath)+L" & echo CONTINUE>"+quote(continuedPath) :
+            L"[IO.File]::WriteAllText("+psLiteral(statusPath)+L",$LASTEXITCODE.ToString()); [IO.File]::WriteAllText("+psLiteral(continuedPath)+L",'CONTINUE')";
+        bool usable=false, reported=false;
+        if (returned) {
+            session.input(utf8(next+L"\r"));
+            usable=session.until([&] { return GetFileAttributesW(continuedPath.c_str()) != INVALID_FILE_ATTRIBUTES && atPrompt(); });
+            const auto actual=fileText(statusPath);
+            reported=actual == std::to_string(static_cast<int32_t>(expectedStatus)) || actual == std::to_string(expectedStatus);
+            observations.fields+=",\"ShellReportedChildExit\":"+json(actual);
+        }
+        observations.add("ShellReportedExitMatches",reported);
+        observations.add("NextCommandExecuted",usable);
+        const bool alive=WaitForSingleObject(session.child.value,0) == WAIT_TIMEOUT;
+        observations.add("ShellAlive",alive);
+        if (alive && returned) { session.input("exit 0\r"); session.finish(); }
+        observations.raw=session.raw; observations.cleanup=session.cleanup();
+        if (!exited || !control || !statusMatches || !returned || !drained || !reported || !usable || !alive)
+            throw Mismatch("active child interruption workflow failed");
+    } catch (...) {
+        if (connected && session.descendant.value != nullptr && session.descendant.value != INVALID_HANDLE_VALUE &&
+            WaitForSingleObject(session.descendant.value,0) == WAIT_TIMEOUT) {
+            try { char quit='Q'; transfer(pipe.value,&quit,1,true,1000); WaitForSingleObject(session.descendant.value,5000); } catch (...) {}
+        }
+        pipe.reset();
+        observations.raw=session.raw; observations.cleanup=session.cleanup(); throw;
+    }
+}
+void cookedCase(const std::wstring &name,const std::wstring &resultDirectory,Observations &observations) {
     Session session;
     try {
-        session.spawn(executable,command);
-        auto atPrompt=[&] { return trimmed(session.state.row(session.state.y())) == expectedPrompt; };
-        if (!session.until(atPrompt,20000)) throw std::runtime_error("controlled shell prompt unavailable");
-        if (!cmd) {
-            const std::wstring identityCommand=L"$m=Get-Module PSReadLine; $mv='none'; $cfg='native-ConsoleHost'; if($m){$mv=$m.Version.ToString(); $o=Get-PSReadLineOption; $cfg=$m.Path+'|'+$o.EditMode.ToString()+'|'+$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAllText("+
-                psLiteral(directoryPath+L"\\shell-identity.txt")+L",$PSVersionTable.PSVersion.ToString()+'|'+$mv+'|'+$Host.Name+'|'+$cfg)";
-            const uint64_t lines=session.lineFeeds;
-            session.input(utf8(identityCommand+L"\r"));
-            if (!session.until([&] { return session.lineFeeds>lines && atPrompt() &&
-                GetFileAttributesW((directoryPath+L"\\shell-identity.txt").c_str()) != INVALID_FILE_ATTRIBUTES; },10000))
-                throw std::runtime_error("shell identity barrier");
-            std::ifstream identity(std::filesystem::path(directoryPath+L"\\shell-identity.txt"));
-            std::string metadata; std::getline(identity,metadata);
-            check(!metadata.empty(),"shell metadata");
-            observations.fields+=",\"ShellIdentity\":"+json(metadata);
-            if (name.starts_with(L"PS7") && (!metadata.starts_with("7.2.24|") || metadata.find("|none|") != std::string::npos))
-                throw std::runtime_error("PowerShell 7 case requires engine 7.2.24 and loaded PSReadLine");
+        const std::wstring pipeName=L"\\\\.\\pipe\\VT7Pty.Cooked."+std::to_wstring(GetCurrentProcessId())+L"."+std::to_wstring(GetTickCount64());
+        Handle pipe(privateServer(pipeName));
+        const std::wstring fixture=directory()+L"\\FidelityFixture.exe";
+        session.spawn(fixture,quote(fixture)+L" CHILD_COOKED "+quote(pipeName)+L" "+std::to_wstring(GetCurrentProcessId()));
+        connect(pipe.value);
+        ULONG peer=0; check(GetNamedPipeClientProcessId(pipe.value,&peer) && peer == GetProcessId(session.child.value),"cooked peer PID");
+        ChildPacket packet;
+        transfer(pipe.value,&packet,sizeof(packet),false); validateChild(packet);
+        check(packet.stage == 1 && packet.processId == peer && !packet.readReturned &&
+            (packet.inputMode&(ENABLE_LINE_INPUT|ENABLE_ECHO_INPUT|ENABLE_PROCESSED_INPUT)) ==
+            (ENABLE_LINE_INPUT|ENABLE_ECHO_INPUT|ENABLE_PROCESSED_INPUT),"cooked readiness mode");
+        session.input("PROBE_TYPED");
+        if (!session.until([&] { return session.state.contains(U"COOKED_INPUT>PROBE_TYPED"); }))
+            throw std::runtime_error("pending cooked read echo barrier");
+        char sample='S'; transfer(pipe.value,&sample,1,true);
+        transfer(pipe.value,&packet,sizeof(packet),false); validateChild(packet);
+        check(!packet.readReturned && !packet.controlCount,"cooked pending read barrier");
+        saveChild(resultDirectory,L"child-ready.bin",packet);
+        observations.fields+=",\"ChildReady\":"+childJson(packet);
+        const bool direct=name == L"READCONSOLE_EVENT";
+        observations.fields+=",\"ControlDelivery\":"+json(direct ? "FixtureGenerateConsoleCtrlEvent" : "VTByte03");
+        if (direct) { char generate='G'; transfer(pipe.value,&generate,1,true); }
+        else session.input("\x03");
+        const bool completed=session.until([&] {
+            while (receiveChild(pipe.value,packet)) {}
+            return packet.stage == 2;
+        },2000);
+        if (!completed) {
+            transfer(pipe.value,&sample,1,true); transfer(pipe.value,&packet,sizeof(packet),false); validateChild(packet);
         }
+        saveChild(resultDirectory,L"child-observation.bin",packet);
+        observations.fields+=",\"ChildObservation\":"+childJson(packet);
+        const bool signal=packet.controlCount == 1 && packet.controlType == CTRL_C_EVENT;
+        const bool canceled=completed && packet.readReturned && packet.textCount == 0;
+        observations.add("ControlSignalMatches",signal); observations.add("CookedReadCanceled",canceled);
+        if (!completed) {
+            session.input("\r");
+            if (!session.until([&] { while (receiveChild(pipe.value,packet)) {} return packet.stage == 2; },5000))
+                throw Mismatch("cooked boundary Enter recovery deadline");
+            observations.fields+=",\"BoundaryEnterRead\":"+childJson(packet);
+            saveChild(resultDirectory,L"boundary-enter-read.bin",packet);
+        }
+        if (!session.until([&] { return WaitForSingleObject(session.child.value,0) == WAIT_OBJECT_0 && session.state.contains(U"CHILD_FINAL_DRAIN"); }))
+            throw Mismatch("cooked fixture drain/exit deadline");
+        DWORD status=0; check(GetExitCodeProcess(session.child.value,&status),"cooked child exit status");
+        observations.fields+=",\"ChildExitCode\":"+std::to_string(status);
+        // Drain through EOF while accepting the fixture's deliberate exit 37.
+        if (status == 37) session.finish(37);
+        observations.raw=session.raw; observations.cleanup=session.cleanup();
+        if (!signal || !canceled || status != 37) throw Mismatch("cooked console read cancellation workflow failed");
+    } catch (...) { observations.raw=session.raw; observations.cleanup=session.cleanup(); throw; }
+}
+
+void shellCase(const std::wstring &name,const std::wstring &directoryPath,const std::wstring &program,Observations &observations) {
+    const bool cmd=name.starts_with(L"CMD"), partial=name.ends_with(L"PARTIAL");
+    Session session;
+    try {
+        const auto expectedPrompt=startShell(name,directoryPath,program,session,observations);
+        auto atPrompt=[&] { return trimmed(session.state.row(session.state.y())) == expectedPrompt; };
         const std::wstring canceledPath=directoryPath+L"\\cancelled-command.txt";
         check(GetFileAttributesW(canceledPath.c_str()) == INVALID_FILE_ATTRIBUTES,"cancellation marker preflight");
         if (partial) {
@@ -392,9 +593,11 @@ int wmain(int argc,wchar_t **argv) {
     std::string status="Pass", category="Observed", error;
     int result=0;
     try {
-        const std::vector<std::wstring> cases={L"STATE",L"UNICODE",L"ALTERNATE",L"RESIZE",L"INPUT",L"PROCESSED_CTRL_C",L"UNPROCESSED_CTRL_C",L"DRAIN",L"NEGATIVE_CELL",L"NEGATIVE_ATTRIBUTE",L"NEGATIVE_CURSOR",L"NEGATIVE_PACKET",L"NEGATIVE_DUPLICATE",L"NEGATIVE_DRAIN",L"NEGATIVE_TIMEOUT",L"NEGATIVE_ORPHAN",L"CMD_EMPTY",L"CMD_PARTIAL",L"PS_EMPTY",L"PS_PARTIAL",L"PS7_EMPTY",L"PS7_PARTIAL"};
+        const std::vector<std::wstring> cases={L"STATE",L"UNICODE",L"ALTERNATE",L"RESIZE",L"INPUT",L"PROCESSED_CTRL_C",L"UNPROCESSED_CTRL_C",L"DRAIN",L"NEGATIVE_CELL",L"NEGATIVE_ATTRIBUTE",L"NEGATIVE_CURSOR",L"NEGATIVE_PACKET",L"NEGATIVE_DUPLICATE",L"NEGATIVE_DRAIN",L"NEGATIVE_TIMEOUT",L"NEGATIVE_ORPHAN",L"CMD_EMPTY",L"CMD_PARTIAL",L"PS_EMPTY",L"PS_PARTIAL",L"PS7_EMPTY",L"PS7_PARTIAL",L"CMD_CHILD_HANDLED",L"CMD_CHILD_DEFAULT",L"CMD_CHILD_UNPROCESSED",L"PS_CHILD_HANDLED",L"PS_CHILD_DEFAULT",L"PS_CHILD_UNPROCESSED",L"PS7_CHILD_HANDLED",L"PS7_CHILD_DEFAULT",L"PS7_CHILD_UNPROCESSED",L"NEGATIVE_CHILD_CONTROL",L"NEGATIVE_CHILD_EXIT",L"READCONSOLE_TRANSPORT",L"READCONSOLE_EVENT"};
         check(std::find(cases.begin(),cases.end(),name) != cases.end(),"unknown case");
-        if (name.starts_with(L"CMD") || name.starts_with(L"PS")) shellCase(name,outputDirectory,program,observations);
+        if (name.find(L"_CHILD_") != std::wstring::npos) childCase(name,outputDirectory,program,observations);
+        else if (name.starts_with(L"READCONSOLE_")) cookedCase(name,outputDirectory,observations);
+        else if (name.starts_with(L"CMD") || name.starts_with(L"PS")) shellCase(name,outputDirectory,program,observations);
         else fixtureCase(name,outputDirectory,observations);
     } catch (const Mismatch &e) { status="Fail"; category="BehaviorMismatch"; error=e.what(); result=1; }
     catch (const std::exception &e) { status="Fail"; category="HarnessOrPrerequisiteError"; error=e.what(); result=2; }

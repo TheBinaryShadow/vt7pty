@@ -6,10 +6,119 @@
 using namespace fidelity;
 namespace {
 volatile LONG controls=0;
+volatile LONG lastControl=-1;
 BOOL WINAPI controlHandler(DWORD event) {
-    if (event == CTRL_C_EVENT || event == CTRL_BREAK_EVENT) { InterlockedIncrement(&controls); return TRUE; }
+    if (event == CTRL_C_EVENT || event == CTRL_BREAK_EVENT) { InterlockedExchange(&lastControl,static_cast<LONG>(event)); InterlockedIncrement(&controls); return TRUE; }
     return FALSE;
 }
+
+struct CookedRead {
+    volatile LONG returned=0;
+    BOOL succeeded=FALSE;
+    DWORD error=0, count=0;
+    wchar_t text[256]={};
+};
+DWORD WINAPI cookedReader(void *context) {
+    auto &read=*static_cast<CookedRead *>(context);
+    SetLastError(ERROR_SUCCESS);
+    read.succeeded=ReadConsoleW(GetStdHandle(STD_INPUT_HANDLE),read.text,255,&read.count,nullptr);
+    read.error=GetLastError();
+    InterlockedExchange(&read.returned,1);
+    return 0;
+}
+struct ConsoleModeRestore {
+    HANDLE input;
+    DWORD original=0;
+    explicit ConsoleModeRestore(HANDLE h) : input(h) { check(GetConsoleMode(input,&original),"original child mode"); }
+    ~ConsoleModeRestore() { SetConsoleMode(input,original); }
+};
+struct CookedThread {
+    CookedRead read;
+    Handle thread;
+    void start() { thread.reset(CreateThread(nullptr,0,cookedReader,&read,0,nullptr)); check(thread.value != nullptr,"cooked read thread"); }
+    void join() {
+        if (thread.value == INVALID_HANDLE_VALUE || thread.value == nullptr) return;
+        if (WaitForSingleObject(thread.value,0) != WAIT_OBJECT_0) {
+            const BOOL canceled=CancelSynchronousIo(thread.value);
+            check(canceled || GetLastError() == ERROR_NOT_FOUND,"cancel owned cooked read");
+            // Keep the read buffer alive until the synchronous call has returned.
+            if (WaitForSingleObject(thread.value,5000) != WAIT_OBJECT_0) ExitProcess(124);
+        }
+        thread.reset();
+    }
+    ~CookedThread() { try { join(); } catch (...) { ExitProcess(124); } }
+};
+void childMarker(const wchar_t *text) {
+    DWORD count=0; const DWORD length=static_cast<DWORD>(wcslen(text));
+    check(WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE),text,length,&count,nullptr) && count == length,"child marker");
+}
+int childFixture(const std::wstring &mode,HANDLE pipe) {
+    const bool cooked=mode == L"CHILD_COOKED", unprocessed=mode == L"CHILD_UNPROCESSED";
+    const bool defaultHandler=mode == L"CHILD_DEFAULT";
+    check(cooked || unprocessed || defaultHandler || mode == L"CHILD_HANDLED","child fixture mode");
+    HANDLE input=GetStdHandle(STD_INPUT_HANDLE);
+    ConsoleModeRestore restore(input);
+    DWORD selected=restore.original;
+    if (cooked) selected=ENABLE_EXTENDED_FLAGS|ENABLE_PROCESSED_INPUT|ENABLE_LINE_INPUT|ENABLE_ECHO_INPUT;
+    else if (unprocessed) selected=(selected|ENABLE_EXTENDED_FLAGS)&~(ENABLE_PROCESSED_INPUT|ENABLE_LINE_INPUT|ENABLE_ECHO_INPUT|ENABLE_QUICK_EDIT_MODE);
+    else selected|=ENABLE_PROCESSED_INPUT;
+    check(SetConsoleMode(input,selected),"child mode");
+    check(SetConsoleCtrlHandler(nullptr,FALSE),"clear inherited Ctrl+C ignore");
+    if (!defaultHandler) check(SetConsoleCtrlHandler(controlHandler,TRUE),"child control handler");
+    check(FlushConsoleInputBuffer(input),"child input barrier");
+    ChildPacket packet;
+    packet.processId=GetCurrentProcessId(); packet.parentId=parentProcessId(packet.processId);
+    DWORD actualMode=0; check(GetConsoleMode(input,&actualMode),"actual child mode"); packet.inputMode=actualMode;
+    CookedThread reader;
+    if (cooked) { childMarker(L"\r\nCOOKED_INPUT>"); reader.start(); }
+    else childMarker(L"\r\nCHILD_READY\r\n");
+    auto snapshot=[&] {
+        packet.controlCount=static_cast<uint32_t>(InterlockedCompareExchange(&controls,0,0));
+        packet.controlType=static_cast<uint32_t>(InterlockedCompareExchange(&lastControl,0,0));
+        if (cooked && InterlockedCompareExchange(&reader.read.returned,0,0)) {
+            packet.readReturned=1; packet.readSucceeded=reader.read.succeeded ? 1u : 0u;
+            packet.readError=reader.read.error; packet.textCount=reader.read.count;
+            check(packet.textCount <= 255,"cooked read bound");
+            std::copy_n(reader.read.text,packet.textCount,packet.text);
+        }
+        validateChild(packet);
+    };
+    transfer(pipe,&packet,sizeof(packet),true);
+    const ULONGLONG deadline=GetTickCount64()+45000;
+    while (GetTickCount64()<deadline) {
+        if (unprocessed) {
+            DWORD available=0; check(GetNumberOfConsoleInputEvents(input,&available),"child event count");
+            if (available) {
+                INPUT_RECORD events[16]={}; DWORD count=0;
+                check(ReadConsoleInputW(input,events,std::min<DWORD>(available,16),&count),"child key records");
+                for (DWORD index=0;index<count;++index) {
+                    if (events[index].EventType != KEY_EVENT) continue;
+                    const auto &key=events[index].Event.KeyEvent;
+                    if (!key.bKeyDown || key.wVirtualKeyCode == VK_CONTROL || key.wVirtualKeyCode == VK_SHIFT || key.wVirtualKeyCode == VK_MENU) continue;
+                    check(packet.keyCount<16,"child key bound");
+                    packet.keys[packet.keyCount++]={key.uChar.UnicodeChar,key.wVirtualKeyCode,key.dwControlKeyState,key.wRepeatCount};
+                }
+            }
+        }
+        snapshot();
+        if ((!cooked && !defaultHandler && (packet.controlCount || packet.keyCount >= 2)) || (cooked && packet.readReturned && packet.controlCount)) {
+            packet.stage=2; transfer(pipe,&packet,sizeof(packet),true);
+            childMarker(L"\r\nCHILD_FINAL_DRAIN\r\n");
+            return 37;
+        }
+        DWORD available=0; check(PeekNamedPipe(pipe,nullptr,0,nullptr,&available,nullptr),"child command peek");
+        if (available) {
+            char command=0; transfer(pipe,&command,1,false);
+            if (command == 'Q') { reader.join(); return 38; }
+            if (command == 'G') { check(cooked && GenerateConsoleCtrlEvent(CTRL_C_EVENT,0),"direct fixture Ctrl+C event"); continue; }
+            check(command == 'S',"child fixture command");
+            transfer(pipe,&packet,sizeof(packet),true);
+        }
+        Sleep(2);
+    }
+    throw std::runtime_error("child fixture overall deadline");
+}
+
 std::unique_ptr<Packet> observe(HANDLE output, const std::vector<Key> &keys) {
     auto storage=std::make_unique<Packet>();
     Packet &packet=*storage;
@@ -79,6 +188,7 @@ int wmain(int argc,wchar_t **argv) {
         check(pipe.value != INVALID_HANDLE_VALUE,"fixture pipe");
         ULONG server=0; check(GetNamedPipeServerProcessId(pipe.value,&server) && server == expectedServer,"fixture server PID");
         SetConsoleTitleW(L"VT7Pty controlled fidelity fixture");
+        if (mode.starts_with(L"CHILD_")) return childFixture(mode,pipe.value);
         const bool input=mode == L"INPUT" || mode == L"PROCESSED";
         const bool unicode=mode == L"UNICODE";
         check(input || unicode || mode == L"STATE","fixture mode");

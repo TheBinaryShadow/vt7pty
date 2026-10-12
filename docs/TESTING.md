@@ -187,8 +187,9 @@ bounded state/input/shell observations and fault controls against the unchanged
 0.5.0 runtime. Remaining coverage is explicitly NotRun in its case manifest;
 the [initial Windows 7 review](validation/2026-10-12-step-1.1-windows7-baseline.md)
 preserves all three target runs and their four prompt-cancellation failures per
-machine. Initial characterization is complete; broader Step 1.1 coverage and
-milestone acceptance remain open. Preserve the existing 30-case regression suite
+machine. The version 1 initial characterization is complete. Harness version 2 adds
+active-child and cooked-read cases; their Windows 7 validation, broader Step 1.1
+coverage and milestone acceptance remain open. Preserve the existing 30-case regression suite
 and review the new binary imports through the maintained verifier.
 
 Console-SSH and remote Vim/htop are deferred optional scenarios, with

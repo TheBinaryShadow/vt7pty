@@ -3,6 +3,7 @@
 #pragma once
 #include <windows.h>
 #include <sddl.h>
+#include <tlhelp32.h>
 #include <cstdint>
 #include <cstdio>
 #include <stdexcept>
@@ -141,5 +142,43 @@ inline void validate(const Packet &p) {
         p.windowLeft > p.bufferColumns || p.windowTop > p.bufferRows ||
         p.columns > p.bufferColumns-p.windowLeft || p.rows > p.bufferRows-p.windowTop)
         throw std::runtime_error("malformed fixture packet");
+}
+
+constexpr uint32_t childPacketMagic=0x32435456;
+struct ChildPacket {
+    uint32_t magic=childPacketMagic, schema=1, stage=1;
+    uint32_t processId=0, parentId=0, inputMode=0;
+    uint32_t controlCount=0, controlType=0xffffffffu, keyCount=0;
+    uint32_t readReturned=0, readSucceeded=0, readError=0, textCount=0;
+    Key keys[16]={};
+    wchar_t text[256]={};
+};
+inline void validateChild(const ChildPacket &p) {
+    if (p.magic != childPacketMagic || p.schema != 1 || (p.stage != 1 && p.stage != 2) ||
+        p.processId == 0 || p.parentId == 0 || p.controlCount > 128 || p.keyCount > 16 ||
+        p.readReturned > 1 || p.readSucceeded > 1 || p.textCount > 255 ||
+        (p.controlType != 0xffffffffu && p.controlType != CTRL_C_EVENT && p.controlType != CTRL_BREAK_EVENT))
+        throw std::runtime_error("malformed child fixture packet");
+}
+inline bool childInputMatches(const ChildPacket &p,bool defaultHandler,bool unprocessed) {
+    if (defaultHandler) return p.stage == 1 && (p.inputMode&ENABLE_PROCESSED_INPUT) && p.controlCount == 0 && p.keyCount == 0;
+    if (p.stage != 2) return false;
+    if (!unprocessed) return (p.inputMode&ENABLE_PROCESSED_INPUT) && p.controlCount == 1 &&
+        p.controlType == CTRL_C_EVENT && p.keyCount == 0;
+    return !(p.inputMode&ENABLE_PROCESSED_INPUT) && p.controlCount == 0 && p.controlType == 0xffffffffu &&
+        p.keyCount == 2 && p.keys[0].character == 3 && p.keys[0].virtualKey == 'C' &&
+        (p.keys[0].modifiers&LEFT_CTRL_PRESSED) && p.keys[0].repeat == 1 &&
+        p.keys[1].character == 'z' && p.keys[1].virtualKey == 'Z' &&
+        !(p.keys[1].modifiers&(LEFT_CTRL_PRESSED|RIGHT_CTRL_PRESSED)) && p.keys[1].repeat == 1;
+}
+inline uint32_t expectedChildExit(bool defaultHandler) { return defaultHandler ? 0xc000013au : 37u; }
+inline DWORD parentProcessId(DWORD processId) {
+    Handle snapshot(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0));
+    check(snapshot.value != INVALID_HANDLE_VALUE,"process snapshot");
+    PROCESSENTRY32W entry={}; entry.dwSize=sizeof(entry);
+    check(Process32FirstW(snapshot.value,&entry),"first process");
+    do { if (entry.th32ProcessID == processId) return entry.th32ParentProcessID; }
+    while (Process32NextW(snapshot.value,&entry));
+    throw std::runtime_error("fixture process absent from snapshot");
 }
 } // namespace fidelity

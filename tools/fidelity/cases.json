@@ -253,6 +253,149 @@
       "ExpectedError": "deliberately live child detected before cleanup",
       "TimeoutSeconds": 30,
       "OptionalOnLegacy": false
+    },
+    {
+      "Name": "CMD_CHILD_HANDLED",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "CMD_CHILD_DEFAULT",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "CMD_CHILD_UNPROCESSED",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "PS_CHILD_HANDLED",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "PS_CHILD_DEFAULT",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "PS_CHILD_UNPROCESSED",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "PS7_CHILD_HANDLED",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": true
+    },
+    {
+      "Name": "PS7_CHILD_DEFAULT",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": true
+    },
+    {
+      "Name": "PS7_CHILD_UNPROCESSED",
+      "Area": "F02",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": true
+    },
+    {
+      "Name": "READCONSOLE_TRANSPORT",
+      "Area": "F01",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "READCONSOLE_EVENT",
+      "Area": "F01",
+      "Kind": "Characterization",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 0,
+      "ExpectedOutput": "",
+      "ExpectedError": "",
+      "TimeoutSeconds": 60,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "NEGATIVE_CHILD_CONTROL",
+      "Area": "Oracle",
+      "Kind": "NegativeControl",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 1,
+      "ExpectedOutput": "",
+      "ExpectedError": "active child interruption workflow failed",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
+    },
+    {
+      "Name": "NEGATIVE_CHILD_EXIT",
+      "Area": "Oracle",
+      "Kind": "NegativeControl",
+      "Executable": "FidelityTest.exe",
+      "ExpectedExitCode": 1,
+      "ExpectedOutput": "",
+      "ExpectedError": "active child interruption workflow failed",
+      "TimeoutSeconds": 90,
+      "OptionalOnLegacy": false
     }
   ],
   "PendingCoverage": [
@@ -291,12 +434,6 @@
       "Scenario": "Target CPU/memory/input-latency budgets",
       "Status": "NotRun",
       "Reason": "The initial bundle records case/observation timings; target performance workloads and budgets are not yet established."
-    },
-    {
-      "Area": "F02",
-      "Scenario": "Native child interruption and return to each shell prompt",
-      "Status": "NotRun",
-      "Reason": "Initial control cases observe a root fixture handler/key record. Shell child-process policy needs separate recipes."
     },
     {
       "Area": "F05",

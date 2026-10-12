@@ -40,12 +40,15 @@ profiles, execution policy, console settings, or installed code pages.
 
 These IDs define scenario groups rather than one completed test each. The
 initial [baseline bundle](FIDELITY_BASELINE.md) implements 14 bounded workflow
-observations, an independent oracle unit suite and eight fault controls.
+observations in harness version 1. Version 2 extends this to 25 workflow
+observations, the independent state/child-oracle suite and ten fault controls,
+including active children under each shell and two cooked-read probes.
 Its case manifest lists remaining coverage as NotRun. The
 [initial Windows 7 baseline](validation/2026-10-12-step-1.1-windows7-baseline.md)
 pins application identities and records four prompt-cancellation failures per
 tier, passing controlled Unicode/resize and passing A/B PowerShell 7 cases.
-Step 1.1 remains open for active-child interruption and broader recipes.
+Step 1.1 remains open for target validation of the new active-child/cooked-read
+recipes and broader coverage.
 The existing 30-case suite remains a required regression gate.
 
 | ID | Scenario | Required observable result |
@@ -118,7 +121,7 @@ accepting performance changes. Preserve existing 500-session, 100-resize,
 four-handle post-warm-up and 120-minute milestone/release stress gates.
 
 The portable runner remains PowerShell 2.0 compatible. Extend the manifest and
-case-level reports as cases are implemented. The separate initial fidelity
+case-level reports as cases are implemented. The separate fidelity
 bundle does not replace or extend the original 30-case release gate by itself.
 Exact-package qualification follows the
 [manual release process](RELEASING.md).

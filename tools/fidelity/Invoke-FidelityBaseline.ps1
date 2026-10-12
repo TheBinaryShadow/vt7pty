@@ -118,6 +118,8 @@ function Invoke-FidelityCase {
                     $record.Status='NotRun'; $record.Reason='The tested shell engine does not match this tier: '+$observation.ShellIdentity
                 }
             }
+            if ($Case.Name.StartsWith('PS_') -and $observation.Category -eq 'HarnessOrPrerequisiteError' -and
+                $observation.Error -like '*Windows PowerShell case requires*') { $record.Status='NotRun' }
             if ($record.ExitCode -ne 0 -and $record.Status -eq 'Pass') { throw 'Native pass has a failing exit code.' }
             if ($Case.Name.StartsWith('PS7') -and $observation.Category -eq 'HarnessOrPrerequisiteError' -and
                 $observation.Error -like '*PowerShell 7 case requires*') { $record.Status='NotRun' }

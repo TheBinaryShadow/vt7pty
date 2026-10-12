@@ -2,7 +2,7 @@
 param(
     [ValidateLength(1,49)]
     [ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')]
-    [string]$Suffix='step-1.1-rc1',
+    [string]$Suffix='step-1.1-rc2',
     [string]$RuntimeArchive='',
     [switch]$NoBuild
 )
@@ -69,6 +69,13 @@ foreach($relative in $plan.Keys) {
     [IO.Directory]::CreateDirectory((Split-Path -Parent $destination)) | Out-Null
     Copy-Item -LiteralPath (Join-Path $root $plan[$relative]) -Destination $destination
 }
+# The portable README has no adjacent repository validation directory.
+# Pin its evidence links to the harness source instead of shipping broken links.
+$portableReadme=Join-Path $stage 'README.md'
+$readmeText=[IO.File]::ReadAllText($portableReadme)
+$readmeText=[regex]::Replace($readmeText,'\]\(validation/([^)]+)\)',
+    '](https://github.com/TheBinaryShadow/vt7pty/blob/'+$sourceCommit+'/docs/validation/$1)')
+[IO.File]::WriteAllText($portableReadme,$readmeText,[Text.UTF8Encoding]::new($false))
 # Keep the product's original manifest/resources distinct from the new harness.
 Copy-Item -LiteralPath (Join-Path $runtime 'manifest.json') -Destination (Join-Path $stage 'runtime-manifest.json')
 $files=@(Get-ChildItem -LiteralPath $stage -File -Recurse | ForEach-Object {
@@ -78,7 +85,7 @@ $files=@(Get-ChildItem -LiteralPath $stage -File -Recurse | ForEach-Object {
 $manifest=[ordered]@{
     SchemaVersion=1;Kind='VT7PtyFidelityBaseline'
     Runtime=[ordered]@{Version='0.5.0';SourceCommit='cbd17727b3c8af21e5afd4499b8dca7d2140ed9d';ArchiveSha256=$archiveHash;Files=$runtimeFiles}
-    Harness=[ordered]@{Version='1';SourceCommit=$sourceCommit;SourceTreeClean=$true;Configuration='Release';Architecture='x64';
+    Harness=[ordered]@{Version='2';SourceCommit=$sourceCommit;SourceTreeClean=$true;Configuration='Release';Architecture='x64';
         VerificationSha256=(Get-FileHash -LiteralPath (Join-Path $root 'artifacts\verification\x64\Release\verification.json') -Algorithm SHA256).Hash.ToLowerInvariant();
         Toolchain=$verification.InspectionTool}
     Files=$files

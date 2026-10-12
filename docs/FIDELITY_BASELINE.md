@@ -30,8 +30,8 @@ packaging commands use the existing development tools and modern PowerShell.
 
 ## Interpreting results
 
-The 23 entries comprise the state-reader unit suite, 14 initial workflow
-observations and eight deliberate negative controls. Controls pass only when
+Harness version 2 has 36 entries: the state/child-oracle unit suite, 25 workflow
+observations and ten deliberate negative controls. Controls pass only when
 their exact injected failure is detected and owned processes are cleaned up.
 The native control record therefore says Fail while the containing control
 entry says Pass; both remain visible.
@@ -53,13 +53,57 @@ need review against the recorded stream, snapshots and consumer resize policy.
 Text and cursor-width results are separate. RawUtf16CellDifferences is a
 diagnostic count and is not the normalized Unicode text oracle.
 
-Automation uses clean shell profiles. PowerShell 7 imports its bundled PSReadLine
+Automation uses clean shell profiles. Installed Windows PowerShell explicitly
+removes PSReadLine in the test session and verifies native ConsoleHost editing.
+This prevents ambient module discovery from silently changing the editor.
+PowerShell 7 imports its bundled PSReadLine
 with Windows editing, prediction disabled, and session-local history configured
 to SaveNothing. The loaded engine/editor versions, module path and editing/history
 configuration are captured through the tested session.
 Ordinary profiles, full key/mouse/layout coverage, distinct Ctrl+Break, the
 broader code-page matrix, automatic buffer restoration and target performance
 budgets remain listed in PendingCoverage.
+
+## Active-child and cooked-read recipes
+
+Harness version 2 adds nine F02 cases, three for each shell:
+
+| Suffix | Child input/control policy | Expected native completion |
+| --- | --- | --- |
+| CHILD_HANDLED | Processed Ctrl+C; installed handler observes exactly one CTRL_C_EVENT | Fixture writes final output and deliberately exits 37 |
+| CHILD_DEFAULT | Processed Ctrl+C with the default handler and inherited ignore cleared | Native exit status 0xC000013A; no final-output marker required |
+| CHILD_UNPROCESSED | Ordered Ctrl+C and z key records; no control event, released Ctrl modifier | Fixture writes final output and deliberately exits 37 |
+
+Every case validates the private pipe peer, executable image and direct parent
+before adopting process cleanup ownership. It records initial/latest native packets
+(default-handler termination has no final packet),
+actual input mode, handler/key observations, independently queried process exit
+status, the shell's reported exit code, final output where applicable, return to
+the prompt and execution of the next command through a file barrier. Missing
+interruption is a Fail; the test asks only its owned fixture to stop and preserves
+the failed observation. Each child has a 45-second fixture lifetime limit.
+Harness startup has a 20-second shell deadline, interruption and return-to-prompt
+each have a 5-second deadline, and the outer child case limit is 90 seconds.
+
+READCONSOLE_TRANSPORT and READCONSOLE_EVENT isolate a pending cooked ReadConsoleW
+call after an observed PROBE_TYPED echo barrier. The first sends VT byte 0x03
+through the unchanged backend; the second invokes GenerateConsoleCtrlEvent
+inside the owned fixture through its private test channel. Both separately
+record handler delivery and read completion within two seconds. Cancellation
+requires the read to return without the typed text. If it stays pending, the
+test preserves that observation, then sends a boundary Enter and records what
+the read actually returned. Recovery does not convert a failed cancellation
+into a pass. The fixture owns and joins its read thread; cancellation during
+cleanup never frees the read buffer before the thread has returned.
+
+Two new fault controls mutate the child oracle's input control count and native
+exit status respectively. Raw fixture observations remain unchanged. Independent
+unit cases reject duplicate controls, wrong event types, unreleased modifiers,
+extra/repeated keys, malformed packets and out-of-bounds text/key counts.
+
+The seven remaining PendingCoverage groups still need broader recipes. This
+extension does not claim Ctrl+Break, ordinary profiles, keyboard-layout coverage,
+general Unicode width, sustained full-screen resize or performance qualification.
 
 ## Recorded initial baseline
 
@@ -79,7 +123,7 @@ PendingCoverage recipes, and failing workflows have not been accepted.
 
 From a clean checkout, build/verify and create an identified candidate:
 
-    powershell.exe -NoProfile -File .\Package-FidelityBaseline.ps1 -Suffix step-1.1-rc1
+    powershell.exe -NoProfile -File .\Package-FidelityBaseline.ps1 -Suffix step-1.1-rc2
 
 The command verifies the existing regression suite and new binary imports,
 runs the independent oracle tests, and refuses to replace an existing candidate
