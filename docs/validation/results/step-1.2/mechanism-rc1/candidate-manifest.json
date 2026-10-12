@@ -1,0 +1,134 @@
+{
+    "SchemaVersion":  1,
+    "Kind":  "VT7PtyFidelityBaseline",
+    "Runtime":  {
+                    "Version":  "0.5.0",
+                    "SourceCommit":  "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+                    "ArchiveSha256":  "59554a9cf8246395e60f30875e047d1bfa20d4f3f462c113ef705a86708f5304",
+                    "Files":  {
+                                  "VT7Pty.dll":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167",
+                                  "VT7Pty-Agent.exe":  "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+                              }
+                },
+    "Harness":  {
+                    "Version":  "4",
+                    "SourceCommit":  "3937d5493e7460b799eb6d75b1c8fcb81a1f614f",
+                    "SourceTreeClean":  true,
+                    "Configuration":  "Release",
+                    "Architecture":  "x64",
+                    "VerificationSha256":  "35f09348be10d739751c43ea59f099490bd7c6cfe4718130fdfce89bf9d7b593",
+                    "Toolchain":  {
+                                      "DumpbinPath":  "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\dumpbin.exe",
+                                      "DumpbinFileVersion":  "14.44.35228.0",
+                                      "ManifestToolPath":  "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe",
+                                      "ManifestToolFileVersion":  "10.0.26100.8249 (WinBuild.160101.0800)"
+                                  }
+                },
+    "Files":  [
+                  {
+                      "Path":  "cases.json",
+                      "Bytes":  13899,
+                      "Sha256":  "bb3a029618d6a5ff99be6c90ab5233ee2e6b7332fdf9f15dea98f996e4413e96"
+                  },
+                  {
+                      "Path":  "CREDITS.md",
+                      "Bytes":  2542,
+                      "Sha256":  "df18c02b70b3accd3fa764bb9e2937d5513d445a5c483c0271038512ae744f7e"
+                  },
+                  {
+                      "Path":  "INPUT_CANCELLATION.md",
+                      "Bytes":  6671,
+                      "Sha256":  "610324f24297b27a643765cef3bd2661f65309a7f464e12ce70b09070d17d755"
+                  },
+                  {
+                      "Path":  "LICENSE.txt",
+                      "Bytes":  1144,
+                      "Sha256":  "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+                  },
+                  {
+                      "Path":  "README.md",
+                      "Bytes":  12291,
+                      "Sha256":  "e3849ba24d0ffec85125e546a5fe7f31a459abf6b3687186193d0b41ba16f572"
+                  },
+                  {
+                      "Path":  "RUN-FIDELITY-ESU.cmd",
+                      "Bytes":  299,
+                      "Sha256":  "365109064c4632169e0c9f9cf48cbe484ad8e2a2d3cf14b5ff544bace597cb69"
+                  },
+                  {
+                      "Path":  "RUN-FIDELITY-LEGACY.cmd",
+                      "Bytes":  302,
+                      "Sha256":  "a2bb7cb2b1d58445a7418882d5f4595b13d390194b40cbd1c2e2295755af0eba"
+                  },
+                  {
+                      "Path":  "RUN-FIDELITY-NONESU.cmd",
+                      "Bytes":  302,
+                      "Sha256":  "8bba47b08417dc0a79cfb85f108687501b26d90e379f928cc1a60408371de3e8"
+                  },
+                  {
+                      "Path":  "runtime-manifest.json",
+                      "Bytes":  2288,
+                      "Sha256":  "db1b7d067987d1f155f91c1e196e577f62fb530e68f179615793b3c136a231b1"
+                  },
+                  {
+                      "Path":  "UPSTREAM.md",
+                      "Bytes":  3092,
+                      "Sha256":  "87111e157e7fa7dcff679a8d30bb6a500ea3fd394d938110680bfaa4f4c7a4d9"
+                  },
+                  {
+                      "Path":  "bin/FidelityFixture.exe",
+                      "Bytes":  179712,
+                      "Sha256":  "7d14fcebe33df757d80b8a678801b3991230c5c3056d615760dc2cbe96c1e38e"
+                  },
+                  {
+                      "Path":  "bin/FidelityFixture.pdb",
+                      "Bytes":  4861952,
+                      "Sha256":  "e161856e94b46246ac3605c5debecaa9dc135c7d675ef397392bd8364094f4ad"
+                  },
+                  {
+                      "Path":  "bin/FidelityTest.exe",
+                      "Bytes":  404992,
+                      "Sha256":  "20d570693d2158d03a61adf0b90adb114685f4f65b4c4921beae2c3ed5216811"
+                  },
+                  {
+                      "Path":  "bin/FidelityTest.pdb",
+                      "Bytes":  7483392,
+                      "Sha256":  "3f0b98e053f21bf23284a04a5d84f67ff70b980da07f6464f557510f14ed1d5f"
+                  },
+                  {
+                      "Path":  "bin/VT7Pty-Agent.exe",
+                      "Bytes":  628736,
+                      "Sha256":  "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+                  },
+                  {
+                      "Path":  "bin/VT7Pty.dll",
+                      "Bytes":  507904,
+                      "Sha256":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167"
+                  },
+                  {
+                      "Path":  "bin/VtStateTest.exe",
+                      "Bytes":  209920,
+                      "Sha256":  "ad12e67d54689a155e03d19c893b33afeca802a0aca75196add4faaf525a2033"
+                  },
+                  {
+                      "Path":  "bin/VtStateTest.pdb",
+                      "Bytes":  4771840,
+                      "Sha256":  "fec52284715ccd5b1608f0ac4ced100a0c6529776e4b5c3aa0f5489842fde724"
+                  },
+                  {
+                      "Path":  "tools/fidelity/Invoke-FidelityBaseline.ps1",
+                      "Bytes":  13662,
+                      "Sha256":  "c843a673897797f4be1a051b2e79dc167ec44a00f6f9e2a88a30c043512607f6"
+                  },
+                  {
+                      "Path":  "tools/fidelity/Test-PortableJson.ps1",
+                      "Bytes":  2107,
+                      "Sha256":  "2d5c68514510a4e0b6c964846aa962f42641176fd00fa8cfbe7921e546679166"
+                  },
+                  {
+                      "Path":  "tools/platform/Windows7Compat.ps1",
+                      "Bytes":  3716,
+                      "Sha256":  "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+                  }
+              ]
+}

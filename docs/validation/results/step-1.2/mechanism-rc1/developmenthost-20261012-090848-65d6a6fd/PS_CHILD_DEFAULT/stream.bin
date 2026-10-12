@@ -1,0 +1,19 @@
+[0m[0KFIDELITY_PS_PROMPT>[0K$m=Get-Module PSReadLine; $mv='none'; $cfg='native-ConsoleHo[0Ks[?25l
+t'; if($m){$mv=$m.Version.ToString(); $o=Get-PSReadLineOption; $cfg=$m.Path+'|'[0K+
+$o.EditMode.ToString()+'|'+$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAll[0KT
+ext('D:\Git\vt7pty\artifacts\fidelity\inspection-step-1.2-mechanism-rc1\results[0K\
+developmenthost-20261012-090848-65d6a6fd\PS_CHILD_DEFAULT\shell-identity.txt',$[0KP
+SVersionTable.PSVersion.ToString()+'|'+$mv+'|'+$Host.Name+'|'+$cfg)[0K
+FIDELITY_PS_PROMPT>[0K[?25h]0;VT7Pty controlled fidelity fixture& 'D:\Git\vt7pty\artifacts\fidelity\inspection-step-1.2-mech[0Ka[?25l
+nism-rc1\bin\FidelityFixture.exe' 'CHILD_DEFAULT' '\\.\pipe\VT7Pty.Child.13820.[0K3
+99959078' 13820[0K
+[0K[?25h]0; [?25l
+CHILD_READY[0K
+FIDELITY_PS_PROMPT>[0K[?25h[IO.File]::WriteAllText('D:\Git\vt7pty\artifacts\fidelity\in[0Ks[?25l
+pection-step-1.2-mechanism-rc1\results\developmenthost-20261012-090848-65d6a6fd[0K\
+PS_CHILD_DEFAULT\child-exit-code.txt',$LASTEXITCODE.ToString()); [IO.File]::Wri[0Kt
+eAllText('D:\Git\vt7pty\artifacts\fidelity\inspection-step-1.2-mechanism-rc1\re[0Ks
+ults\developmenthost-20261012-090848-65d6a6fd\PS_CHILD_DEFAULT\continued-comman[0Kd
+.txt','CONTINUE')[0K
+FIDELITY_PS_PROMPT>exit 0[0K
+[0K[?25h

@@ -91,7 +91,9 @@ remain research findings, not supported product capabilities.
 
 ## Next gate
 
-Run the identified version 4 candidate on the Windows 7 tiers. Preserve API
+The [identified version 4 candidate](validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
+preserves the full development comparison and independent evidence checks.
+Run it on the Windows 7 tiers. Preserve API
 errors and the second-read result as well as the original failures and guards.
 If neither public-API probe meets the contract, use that evidence to choose
 between further console-host research and an application-facing read shim.

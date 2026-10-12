@@ -177,6 +177,15 @@ The target review preserves complete failed records as baseline evidence;
 seven remaining coverage groups keep Step 1.1 open. Future candidates must
 retain actual failures and obtain their own applicable target evidence.
 
+## Current mechanism candidate
+
+[Step-1.2-mechanism-rc1](validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
+contains the version 4 public-API probes and all prior recipes. Its development
+run reports 29 Pass / 10 Fail: the eight prior workflow failures and two mechanism
+failures, with no harness errors. The second-read check detects lost new input
+after an apparently successful direct cancellation. Windows 7 results are pending.
+This is a research candidate with unchanged 0.5.0 runtime, not a production fix.
+
 ## Development commands
 
 From a clean checkout, build/verify and create an identified candidate:

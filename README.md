@@ -56,7 +56,8 @@ case passing, and successful native/portable JSON oracles, including PowerShell 
 The target probes confirm retained cooked input after control-handler delivery.
 [Step 1.2 cancellation research](docs/INPUT_CANCELLATION.md) adds controlled
 public-API mechanism probes with a second-read check; Windows 7 results are
-pending. There is no production cancellation fix yet.
+pending. The [mechanism candidate](docs/validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
+records the new development observations. There is no production cancellation fix yet.
 Input, output/Unicode,
 resize, full-screen state and lifecycle improvements follow the measurements.
 Console-SSH testing is deferred optional work. The VT7-facing API and standalone
