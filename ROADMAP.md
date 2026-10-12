@@ -1,6 +1,6 @@
 # VT7Pty Roadmap
 
-Status: Milestone 0 complete; Milestone 1 next. Updated: 2026-10-02.
+Status: Milestone 0 complete; Milestone 1 execution plan established. Updated: 2026-10-12.
 
 This file owns milestone scope and completion. It records intended work, not
 implemented capability. Milestones follow technical dependencies rather than
@@ -80,7 +80,7 @@ recorded separately by the checked items below.
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Fully modernized, native VT7Pty 0.5.x foundation | Complete; exact `0.5.0` release accepted and published |
-| 1 | Measured backend fidelity and reliability improvements | Next; application corpus and acceptance criteria to be fixed from baseline evidence |
+| 1 | Measured backend fidelity and reliability improvements | Planned as Steps 1.1-1.6; implementation and target characterization begin with Step 1.1 |
 | 2 | Documented VT7Pty API and standalone integration host | Planned after proven backend behavior |
 | 3 | Versioned backend handoff ready for separately authorized VT7 integration | Planned after API and standalone-host validation |
 | Later | Other consumers and optional ConPTY user-mode compatibility | Deferred |
@@ -396,30 +396,85 @@ integration, or ConPTY compatibility.
 
 ## Milestone 1: Improve backend fidelity and reliability
 
-The first work is to define a reproducible application corpus and pass/fail
-criteria, using the released `0.5.0` behavior as the comparison point. Local
-shells, native child programs, full-screen applications, input/control handling,
-Unicode, resize, screen restoration, and teardown are candidate measurements,
-not accepted fidelity claims. The console-SSH/full-screen path has an
-[unresolved baseline dependency](docs/SSH_BASELINE.md); VT7's direct SSH
-transport does not exercise this backend.
+The [fidelity execution plan](docs/FIDELITY.md) defines the local application
+corpus, F01-F09 measurements, oracles, budgets and evidence. The released
+0.5.0 runtime is the comparison point. The plan is established; its new cases
+have not yet been implemented or run. Existing Milestone 0 acceptance does
+not qualify these additional workflows.
 
-VT7's current WinPTY transport is reference material for required consumer
-behavior. An early integration proof can follow a narrow API contract and a
-standalone host in this repository; it is not the production handoff or an
-authorization to edit VT7.
+Console-SSH and remote full-screen applications are deferred optional scenarios
+and do not block this local milestone. Their [setup prerequisites](docs/SSH_BASELINE.md)
+remain documented. VT7's direct SSH transport bypasses VT7Pty.
 
-- [ ] Define the application corpus and measurable fidelity criteria from the
-  Milestone 0 baseline, including local shells and the identified SSH path.
-- [ ] Prioritize and improve input semantics, output/state reconstruction,
-  Unicode preservation, resize, screen restoration, and lifecycle behavior.
-- [ ] Add regression coverage and Windows 7 evidence with each accepted change.
-- [ ] Where screen scraping cannot preserve required information, prove an
-  adaptation or record an explicit scope decision.
-- [ ] Publish tested capabilities, limitations, stability, and performance.
+### Step 1.1: Establish the local fidelity harness and baseline
 
-Exit criterion: agreed application workflows meet their documented Windows 7+
+- [ ] Pin application identities and tier applicability for Command Prompt,
+  installed Windows PowerShell, PowerShell 7.2.24 and controlled native fixtures.
+- [ ] Add a bounded, independently tested VT state reader and synchronized
+  fixture observations; extend portable case-level reports and negative controls.
+- [ ] Characterize the exact 0.5.0 runtime on the development host and three
+  Windows 7 tiers, starting with prompt cancellation and active-child interrupts.
+- [ ] Record missing prerequisites, limitations and reproducible failures;
+  prioritize fixes without inferring VT7Pty behavior from WinPTY 0.4.3 results.
+
+Exit criterion: the harness detects incorrect state and input, and each required
+baseline workflow has identified application/runtime/harness evidence or an
+explicit unresolved prerequisite. Required missing evidence keeps this step open.
+
+### Step 1.2: Improve input and control semantics
+
+- [ ] Resolve measured F01-F03 failures in prompt cancellation, active-child
+  interrupts, processed/unprocessed input, editing, modifiers, text and paste.
+- [ ] Add focused regressions and validate actual US/Croatian layout behavior
+  where record-level automation cannot establish it.
+
+Exit criterion: the defined input workflows pass without duplicate/lost input,
+incorrect child interruption, or a broken shell after cancellation.
+
+### Step 1.3: Improve output and Unicode reconstruction
+
+- [ ] Resolve measured F04-F05 failures in cells, cursor, supported attributes,
+  erase, wrap, scroll, encoding and requested/actual code-page behavior.
+- [ ] Record text and width results separately; prove a narrow adaptation or
+  obtain an explicit scope decision for information lost by the backing console.
+
+Exit criterion: required stable states and text match independently checked
+expectations; raw-VT, width and intermediate-state limitations are explicit.
+
+### Step 1.4: Improve full-screen restoration and resize
+
+- [ ] Resolve measured F06-F07 failures in active-buffer transitions, return to
+  the original screen, shell repaint and authoritative child dimensions.
+- [ ] Exercise repeated resize during editing/output and application exit.
+
+Exit criterion: full-screen fixtures and shells converge to the required state
+after resize and exit with no unexplained lasting corruption or hang.
+
+### Step 1.5: Validate lifecycle and resource behavior under real workloads
+
+- [ ] Resolve measured F08-F09 failures in final drain, child status, close,
+  failure cleanup, response times and resource stability.
+- [ ] Preserve existing lifecycle/stress gates and establish target-derived
+  performance budgets before accepting performance changes.
+
+Exit criterion: application workloads meet bounded lifetime/resource contracts
+and preserve the accepted 0.5.0 regression suite.
+
+### Step 1.6: Accept and publish the improved backend capability record
+
+- [ ] Run the exact milestone candidate against the required corpus and existing
+  suite on all designated Windows 7 tiers, including the full soak.
+- [ ] Resolve required failures or obtain explicit scope dispositions; publish
+  exact identities, capabilities, limitations and performance measurements.
+- [ ] Link acceptance evidence and the remaining VT7-facing contract requirements
+  before Milestone 2 API work.
+
+Exit criterion: agreed local workflows meet their documented Windows 7+
 fidelity and reliability criteria with no unexplained baseline regression.
+
+VT7's transport remains reference material. An early consumer proof requires
+a narrow API contract and a standalone host in this repository; actual VT7
+integration follows the separately authorized handoff.
 
 ## Milestone 2: Define the VT7 integration API
 

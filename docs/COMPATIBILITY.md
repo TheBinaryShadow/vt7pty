@@ -1,7 +1,7 @@
 # VT7Pty Compatibility Contract
 
 Status: approved target contract; exact 0.5.0 release package accepted on all three tiers.
-Updated: 2026-10-02.
+Updated: 2026-10-12.
 
 This document separates approved targets from verified support. A target is not
 a compatibility claim until an identified build passes the required procedure.
@@ -108,8 +108,11 @@ output, Unicode, resize, cancellation, screen restoration, process lifetime,
 and shutdown behavior.
 
 Command Prompt and Windows PowerShell are initial required local applications.
-The SSH/full-screen application path will be fixed from measured Milestone 0
-evidence rather than assumed. See [Testing](TESTING.md).
+The [Milestone 1 fidelity plan](FIDELITY.md) adds an explicit local corpus and
+tier-specific shell requirements, including PowerShell 7.2.24 on designated
+tiers. These planned workflows are not qualified by the 0.5.0 suite. Console-SSH
+and remote full-screen testing are deferred optional scenarios. See
+[Testing](TESTING.md) for execution and evidence requirements.
 
 ## ConPTY and other consumers
 

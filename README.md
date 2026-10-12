@@ -38,10 +38,13 @@ pre-Windows 7 compatibility, established the VT7Pty 0.5.x identity, modernized
 the retained C++ code, and created the permanent local build, test,
 diagnostic, and manual release systems.
 
-Milestone 1 is next: measure and improve application-facing fidelity against a
-defined corpus. The VT7-facing API and standalone integration host follow in
-Milestone 2, then a versioned handoff in Milestone 3. No VT7 integration or
-ConPTY compatibility is claimed by the `0.5.0` release.
+Milestone 1 now has a [fidelity execution plan](docs/FIDELITY.md) and numbered
+roadmap Steps 1.1-1.6. Implementation starts with the local application harness
+and 0.5.0 characterization, then measured input, output/Unicode, resize,
+full-screen state, and lifecycle improvements. New fidelity cases are not yet implemented
+or accepted. Console-SSH testing is deferred optional work. The VT7-facing API
+and standalone consumer follow in Milestone 2, then a versioned handoff in
+Milestone 3.
 
 The Cygwin/MSYS adapter and superseded GYP, GNU Make, Python 2 packaging, and
 hosted-build infrastructure have been removed. Active binaries, headers,

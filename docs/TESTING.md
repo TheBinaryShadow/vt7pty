@@ -1,7 +1,7 @@
 # VT7Pty Testing Strategy
 
-Status: approved Milestone 0 strategy; Step 0.9 accepted on all three Windows 7 tiers.
-Updated: 2026-10-02.
+Status: Milestone 0 accepted; Milestone 1 fidelity execution plan established.
+Updated: 2026-10-12.
 
 This document defines how VT7Pty distinguishes preserved WinPTY behavior, new
 regressions, inherited limitations, and accepted improvements. Results must
@@ -179,9 +179,16 @@ Command Prompt and Windows PowerShell are required local acceptance cases.
 Record exact versions and relevant configuration such as profiles or line-editing
 modules.
 
-SSH, Vim, and htop remain useful fidelity scenarios. The exact unresolved
-dependency and the criteria for a Milestone 1 baseline are recorded in
-[SSH and full-screen baseline dependency](SSH_BASELINE.md).
+The [Milestone 1 fidelity plan](FIDELITY.md) defines the local shell/native
+application corpus, planned F01-F09 cases, state oracles, budgets, and evidence.
+The existing marker checks do not establish complete screen/cursor/attribute
+fidelity. New cases extend the manifest and portable runner when implemented;
+their current status is NotRun. Preserve the existing 30-case regression suite.
+
+Console-SSH and remote Vim/htop are deferred optional scenarios, with
+[setup prerequisites](SSH_BASELINE.md) retained for later use. They do not
+block local Milestone 1 acceptance. VT7's direct SSH transport bypasses this
+backend.
 
 ## Negative controls
 

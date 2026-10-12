@@ -1,27 +1,32 @@
-# SSH and Full-Screen Baseline Dependency
+# Optional Console-SSH Baseline
 
-Status: unresolved dependency for Milestone 1. Updated: 2026-09-24.
+Status: deferred optional scenario; not a local Milestone 1 acceptance dependency.
+Updated: 2026-10-12.
 
-Step 0.8 defines the remote application baseline instead of claiming an
-unmeasured result. The current VT7Pty test package verifies local Command
-Prompt, Windows PowerShell, console input and output, Unicode, resize, and
-lifecycle behavior. It does not include a Windows 7-qualified console SSH
-client or a controlled remote endpoint. VT7's direct SSH transport is a
-different path and does not exercise VT7Pty's application-facing backend.
+Earlier testing plans retained SSH and remote full-screen applications as
+an unresolved dependency. The [Milestone 1 fidelity plan](FIDELITY.md) now
+prioritizes local shells, native children and controlled full-screen fixtures.
+A remote endpoint and console SSH client are not required to begin or complete
+that local milestone.
 
-Before SSH, Vim, htop, or another full-screen remote application becomes a
-Milestone 1 regression gate, fix and record all of the following:
+This scenario would launch a Windows console SSH client inside VT7Pty and
+exercise its input/output path against remote applications such as Vim or
+htop. VT7's built-in direct SSH transport bypasses VT7Pty and is a separate
+consumer path.
 
-- an exact Windows 7-compatible console SSH client binary, version, license,
-  and SHA-256 hash that launches inside VT7Pty;
-- a controlled remote host and OS, server version, shell, authentication method,
-  locale, `TERM`, and application versions;
-- credential-safe setup, host-key verification, and a disposable test account;
-- terminal geometry, input sequence, observable screen-state expectations,
-  resize sequence, cancellation, exit, and cleanup criteria; and
-- matching non-ESU, ESU, and legacy PowerShell 2.0 Windows 7 result records for
-  the same candidate.
+## Prerequisites if activated later
 
-Until these dependencies are fixed, the remote baseline is **NotRun**, not a
-backend pass or failure. Local full-screen fixture behavior can be added to
-the maintained package without implying SSH fidelity.
+Before this scenario becomes a gate, record:
+
+- an exact Windows 7-compatible console SSH client binary, version, license
+  and SHA-256 that launches inside VT7Pty;
+- a controlled remote host/OS, server version, shell, authentication method,
+  locale, TERM and application versions;
+- host-key verification, credential-safe setup and a disposable test account;
+- geometry, input recipe, expected screen state, resize, cancellation, exit
+  and cleanup criteria; and
+- designated Windows 7 acceptance tiers and matching exact-candidate evidence.
+
+Until activated and executed, the scenario is deferred and NotRun. It is not
+a backend pass or failure, and does not block local fidelity acceptance.
+Local full-screen results do not imply remote SSH fidelity.

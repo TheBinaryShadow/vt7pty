@@ -2,8 +2,8 @@
 
 This procedure validates a specific VT7Pty candidate on the three physical
 Windows 7 SP1 x64 tiers defined in [COMPATIBILITY.md](COMPATIBILITY.md). It is
-the target-side gate for Milestone 0 candidates and remains separate from
-development-host verification.
+the target-side gate for milestone and release candidates and remains separate
+from development-host verification.
 
 ## Candidate preparation
 
@@ -105,8 +105,10 @@ manifest and all three returned JSON records.
 The target JSON and text records include per-case status and duration, package
 and OS/update identity, and any dump or WER files found in the results
 directory. Preserve generated diagnostic logs and bundles alongside the result
-pair. The remote SSH/full-screen application baseline remains [an explicit
-dependency](SSH_BASELINE.md) for Milestone 1.
+pair. The [Milestone 1 fidelity plan](FIDELITY.md) adds local application
+cases as they are implemented; the current 30-case bundle does not already
+run them. Console-SSH/remote full-screen testing is [deferred optional work](SSH_BASELINE.md)
+and does not block the local milestone.
 
 ## Result handling
 
