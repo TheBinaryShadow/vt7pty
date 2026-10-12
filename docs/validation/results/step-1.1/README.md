@@ -35,7 +35,9 @@ PendingCoverage groups remain NotRun and MilestoneAccepted remains false for rc1
 
 [rc3/README.md](rc3/README.md) indexes the separately qualified 37-entry
 development-host extension, exact metadata and clean verification reports.
-It records 29 Pass / 8 Fail, including nine passing active-child cases and
-two failed cooked-read probes. Seven broader groups remain pending in rc3.
-The original directories above retain the unchanged rc1 records; they do not
+It retains the 29 Pass / 8 Fail development run alongside the later three
+rc3 target runs: 31 Pass / 6 Fail on NESSY and TURTLE, 26 Pass / 6 Fail /
+5 NotApplicable on LEOPARD. Every applicable active-child case passes; both
+cooked-read probes fail on every target. Seven broader groups remain pending.
+The original directories above retain unchanged rc1 records; they do not
 qualify the extension.

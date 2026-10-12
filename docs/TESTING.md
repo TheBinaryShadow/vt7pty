@@ -188,8 +188,12 @@ bounded state/input/shell observations and fault controls against the unchanged
 the [initial Windows 7 review](validation/2026-10-12-step-1.1-windows7-baseline.md)
 preserves all three target runs and their four prompt-cancellation failures per
 machine. The version 1 initial characterization is complete. Harness version 3 adds
-active-child and cooked-read cases; their Windows 7 validation, broader Step 1.1
-coverage and milestone acceptance remain open. Preserve the existing 30-case regression suite
+active-child and cooked-read cases; their
+[three-tier review](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md) records
+all applicable child cases passing and six cancellation failures per machine.
+Portable JSON round-trips pass under both installed engine generations. Broader
+Step 1.1 coverage and milestone acceptance remain open. Preserve the existing
+30-case regression suite
 and review the new binary imports through the maintained verifier. The
 [rc3 review](validation/2026-10-12-step-1.1-rc3-candidate.md) preserves complete local
 extension evidence and verifies native/aggregate metadata equality before handoff.

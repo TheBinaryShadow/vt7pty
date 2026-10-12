@@ -1,6 +1,6 @@
 # Milestone 1 Fidelity Plan
 
-Status: initial three-tier Step 1.1 baseline recorded; rc3 extension locally verified, Windows 7 extension and broader coverage pending.
+Status: rc3 Step 1.1 corpus measured on the development host and all three Windows 7 tiers; broader coverage pending.
 Updated: 2026-10-12.
 
 The [roadmap](../ROADMAP.md) owns completion. This document defines the local
@@ -47,10 +47,13 @@ Its case manifest lists remaining coverage as NotRun. The
 [initial Windows 7 baseline](validation/2026-10-12-step-1.1-windows7-baseline.md)
 pins application identities and records four prompt-cancellation failures per
 tier, passing controlled Unicode/resize and passing A/B PowerShell 7 cases.
-Step 1.1 remains open for target validation of the new active-child/cooked-read
-recipes and broader coverage.
-The [rc3 candidate record](validation/2026-10-12-step-1.1-rc3-candidate.md) links
-local active-child results, cooked-read diagnosis and exact target handoff.
+The [rc3 target baseline](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
+records every applicable active-child case passing and six cancellation failures
+per target: the four prompt cases and two cooked-read probes. The pending read
+retains typed text despite one control-handler event. The portable JSON oracle
+passes on PowerShell 2.0 and 5.1. Broader coverage keeps Step 1.1 open.
+The [rc3 candidate record](validation/2026-10-12-step-1.1-rc3-candidate.md) retains
+the separate development-host results and exact bundle identity.
 The existing 30-case suite remains a required regression gate.
 
 | ID | Scenario | Required observable result |

@@ -147,7 +147,9 @@ unchanged 0.5.0 binaries. The
 records target observations and retained prompt-cancellation failures. Broader
 Step 1.1 coverage remains open. The [rc3 extension](validation/2026-10-12-step-1.1-rc3-candidate.md)
 separately measures native-child event/key delivery and cooked-read cancellation;
-its Windows 7 runs remain pending. Milestone 2 defines the VT7Pty integration API
+the [three-tier target results](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
+confirm passing child policies and retained cooked input after handler delivery.
+Broader baseline coverage remains open. Milestone 2 defines the VT7Pty integration API
 around the proven backend. That API will borrow useful ConPTY
 conventions but must specify an
 explicit Windows 7 process-launch operation and complete ownership, concurrency,

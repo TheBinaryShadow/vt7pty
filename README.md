@@ -49,8 +49,12 @@ Broader recipes remain pending; Step 1.1 stays open. The
 retains the separate development-host evidence. The
 [rc3 extension](docs/validation/2026-10-12-step-1.1-rc3-candidate.md) adds active-child
 and cooked-read recipes, portable JSON verification and explicit native ConsoleHost
-editing for installed Windows PowerShell. It is locally verified; its three
-Windows 7 runs remain pending. Input, output/Unicode,
+editing for installed Windows PowerShell. Its
+[three-tier target review](docs/validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
+records six cancellation failures per machine, every applicable active-child
+case passing, and successful native/portable JSON oracles, including PowerShell 2.0.
+The target probes confirm retained cooked input after control-handler delivery.
+Input, output/Unicode,
 resize, full-screen state and lifecycle improvements follow the measurements.
 Console-SSH testing is deferred optional work. The VT7-facing API and standalone
 consumer follow in Milestone 2, then a versioned handoff in Milestone 3.

@@ -126,16 +126,23 @@ PendingCoverage recipes, and failing workflows have not been accepted.
 
 ## Current extension candidate
 
-Use [step-1.1-rc3](validation/2026-10-12-step-1.1-rc3-candidate.md) for the new
-Windows 7 extension runs. Its 37-entry development-host comparison reports
-29 Pass / 8 Fail with both oracles and all fault controls passing. All nine
-active-child cases pass locally. Both cooked-read probes deliver one Ctrl+C
-event but leave ReadConsole pending with retained typed text.
+[Step-1.1-rc3](validation/2026-10-12-step-1.1-rc3-candidate.md) has completed its
+[three-tier target characterization](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md):
+NESSY and TURTLE each report 31 Pass / 6 Fail; LEOPARD reports 26 Pass / 6 Fail /
+5 NotApplicable. Every applicable active-child case passes. Both oracles and all
+ten fault controls pass on every target, including portable JSON under PowerShell 2.0.
+
+The same six cancellation cases fail on all targets: four native-editor prompt
+cases and two cooked-read probes. Each probe delivers one Ctrl+C event but leaves
+ReadConsole pending with retained typed text. These results supplement the
+separate development-host comparison of 29 Pass / 8 Fail; bounded Unicode and
+resize pass on Windows 7.
 
 Rc2 was stopped before handoff because its aggregate serializer lost nested
 child metadata. Rc3 corrects that and verifies all native/aggregate observations.
-Return complete failed records as baseline evidence; the seven remaining
-coverage groups and Windows 7 extension validation keep Step 1.1 open.
+The target review preserves complete failed records as baseline evidence;
+seven remaining coverage groups keep Step 1.1 open. Future candidates must
+retain actual failures and obtain their own applicable target evidence.
 
 ## Development commands
 

@@ -1,6 +1,6 @@
 # VT7Pty Roadmap
 
-Status: Milestone 0 complete; initial three-tier baseline recorded; active-child/cooked-read extension locally verified, target runs and broader recipes pending. Updated: 2026-10-12.
+Status: Milestone 0 complete; rc3 three-tier fidelity baseline recorded, six cancellation failures per machine; broader Step 1.1 coverage pending. Updated: 2026-10-12.
 
 This file owns milestone scope and completion. It records intended work, not
 implemented capability. Milestones follow technical dependencies rather than
@@ -80,7 +80,7 @@ recorded separately by the checked items below.
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Fully modernized, native VT7Pty 0.5.x foundation | Complete; exact `0.5.0` release accepted and published |
-| 1 | Measured backend fidelity and reliability improvements | Initial Windows 7 baseline recorded; rc3 active-child/cooked-read extension awaiting targets, broader Step 1.1 coverage pending |
+| 1 | Measured backend fidelity and reliability improvements | rc3 three-tier baseline recorded; six cancellation failures per machine, broader Step 1.1 coverage pending |
 | 2 | Documented VT7Pty API and standalone integration host | Planned after proven backend behavior |
 | 3 | Versioned backend handoff ready for separately authorized VT7 integration | Planned after API and standalone-host validation |
 | Later | Other consumers and optional ConPTY user-mode compatibility | Deferred |
@@ -402,6 +402,8 @@ corpus, F01-F09 measurements, oracles, budgets and evidence. The released
 implements bounded local scenarios and fault controls against the unchanged
 release binaries. The [initial Windows 7 baseline](docs/validation/2026-10-12-step-1.1-windows7-baseline.md)
 records all three tiers and retains four prompt-cancellation failures per machine.
+The later [rc3 target baseline](docs/validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
+records passing active-child policies and six cancellation failures per machine.
 Broader case recipes remain pending; existing Milestone 0 acceptance does not
 qualify these additional workflows.
 
@@ -418,9 +420,11 @@ remain documented. VT7's direct SSH transport bypasses VT7Pty.
 - [ ] Complete a bounded, independently tested VT state reader and synchronized
   fixture observations, portable reports and fault controls. The initial
   implementation is validated on the initial corpus; rc3 extends active-child,
-  cooked-read and report oracles locally. Target extension and broader recipes remain open.
+  cooked-read and report oracles on all three targets. Broader recipes remain open.
 - [ ] Characterize the exact 0.5.0 runtime on the development host and three
   Windows 7 tiers, starting with prompt cancellation and active-child interrupts.
+  The rc3 37-entry corpus is measured on all four hosts; seven broader groups
+  still need recipes/evidence before the complete baseline scope can close.
 - [ ] Record missing prerequisites, limitations and reproducible failures;
   prioritize fixes without inferring VT7Pty behavior from WinPTY 0.4.3 results.
 
@@ -436,8 +440,11 @@ records the exact candidate on NESSY, TURTLE and LEOPARD. Four prompt-cancellati
 workflows fail on each machine; controlled Unicode and resize pass on all three.
 The [rc3 extension](docs/validation/2026-10-12-step-1.1-rc3-candidate.md) adds nine
 active-child recipes, two cooked-read probes and portable JSON verification.
-All active-child cases pass locally; cooked-read cancellation still fails.
-Its target runs and broader recipes remain pending; Step 1.1 is not complete.
+The [rc3 target review](docs/validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
+records every applicable active-child case passing on all three tiers. Both
+cooked-read probes deliver one event but retain pending typed input, alongside
+the four prompt failures. The corrected portable JSON oracle passes under
+PowerShell 2.0 as well as 5.1. Broader recipes remain pending; Step 1.1 is not complete.
 
 ### Step 1.2: Improve input and control semantics
 
