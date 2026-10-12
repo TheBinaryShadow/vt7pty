@@ -1,6 +1,6 @@
 # Milestone 1 Fidelity Plan
 
-Status: execution plan established; new fidelity cases not yet implemented or run.
+Status: initial Step 1.1 harness implemented and exercised locally; Windows 7 characterization and broader recipes pending.
 Updated: 2026-10-12.
 
 The [roadmap](../ROADMAP.md) owns completion. This document defines the local
@@ -38,8 +38,11 @@ profiles, execution policy, console settings, or installed code pages.
 
 ## Measurement matrix
 
-These IDs are planned cases. Each starts as NotRun until implemented and
-executed. The existing 30-case suite remains a required regression gate.
+These IDs define scenario groups rather than one completed test each. The
+initial [baseline bundle](FIDELITY_BASELINE.md) implements 14 bounded workflow
+observations, an independent oracle unit suite and eight fault controls.
+Its case manifest lists remaining coverage as NotRun. The existing 30-case
+suite remains a required regression gate.
 
 | ID | Scenario | Required observable result |
 | --- | --- | --- |
@@ -111,8 +114,9 @@ accepting performance changes. Preserve existing 500-session, 100-resize,
 four-handle post-warm-up and 120-minute milestone/release stress gates.
 
 The portable runner remains PowerShell 2.0 compatible. Extend the manifest and
-case-level reports as cases are implemented; F01-F09 are not already part of
-the current suite. Exact-package qualification follows the
+case-level reports as cases are implemented. The separate initial fidelity
+bundle does not replace or extend the original 30-case release gate by itself.
+Exact-package qualification follows the
 [manual release process](RELEASING.md).
 
 ## Evidence and disposition

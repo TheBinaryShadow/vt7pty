@@ -139,8 +139,10 @@ established Windows 7 release acceptance. The exact 0.5.0 baseline is
 [published](validation/2026-10-02-0.5.0-publication.md).
 
 Milestone 1 improves observable backend behavior against the local corpus and
-state measurements in the [fidelity plan](FIDELITY.md). Its harness and new cases
-are planned work, not implemented capability. Milestone 2 defines the VT7Pty
+state measurements in the [fidelity plan](FIDELITY.md). The initial independent
+reader and controlled fixtures are implemented in tests/fidelity, tests/unit
+and tests/fixtures; the [baseline bundle](FIDELITY_BASELINE.md) characterizes
+unchanged 0.5.0 binaries. Broader coverage and Windows 7 validation remain open. Milestone 2 defines the VT7Pty
 integration API around the proven backend. That API will borrow useful ConPTY
 conventions but must specify an
 explicit Windows 7 process-launch operation and complete ownership, concurrency,

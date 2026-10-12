@@ -312,6 +312,9 @@ $expectedImports = [ordered]@{
     'BackendSmokeTest.exe' = @('KERNEL32.dll', 'VT7Pty.dll')
     'SessionContractTest.exe' = @('KERNEL32.dll', 'VT7Pty.dll')
     'SessionFixture.exe' = @('KERNEL32.dll')
+    'VtStateTest.exe' = @('KERNEL32.dll')
+    'FidelityFixture.exe' = @('KERNEL32.dll')
+    'FidelityTest.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'VT7Pty.dll')
     'ProtocolTest.exe' = @('KERNEL32.dll')
     'ProtocolTestAgent.exe' = @('KERNEL32.dll')
     'ModernCppTest.exe' = @('KERNEL32.dll')
@@ -373,6 +376,9 @@ foreach ($configurationName in $configurations) {
         'BackendSmokeTest.exe', 'BackendSmokeTest.pdb',
         'SessionContractTest.exe', 'SessionContractTest.pdb',
         'SessionFixture.exe', 'SessionFixture.pdb',
+        'VtStateTest.exe', 'VtStateTest.pdb',
+        'FidelityFixture.exe', 'FidelityFixture.pdb',
+        'FidelityTest.exe', 'FidelityTest.pdb',
         'ProtocolTest.exe', 'ProtocolTest.pdb',
         'ProtocolTestAgent.exe', 'ProtocolTestAgent.pdb',
         'fixture-console-color-grid.exe', 'fixture-console-color-grid.pdb',

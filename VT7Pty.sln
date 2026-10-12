@@ -42,6 +42,12 @@ Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "SessionFixture", "projects\
 EndProject
 Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "SessionContractTest", "projects\SessionContractTest.vcxproj", "{49DB15C5-A350-43E2-A88D-E94DA7D70F63}"
 EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "VtStateTest", "projects\VtStateTest.vcxproj", "{46923FC3-93E7-4BD6-98C4-6F94BCDA5AF1}"
+EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "FidelityFixture", "projects\FidelityFixture.vcxproj", "{A7C4F8D5-7AA2-4197-B988-6D143F068435}"
+EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "FidelityTest", "projects\FidelityTest.vcxproj", "{09578A7E-E18C-4C9E-8FC9-5DDA12AC87A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -128,6 +134,18 @@ Global
 		{49DB15C5-A350-43E2-A88D-E94DA7D70F63}.Debug|x64.Build.0 = Debug|x64
 		{49DB15C5-A350-43E2-A88D-E94DA7D70F63}.Release|x64.ActiveCfg = Release|x64
 		{49DB15C5-A350-43E2-A88D-E94DA7D70F63}.Release|x64.Build.0 = Release|x64
+		{46923FC3-93E7-4BD6-98C4-6F94BCDA5AF1}.Debug|x64.ActiveCfg = Debug|x64
+		{46923FC3-93E7-4BD6-98C4-6F94BCDA5AF1}.Debug|x64.Build.0 = Debug|x64
+		{46923FC3-93E7-4BD6-98C4-6F94BCDA5AF1}.Release|x64.ActiveCfg = Release|x64
+		{46923FC3-93E7-4BD6-98C4-6F94BCDA5AF1}.Release|x64.Build.0 = Release|x64
+		{A7C4F8D5-7AA2-4197-B988-6D143F068435}.Debug|x64.ActiveCfg = Debug|x64
+		{A7C4F8D5-7AA2-4197-B988-6D143F068435}.Debug|x64.Build.0 = Debug|x64
+		{A7C4F8D5-7AA2-4197-B988-6D143F068435}.Release|x64.ActiveCfg = Release|x64
+		{A7C4F8D5-7AA2-4197-B988-6D143F068435}.Release|x64.Build.0 = Release|x64
+		{09578A7E-E18C-4C9E-8FC9-5DDA12AC87A2}.Debug|x64.ActiveCfg = Debug|x64
+		{09578A7E-E18C-4C9E-8FC9-5DDA12AC87A2}.Debug|x64.Build.0 = Debug|x64
+		{09578A7E-E18C-4C9E-8FC9-5DDA12AC87A2}.Release|x64.ActiveCfg = Release|x64
+		{09578A7E-E18C-4C9E-8FC9-5DDA12AC87A2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

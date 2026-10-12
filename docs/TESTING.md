@@ -182,8 +182,11 @@ modules.
 The [Milestone 1 fidelity plan](FIDELITY.md) defines the local shell/native
 application corpus, planned F01-F09 cases, state oracles, budgets, and evidence.
 The existing marker checks do not establish complete screen/cursor/attribute
-fidelity. New cases extend the manifest and portable runner when implemented;
-their current status is NotRun. Preserve the existing 30-case regression suite.
+fidelity. The initial [fidelity baseline bundle](FIDELITY_BASELINE.md) now runs
+bounded state/input/shell observations and fault controls against the unchanged
+0.5.0 runtime. Remaining coverage is explicitly NotRun in its case manifest;
+Windows 7 qualification remains pending. Preserve the existing 30-case regression
+suite and review the new binary imports through the maintained verifier.
 
 Console-SSH and remote Vim/htop are deferred optional scenarios, with
 [setup prerequisites](SSH_BASELINE.md) retained for later use. They do not

@@ -1,6 +1,6 @@
 # VT7Pty Roadmap
 
-Status: Milestone 0 complete; Milestone 1 execution plan established. Updated: 2026-10-12.
+Status: Milestone 0 complete; initial Step 1.1 harness implemented, target evidence pending. Updated: 2026-10-12.
 
 This file owns milestone scope and completion. It records intended work, not
 implemented capability. Milestones follow technical dependencies rather than
@@ -80,7 +80,7 @@ recorded separately by the checked items below.
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Fully modernized, native VT7Pty 0.5.x foundation | Complete; exact `0.5.0` release accepted and published |
-| 1 | Measured backend fidelity and reliability improvements | Planned as Steps 1.1-1.6; implementation and target characterization begin with Step 1.1 |
+| 1 | Measured backend fidelity and reliability improvements | Initial Step 1.1 harness implemented; Windows 7 baseline and broader coverage pending |
 | 2 | Documented VT7Pty API and standalone integration host | Planned after proven backend behavior |
 | 3 | Versioned backend handoff ready for separately authorized VT7 integration | Planned after API and standalone-host validation |
 | Later | Other consumers and optional ConPTY user-mode compatibility | Deferred |
@@ -398,9 +398,10 @@ integration, or ConPTY compatibility.
 
 The [fidelity execution plan](docs/FIDELITY.md) defines the local application
 corpus, F01-F09 measurements, oracles, budgets and evidence. The released
-0.5.0 runtime is the comparison point. The plan is established; its new cases
-have not yet been implemented or run. Existing Milestone 0 acceptance does
-not qualify these additional workflows.
+0.5.0 runtime is the comparison point. The initial [baseline harness](docs/FIDELITY_BASELINE.md)
+implements bounded local scenarios and fault controls against the unchanged
+release binaries. Windows 7 results and broader case recipes remain pending;
+existing Milestone 0 acceptance does not qualify these additional workflows.
 
 Console-SSH and remote full-screen applications are deferred optional scenarios
 and do not block this local milestone. Their [setup prerequisites](docs/SSH_BASELINE.md)
@@ -410,8 +411,9 @@ remain documented. VT7's direct SSH transport bypasses VT7Pty.
 
 - [ ] Pin application identities and tier applicability for Command Prompt,
   installed Windows PowerShell, PowerShell 7.2.24 and controlled native fixtures.
-- [ ] Add a bounded, independently tested VT state reader and synchronized
-  fixture observations; extend portable case-level reports and negative controls.
+- [ ] Complete a bounded, independently tested VT state reader and synchronized
+  fixture observations, portable reports and fault controls. The initial
+  implementation is available; broader recipes and target validation remain open.
 - [ ] Characterize the exact 0.5.0 runtime on the development host and three
   Windows 7 tiers, starting with prompt cancellation and active-child interrupts.
 - [ ] Record missing prerequisites, limitations and reproducible failures;
