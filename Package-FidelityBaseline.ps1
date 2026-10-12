@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-    [ValidatePattern('^[a-z0-9][a-z0-9-]{0,48}$')]
+    [ValidateLength(1,49)]
+    [ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')]
     [string]$Suffix='step-1.1-rc1',
     [string]$RuntimeArchive='',
     [switch]$NoBuild
