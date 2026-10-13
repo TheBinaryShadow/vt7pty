@@ -3,7 +3,8 @@
 I've built the first H3 prototype to test actual Ctrl+C cancellation through
 the console host. Initial local runs discard cooked input, deliver one event,
 preserve the next read and restore CMD and native PowerShell prompts.
-Windows 7 results are still required.
+The [rc1 review](validation/2026-10-13-step-1.2-host-cancellation-rc1-candidate.md)
+records three passing exact-package repetitions. Windows 7 results are still required.
 
 This is a research package using the unchanged released 0.5.0 runtime.
 The callback and its controller are test programs. I have not selected a

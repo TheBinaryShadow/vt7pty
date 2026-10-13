@@ -5,13 +5,15 @@ package and test environment. The [roadmap](../../ROADMAP.md) describes current
 progress; each review describes the state at the time it was written.
 
 **Current result:** host identity and dispatch are accepted on all three
-Windows 7 machines. Ctrl+C cancellation remains unresolved. Next is a
-cooked-read cancellation prototype.
+Windows 7 machines. The first cancellation prototype passes its twelve cases
+in three exact-package development runs. Windows 7 results and remaining H3
+coverage are pending; the runtime cancellation defect remains open.
 
 ## Current fidelity work
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
+| Host cancellation (H3) | [rc1 prototype and local results](2026-10-13-step-1.2-host-cancellation-rc1-candidate.md) | Pending |
 | Host dispatch (H2) | [rc1 candidate](2026-10-13-step-1.2-host-dispatch-rc1-candidate.md) | [Accepted](2026-10-13-step-1.2-host-dispatch-rc1-windows7.md) |
 | Host identity (H1) | [rc1 candidate](2026-10-13-step-1.2-host-identity-rc1-candidate.md) | [Accepted](2026-10-13-step-1.2-host-identity-rc1-windows7.md) |
 | Public-API cancellation experiments | [Mechanism rc1](2026-10-12-step-1.2-mechanism-rc1-candidate.md) | [Both approaches failed](2026-10-13-step-1.2-mechanism-rc1-windows7.md) |

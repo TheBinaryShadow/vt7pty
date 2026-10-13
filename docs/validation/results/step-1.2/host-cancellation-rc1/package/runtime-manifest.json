@@ -1,0 +1,76 @@
+{
+  "SchemaVersion": 2,
+  "Product": "VT7Pty",
+  "Version": "0.5.0",
+  "ApiVersion": "1.0",
+  "ProtocolVersion": 1,
+  "Configuration": "Release",
+  "Architecture": "x64",
+  "MinimumOperatingSystem": "Windows 7 SP1",
+  "PackageKind": "runtime",
+  "PackageSuffix": "",
+  "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+  "SourceTreeClean": true,
+  "SourceTreeChanges": [],
+  "Toolchain": {
+    "VisualStudio": "2022",
+    "MSVCDirectoryVersion": "14.44.35207",
+    "CompilerFileVersion": "19.44.35228.0",
+    "WindowsSDKVersion": "10.0.26100.0",
+    "PowerShellVersion": "7.6.5"
+  },
+  "Verification": {
+    "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+    "TestCount": 29,
+    "RecordSha256": "addba595619ea905a0745dfeba69c73b0a62646d7f057a9653645934265fb2ec",
+    "CleanReleaseRebuild": true,
+    "StaticAnalysisRebuild": true
+  },
+  "Files": [
+    {
+      "Path": "bin/VT7Pty-Agent.exe",
+      "Bytes": 628736,
+      "Sha256": "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+    },
+    {
+      "Path": "bin/VT7Pty.dll",
+      "Bytes": 507904,
+      "Sha256": "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167"
+    },
+    {
+      "Path": "CHANGELOG.md",
+      "Bytes": 5442,
+      "Sha256": "684b7357d183fd041bcd358ababd4099e939965c856ceea6da63d912c38cc36b"
+    },
+    {
+      "Path": "CREDITS.md",
+      "Bytes": 2542,
+      "Sha256": "df18c02b70b3accd3fa764bb9e2937d5513d445a5c483c0271038512ae744f7e"
+    },
+    {
+      "Path": "docs/COMPATIBILITY.md",
+      "Bytes": 6691,
+      "Sha256": "c40da30f0fef290a0bdf489e777b92ccc7b7fdec29388c8eab7c482cba3ba229"
+    },
+    {
+      "Path": "LICENSE.txt",
+      "Bytes": 1144,
+      "Sha256": "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+    },
+    {
+      "Path": "README.md",
+      "Bytes": 7789,
+      "Sha256": "a4aee009dc42d7b8d3c05afa68f92640cfe0baf0c36de17db5ad56bf185d500d"
+    },
+    {
+      "Path": "UPSTREAM.md",
+      "Bytes": 3032,
+      "Sha256": "0bc2672591a8be95997fb9a8e0b1f6c066a346f9ddab21daca6a8f8fd199a45c"
+    },
+    {
+      "Path": "VERSION.txt",
+      "Bytes": 6,
+      "Sha256": "a0ad50640139a524f86591157145bf1d4674ea9c065bfea21558f0f7b04430c8"
+    }
+  ]
+}

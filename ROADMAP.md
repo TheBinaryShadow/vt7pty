@@ -3,9 +3,10 @@
 Updated: 2026-10-13.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
-behavior in Milestone 1. **Next: actual Ctrl+C line cancellation and shell
-recovery (H3).** Host identity and dispatch are verified on all three Windows 7
-test machines; the cancellation fix and broader baseline coverage remain open.
+behavior in Milestone 1. **Next: test the first H3 cancellation prototype on
+Windows 7, then finish its remaining guards.** The exact package passes three
+local repetitions. Host identity and dispatch are accepted on all three test
+machines; the runtime cancellation fix and broader coverage remain open.
 
 I check an item only when its stated work and required tests are complete.
 Partial implementations stay unchecked. A local pass does not replace a required
@@ -90,6 +91,7 @@ public-API experiments failed. I'm now following the
 - [ ] H3: Cancel a pending cooked read, discard the old line, deliver exactly
   one control event, preserve the next read and recover real shell prompts.
   The first [private-desktop prototype](docs/HOST_CANCELLATION_PROBE.md) is implemented;
+  [rc1 passes three local repetitions](docs/validation/2026-10-13-step-1.2-host-cancellation-rc1-candidate.md);
   Windows 7 results and the remaining H3 guards are pending.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,

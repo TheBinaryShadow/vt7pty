@@ -1,0 +1,145 @@
+{
+  "SourceCommit": "eb679c3b5318a242659c8a13f2d5aa45d321ae81",
+  "SourceTreeClean": false,
+  "RecordedUtc": "2026-10-13T12:23:03.0127739Z",
+  "SourceFiles": [
+    {
+      "Path": "Package-HostCancellationProbe.ps1",
+      "Sha256": "5dd69b7885197d7b00251dc20f091990f0bcec2550b9b38dc0dfe40b8f2cf984"
+    },
+    {
+      "Path": "RUN-HOST-CANCELLATION-ESU.cmd",
+      "Sha256": "36e6dd61c5af19a7393a55e79b3540a645019498c99302f3717c097d185ec5ab"
+    },
+    {
+      "Path": "RUN-HOST-CANCELLATION-LEGACY.cmd",
+      "Sha256": "289c51860eb159107b991d8de8387c1b34e31cc9345da3b04513e65e10988df8"
+    },
+    {
+      "Path": "RUN-HOST-CANCELLATION-NONESU.cmd",
+      "Sha256": "53604542ee2ff13d26b71f8af623eae6b8f3ee8d439e9e04952a6c482e6dd72e"
+    },
+    {
+      "Path": "docs/HOST_CANCELLATION_PROBE.md",
+      "Sha256": "2419d0e7dace574e1cca5da995b231dc17cc2dc2116775296b641d782c1b16fe"
+    },
+    {
+      "Path": "projects/HostCancellationHook.vcxproj",
+      "Sha256": "15c3c9457f7b072642db91a9bb20b1b0984114d61500e224b4394d058bd0dcaa"
+    },
+    {
+      "Path": "projects/HostCancellationProbe.vcxproj",
+      "Sha256": "31edc0082251cf9ab2fa604d499c6e20dab3a481a2cdfd79e1f611d2c907c8b8"
+    },
+    {
+      "Path": "tests/fidelity/HostCancellationChannel.h",
+      "Sha256": "a05bd876fb542e85c395bd1d4a4eeaac4043a0cd30e454c7e9f31a6e92f3ccd2"
+    },
+    {
+      "Path": "tests/fidelity/HostCancellationHook.cc",
+      "Sha256": "36d0f242070c008036040a76a15b339b2059b6b906a564928c1ee67fa806bed1"
+    },
+    {
+      "Path": "tests/fidelity/HostCancellationProbe.cc",
+      "Sha256": "ddb2bc8b4152b566e166c0f2ae70071859ad167f361c8376e5573f590c0bfd81"
+    },
+    {
+      "Path": "tests/fidelity/HostCancellationProtocol.h",
+      "Sha256": "50e795bb9d483874063dea38498187198e0999baf42769cd83bde6e90e20b539"
+    },
+    {
+      "Path": "tests/fidelity/HostCancellationResearch.h",
+      "Sha256": "1ddf9539ebbfe808b6878bce10010d8554ceca398c0dcdbe397eb5d5b07091d8"
+    },
+    {
+      "Path": "tests/fidelity/HostCancellationWorker.h",
+      "Sha256": "1d4fecc8df76c3931417273b1524e7848d544160df1c920b866998e7c266792c"
+    },
+    {
+      "Path": "tools/research/Invoke-HostCancellationProbe.ps1",
+      "Sha256": "dc73f702036d76381268c5b24eb299efe4bff7eb0401f74d304c01d53c268482"
+    },
+    {
+      "Path": "tools/research/Test-HostCancellationEvidence.ps1",
+      "Sha256": "a4c102762adb5fa85ee95258fd0661807b9f20e7a33921876e83147f891a399f"
+    },
+    {
+      "Path": "README.md",
+      "Sha256": "13f2b95e374203aea7d349f5eba3da537b1b34832f3a3034e208a7e491cf6699"
+    },
+    {
+      "Path": "ROADMAP.md",
+      "Sha256": "af3b01f7733a9a36687e85746acb5b5774fd3213c955c92d180a8f375df3ddbe"
+    },
+    {
+      "Path": "VT7Pty.sln",
+      "Sha256": "ee6d496b55652f36d57fd8c1b8fba89203bf3c9b2cdcab95e63835dc8a0da5cf"
+    },
+    {
+      "Path": "Verify-VT7Pty.ps1",
+      "Sha256": "e511486f40d5fa6a3077142ecf62af84096f05b163e73080a0e4ef1ea40a1c18"
+    },
+    {
+      "Path": "docs/HOST_CANCELLATION_DESIGN.md",
+      "Sha256": "70b5fcc8cdf499b942f494a568718930498546f9065ffc54f67f72953f54f9df"
+    },
+    {
+      "Path": "docs/HOST_DISPATCH_PROBE.md",
+      "Sha256": "54573b5f1e39ad093f5ec20a16b891874576366f982c9063394a2188a40ed89e"
+    },
+    {
+      "Path": "docs/HOST_IDENTITY_PROBE.md",
+      "Sha256": "751e21188ecd983f1fd585157a3ec477f41c2fc3c5061eec96b2a23695e8dba5"
+    },
+    {
+      "Path": "docs/INPUT_CANCELLATION.md",
+      "Sha256": "ff0e86afaa1fecd0c02290a443178ef4b73a199d2004e1b1dbbe8e2848bef004"
+    },
+    {
+      "Path": "docs/README.md",
+      "Sha256": "b8a29a04ed36ca2889dc6310ed3e93ce9027cb066cec33a96fc7f495df497daf"
+    },
+    {
+      "Path": "docs/TESTING.md",
+      "Sha256": "c12dbf91026ae0dcd22bf2f5850d6c6b88f973379a8ea7bd2d0ed097fa1abb64"
+    }
+  ],
+  "Verification": [
+    {
+      "ReportSha256": "ef61d24436fc6d7029946170c7dac9478969ea7cf130e69ab0e6d0d1189910cd",
+      "Configuration": "Debug",
+      "Checks": 32
+    },
+    {
+      "ReportSha256": "3fa3acfe0a7489be4e3c1e5e1d70e117643d9b4e88ff8635bf9094bf20902ce7",
+      "Configuration": "Release",
+      "Checks": 32
+    }
+  ],
+  "Binaries": [
+    {
+      "Bytes": 2975232,
+      "Sha256": "c46d6195969c8ea432a31eff56a7d5f2a56488affeb77f1c07245f97343fa5ad",
+      "Configuration": "Debug",
+      "Name": "HostCancellationProbe.exe"
+    },
+    {
+      "Bytes": 1805312,
+      "Sha256": "19e1e89c3a1ada1b000c4e1b8f171fa4ca2643f60f6646a7582ab1068df06559",
+      "Configuration": "Debug",
+      "Name": "HostCancellationHook.dll"
+    },
+    {
+      "Bytes": 499200,
+      "Sha256": "e18a60419298306309e967fa96074560a12a068d4a76970fdadb71d90f700cd8",
+      "Configuration": "Release",
+      "Name": "HostCancellationProbe.exe"
+    },
+    {
+      "Bytes": 156672,
+      "Sha256": "42d4eab1cfbba32e9d64fce2a69b2283ea84e40e0fa8fb42aa9958ff9257f4ec",
+      "Configuration": "Release",
+      "Name": "HostCancellationHook.dll"
+    }
+  ]
+}

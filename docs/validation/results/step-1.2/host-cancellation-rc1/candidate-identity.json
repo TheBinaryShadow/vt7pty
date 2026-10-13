@@ -1,0 +1,30 @@
+{
+  "Archive": "VT7Pty-host-cancellation-0.5.0-rc1.zip",
+  "ArchiveBytes": 3670907,
+  "ArchiveSha256": "19d2755ad052744953efaed46c91a3fda18694aa6337086808682e22aaf71c1c",
+  "ManifestSha256": "67b715e9ac7913d6b520ac5bfe99d67b942fb1e8b161d764bd4319c6f85145e7",
+  "Harness": {
+    "Version": "1",
+    "SourceCommit": "464b3546e2402cbd419b328e055291f85a4dcb14",
+    "SourceTreeClean": true,
+    "Configuration": "Release",
+    "Architecture": "x64",
+    "VerificationSha256": "24d64acf915ecbc6a157dbf89051f8f9d7ad4aa172e0cb0dddfae7f041a96c68",
+    "Toolchain": {
+      "DumpbinPath": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\dumpbin.exe",
+      "DumpbinFileVersion": "14.44.35228.0",
+      "ManifestToolPath": "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe",
+      "ManifestToolFileVersion": "10.0.26100.8249 (WinBuild.160101.0800)"
+    }
+  },
+  "Runtime": {
+    "Version": "0.5.0",
+    "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+    "ArchiveSha256": "59554a9cf8246395e60f30875e047d1bfa20d4f3f462c113ef705a86708f5304",
+    "Files": {
+      "VT7Pty.dll": "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167",
+      "VT7Pty-Agent.exe": "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+    }
+  },
+  "ManifestFiles": 17
+}

@@ -184,7 +184,9 @@ receipt, denied access and close during a request. Only then consider H4.
 
 ### First prototype boundary
 
-I've implemented a separate H3 executable and callback DLL. Each repetition
+I've implemented a separate H3 executable and callback DLL. The
+[rc1 review](validation/2026-10-13-step-1.2-host-cancellation-rc1-candidate.md)
+records three passing exact-package development repetitions. Each repetition
 uses a private desktop for the cancellation suite and a different private
 desktop for a neighboring pending read. The normal desktop is never switched.
 Private names are random, access is limited to the user/SYSTEM, and all created

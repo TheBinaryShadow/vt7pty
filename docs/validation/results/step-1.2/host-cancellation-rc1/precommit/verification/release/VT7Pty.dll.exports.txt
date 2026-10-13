@@ -1,0 +1,48 @@
+Microsoft (R) COFF/PE Dumper Version 14.44.35228.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty.dll
+
+File Type: DLL
+
+  Section contains the following exports for VT7Pty.dll
+
+    00000000 characteristics
+    76A0FF82 time date stamp
+        0.00 version
+           1 ordinal base
+          19 number of functions
+          19 number of names
+
+    ordinal hint RVA      name
+
+          1    0 000119C0 vt7pty_agent_process = vt7pty_agent_process
+          2    1 000119F0 vt7pty_conerr_name = vt7pty_conerr_name
+          3    2 00011A40 vt7pty_config_free = vt7pty_config_free
+          4    3 00011A50 vt7pty_config_new = vt7pty_config_new
+          5    4 00011AF0 vt7pty_config_set_agent_timeout = vt7pty_config_set_agent_timeout
+          6    5 00011B30 vt7pty_config_set_initial_size = vt7pty_config_set_initial_size
+          7    6 00011B70 vt7pty_config_set_mouse_mode = vt7pty_config_set_mouse_mode
+          8    7 00011BB0 vt7pty_conin_name = vt7pty_conin_name
+          9    8 00011BF0 vt7pty_conout_name = vt7pty_conout_name
+         10    9 00011C30 vt7pty_error_code = vt7pty_error_code
+         11    A 00011C40 vt7pty_error_free = vt7pty_error_free
+         12    B 00011C60 vt7pty_error_msg = vt7pty_error_msg
+         13    C 00011CC0 vt7pty_free = vt7pty_free
+         14    D 00011D20 vt7pty_get_console_process_list = vt7pty_get_console_process_list
+         15    E 00011F10 vt7pty_open = vt7pty_open
+         16    F 00012650 vt7pty_set_size = vt7pty_set_size
+         17   10 00012800 vt7pty_spawn = vt7pty_spawn
+         18   11 00012C60 vt7pty_spawn_config_free = vt7pty_spawn_config_free
+         19   12 00012CB0 vt7pty_spawn_config_new = vt7pty_spawn_config_new
+
+  Summary
+
+        3000 .data
+        1000 .fptable
+        4000 .pdata
+       37000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       3F000 .text

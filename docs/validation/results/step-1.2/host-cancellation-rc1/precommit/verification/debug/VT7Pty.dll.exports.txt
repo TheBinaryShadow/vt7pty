@@ -1,0 +1,52 @@
+Microsoft (R) COFF/PE Dumper Version 14.44.35228.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty.dll
+
+File Type: DLL
+
+  Section contains the following exports for VT7Pty.dll
+
+    00000000 characteristics
+    F2121AF0 time date stamp
+        0.00 version
+           1 ordinal base
+          19 number of functions
+          19 number of names
+
+    ordinal hint RVA      name
+
+          1    0 00004309 vt7pty_agent_process = @ILT+13060(vt7pty_agent_process)
+          2    1 00005DC1 vt7pty_conerr_name = @ILT+19900(vt7pty_conerr_name)
+          3    2 00006591 vt7pty_config_free = @ILT+21900(vt7pty_config_free)
+          4    3 00007F6D vt7pty_config_new = @ILT+28520(vt7pty_config_new)
+          5    4 00007B21 vt7pty_config_set_agent_timeout = @ILT+27420(vt7pty_config_set_agent_timeout)
+          6    5 00007C4D vt7pty_config_set_initial_size = @ILT+27720(vt7pty_config_set_initial_size)
+          7    6 000086C0 vt7pty_config_set_mouse_mode = @ILT+30395(vt7pty_config_set_mouse_mode)
+          8    7 0000466A vt7pty_conin_name = @ILT+13925(vt7pty_conin_name)
+          9    8 000087D8 vt7pty_conout_name = @ILT+30675(vt7pty_conout_name)
+         10    9 00006537 vt7pty_error_code = @ILT+21810(vt7pty_error_code)
+         11    A 00007AD6 vt7pty_error_free = @ILT+27345(vt7pty_error_free)
+         12    B 000015FF vt7pty_error_msg = @ILT+1530(vt7pty_error_msg)
+         13    C 000067CB vt7pty_free = @ILT+22470(vt7pty_free)
+         14    D 000058E9 vt7pty_get_console_process_list = @ILT+18660(vt7pty_get_console_process_list)
+         15    E 00002135 vt7pty_open = @ILT+4400(vt7pty_open)
+         16    F 000061D6 vt7pty_set_size = @ILT+20945(vt7pty_set_size)
+         17   10 00002199 vt7pty_spawn = @ILT+4500(vt7pty_spawn)
+         18   11 000064B5 vt7pty_spawn_config_free = @ILT+21680(vt7pty_spawn_config_free)
+         19   12 000083E1 vt7pty_spawn_config_new = @ILT+29660(vt7pty_spawn_config_new)
+
+  Summary
+
+        1000 .00cfg
+        6000 .data
+        1000 .fptable
+        2000 .idata
+        1000 .msvcjmc
+       1B000 .pdata
+       9A000 .rdata
+        4000 .reloc
+        1000 .rsrc
+      24E000 .text
+        1000 .tls

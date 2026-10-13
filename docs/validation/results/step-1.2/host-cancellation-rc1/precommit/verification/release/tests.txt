@@ -1,0 +1,32 @@
+Pass: HostCancellationProbe.exe
+Pass: HostDispatchProbe.exe
+Pass: HostIdentityProbe.exe
+Pass: ModernCppTest.exe
+Pass: ProtocolTest.exe
+Pass: VT7Pty-DebugServer.exe
+Pass: VT7Pty-DebugServer.exe
+Pass: Structured diagnostic transport
+Pass: BackendSmokeTest.exe
+Pass: BackendSmokeTest.exe
+Pass: Session contract: OUTPUT
+Pass: Session contract: UNICODE
+Pass: Session contract: INPUT
+Pass: Session contract: RESIZE
+Pass: Session contract: REPEAT
+Pass: Session contract: SHUTDOWN
+Pass: Session contract: SPAWN_FAILURE
+Pass: Session contract: CONCURRENT
+Pass: Negative control: NEGATIVE_OUTPUT
+Pass: Negative control: NEGATIVE_STATUS
+Pass: Negative control: NEGATIVE_ORDER
+Pass: Negative control: NEGATIVE_TRUNCATION
+Pass: Negative control: NEGATIVE_LEAK
+Pass: Negative control: NEGATIVE_TIMEOUT
+Pass: VT7Pty-Agent.exe
+Pass: fixture-show-argv.exe
+Pass: fixture-output-lines.exe
+Pass: Agent rejection: missing
+Pass: Agent rejection: malformed
+Pass: Agent rejection: wrong-identity
+Pass: Agent rejection: older-protocol
+Pass: Agent rejection: newer-protocol
