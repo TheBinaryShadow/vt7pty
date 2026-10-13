@@ -4,6 +4,10 @@ H1 measures console-host identity and ordinary-read isolation using the unchange
 released VT7Pty 0.5.0 binaries. A Pass does not mean Ctrl+C is fixed, a dispatch
 thread has been identified, or Milestone 1 is accepted. No hook DLL is included.
 
+The [rc1 candidate record](validation/2026-10-13-step-1.2-host-identity-rc1-candidate.md)
+identifies the issued ZIP and passing development evidence. All three Windows 7
+tier measurements remain pending.
+
 ## Run on Windows 7
 
 Extract the whole ZIP into a fresh local directory, keeping all files together.

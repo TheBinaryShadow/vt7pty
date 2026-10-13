@@ -458,7 +458,9 @@ rejects both public-API approaches on Windows 7; all original outcomes and
 applicable child guards remain unchanged. The
 [console-host design](docs/HOST_CANCELLATION_DESIGN.md) defines H1-H4 gates.
 Its [H1 identity/isolation probe](docs/HOST_IDENTITY_PROBE.md) is implemented;
-Windows 7 measurements are pending before host dispatch work. No production
+the [rc1 development comparison](docs/validation/2026-10-13-step-1.2-host-identity-rc1-candidate.md)
+passes three repetitions against exact 0.5.0 binaries. Windows 7 measurements
+are pending before host dispatch work. No production
 fix or Step 1.2 completion is claimed.
 
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, active-child

@@ -1,0 +1,104 @@
+{
+    "SchemaVersion":  1,
+    "Kind":  "VT7PtyHostIdentityProbe",
+    "Runtime":  {
+                    "Version":  "0.5.0",
+                    "SourceCommit":  "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+                    "ArchiveSha256":  "59554a9cf8246395e60f30875e047d1bfa20d4f3f462c113ef705a86708f5304",
+                    "Files":  {
+                                  "VT7Pty.dll":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167",
+                                  "VT7Pty-Agent.exe":  "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+                              }
+                },
+    "Harness":  {
+                    "Version":  "1",
+                    "SourceCommit":  "ab442287eee97c94249c55f0b1573c660873268e",
+                    "SourceTreeClean":  true,
+                    "Configuration":  "Release",
+                    "Architecture":  "x64",
+                    "VerificationSha256":  "cee3fa6d309bd882586d0e325e3f6b263d7c3c61d0c736ddbca760febcbefe92",
+                    "Toolchain":  {
+                                      "DumpbinPath":  "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\dumpbin.exe",
+                                      "DumpbinFileVersion":  "14.44.35228.0",
+                                      "ManifestToolPath":  "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe",
+                                      "ManifestToolFileVersion":  "10.0.26100.8249 (WinBuild.160101.0800)"
+                                  }
+                },
+    "Files":  [
+                  {
+                      "Path":  "CREDITS.md",
+                      "Bytes":  2542,
+                      "Sha256":  "df18c02b70b3accd3fa764bb9e2937d5513d445a5c483c0271038512ae744f7e"
+                  },
+                  {
+                      "Path":  "HOST_CANCELLATION_DESIGN.md",
+                      "Bytes":  8188,
+                      "Sha256":  "590b443d4d3d1c4d0d6780aef1ec768e60033889d5137c8c6c5a0f27609f3430"
+                  },
+                  {
+                      "Path":  "LICENSE.txt",
+                      "Bytes":  1144,
+                      "Sha256":  "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+                  },
+                  {
+                      "Path":  "README.md",
+                      "Bytes":  2284,
+                      "Sha256":  "1ea725b5ccd0b828ef31290f185cc639f1fa30fadad3f460d667751af2c6334b"
+                  },
+                  {
+                      "Path":  "RUN-HOST-IDENTITY-ESU.cmd",
+                      "Bytes":  295,
+                      "Sha256":  "fbf6afbf6fa4b98779eba3a67a7ea06bd128cb21f49991b7487d5515bc623ad9"
+                  },
+                  {
+                      "Path":  "RUN-HOST-IDENTITY-LEGACY.cmd",
+                      "Bytes":  298,
+                      "Sha256":  "c8658918547b8524aca526ddbe0268c3cd4c9f7265b4b5bcbcce2dde3d2744d1"
+                  },
+                  {
+                      "Path":  "RUN-HOST-IDENTITY-NONESU.cmd",
+                      "Bytes":  298,
+                      "Sha256":  "29906ba0d19736f2632966143e44e9fd36101c1cf07ededb2e89a8cdf53d3c3f"
+                  },
+                  {
+                      "Path":  "runtime-manifest.json",
+                      "Bytes":  2288,
+                      "Sha256":  "db1b7d067987d1f155f91c1e196e577f62fb530e68f179615793b3c136a231b1"
+                  },
+                  {
+                      "Path":  "UPSTREAM.md",
+                      "Bytes":  3092,
+                      "Sha256":  "87111e157e7fa7dcff679a8d30bb6a500ea3fd394d938110680bfaa4f4c7a4d9"
+                  },
+                  {
+                      "Path":  "bin/HostIdentityProbe.exe",
+                      "Bytes":  257024,
+                      "Sha256":  "387b5614c457fdf3b91313e4e0ace61f711b19be48cc6b4cf2cbb63d50f70be8"
+                  },
+                  {
+                      "Path":  "bin/HostIdentityProbe.pdb",
+                      "Bytes":  5345280,
+                      "Sha256":  "b5a649b37eb2c358f7349448ef93021127629c2c57bf93230774aa62d505be51"
+                  },
+                  {
+                      "Path":  "bin/VT7Pty-Agent.exe",
+                      "Bytes":  628736,
+                      "Sha256":  "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+                  },
+                  {
+                      "Path":  "bin/VT7Pty.dll",
+                      "Bytes":  507904,
+                      "Sha256":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167"
+                  },
+                  {
+                      "Path":  "tools/platform/Windows7Compat.ps1",
+                      "Bytes":  3716,
+                      "Sha256":  "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+                  },
+                  {
+                      "Path":  "tools/research/Invoke-HostIdentityProbe.ps1",
+                      "Bytes":  8014,
+                      "Sha256":  "12c880a386da366f1688543921c5abfacf95fda0bac26b2636a4f44290bbd6f0"
+                  }
+              ]
+}
