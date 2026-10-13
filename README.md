@@ -62,9 +62,11 @@ Direct cancellation returns error 1168 with the read still pending.
 The [mechanism candidate](docs/validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
 retains the separate development observations. A production cancellation fix
 remains open. The [console-host design](docs/HOST_CANCELLATION_DESIGN.md)
-now has a [query-only identity/isolation prototype](docs/HOST_IDENTITY_PROBE.md),
-with Windows 7 measurements pending before host dispatch and cancellation work.
-Input, output/Unicode,
+has a [query-only identity/isolation prototype](docs/HOST_IDENTITY_PROBE.md).
+Its [H1 target review](docs/validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
+accepts nine repetitions across all three Windows 7 tiers. Actual host dispatch
+and a session-bound request/acknowledgment path are the next research gate;
+cancellation remains unresolved. Input, output/Unicode,
 resize, full-screen state and lifecycle improvements follow the measurements.
 Console-SSH testing is deferred optional work. The VT7-facing API and standalone
 consumer follow in Milestone 2, then a versioned handoff in Milestone 3.

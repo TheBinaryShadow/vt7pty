@@ -220,8 +220,13 @@ PowerShell 2.0-compatible runner. Each target runs three repetitions covering
 host association, concurrent pending reads and replacement-session isolation.
 The local verifier also checks its imports and ten-case query oracle, making
 30 local checks without the optional soak. Existing acceptance packages retain
-their historical counts. H1 success does not establish cancellation or dispatch;
-the [design](HOST_CANCELLATION_DESIGN.md) defines the subsequent gates.
+their historical counts. The
+[H1 target review](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
+accepts all nine repetitions on the three designated Windows 7 tiers, including
+the PowerShell 2.0 runner. Its independent review preserves 132 returned files
+and checks 54 host observations and 27 read results. H1 success does not
+establish cancellation or dispatch; the [design](HOST_CANCELLATION_DESIGN.md)
+defines the subsequent gates. The wider fidelity corpus was not rerun by H1.
 
 ## Negative controls
 

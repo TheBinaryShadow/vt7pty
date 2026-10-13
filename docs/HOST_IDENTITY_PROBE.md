@@ -5,8 +5,10 @@ released VT7Pty 0.5.0 binaries. A Pass does not mean Ctrl+C is fixed, a dispatch
 thread has been identified, or Milestone 1 is accepted. No hook DLL is included.
 
 The [rc1 candidate record](validation/2026-10-13-step-1.2-host-identity-rc1-candidate.md)
-identifies the issued ZIP and passing development evidence. All three Windows 7
-tier measurements remain pending.
+identifies the issued ZIP and passing development evidence. The
+[Windows 7 review](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
+accepts H1 on all three designated tiers, with three successful repetitions
+per machine, including PowerShell 2.0 on LEOPARD. H2 dispatch is next.
 
 ## Run on Windows 7
 

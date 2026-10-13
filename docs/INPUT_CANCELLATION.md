@@ -106,7 +106,10 @@ outcomes remain unchanged. This completes the research measurements, not F01.
 The [console-host design](HOST_CANCELLATION_DESIGN.md) now separates identity,
 dispatch, cancellation and production integration into H1-H4 gates. The
 [H1 probe](HOST_IDENTITY_PROBE.md) implements query-only host identification
-and concurrent-session read isolation. Windows 7 measurements are pending.
+and concurrent-session read isolation. The
+[H1 Windows 7 review](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
+accepts all nine target repetitions. Both observed host threads report GUI state;
+H2 must establish which context actually dispatches the session's requests.
 H2 dispatch and H3 cancellation remain unimplemented. The earlier HWND/thread-hook
 prototype provides no qualified implementation and must not be promoted as a fix.
 

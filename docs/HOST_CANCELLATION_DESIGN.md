@@ -1,6 +1,6 @@
 # Console-host cancellation design
 
-Status: H1 identity prototype implemented; Windows 7 measurements pending.
+Status: H1 accepted on all three designated Windows 7 tiers; H2 dispatch next.
 Updated: 2026-10-13.
 
 This design follows the [cancellation investigation](INPUT_CANCELLATION.md).
@@ -16,10 +16,12 @@ policies. The production runtime remains 0.5.0.
 | H3 | Cooked-read cancellation prototype | Old text discarded, appropriate read completion, one event, intact next read and passing real shell prompts |
 | H4 | Production integration and candidate | Input/child/PS7 guards, concurrency, failure, cleanup and Windows 7 regression qualification pass |
 
-Measure H1 on NESSY, TURTLE and LEOPARD before issuing H2 to those machines.
-A development-host pass cannot establish the Windows 7 relationship. A failed
-gate blocks dependent work for that configuration; retain the evidence.
-H2/H3 are hypotheses. No production hook mechanism is selected.
+The [H1 target review](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
+accepts three repetitions each on NESSY, TURTLE and LEOPARD: 54 consistent
+host observations, 27 ordinary reads, session isolation and cleanup. This
+completes the prerequisite for H2 on those configurations. A failed later gate
+blocks dependent work for that configuration; retain the evidence.
+H2/H3 remain unimplemented hypotheses. No production hook mechanism is selected.
 
 ## H1 implementation
 
@@ -50,8 +52,9 @@ The controlled console must contain exactly the expected agent and fixture.
 
 Record the HWND's reported PID/thread as observations only. Enumerate threads
 belonging to the verified host and record GetGUIThreadInfo results. A GUI-capable
-thread is not proven to be the dispatch thread: the local host already exposes
-multiple such threads. No thread is selected and no host message is sent.
+thread is not proven to be the dispatch thread: all 54 Windows 7 observations
+expose two such threads, and the development host also exposes multiple threads.
+No thread is selected and no host message is sent.
 
 A/B coexist with distinct pending cooked reads. Complete and close A, create
 and complete C while B remains pending, then verify B returns BRAVO_KEEP intact.

@@ -1,7 +1,7 @@
 # VT7Pty Architecture
 
 Status: released 0.5.0 native architecture and planned boundaries. Updated:
-2026-10-12.
+2026-10-13.
 
 This document describes the maintained native architecture through Roadmap
 Milestone 0. Source code remains authoritative when this overview and the
@@ -151,8 +151,13 @@ the [three-tier target results](validation/2026-10-12-step-1.1-rc3-windows7-base
 confirm passing child policies and retained cooked input after handler delivery.
 The [version 4 mechanism results](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
 reject the two measured direct-API cancellation approaches on all three tiers.
-A later user-mode mechanism needs explicit host/read ownership, acknowledgment,
-failure and session-isolation semantics before runtime use.
+The query-only [H1 prototype](HOST_IDENTITY_PROBE.md) now has
+[three-tier identity/isolation evidence](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md).
+It identifies each controlled session's actual host process; both observed host
+threads expose GUI state, so dispatch-thread selection remains unresolved.
+The [H2-H4 design](HOST_CANCELLATION_DESIGN.md) requires actual dispatch context,
+session-bound acknowledgment, read cancellation and regression qualification
+before runtime use.
 Broader baseline coverage remains open. Milestone 2 defines the VT7Pty integration API
 around the proven backend. That API will borrow useful ConPTY
 conventions but must specify an

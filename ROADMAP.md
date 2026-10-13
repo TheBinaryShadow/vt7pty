@@ -1,6 +1,6 @@
 # VT7Pty Roadmap
 
-Status: Milestone 0 complete; Step 1.2's two API cancellation candidates rejected on all three Windows 7 tiers; broader Step 1.1 coverage pending. Updated: 2026-10-13.
+Status: Milestone 0 complete; Step 1.2 H1 host identity/isolation accepted on all three Windows 7 tiers; H2 dispatch next; cancellation and broader Step 1.1 coverage remain open. Updated: 2026-10-13.
 
 This file owns milestone scope and completion. It records intended work, not
 implemented capability. Milestones follow technical dependencies rather than
@@ -404,8 +404,10 @@ release binaries. The [initial Windows 7 baseline](docs/validation/2026-10-12-st
 records all three tiers and retains four prompt-cancellation failures per machine.
 The later [rc3 target baseline](docs/validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
 records passing active-child policies and six cancellation failures per machine.
-Broader case recipes remain pending; existing Milestone 0 acceptance does not
-qualify these additional workflows.
+Step 1.2's [H1 host identity review](docs/validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
+accepts the controlled identity/isolation gate on all three tiers; host dispatch
+and cancellation remain unimplemented. Broader case recipes remain pending;
+existing Milestone 0 acceptance does not qualify these additional workflows.
 
 Console-SSH and remote full-screen applications are deferred optional scenarios
 and do not block this local milestone. Their [setup prerequisites](docs/SSH_BASELINE.md)
@@ -457,11 +459,19 @@ records the separate development observations. The
 rejects both public-API approaches on Windows 7; all original outcomes and
 applicable child guards remain unchanged. The
 [console-host design](docs/HOST_CANCELLATION_DESIGN.md) defines H1-H4 gates.
-Its [H1 identity/isolation probe](docs/HOST_IDENTITY_PROBE.md) is implemented;
-the [rc1 development comparison](docs/validation/2026-10-13-step-1.2-host-identity-rc1-candidate.md)
-passes three repetitions against exact 0.5.0 binaries. Windows 7 measurements
-are pending before host dispatch work. No production
-fix or Step 1.2 completion is claimed.
+The [H1 identity/isolation probe](docs/HOST_IDENTITY_PROBE.md) passes three
+[development repetitions](docs/validation/2026-10-13-step-1.2-host-identity-rc1-candidate.md)
+and nine [Windows 7 repetitions](docs/validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
+against exact 0.5.0 binaries. All targets expose two GUI-capable host threads,
+so actual dispatch context still needs proof. No production fix or Step 1.2
+completion is claimed.
+
+- [x] Complete H1 controlled host identity/isolation on the three designated
+  Windows 7 tiers, with linked native observations and preserved input.
+- [ ] Complete H2 actual host dispatch and authenticated session-bound
+  request/acknowledgment, including failure, stale-request and isolation controls.
+- [ ] Complete H3 cooked-read cancellation and real shell prompt checks.
+- [ ] Complete H4 production integration and regression qualification.
 
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, active-child
   interrupts, processed/unprocessed input, editing, modifiers, text and paste.
