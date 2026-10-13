@@ -468,7 +468,10 @@ against exact 0.5.0 binaries. All targets expose two GUI-capable host threads.
 The [H2 prototype](docs/HOST_DISPATCH_PROBE.md) uses repeated scoped title events
 followed by an in-host callback and private-pipe peer verification to establish
 actual dispatch context. It tests request rejection, input isolation and
-acknowledgment/lifetime failures. Windows 7 qualification remains pending.
+acknowledgment/lifetime failures. The
+[rc1 candidate review](docs/validation/2026-10-13-step-1.2-host-dispatch-rc1-candidate.md)
+records three passing exact-package development repetitions. Windows 7
+qualification remains pending.
 No production fix or Step 1.2 completion is claimed.
 
 - [x] Complete H1 controlled host identity/isolation on the three designated

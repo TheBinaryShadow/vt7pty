@@ -1,0 +1,281 @@
+﻿[
+    {
+        "Name":  "HostDispatchProbe.exe",
+        "Status":  "Pass",
+        "DurationMilliseconds":  56,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Host dispatch oracle: 13 checks passed",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "HostIdentityProbe.exe",
+        "Status":  "Pass",
+        "DurationMilliseconds":  40,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Host identity oracle: 10 checks passed",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "ModernCppTest.exe",
+        "Status":  "Pass",
+        "DurationMilliseconds":  39,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "VT7Pty modern C++ utility tests passed.",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "ProtocolTest.exe",
+        "Status":  "Pass",
+        "DurationMilliseconds":  22,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "VT7Pty protocol tests passed",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "VT7Pty-DebugServer.exe",
+        "Status":  "Pass",
+        "DurationMilliseconds":  23,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "VT7Pty diagnostic security self-test passed.",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "VT7Pty-DebugServer.exe",
+        "Status":  "Pass",
+        "DurationMilliseconds":  22,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "VT7Pty version 0.5.0\r\ncommit 0a8c0350bca5630d6a09e907d4f093ee331e364a\r\nAPI version 1.0\r\nprotocol version 1",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Structured diagnostic transport",
+        "Status":  "Pass",
+        "DurationMilliseconds":  405,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "{\"timestamp\":\"2026-10-13T10:16:18.303Z\",\"severity\":\"info\",\"subsystem\":\"general\",\"product\":\"VT7Pty\",\"version\":\"0.5.0\",\"commit\":\"0a8c0350bca5630d6a09e907d4f093ee331e364a\",\"api\":\"1.0\",\"protocol\":1,\"process\":\"ProtocolTest.exe\",\"pid\":1004,\"tid\":53032,\"message\":\"diagnostic transport test 1\"}\r\n{\"timestamp\":\"2026-10-13T10:16:18.303Z\",\"severity\":\"warning\",\"subsystem\":\"ipc\",\"product\":\"VT7Pty\",\"version\":\"0.5.0\",\"commit\":\"0a8c0350bca5630d6a09e907d4f093ee331e364a\",\"api\":\"1.0\",\"protocol\":1,\"process\":\"ProtocolTest.exe\",\"pid\":1004,\"tid\":53032,\"message\":\"diagnostic transport test 2\"}\r\n{\"timestamp\":\"2026-10-13T10:16:18.303Z\",\"severity\":\"error\",\"subsystem\":\"security\",\"product\":\"VT7Pty\",\"version\":\"0.5.0\",\"commit\":\"0a8c0350bca5630d6a09e907d4f093ee331e364a\",\"api\":\"1.0\",\"protocol\":1,\"process\":\"ProtocolTest.exe\",\"pid\":1004,\"tid\":53032,\"message\":\"diagnostic transport test 3\"}",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "BackendSmokeTest.exe",
+        "Status":  "Pass",
+        "DurationMilliseconds":  131,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "BackendSmokeTest.exe",
+        "Status":  "Pass",
+        "DurationMilliseconds":  395,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Command Prompt and Windows PowerShell sessions passed.",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Session contract: OUTPUT",
+        "Status":  "Pass",
+        "DurationMilliseconds":  137,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Session contract OUTPUT passed.",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Session contract: UNICODE",
+        "Status":  "Pass",
+        "DurationMilliseconds":  133,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Session contract UNICODE passed.",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Session contract: INPUT",
+        "Status":  "Pass",
+        "DurationMilliseconds":  132,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Session contract INPUT passed.",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Session contract: RESIZE",
+        "Status":  "Pass",
+        "DurationMilliseconds":  1546,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Session contract RESIZE passed.",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Session contract: REPEAT",
+        "Status":  "Pass",
+        "DurationMilliseconds":  46026,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Session contract REPEAT passed.",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Session contract: SHUTDOWN",
+        "Status":  "Pass",
+        "DurationMilliseconds":  3635,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Session contract SHUTDOWN passed.",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Session contract: SPAWN_FAILURE",
+        "Status":  "Pass",
+        "DurationMilliseconds":  112,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Session contract SPAWN_FAILURE passed.",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Session contract: CONCURRENT",
+        "Status":  "Pass",
+        "DurationMilliseconds":  344,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Session contract CONCURRENT passed.",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Negative control: NEGATIVE_OUTPUT",
+        "Status":  "Pass",
+        "DurationMilliseconds":  131,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Observed exit=1, timeout=False",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Negative control: NEGATIVE_STATUS",
+        "Status":  "Pass",
+        "DurationMilliseconds":  131,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Observed exit=1, timeout=False",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Negative control: NEGATIVE_ORDER",
+        "Status":  "Pass",
+        "DurationMilliseconds":  128,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Observed exit=1, timeout=False",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Negative control: NEGATIVE_TRUNCATION",
+        "Status":  "Pass",
+        "DurationMilliseconds":  120,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Observed exit=1, timeout=False",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Negative control: NEGATIVE_LEAK",
+        "Status":  "Pass",
+        "DurationMilliseconds":  23,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Observed exit=1, timeout=False",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Negative control: NEGATIVE_TIMEOUT",
+        "Status":  "Pass",
+        "DurationMilliseconds":  2212,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Observed exit=, timeout=True",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "VT7Pty-Agent.exe",
+        "Status":  "Pass",
+        "DurationMilliseconds":  41,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "VT7Pty version 0.5.0\r\ncommit 0a8c0350bca5630d6a09e907d4f093ee331e364a\r\nAPI version 1.0\r\nprotocol version 1",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "fixture-show-argv.exe",
+        "Status":  "Pass",
+        "DurationMilliseconds":  24,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "cmdline = [\"D:\\Git\\vt7pty\\artifacts\\bin\\x64\\Debug\\fixture-show-argv.exe\" \"alpha\" \"two words\"]\r\n[D:\\Git\\vt7pty\\artifacts\\bin\\x64\\Debug\\fixture-show-argv.exe]\r\n[alpha]\r\n[two words]",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "fixture-output-lines.exe",
+        "Status":  "Pass",
+        "DurationMilliseconds":  22,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "1 XXXXX\r\n2 XXXXX\r\n3 XXXXX",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Agent rejection: missing",
+        "Status":  "Pass",
+        "DurationMilliseconds":  43,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Expected VT7Pty failure: VT7Pty agent executable is missing: \u0027D:\\Git\\vt7pty\\artifacts\\verification\\x64\\Debug\\agent-failure-missing\\VT7Pty-Agent.exe\u0027",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Agent rejection: malformed",
+        "Status":  "Pass",
+        "DurationMilliseconds":  91,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Expected VT7Pty failure: VT7Pty agent handshake is missing or malformed",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Agent rejection: wrong-identity",
+        "Status":  "Pass",
+        "DurationMilliseconds":  75,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Expected VT7Pty failure: VT7Pty agent identity mismatch: expected \u0027VT7Pty-Agent\u0027, received \u0027Not-VT7Pty-Agent\u0027",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Agent rejection: older-protocol",
+        "Status":  "Pass",
+        "DurationMilliseconds":  73,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Expected VT7Pty failure: VT7Pty agent protocol mismatch: client=1, agent=0",
+        "StandardError":  ""
+    },
+    {
+        "Name":  "Agent rejection: newer-protocol",
+        "Status":  "Pass",
+        "DurationMilliseconds":  75,
+        "ExitCode":  0,
+        "TimedOut":  false,
+        "StandardOutput":  "Expected VT7Pty failure: VT7Pty agent protocol mismatch: client=1, agent=2",
+        "StandardError":  ""
+    }
+]

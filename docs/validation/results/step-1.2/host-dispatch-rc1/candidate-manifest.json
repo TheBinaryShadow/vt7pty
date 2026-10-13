@@ -1,0 +1,114 @@
+{
+    "SchemaVersion":  1,
+    "Kind":  "VT7PtyHostDispatchProbe",
+    "Runtime":  {
+                    "Version":  "0.5.0",
+                    "SourceCommit":  "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+                    "ArchiveSha256":  "59554a9cf8246395e60f30875e047d1bfa20d4f3f462c113ef705a86708f5304",
+                    "Files":  {
+                                  "VT7Pty.dll":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167",
+                                  "VT7Pty-Agent.exe":  "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+                              }
+                },
+    "Harness":  {
+                    "Version":  "1",
+                    "SourceCommit":  "8b1a20caf969088b1efb01e96a34dea5e63b494f",
+                    "SourceTreeClean":  true,
+                    "Configuration":  "Release",
+                    "Architecture":  "x64",
+                    "VerificationSha256":  "dc3f8f9548f2fca96a6c128a7f73d0774caeb1a860513cc5dfc4506bfcea777f",
+                    "Toolchain":  {
+                                      "DumpbinPath":  "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\dumpbin.exe",
+                                      "DumpbinFileVersion":  "14.44.35228.0",
+                                      "ManifestToolPath":  "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe",
+                                      "ManifestToolFileVersion":  "10.0.26100.8249 (WinBuild.160101.0800)"
+                                  }
+                },
+    "Files":  [
+                  {
+                      "Path":  "CREDITS.md",
+                      "Bytes":  2542,
+                      "Sha256":  "df18c02b70b3accd3fa764bb9e2937d5513d445a5c483c0271038512ae744f7e"
+                  },
+                  {
+                      "Path":  "HOST_CANCELLATION_DESIGN.md",
+                      "Bytes":  12506,
+                      "Sha256":  "075e0a8f8533f8a4ad23445fd8352037e74d58d2b65d54e4ef8c958a2505e267"
+                  },
+                  {
+                      "Path":  "LICENSE.txt",
+                      "Bytes":  1144,
+                      "Sha256":  "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+                  },
+                  {
+                      "Path":  "README.md",
+                      "Bytes":  5434,
+                      "Sha256":  "9815a8a1a371b9086e8cf16dee8e92a80ce05a06e6bbf7771be080eba7b1b505"
+                  },
+                  {
+                      "Path":  "RUN-HOST-DISPATCH-ESU.cmd",
+                      "Bytes":  295,
+                      "Sha256":  "3fcf5ce9c84d3eb6e0c543d69663b0ed6981e3c44595314876292fcacaecb5f5"
+                  },
+                  {
+                      "Path":  "RUN-HOST-DISPATCH-LEGACY.cmd",
+                      "Bytes":  298,
+                      "Sha256":  "6df554791e3ea9d5bf18b7f276e82a5b4d50bbbaa790508df649a535bb32872e"
+                  },
+                  {
+                      "Path":  "RUN-HOST-DISPATCH-NONESU.cmd",
+                      "Bytes":  298,
+                      "Sha256":  "35caf1584bad1be2e34d78888e34bd20aea9a8e5e824a2a488d76ff458dc9fbf"
+                  },
+                  {
+                      "Path":  "runtime-manifest.json",
+                      "Bytes":  2288,
+                      "Sha256":  "db1b7d067987d1f155f91c1e196e577f62fb530e68f179615793b3c136a231b1"
+                  },
+                  {
+                      "Path":  "UPSTREAM.md",
+                      "Bytes":  3092,
+                      "Sha256":  "87111e157e7fa7dcff679a8d30bb6a500ea3fd394d938110680bfaa4f4c7a4d9"
+                  },
+                  {
+                      "Path":  "bin/HostDispatchHook.dll",
+                      "Bytes":  153600,
+                      "Sha256":  "30c3be06d003c873d6544f972531ce4c1296b32cf3bf53f2fb6781a1754073d4"
+                  },
+                  {
+                      "Path":  "bin/HostDispatchHook.pdb",
+                      "Bytes":  4648960,
+                      "Sha256":  "03832c1113394f9d05cefbf06c4b1137ee0e67b0e37b81157100a387d959cbc9"
+                  },
+                  {
+                      "Path":  "bin/HostDispatchProbe.exe",
+                      "Bytes":  326144,
+                      "Sha256":  "193cd1e724556cbde5bda76f4899fe47eeb43b84ece900b06a3ab9ff5731fa78"
+                  },
+                  {
+                      "Path":  "bin/HostDispatchProbe.pdb",
+                      "Bytes":  5689344,
+                      "Sha256":  "1178a5af8ea821cfd7e1960e5fbbd8ed58867c139c434a35ae4454a6a1675823"
+                  },
+                  {
+                      "Path":  "bin/VT7Pty-Agent.exe",
+                      "Bytes":  628736,
+                      "Sha256":  "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+                  },
+                  {
+                      "Path":  "bin/VT7Pty.dll",
+                      "Bytes":  507904,
+                      "Sha256":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167"
+                  },
+                  {
+                      "Path":  "tools/platform/Windows7Compat.ps1",
+                      "Bytes":  3716,
+                      "Sha256":  "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+                  },
+                  {
+                      "Path":  "tools/research/Invoke-HostDispatchProbe.ps1",
+                      "Bytes":  8254,
+                      "Sha256":  "4e8131544e115b6c53309f30b8cbef0ec4bf93d7f9de182c2135354e924da1e8"
+                  }
+              ]
+}

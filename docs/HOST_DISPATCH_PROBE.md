@@ -4,7 +4,9 @@ H2 measures execution inside an owned console host and a session-bound
 request/acknowledgment channel. The VT7Pty runtime is the unchanged released
 0.5.0 pair. This probe never requests Ctrl+C or cancels an application read.
 
-The prototype is implemented and its development experiments pass. Windows 7
+The [rc1 candidate review](validation/2026-10-13-step-1.2-host-dispatch-rc1-candidate.md)
+identifies the issued ZIP and three passing exact-package development repetitions.
+Windows 7
 qualification remains pending; H2 is not complete until the exact candidate is
 reviewed on NESSY, TURTLE and LEOPARD. See the
 [staged design](HOST_CANCELLATION_DESIGN.md).

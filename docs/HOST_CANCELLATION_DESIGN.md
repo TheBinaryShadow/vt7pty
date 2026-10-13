@@ -71,7 +71,8 @@ must retain agent ownership and validate a host endpoint independently.
 ## H2 implementation and remaining qualification
 
 The test-only [H2 probe](HOST_DISPATCH_PROBE.md) implements the following
-contract. Development experiments establish the callback on WOLF; exact-candidate
+contract. The [rc1 candidate review](validation/2026-10-13-step-1.2-host-dispatch-rc1-candidate.md)
+records three exact-package repetitions establishing the callback on WOLF;
 Windows 7 runs remain required. H3 cancellation is not implemented.
 
 ### Discovery and loading boundary

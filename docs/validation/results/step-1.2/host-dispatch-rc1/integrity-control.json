@@ -1,0 +1,9 @@
+{
+  "RecordedUtc": "2026-10-13T10:21:27.6709578Z",
+  "CandidateSha256": "638d0a0b96f09b33f47e70df7d13ea19d2a3709bb9e80e11eb7ae8550d249cef",
+  "AlteredSeparateExtraction": "bin/HostDispatchHook.dll",
+  "ExitCode": 1,
+  "ResultsDirectoryCreated": false,
+  "RejectedBeforeNativeExecution": true,
+  "Output": "File verification failed: bin/HostDispatchHook.dll\r\nAt D:\\Git\\vt7pty\\artifacts\\fidelity\\host-dispatch-integrity-control-rc1\\tools\\research\\Invoke-HostDispatchProbe.ps1:24 \r\nchar:59\r\n+ ... kFile.Sha256) { throw ('File verification failed: '+$taskFile.Path) }\r\n+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : OperationStopped: (File verificati...ispatchHook.dll:String) [], RuntimeException\r\n    + FullyQualifiedErrorId : File verification failed: bin/HostDispatchHook.dll\r\n \r\n"
+}
