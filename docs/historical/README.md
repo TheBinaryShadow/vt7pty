@@ -1,9 +1,8 @@
 # Historical console research
 
-This directory preserves WinPTY-era observations that still inform console
-compatibility work. The material records the environment and assumptions of
-its time; it is research evidence rather than current VT7Pty behavior or build
-guidance.
+I preserve WinPTY-era observations here because they still inform console
+compatibility work. The original authors' notes reflect the environments and
+assumptions of their time, not current VT7Pty behavior or build guidance.
 
 - `EnableExtendedFlags.txt` and `MouseInputNotes.txt` record console-input and
   mouse-mode findings.

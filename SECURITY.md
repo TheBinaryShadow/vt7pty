@@ -1,6 +1,6 @@
 # VT7Pty Security Policy
 
-VT7Pty welcomes reports about vulnerabilities in its console backend, including
+I welcome reports about vulnerabilities in VT7Pty's console backend, including
 issues inherited from WinPTY.
 
 ## Report a vulnerability privately
@@ -23,11 +23,10 @@ Include what you safely can:
 - Whether the issue also reproduces in upstream WinPTY, if known.
 - Any suggested mitigation and your preferred contact method.
 
-Do not send credentials or unrelated private terminal/session content. Reports
-are reviewed as maintainer availability permits, without a guaranteed response
-deadline. We aim to investigate privately and coordinate disclosure, fixes or
-mitigations, and reporter credit with the people involved. Tell us if you prefer
-not to be named.
+Do not send credentials or unrelated private terminal/session content.
+I'll review reports as time permits, without a guaranteed response deadline.
+I aim to investigate privately and coordinate disclosure, fixes or mitigations,
+and reporter credit with the people involved. Tell me if you prefer not to be named.
 
 ## Supported versions
 
@@ -35,17 +34,17 @@ VT7Pty is in its pre-stable 0.5.x line and has no supported stable release serie
 The inherited `0.4.4-dev` version identifies the WinPTY baseline; it is not a
 VT7Pty security-support commitment.
 
-The approved product target is Windows 7 SP1 and later on x64. XP, Vista, and
+My product target is Windows 7 SP1 and later on x64. XP, Vista, and
 x86 are outside the maintained VT7Pty compatibility policy. This project policy
 does not provide operating-system vendor support.
 
 | Version | Status |
 | --- | --- |
 | VT7Pty 0.5.x and current development branch | Reports welcome; best-effort triage, without a stability or response-time guarantee |
-| Historical upstream WinPTY versions | No separate VT7Pty maintenance commitment; report issues affecting our baseline |
+| Historical upstream WinPTY versions | No separate VT7Pty maintenance commitment; report issues affecting the VT7Pty baseline |
 | Third-party or modified builds | Reproduction against identifiable repository source may be needed |
 
-This policy will be revised if the release support commitment changes.
+I'll revise this policy if my release support commitment changes.
 Current platform and application claims are tracked separately in the
 [compatibility contract](docs/COMPATIBILITY.md).
 

@@ -3,10 +3,10 @@
 Status: rc3 Step 1.1 corpus measured on the development host and all three Windows 7 tiers; broader coverage pending.
 Updated: 2026-10-13.
 
-The [roadmap](../ROADMAP.md) owns completion. This document defines the local
-application corpus, measurements, and evidence needed to improve VT7Pty after
-the [published 0.5.0 baseline](validation/2026-10-02-0.5.0-publication.md).
-Planning does not qualify an application or complete an implementation step.
+I'm using these applications and measurements to improve the
+[published 0.5.0 baseline](validation/2026-10-02-0.5.0-publication.md).
+The [roadmap](../ROADMAP.md) tracks completion; this plan defines the required
+behavior and evidence.
 
 ## Scope and application corpus
 
@@ -38,40 +38,16 @@ profiles, execution policy, console settings, or installed code pages.
 
 ## Measurement matrix
 
-These IDs define scenario groups rather than one completed test each. The
-initial [baseline bundle](FIDELITY_BASELINE.md) implements 14 bounded workflow
-observations in harness version 1. Version 3 extends this to 25 workflow
-observations, independent state/child and portable JSON oracles, and ten fault controls,
-including active children under each shell and two cooked-read probes.
-Its case manifest lists remaining coverage as NotRun. The
-[initial Windows 7 baseline](validation/2026-10-12-step-1.1-windows7-baseline.md)
-pins application identities and records four prompt-cancellation failures per
-tier, passing controlled Unicode/resize and passing A/B PowerShell 7 cases.
-The [rc3 target baseline](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
-records every applicable active-child case passing and six cancellation failures
-per target: the four prompt cases and two cooked-read probes. The pending read
-retains typed text despite one control-handler event. The portable JSON oracle
-passes on PowerShell 2.0 and 5.1. Broader coverage keeps Step 1.1 open.
-The [rc3 candidate record](validation/2026-10-12-step-1.1-rc3-candidate.md) retains
-the separate development-host results and exact bundle identity.
-The existing 30-case suite remains a required regression gate.
+I use F01-F09 to group the behavior I need to measure. They are not individual
+completed tests. The [baseline runner](FIDELITY_BASELINE.md) lists implemented
+recipes and PendingCoverage; the [validation index](validation/README.md)
+links their results.
 
-[Step 1.2 cancellation research](INPUT_CANCELLATION.md) retains the version 3
-corpus and adds two version 4 public-API mechanism probes, for 39 entries.
-An empty canceled read is checked separately from reuse of the same input
-buffer. The [three-tier mechanism review](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
-records both approaches failing on all Windows 7 targets. Direct cancellation
-returns error 1168; record injection retains the line and adds character 0x03.
-Original outcomes are unchanged. The product runtime remains unchanged and
-the measured F01 failures remain unresolved.
-
-The separate [H1 host identity review](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
-accepts controlled host association and ordinary-read isolation on all three
-Windows 7 tiers. It does not rerun this corpus or change its outcomes. The
-[H2 dispatch probe](HOST_DISPATCH_PROBE.md) has an accepted
-[Windows 7 review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
-covering actual host execution, session binding, rejection and lifetime controls.
-H3 cancellation and H4 production regressions remain required before a fix can qualify.
+The current baseline retains six cancellation failures per Windows 7 machine.
+Applicable active-child tests pass. I keep the original 30-case regression
+suite as a separate requirement, and use the
+[cancellation investigation](INPUT_CANCELLATION.md) for the proposed fix.
+Broader coverage keeps Step 1.1 open.
 
 | ID | Scenario | Required observable result |
 | --- | --- | --- |
@@ -148,7 +124,7 @@ bundle does not replace or extend the original 30-case release gate by itself.
 Exact-package qualification follows the
 [manual release process](RELEASING.md).
 
-## Evidence and disposition
+## Evidence and decisions
 
 Record source/package/harness identity, machine/tier/update state, application
 hash/version/profile/editor, console modes and actual code pages, geometry,
@@ -167,7 +143,7 @@ from 0.4.4-dev. Reference records:
 - [VT7 PowerShell profiles](https://github.com/TheBinaryShadow/VT7/blob/85d2fb1bcdd5bd0c5952d12fb2013d38790062d0/doc/vt7/validation/2026-09-17-powershell-profiles-3b2.md)
 
 Required workflow failures block acceptance until fixed or explicitly reconsidered
-with owner-approved scope and preserved evidence. Optional/inapplicable cases
+with a scope decision I document alongside the preserved evidence. Optional/inapplicable cases
 retain their real status. Publish capabilities and limitations with the accepted
 candidate; launching or showing a prompt is insufficient.
 

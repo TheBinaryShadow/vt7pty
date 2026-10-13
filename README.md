@@ -1,191 +1,76 @@
 # VT7Pty
 
-**A modern WinPTY-derived console backend for Windows 7 and later, built for VT7.**
+**A WinPTY-derived console backend for Windows 7 and later, built for VT7.**
 
-VT7Pty is a user-mode PTY project whose goal is to improve the fidelity and
-reliability of Windows console applications and prepare a better backend for
-[VT7](https://github.com/TheBinaryShadow/VT7).
+I'm building VT7Pty to give [VT7](https://github.com/TheBinaryShadow/VT7) a more
+faithful and reliable backend for Windows console applications. The project
+runs entirely in user mode and targets Windows 7 SP1 and later on x64.
 
-Our foundation is [WinPTY](https://github.com/rprichard/winpty), created by
-Ryan Prichard and developed with its contributors. Microsoft's
+My starting point is [WinPTY](https://github.com/rprichard/winpty), created by
+Ryan Prichard and its contributors. Microsoft's
 [ConPTY and Windows Terminal work](https://github.com/microsoft/terminal)
-provides architectural inspiration and a reference for modern terminal
-behavior. We are building on years of engineering by both communities.
+provides a reference for behavior and API design. I want to build on that work
+while keeping Windows 7 support practical.
 
-## Project status
+## Where things stand
 
-Milestone 0 is complete. The first baseline,
-[VT7Pty 0.5.0](https://github.com/TheBinaryShadow/vt7pty/releases/tag/v0.5.0),
-is published. It established the WinPTY baseline, modern VS2022/MSBuild and
-C++20 native foundation, VT7Pty identity, diagnostic and security boundaries,
-permanent test system, and manual release process. The exact `0.5.0` package
-passed [three-tier release acceptance](docs/validation/2026-10-02-0.5.0-release-acceptance.md):
-all 30 cases and the full 120-minute soak on each accepted Windows 7 SP1 x64
-machine, including a PowerShell 2.0 installation without KB3191566. The
-[publication record](docs/validation/2026-10-02-0.5.0-publication.md) verifies
-the published tag and assets. Each future release build must pass its own
-exact-package Windows 7 acceptance before publication. See the
-[compatibility contract](docs/COMPATIBILITY.md) for the tested scope.
+I've published the [0.5.0 baseline](https://github.com/TheBinaryShadow/vt7pty/releases/tag/v0.5.0).
+It establishes the modern build, renamed native backend, diagnostics and test
+system. The exact release passed all 30 acceptance cases and a two-hour soak
+on each of my three Windows 7 test machines, including a PowerShell 2.0
+installation without KB3191566. See the [release review](docs/validation/2026-10-02-0.5.0-release-acceptance.md).
 
-The [development foundation](docs/FOUNDATION.md) and
-[roadmap](ROADMAP.md) record the approved product and engineering direction.
-The [diagnostic collection guide](docs/DIAGNOSTICS.md) and
-[native boundary review](docs/SECURITY_REVIEW.md) define the Step 0.7 support
-and security baseline.
+I'm now working on console fidelity. Ctrl+C at CMD and native Windows PowerShell
+prompts still leaves typed input behind. I've verified host identification and
+a test-only dispatch channel on all three machines. Next I'll use that work
+to investigate actual line cancellation and shell recovery.
 
-Milestone 0 replaced the inherited toolchain, removed the Unix adapter and
-pre-Windows 7 compatibility, established the VT7Pty 0.5.x identity, modernized
-the retained C++ code, and created the permanent local build, test,
-diagnostic, and manual release systems.
+VT7 integration comes after the backend and its API are ready. VT7Pty does not
+yet replace ConPTY for unmodified applications. I am not planning a kernel driver.
 
-Milestone 1 follows the [fidelity execution plan](docs/FIDELITY.md) and numbered
-roadmap Steps 1.1-1.6. The initial Step 1.1 [baseline harness](docs/FIDELITY_BASELINE.md)
-now measures bounded local workflows against unchanged 0.5.0 binaries. Its
-[Windows 7 baseline review](docs/validation/2026-10-12-step-1.1-windows7-baseline.md)
-records the same four prompt-cancellation failures on all three tiers, passing
-controlled Unicode/resize comparisons, and passing PowerShell 7 cases on A/B.
-Broader recipes remain pending; Step 1.1 stays open. The
-[initial candidate review](docs/validation/2026-10-12-step-1.1-candidate.md)
-retains the separate development-host evidence. The
-[rc3 extension](docs/validation/2026-10-12-step-1.1-rc3-candidate.md) adds active-child
-and cooked-read recipes, portable JSON verification and explicit native ConsoleHost
-editing for installed Windows PowerShell. Its
-[three-tier target review](docs/validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
-records six cancellation failures per machine, every applicable active-child
-case passing, and successful native/portable JSON oracles, including PowerShell 2.0.
-The target probes confirm retained cooked input after control-handler delivery.
-[Step 1.2 cancellation research](docs/INPUT_CANCELLATION.md) adds controlled
-public-API mechanism probes with a second-read check. Their
-[Windows 7 review](docs/validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
-rejects both approaches on all three tiers while preserving the original guards.
-Direct cancellation returns error 1168 with the read still pending.
-The [mechanism candidate](docs/validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
-retains the separate development observations. A production cancellation fix
-remains open. The [console-host design](docs/HOST_CANCELLATION_DESIGN.md)
-has a [query-only identity/isolation prototype](docs/HOST_IDENTITY_PROBE.md).
-Its [H1 target review](docs/validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
-accepts nine repetitions across all three Windows 7 tiers. The
-[H2 dispatch probe](docs/HOST_DISPATCH_PROBE.md) verifies actual host callbacks
-and a session-bound request/acknowledgment path. Its
-[Windows 7 review](docs/validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
-accepts all nine target repetitions, including isolation and failure controls.
-H3 cooked-read cancellation is next; F01 remains unresolved.
-Input, output/Unicode,
-resize, full-screen state and lifecycle improvements follow the measurements.
-Console-SSH testing is deferred optional work. The VT7-facing API and standalone
-consumer follow in Milestone 2, then a versioned handoff in Milestone 3.
+## Build, test or follow development
 
-The Cygwin/MSYS adapter and superseded GYP, GNU Make, Python 2 packaging, and
-hosted-build infrastructure have been removed. Active binaries, headers,
-exports, environment variables, named endpoints, diagnostics, and tests use
-the VT7Pty identity. The [technical naming map](docs/NAMING.md) records every
-intentional compatibility break.
+| Start here | What you'll find |
+| --- | --- |
+| [Building](BUILDING.md) | Tools, local commands and debugging |
+| [Testing](docs/TESTING.md) | Local checks and Windows 7 acceptance |
+| [Roadmap](ROADMAP.md) | Completed milestones, current work and next steps |
+| [Documentation](docs/README.md) | Architecture, guides, design notes and results |
+| [Compatibility](docs/COMPATIBILITY.md) | Platform targets and what I've actually tested |
 
-VT7Pty targets x64 Windows 7 SP1 and later. Windows XP, Windows Vista, and x86
-are outside the maintained product. Historical WinPTY support claims and
-release notes describe upstream behavior; they are not acceptance results for
-future VT7Pty builds. Milestone and release candidates are validated on
-non-ESU, ESU, and PowerShell 2.0 Windows 7 SP1 x64 machines, with the recorded
-machine-environment dispositions in the validation evidence.
+## How it works
 
-## What we are working toward
+The client DLL starts an agent with a hidden Windows console. The agent launches
+the application, translates terminal input into console events, and turns
+screen-buffer changes into VT output.
 
-- More faithful console output, keyboard input, Unicode handling, resizing,
-  and screen restoration.
-- Predictable process and session lifetimes, clean teardown, and useful
-  diagnostics.
-- A modern Visual Studio/MSBuild and C++20 codebase with reproducible local
-  build, verification, packaging, and physical Windows 7 acceptance.
-- A documented API that makes eventual VT7 integration straightforward,
-  using ConPTY conventions where they fit the legacy-console backend.
+~~~text
+Terminal host <--> VT7Pty.dll <--> VT7Pty-Agent.exe
+                                         |
+                                  Hidden console
+                                         |
+                                 Console application
+~~~
 
-VT7 is the primary intended consumer. Compatibility for other consumers,
-including a possible ConPTY user-mode shim, is a later objective. VT7Pty does
-not currently provide a drop-in ConPTY replacement. A kernel driver is not
-part of the project direction.
+This retains the console bridge that made WinPTY useful on older Windows.
+I'm improving it through measured application behavior and regression tests.
+The [architecture guide](docs/ARCHITECTURE.md) explains the boundaries.
 
-## How the current backend works
+## Contributing
 
-The client library starts an agent that owns a hidden Windows console. The
-agent launches console applications, translates terminal input into Windows
-console events, and turns observed screen-buffer changes into VT output.
-
-```text
-Terminal host
-    |
-    | VT7Pty C API
-    v
-Client DLL <---- control and I/O ----> Agent
-                                      |
-                                      v
-                               Hidden Windows console
-                                      |
-                                      v
-                               Console applications
-```
-
-This preserves the legacy-console foundation that makes WinPTY useful on
-Windows 7. Backend improvements will be guided by reproducible application
-failures and tests, with proven behavior retained where it meets our needs.
-
-## Building and exploring
-
-See [Building](BUILDING.md) for the supported local build, verify, and package
-commands. The
-[original WinPTY README](docs/UPSTREAM_WINPTY_README.md) is preserved for
-historical build, adapter, embedding, and debugging details.
-
-Useful starting points:
-
-- [Roadmap and milestone acceptance criteria](ROADMAP.md)
-- [Approved development foundation](docs/FOUNDATION.md)
-- [Inherited component inventory](docs/INVENTORY.md)
-- [Accepted inherited native baseline](docs/validation/2026-09-21-upstream-baseline.md)
-- [Accepted MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
-- [Accepted Step 0.2 completion validation](docs/validation/2026-09-22-step-0.2-completion.md)
-- [Accepted Step 0.3 completion validation](docs/validation/2026-09-22-step-0.3-completion.md)
-- [Step 0.4 platform candidate](docs/validation/2026-09-22-step-0.4-candidate.md)
-- [Accepted Step 0.4 completion validation](docs/validation/2026-09-22-step-0.4-completion.md)
-- [Step 0.5 technical identity candidate](docs/validation/2026-09-22-step-0.5-candidate.md)
-- [Accepted Step 0.5 completion validation](docs/validation/2026-09-22-step-0.5-completion.md)
-- [Step 0.6 native modernization candidate](docs/validation/2026-09-22-step-0.6-candidate.md)
-- [Accepted Step 0.6 completion validation](docs/validation/2026-09-23-step-0.6-completion.md)
-- [Accepted Step 0.8 permanent test system](docs/validation/2026-09-24-step-0.8-completion.md)
-- [Accepted Step 0.9 manual release process](docs/validation/2026-09-25-step-0.9-completion.md)
-- [Architecture and current data flows](docs/ARCHITECTURE.md)
-- [Testing strategy and evidence requirements](docs/TESTING.md)
-- [Windows 7 physical acceptance procedure](docs/WINDOWS7_ACCEPTANCE.md)
-- [Compatibility targets and verified status](docs/COMPATIBILITY.md)
-- [Versioning policy](docs/VERSIONING.md)
-- [Technical naming map](docs/NAMING.md)
-- [Public VT7Pty header](src/include/vt7pty.h)
-- [Client library](src/libvt7pty)
-- [Console agent](src/agent)
-- [Tests](tests)
-- [Upstream baseline and attribution policy](UPSTREAM.md)
-- [Historical WinPTY release notes](RELEASES.md)
-- [VT7Pty changelog](CHANGELOG.md)
-- [Manual release process](docs/RELEASING.md)
-- [0.5.0 release notes](docs/releases/0.5.0.md)
-
-## Contributing and community
-
-Read [Contributing](CONTRIBUTING.md) before opening a pull request. Report
-ordinary bugs and discuss proposals in the
-[VT7Pty issue tracker](https://github.com/TheBinaryShadow/vt7pty/issues).
-
-The [Code of Conduct](CODE_OF_CONDUCT.md) applies to project spaces. For
-vulnerabilities, use the private reporting instructions in our
-[Security Policy](SECURITY.md).
+Read [Contributing](CONTRIBUTING.md) before opening a pull request. Bugs and
+proposals belong in the [issue tracker](https://github.com/TheBinaryShadow/vt7pty/issues).
+The [Code of Conduct](CODE_OF_CONDUCT.md) applies to project spaces; use the
+[Security Policy](SECURITY.md) for private vulnerability reports.
 
 ## Credits and license
 
-Thank you to **Ryan Prichard and the WinPTY contributors** for the legacy
-console bridge on which this project is based, and to **Microsoft's Console,
-ConPTY, and Windows Terminal teams and community contributors** for the work
-that informs its future direction. See [Credits](CREDITS.md) for acknowledgements
-and the distinction between inherited code and design references.
+I'm grateful to **Ryan Prichard and the WinPTY contributors**, and to
+**Microsoft's Console, ConPTY and Windows Terminal teams and community
+contributors**. Their engineering makes this project possible.
+[Credits](CREDITS.md) and [Upstream provenance](UPSTREAM.md) distinguish inherited
+code from design references.
 
-VT7Pty is distributed under the [MIT License](LICENSE). Original copyright
-notices and upstream history are retained. VT7Pty is an independent project
-and is not an official Microsoft product or an upstream WinPTY release.
+VT7Pty uses the [MIT License](LICENSE). Original copyright notices and upstream
+history are retained. This is an independent project, not an official Microsoft
+product or an upstream WinPTY release.

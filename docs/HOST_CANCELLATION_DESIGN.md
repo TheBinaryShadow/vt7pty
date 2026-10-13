@@ -3,11 +3,11 @@
 Status: H1 and H2 accepted on all three Windows 7 tiers; H3 cancellation is next.
 Updated: 2026-10-13.
 
-This design follows the [cancellation investigation](INPUT_CANCELLATION.md).
-The goal is correct line cancellation while preserving active-child and raw-input
-policies. The production runtime remains 0.5.0.
+I'm following the [cancellation investigation](INPUT_CANCELLATION.md) with
+four stages. I need correct line cancellation while preserving active-child
+and raw-input behavior. The production runtime remains 0.5.0.
 
-## Decisions and gates
+## Plan and acceptance
 
 | Gate | Deliverable | Acceptance |
 | --- | --- | --- |
@@ -70,7 +70,7 @@ This is a controlled consistency experiment, not authentication against a
 malicious application. Class 49 is an internal query/set interface. Production
 must retain agent ownership and validate a host endpoint independently.
 
-## H2 implementation and acceptance
+## H2: Host dispatch and session binding
 
 The test-only [H2 probe](HOST_DISPATCH_PROBE.md) implements the following
 contract. The [rc1 candidate review](validation/2026-10-13-step-1.2-host-dispatch-rc1-candidate.md)
@@ -162,7 +162,7 @@ H2 is accepted on those configurations. Proceed next to an H3 cancellation
 prototype; H2 does not prove read cancellation or qualify production use.
 
 
-## H3 contract, not implemented
+## H3: Cancel the pending read (next)
 
 After H2, evaluate the host's normal input-processing path. Define cancellation
 and event delivery as one operation; first measure whether the host already
@@ -182,7 +182,7 @@ Cover repeated requests, empty/partial lines, no pending read, completion races,
 active children, default handlers, raw keys, PS7, two sessions, timeout after
 receipt, denied access and close during a request. Only then consider H4.
 
-## If a gate fails
+## If an experiment fails
 
 Record the exact failure and reject that approach. Do not relax isolation or
 ownership checks. The separate application-read-shim alternative must specify

@@ -1,8 +1,8 @@
 # Host identity research probe
 
-H1 measures console-host identity and ordinary-read isolation using the unchanged
-released VT7Pty 0.5.0 binaries. A Pass does not mean Ctrl+C is fixed, a dispatch
-thread has been identified, or Milestone 1 is accepted. No hook DLL is included.
+I use H1 to identify each session's console host and check that ordinary reads
+stay isolated. It uses the unchanged released 0.5.0 binaries, with no hook DLL.
+A pass establishes neither cancellation nor the actual dispatch thread.
 
 The [rc1 candidate record](validation/2026-10-13-step-1.2-host-identity-rc1-candidate.md)
 identifies the issued ZIP and passing development evidence. The

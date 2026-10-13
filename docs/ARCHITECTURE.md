@@ -3,9 +3,9 @@
 Status: released 0.5.0 native architecture and planned boundaries. Updated:
 2026-10-13.
 
-This document describes the maintained native architecture through Roadmap
-Milestone 0. Source code remains authoritative when this overview and the
-implementation disagree.
+I use this guide to explain the released native backend and its planned
+boundaries. The source code is authoritative if an implementation detail
+differs from this overview.
 
 ## Purpose
 
@@ -133,42 +133,18 @@ and parent failure require explicit tests.
 
 ## Planned boundaries
 
-Milestone 0 replaced the build system, removed adapter-only and pre-Windows 7
-code, renamed the runtime, modernized the retained C++ implementation, and
-established Windows 7 release acceptance. The exact 0.5.0 baseline is
-[published](validation/2026-10-02-0.5.0-publication.md).
+I'm improving application behavior in [Milestone 1](FIDELITY.md) before
+designing the VT7-facing API. The [cancellation investigation](INPUT_CANCELLATION.md)
+and [host design](HOST_CANCELLATION_DESIGN.md) describe the current experiments.
+These test-only mechanisms do not change the released runtime.
 
-Milestone 1 improves observable backend behavior against the local corpus and
-state measurements in the [fidelity plan](FIDELITY.md). The initial independent
-reader and controlled fixtures are implemented in tests/fidelity, tests/unit
-and tests/fixtures; the [baseline bundle](FIDELITY_BASELINE.md) characterizes
-unchanged 0.5.0 binaries. The
-[initial Windows 7 review](validation/2026-10-12-step-1.1-windows7-baseline.md)
-records target observations and retained prompt-cancellation failures. Broader
-Step 1.1 coverage remains open. The [rc3 extension](validation/2026-10-12-step-1.1-rc3-candidate.md)
-separately measures native-child event/key delivery and cooked-read cancellation;
-the [three-tier target results](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
-confirm passing child policies and retained cooked input after handler delivery.
-The [version 4 mechanism results](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
-reject the two measured direct-API cancellation approaches on all three tiers.
-The query-only [H1 prototype](HOST_IDENTITY_PROBE.md) now has
-[three-tier identity/isolation evidence](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md).
-It identifies each controlled session's actual host process; both observed host
-threads expose GUI state, so that observation alone cannot select a dispatch thread.
-The test-only [H2 probe](HOST_DISPATCH_PROBE.md) uses repeated scoped title events,
-a thread-scoped callback and independently verified pipe peers. Session binding,
-rejection and lifetime controls now have accepted
-[three-tier Windows 7 evidence](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md).
-The [H2-H4 design](HOST_CANCELLATION_DESIGN.md) still requires read cancellation
-and production regression qualification before runtime use.
-Broader baseline coverage remains open. Milestone 2 defines the VT7Pty integration API
-around the proven backend. That API will borrow useful ConPTY
-conventions but must specify an
-explicit Windows 7 process-launch operation and complete ownership, concurrency,
-and shutdown semantics.
+Milestone 2 will define the public contract for the proven backend: process
+launch, handles, streams, errors, concurrency, cancellation and shutdown.
+I'll validate it with a standalone consumer in this repository before the
+Milestone 3 handoff to VT7.
 
-A future ConPTY user-mode shim is outside these milestones. It must address the
-process-creation attachment contract as well as public function names.
+A later ConPTY shim would also need the process-creation attachment contract.
+Matching exported function names alone would not make existing clients work.
 
 ## Architectural rules
 

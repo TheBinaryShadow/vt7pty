@@ -1,6 +1,6 @@
 # Step 0.8 Raw Windows 7 Results
 
-These are the unmodified JSON, text, and diagnostic records supplied for the
+I preserve the original JSON, text and diagnostic records here for the
 [Step 0.8 completion](../../2026-09-24-step-0.8-completion.md). The JSON files
 retain the complete installed-update inventories and per-case output. The
 temporary agent-rejection fixture directories were not retained because their

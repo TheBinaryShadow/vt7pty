@@ -1,10 +1,9 @@
 # Running the VT7Pty 0.5.0 Fidelity Baseline
 
-This is a characterization bundle for Roadmap Step 1.1 and controlled mechanism
-research for Step 1.2. It combines the unchanged,
-accepted 0.5.0 DLL/agent with a separately identified new harness, fixture and
-independent VT state reader. Its manifest records both source identities and
-hashes. It is not a new runtime release or Milestone 1 acceptance.
+I use this bundle to measure the 0.5.0 backend and investigate cancellation.
+It combines the unchanged released DLL and agent with a separately identified
+harness, fixture and VT state reader. The manifest records both source
+identities and hashes. These are research tests, not a new runtime release.
 
 ## Windows 7 runs
 
@@ -145,54 +144,24 @@ HarnessHealthy false. The [Windows 7 review](validation/2026-10-13-step-1.2-mech
 records both probes failing on all three tiers. Their results supplement
 the rc3 target baseline; F01 remains unresolved.
 
-## Recorded initial baseline
+## Recorded results
 
-The [candidate review](validation/2026-10-12-step-1.1-candidate.md) identifies
-step-1.1-rc1 and its development-host observations. The
-[Windows 7 review](validation/2026-10-12-step-1.1-windows7-baseline.md) preserves
-the same candidate's three target runs: NESSY and TURTLE each report 19 Pass /
-4 Fail; LEOPARD reports 17 Pass / 4 Fail / 2 NotApplicable. All four failures
-concern Command Prompt and installed Windows PowerShell prompt cancellation.
-The controlled Unicode and resize cases pass on all three targets; PowerShell 7
-passes on A/B. Oracles and fault controls pass, with no harness failures.
+I preserve failures as baseline measurements. None of these bundles qualifies
+a production cancellation fix.
 
-These are initial characterization results. Step 1.1 remains open for the
-PendingCoverage recipes, and failing workflows have not been accepted.
+| Bundle | What I learned | Reviews |
+| --- | --- | --- |
+| Initial Step 1.1 baseline | Four prompt-cancellation failures per Windows 7 machine; controlled Unicode/resize passed | [Candidate](validation/2026-10-12-step-1.1-candidate.md), [Windows 7](validation/2026-10-12-step-1.1-windows7-baseline.md) |
+| Step 1.1 rc3 | Applicable active-child tests passed; four prompt failures and two cooked-read failures remained per machine | [Candidate](validation/2026-10-12-step-1.1-rc3-candidate.md), [Windows 7](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md) |
+| Step 1.2 mechanism rc1 | Both public-API cancellation probes failed on all three targets; original outcomes and child checks were unchanged | [Candidate](validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md), [Windows 7](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md) |
 
-## Current extension candidate
+Rc2 was stopped before handoff because its serializer lost nested child metadata.
+Rc3 fixed that and checked native/aggregate agreement. The reviews retain the
+separate development-host results and explain where they differ from Windows 7.
 
-[Step-1.1-rc3](validation/2026-10-12-step-1.1-rc3-candidate.md) has completed its
-[three-tier target characterization](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md):
-NESSY and TURTLE each report 31 Pass / 6 Fail; LEOPARD reports 26 Pass / 6 Fail /
-5 NotApplicable. Every applicable active-child case passes. Both oracles and all
-ten fault controls pass on every target, including portable JSON under PowerShell 2.0.
-
-The same six cancellation cases fail on all targets: four native-editor prompt
-cases and two cooked-read probes. Each probe delivers one Ctrl+C event but leaves
-ReadConsole pending with retained typed text. These results supplement the
-separate development-host comparison of 29 Pass / 8 Fail; bounded Unicode and
-resize pass on Windows 7.
-
-Rc2 was stopped before handoff because its aggregate serializer lost nested
-child metadata. Rc3 corrects that and verifies all native/aggregate observations.
-The target review preserves complete failed records as baseline evidence;
-seven remaining coverage groups keep Step 1.1 open. Future candidates must
-retain actual failures and obtain their own applicable target evidence.
-
-## Current mechanism candidate
-
-[Step-1.2-mechanism-rc1](validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
-contains the version 4 public-API probes and all prior recipes. Its development
-run reports 29 Pass / 10 Fail: the eight prior workflow failures and two mechanism
-failures, with no harness errors. The second-read check detects lost new input
-after an apparently successful direct cancellation on WOLF.
-The [Windows 7 review](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
-records 31 Pass / 8 Fail on NESSY and TURTLE, and 26 Pass / 8 Fail /
-5 NotApplicable on LEOPARD. Both mechanisms fail; direct cancellation returns
-error 1168 while the read remains pending. After Enter recovery, the next read
-works normally. All original recipe outcomes and applicable child guards match
-rc3, with healthy harnesses and no missing required cases.
-The research runtime remains unchanged 0.5.0 and no production fix is qualified.
+Seven PendingCoverage groups keep Step 1.1 open. Every future candidate needs
+its own applicable Windows 7 evidence; the [investigation](INPUT_CANCELLATION.md)
+records the next approach.
 
 ## Development commands
 

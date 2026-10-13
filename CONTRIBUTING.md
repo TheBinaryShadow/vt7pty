@@ -1,17 +1,14 @@
 # Contributing to VT7Pty
 
-Thank you for helping improve the console backend for VT7 on Windows 7 and
-later.
-VT7Pty is in early development, and focused changes with reproducible evidence
-are especially useful.
+I welcome help improving the console backend for VT7 on Windows 7 and later.
+Focused changes, small reproductions and clear test results are especially
+useful while the project is in early development.
 
 ## Before starting
 
-Read the [README](README.md),
-[development foundation](docs/FOUNDATION.md), [roadmap](ROADMAP.md),
-[architecture](docs/ARCHITECTURE.md),
-[compatibility contract](docs/COMPATIBILITY.md), [build notes](BUILDING.md), and
-[upstream record](UPSTREAM.md). Search the
+Start with the [README](README.md), [roadmap](ROADMAP.md) and
+[build guide](BUILDING.md). The [documentation index](docs/README.md) links
+architecture, compatibility and upstream history when you need them. Search the
 [issue tracker](https://github.com/TheBinaryShadow/vt7pty/issues) before opening
 a new report or proposal.
 
@@ -21,7 +18,7 @@ documentation corrections and focused fixes can go straight to a pull request.
 
 ## Project priorities
 
-The primary goal is application-facing fidelity and reliability on Windows 7+,
+My first goal is application-facing fidelity and reliability on Windows 7+,
 followed by a clean integration boundary for eventual use in VT7. ConPTY is a
 behavioral and architectural reference. Compatibility for unrelated consumers
 is later work; a kernel driver is outside the project direction.
@@ -72,7 +69,7 @@ logs and crash reports. Report suspected vulnerabilities through
 
 ## Source and attribution
 
-Follow the approved C++20 repository style and keep maintained targets clean
+Follow the C++20 repository style and keep maintained targets clean
 under `/W4 /WX` and Release static analysis. Do not extend retired compiler,
 Unix-adapter, XP, or Vista paths.
 Explain why a remaining compatibility workaround exists and preserve relevant
@@ -96,6 +93,17 @@ A useful pull request explains:
 
 Keep changes reviewable and commit subjects descriptive. Draft pull requests
 are welcome for bounded experiments; label unproven conclusions clearly.
+
+## Documentation
+
+I write project decisions, plans and test reviews in first person. Keep
+technical facts direct and instructions easy to follow. Use familiar language,
+short paragraphs and descriptive links; put detailed measurements in validation
+records instead of repeating them across guides. Avoid em dashes.
+
+Keep recorded outcomes, hashes and raw test files unchanged during editorial
+work. Preserve upstream authorship and historical quotations. If a fact needs
+correction, explain it in the review or add a dated follow-up.
 
 ## License and community
 

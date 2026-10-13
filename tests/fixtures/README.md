@@ -1,9 +1,9 @@
 # Native console fixtures
 
-These small executables give the maintained test suite controlled child
-processes for argument, input, output, Unicode, and console API behavior. They
-were inherited from WinPTY's `misc` directory and moved here without turning
-interactive behavior into unattended tests.
+I use these small executables as controlled child processes for argument,
+input, output, Unicode and console API tests. They came from WinPTY's
+`misc` directory. Moving them here did not make their interactive tests
+suitable for unattended execution.
 
 | Fixture | Purpose |
 | --- | --- |

@@ -1,13 +1,13 @@
 # Credits and acknowledgements
 
-VT7Pty exists because others solved difficult console and terminal problems
-before us. We want their work to remain visible as this project develops.
+I'm building VT7Pty on work by people who solved difficult console and terminal
+problems long before this project. I want their contributions to stay visible.
 
 ## WinPTY
 
 **Ryan Prichard** created [WinPTY](https://github.com/rprichard/winpty), the
 implementation from which VT7Pty is derived. Its hidden-console agent, input
-translation, screen scraping, resizing, and compatibility work provide our
+translation, screen scraping, resizing, and compatibility work provide my
 starting point.
 
 The inherited Git history through
@@ -44,7 +44,7 @@ terminal parsing, text handling, and terminal behavior.
 The [Microsoft Terminal repository](https://github.com/microsoft/terminal)
 and [its contributors](https://github.com/microsoft/terminal/graphs/contributors)
 are important references for VT7Pty's direction. ConPTY is currently a source
-of design inspiration and behavioral guidance; this rebranding does not copy
+of design inspiration and behavioral guidance; this project does not include
 its implementation or claim compatibility with it. If code is adopted later,
 its exact provenance and required notices will be recorded at that time.
 

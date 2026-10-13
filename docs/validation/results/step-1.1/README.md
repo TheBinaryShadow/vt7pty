@@ -1,6 +1,6 @@
 # Step 1.1 Initial Fidelity Baseline Evidence
 
-Date: 2026-10-12. Initial step-1.1-rc1 corpus only; Step 1.1 remains open.
+Date: 2026-10-12. I recorded the initial step-1.1-rc1 corpus here; Step 1.1 remains open.
 
 | Directory | Platform / machine | Original run ID | Pass / Fail / NotApplicable |
 | --- | --- | --- | --- |

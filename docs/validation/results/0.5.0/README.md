@@ -1,6 +1,6 @@
 # VT7Pty 0.5.0 Raw Windows 7 Results
 
-These are the unmodified JSON, text, and diagnostic records returned for the [0.5.0 release acceptance](../../2026-10-02-0.5.0-release-acceptance.md). All 18 raw files were copied and verified byte for byte against the returned originals. The JSON records retain complete update inventories, test outputs, and machine identities. Temporary agent-rejection fixture directories are omitted; their outcomes are recorded in the JSON tests.
+I preserve the original JSON, text and diagnostic records here for the [0.5.0 release acceptance](../../2026-10-02-0.5.0-release-acceptance.md). All 18 raw files were copied and verified byte for byte against the returned originals. The JSON records retain complete update inventories, test outputs, and machine identities. Temporary agent-rejection fixture directories are omitted; their outcomes are recorded in the JSON tests.
 
 The generated `release-review.json` also remains here. It reports `Pass`, zero failures, and `PublicationApproved: false`; SHA-256: `25ed300546fc372fcfdcc8f6d56fd8c164b140d309c17ebb710679931afffebb`.
 

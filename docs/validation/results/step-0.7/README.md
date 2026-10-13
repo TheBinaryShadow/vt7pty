@@ -1,7 +1,6 @@
 # Step 0.7 Raw Physical Results
 
-These files are the unmodified results supplied for the accepted Step 0.7
-candidate. See the
+I preserve the original results here for the accepted Step 0.7 candidate. See the
 [completion record](../../2026-09-24-step-0.7-completion.md) for interpretation
 and the recorded `NESSY` environment disposition.
 

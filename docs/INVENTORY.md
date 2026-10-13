@@ -3,9 +3,8 @@
 Status: completed for Roadmap Step 0.1 and updated through Step 0.6.
 Updated: 2026-09-22.
 
-This inventory began as the classification of the inherited WinPTY tree. It is
-kept current as items move or are removed so the disposition of inherited
-material remains reviewable.
+I started this inventory to decide what to retain, modernize or remove from
+WinPTY. I update it as files move so those decisions remain traceable.
 
 ## Classification
 

@@ -1,120 +1,72 @@
-# VT7Pty Testing Strategy
+# Testing VT7Pty
 
-Status: Milestone 0 accepted; Milestone 1 fidelity execution plan established.
-Updated: 2026-10-13.
+I use local native tests, portable Windows 7 packages and focused research
+probes. They answer different questions, so a passing research probe does not
+replace release acceptance. The [roadmap](../ROADMAP.md) records what is complete.
 
-This document defines how VT7Pty distinguishes preserved WinPTY behavior, new
-regressions, inherited limitations, and accepted improvements. Results must
-identify the exact source and binaries under test.
+## Choose a test run
 
-## Principles
-
-- Capture a baseline before removal, renaming, or intentional behavior changes.
-- Add tests throughout modernization rather than postponing them to its end.
-- Automate deterministic protocol and lifecycle checks where practical.
-- Test observable terminal state when multiple byte encodings are equivalent.
-- Keep development-host results separate from physical Windows 7 acceptance.
-- Report every required case as pass, fail, skipped, or not run.
-- Preserve failures and partial results; missing coverage is not a pass.
-- Use negative controls to prove that the harness detects broken behavior.
-- Keep credentials, private terminal content, and personal information out of
-  default logs and published artifacts.
-
-## Execution model
-
-Verification uses repository-owned native executables and Windows PowerShell
-scripts. There is no hosted build or test service.
-
-The maintained entry point is `Verify-VT7Pty.ps1`. Tests that must run
-on Windows 7 will work from a portable package without Visual Studio. The
-target-side acceptance and diagnostic scripts are designed for the PowerShell
-2.0 version included with Windows 7 SP1; development-host build tools retain their
-modern PowerShell requirements.
-
-| Layer | Purpose | Expected execution |
+| Task | Entry point | Guide |
 | --- | --- | --- |
-| Unit | Encoding, buffers, mappings, protocol helpers, and deterministic algorithms | Development host; portable subset on targets where useful |
-| Component | Client/agent control, fixtures, pipes, spawn, resize, and teardown | Development host and portable Windows 7 package |
-| Contract | Public API ownership, errors, concurrency, cancellation, and version negotiation | Introduced during rebranding and completed in Milestone 2 |
-| Application | Command Prompt, Windows PowerShell, and defined console applications | Development-host comparison and physical acceptance |
-| Stress | Repeated lifecycle/resize, long sessions, resource stability, and output load | Bounded local and physical-machine runs |
-| Manual | Keyboard layouts, interactive editing, repaint, resize, and screen restoration | Recorded physical-machine procedure |
+| Verify a local build | Verify-VT7Pty.ps1 | Commands below |
+| Test a release candidate | The candidate's -tests.zip | [Windows 7 acceptance](WINDOWS7_ACCEPTANCE.md) |
+| Measure shell and console fidelity | Fidelity baseline package | [Runner guide](FIDELITY_BASELINE.md) |
+| Check console-host identity | Host identity research package | [H1 probe](HOST_IDENTITY_PROBE.md) |
+| Check host dispatch and isolation | Host dispatch research package | [H2 probe](HOST_DISPATCH_PROBE.md) |
+| Collect failure details | Diagnostic tools | [Diagnostics](DIAGNOSTICS.md) |
 
-## Baseline record
+The target runners support Windows PowerShell 2.0 without KB3191566.
+Build-host commands use the tools in [Building](../BUILDING.md). I do not use
+hosted CI.
 
-Before obsolete components are removed, preserve:
+## Local verification
 
-- exact source revision and working-tree state,
-- compiler, SDK, architecture, configuration, runtime model, and build command,
-- artifact names, sizes, hashes, imports, exports, and symbol identity,
-- test command, timeout, exit status, and captured output,
-- development-host OS information and separate target information,
-- known failures, limitations, skipped cases, and reasons.
+From the repository root:
 
-Roadmap Step 0.1 produced the accepted
-[inherited native baseline](validation/2026-09-21-upstream-baseline.md) through
-a temporary checked-in harness. It records Debug/Release artifacts, hashes,
-imports, exports, warnings, and the two inherited test results. Step 0.2 must
-reproduce that boundary through the supported MSBuild workflow. The original
-ignored environment-check harness is no longer baseline evidence.
-
-Roadmap Step 0.2 now provides the first maintained development-host command:
-
-```powershell
+~~~powershell
 .\Verify-VT7Pty.ps1
-```
+~~~
 
-Release verification also runs the MSVC native code analyzer. It can be run
-independently with `.\Analyze-VT7Pty.ps1`; diagnostics fail the build, just as
-compiler warnings do under the maintained `/W4 /WX` policy.
+This builds and tests Debug and Release by default. Results and binary inspection
+records go under artifacts/verification. Each configuration keeps tests.json
+and tests.txt even when a case fails before binary inspection finishes.
 
-It builds Debug and Release by default, runs unit, protocol, lifecycle,
-application, agent-rejection, argument-quoting, and bounded-output checks. The
-negative controls exercise a missing agent plus malformed, wrong-identity,
-older, and newer protocol handshakes. It validates
-architecture, subsystem floor, direct imports, the inherited DLL export
-boundary, PDB presence, and generated artifact identity for all maintained
-binaries. Results and dumpbin evidence are written below ignored
-`artifacts/verification`. Verification also extracts every embedded manifest,
-requires the Windows 7 through Windows 11 compatibility declarations, rejects
-delay-loaded DLLs and a maintained set of post-Windows 7 direct imports, and
-runs real Command Prompt and Windows PowerShell sessions after a resize. The
-interactive console fixtures are built and inspected here but remain reserved
-for focused tests that can provide their required console and input state.
+The suite covers units, protocol validation, missing/incompatible agents, child
+launch, quoting, output, console input, Unicode, resize, lifecycle, diagnostics
+and deliberate faults. Inspection checks x64 images, subsystem 6.01, imports,
+exports, PDBs, resources and embedded compatibility manifests. It rejects
+delay-loaded DLLs and a maintained list of post-Windows 7 direct imports.
+Release verification also runs static analysis under /W4 /WX.
 
-Source and caller line resolution can be checked independently with:
+The current local suite has 31 checks without the optional soak, including
+the H1 and H2 logic checks. Historical release bundles retain their own counts;
+the published 0.5.0 acceptance bundle has 30 cases including its full soak.
 
-```powershell
-.\tools\debug\Verify-SourceDebugging.ps1
-```
+For a short local soak:
 
-That check launches the Debug integration test under CDB, breaks at
-`vt7pty_config_new`, and requires resolved locations in both `vt7pty.cc` and
-`BackendSmokeTest.cc`. These checks establish build-transition parity only; they do
-not satisfy the broader permanent suite or either physical Windows 7 tier.
+~~~powershell
+.\Verify-VT7Pty.ps1 -Configuration Release -SoakMinutes 1
+~~~
 
-The accepted clean-commit result is the
-[2026-09-21 MSBuild transition record](validation/2026-09-21-msbuild-transition.md).
-The added fixture/tool boundary and source-debugging proof are recorded in the
-[2026-09-22 Step 0.2 completion record](validation/2026-09-22-step-0.2-completion.md).
-The same boundary passed after obsolete infrastructure and compatibility code
-were removed, as recorded in the
-[2026-09-22 Step 0.3 completion record](validation/2026-09-22-step-0.3-completion.md).
-Step 0.6 adds the warning-clean compiler/analyzer gate and a focused
-`ModernCppTest` for the standard formatting and checked-narrowing replacements.
-Step 0.8 adds `SessionFixture` and `SessionContractTest` as separate controlled
-child and component executables. The default local command runs both Debug and
-Release suites. A one-minute soak can be exercised locally with
-`./Verify-VT7Pty.ps1 -Configuration Release -SoakMinutes 1`.
+[Building](../BUILDING.md) covers standalone analysis and source debugging.
+The [native security review](SECURITY_REVIEW.md) distinguishes automated checks
+from design review. The live diagnostic-pipe descriptor can also be checked with:
 
-The normal suite verifies exact output order and exit status, console input,
-Unicode output, 100 resizes under load, 500 repeated sessions after five warm-up
-sessions, 20 live-session shutdowns, failed child creation, and four concurrent
-sessions. It also verifies that deliberate output, status, order, truncation,
-timeout, and handle-leak faults are detected. The agent compatibility controls
-remain separate. `artifacts/verification/x64/<configuration>/tests.json` and
-`tests.txt` retain each local case status even if a case fails before binary
-inspection completes.
+~~~powershell
+.\artifacts\bin\x64\Release\VT7Pty-DebugServer.exe --self-test
+~~~
+
+## How I assess results
+
+I record the baseline before changing behavior, use deterministic tests where
+possible, and compare terminal state when different byte streams can represent
+the same result. Tests that deliberately inject incorrect output, status or
+lifetime behavior must prove that the harness detects it.
+
+Every required case keeps its actual Pass, Fail, Skipped or NotRun result.
+Missing coverage stays open. I preserve partial runs and failures, and separate
+development-host observations from Windows 7 results. Default logs must exclude
+credentials and private terminal content.
 
 ## Coverage matrix
 
@@ -136,7 +88,7 @@ inspection completes.
 Exact fixtures, expected terminal state, timeouts, target-specific skips, and
 resource budgets are deliverables of the relevant implementation step.
 
-## Physical Windows 7 matrix
+## Windows 7 test matrix
 
 | Candidate | Non-ESU Windows 7 SP1 x64 | ESU Windows 7 SP1 x64 | Legacy PowerShell 2.0 Windows 7 SP1 x64 |
 | --- | --- | --- | --- |
@@ -154,10 +106,9 @@ contains the runner, runtime binaries, native tests, fixtures, and a hash
 manifest. Matching symbols are in the separate symbols archive. The same test
 ZIP is run on all three machines.
 
-## Initial stress profiles
+## Stress profiles
 
-These are starting acceptance workloads and may be revised with recorded
-evidence:
+I use these acceptance workloads and change them only with recorded evidence:
 
 - 500 output-checked create and close cycles following five warm-up sessions;
 - 100 alternating 80x25 and 120x40 resizes during 200 numbered output rows;
@@ -167,78 +118,29 @@ evidence:
 
 The portable milestone runner includes the 120-minute soak by default. Setting
 `-SoakMinutes 0` provides a fast diagnostic run but records the soak as
-`NotRun` and fails the Step 0.8 milestone preflight. A per-case timeout exceeds
+`NotRun` and fails milestone/release preflight. A per-case timeout exceeds
 the requested soak duration by two minutes. Output is bounded to one MiB per
 session; the fixture load is 200 rows and the runner kills timed-out process
 trees. The four-handle budget follows warm-up to exclude one-time runtime
 initialization.
 
-## Application and remote scenarios
+## Fidelity and cancellation research
 
-Command Prompt and Windows PowerShell are required local acceptance cases.
-Record exact versions and relevant configuration such as profiles or line-editing
-modules.
+I use the [fidelity plan](FIDELITY.md) for the application corpus, expected state,
+timing limits and remaining coverage. The
+[baseline guide](FIDELITY_BASELINE.md) explains clean shell profiles, pinned
+PowerShell versions and how to interpret expected fault-control results.
+Marker output alone does not establish complete screen, cursor or attribute fidelity.
 
-The [Milestone 1 fidelity plan](FIDELITY.md) defines the local shell/native
-application corpus, planned F01-F09 cases, state oracles, budgets, and evidence.
-The existing marker checks do not establish complete screen/cursor/attribute
-fidelity. The initial [fidelity baseline bundle](FIDELITY_BASELINE.md) now runs
-bounded state/input/shell observations and fault controls against the unchanged
-0.5.0 runtime. Remaining coverage is explicitly NotRun in its case manifest;
-the [initial Windows 7 review](validation/2026-10-12-step-1.1-windows7-baseline.md)
-preserves all three target runs and their four prompt-cancellation failures per
-machine. The version 1 initial characterization is complete. Harness version 3 adds
-active-child and cooked-read cases; their
-[three-tier review](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md) records
-all applicable child cases passing and six cancellation failures per machine.
-Portable JSON round-trips pass under both installed engine generations. Broader
-Step 1.1 coverage and milestone acceptance remain open. Preserve the existing
-30-case regression suite
-and review the new binary imports through the maintained verifier. The
-[rc3 review](validation/2026-10-12-step-1.1-rc3-candidate.md) preserves complete local
-extension evidence and verifies native/aggregate metadata equality before handoff.
+Ctrl+C cancellation remains unresolved in CMD and native Windows PowerShell.
+The [investigation](INPUT_CANCELLATION.md) records failed public-API approaches.
+The [console-host design](HOST_CANCELLATION_DESIGN.md) separates identity (H1),
+dispatch (H2), cancellation (H3) and production integration (H4).
+H1 and H2 are accepted; neither cancels a read or reruns the wider fidelity corpus.
 
-The [input cancellation investigation](INPUT_CANCELLATION.md) adds two
-test-only mechanism probes in harness version 4. They record API results,
-pending-read cancellation and a second read before considering runtime changes.
-The fixture owns the targeted thread and does not enumerate application readers.
-The [three-tier mechanism results](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
-reject both approaches: direct cancellation returns error 1168 with the read
-pending; records retain the line and add character 0x03. The next read succeeds
-after boundary Enter recovery. All original outcomes and child guards remain
-unchanged. These are failed mechanism measurements, not runtime acceptance.
-
-Console-SSH and remote Vim/htop are deferred optional scenarios, with
-[setup prerequisites](SSH_BASELINE.md) retained for later use. They do not
-block local Milestone 1 acceptance. VT7's direct SSH transport bypasses this
-backend.
-
-## Console-host research gate
-
-The [H1 probe](HOST_IDENTITY_PROBE.md) has a separate portable package and
-PowerShell 2.0-compatible runner. Each target runs three repetitions covering
-host association, concurrent pending reads and replacement-session isolation.
-The local verifier also checks its imports and ten-case query oracle, making
-30 local checks without the optional soak. Existing acceptance packages retain
-their historical counts. The
-[H1 target review](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
-accepts all nine repetitions on the three designated Windows 7 tiers, including
-the PowerShell 2.0 runner. Its independent review preserves 132 returned files
-and checks 54 host observations and 27 read results. H1 success does not
-establish cancellation or dispatch; the [design](HOST_CANCELLATION_DESIGN.md)
-defines the subsequent gates. The wider fidelity corpus was not rerun by H1.
-
-The separate [H2 package](HOST_DISPATCH_PROBE.md) repeats actual host callback,
-request/acknowledgment and isolation/lifetime checks three times per target.
-It includes an x64 research DLL and keeps the released runtime pinned.
-Its 13-case protocol oracle brings current local verification to 31 checks
-without the optional soak. The
-[H2 target review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
-accepts all nine repetitions, including PowerShell 2.0 without KB3191566.
-Independent review preserves 519 returned files and checks 54 host lifetimes,
-225 exchanges, 45 reads and 3,647 consistent discovery events without overflow.
-The deliberate receipt-only timeout and rejected requests remain explicit
-controls. H2 does not rerun the broader corpus or establish cancellation.
+Each research package has its own instructions and evidence. I keep the
+released 0.5.0 regression suite and full Windows 7 soak as separate requirements.
+[Console-SSH testing](SSH_BASELINE.md) is optional later work.
 
 ## Negative controls
 
@@ -255,7 +157,7 @@ isolated group with bounded cleanup.
 
 ## Result records
 
-Each acceptance record includes:
+I keep the following with each acceptance record:
 
 - source commit, dirty-state description, version, and artifact hashes,
 - configuration, compiler, SDK, dependencies, and package ID,
@@ -266,16 +168,7 @@ Each acceptance record includes:
 - differences from the previous accepted baseline,
 - known defects, untested areas, and the next decision enabled by the result.
 
-Reusable procedures remain here. Immutable results will live under
-`docs/validation/` and roadmap items will link to their evidence.
-
-Step 0.7 also validates structured diagnostic record bounds and escaping in
-`ProtocolTest.exe`, and validates the real debug-pipe ACL with:
-
-```powershell
-.\artifacts\bin\x64\Release\VT7Pty-DebugServer.exe --self-test
-```
-
-Physical failure collection follows [Diagnostics](DIAGNOSTICS.md). The
-[native boundary security review](SECURITY_REVIEW.md) records which properties
-are automated and which are architectural dispositions.
+I keep reusable procedures here and dated reviews in the
+[validation index](validation/README.md). Raw machine records retain their
+original bytes; edits to review prose must preserve the measured results and
+explain any factual correction.

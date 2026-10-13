@@ -1,6 +1,6 @@
 # Step 0.9 Raw Windows 7 Results
 
-These are unmodified JSON, text, and diagnostic records supplied for the
+I preserve the original JSON, text and diagnostic records here for the
 [Step 0.9 completion](../../2026-09-25-step-0.9-completion.md). All 18 retained
 files match the returned originals byte for byte. The JSON files retain the
 complete installed-update inventories, test outputs, and machine identities.

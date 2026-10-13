@@ -1,6 +1,6 @@
 # Host dispatch rc1 evidence
 
-Recorded: 2026-10-13. H2 accepted on NESSY, TURTLE and LEOPARD.
+Recorded: 2026-10-13. I accepted H2 on NESSY, TURTLE and LEOPARD.
 See the [Windows 7 review](../../../2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
 and the earlier [candidate review](../../../2026-10-13-step-1.2-host-dispatch-rc1-candidate.md).
 

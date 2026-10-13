@@ -2,9 +2,9 @@
 
 Status: implemented for Roadmap Step 0.5 and the 0.5.0 baseline.
 
-VT7Pty keeps separate identities for its package, public API, internal
-client-agent protocol, and exact source. One number cannot describe all four
-without making compatibility ambiguous.
+I version the package, public API and client-agent protocol separately, and
+record the exact source commit. This keeps a release number from implying
+compatibility that has not been established.
 
 ## Current identities
 

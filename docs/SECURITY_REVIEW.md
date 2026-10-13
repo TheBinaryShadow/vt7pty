@@ -1,9 +1,9 @@
 # Native Boundary Security Review
 
-This review records the Milestone 0 Step 0.7 audit of VT7Pty's application,
-client, agent, child-process, and diagnostic boundaries. It describes the
-current `0.5.0-dev` architecture; it is not a claim that arbitrary code in the
-same Windows logon session is isolated from the user who owns that session.
+I reviewed the application, client, agent, child-process and diagnostic
+boundaries during Milestone 0 Step 0.7. This records the `0.5.0-dev`
+architecture at that stage. It does not establish isolation from arbitrary
+code running under the same Windows user.
 
 ## Named pipes and peer identity
 

@@ -1,5 +1,8 @@
 # VT7Pty upstream provenance
 
+I keep the origin of inherited code and design references here. Git history,
+licenses and contributor credits remain part of the project.
+
 ## WinPTY foundation
 
 | Item | Baseline |
@@ -18,7 +21,7 @@ in [docs/UPSTREAM_WINPTY_README.md](docs/UPSTREAM_WINPTY_README.md), and
 ## Current divergence
 
 VT7Pty now uses a Windows 7 SP1+ x64 platform contract, VS2022/MSBuild and
-C++20, a native-only source tree, a `0.5.0-dev` VT7Pty identity, and maintained
+C++20, a native-only source tree, the released `0.5.0` VT7Pty identity, and maintained
 local build, test, diagnostic, and packaging commands. The inherited Unix
 adapter, pre-Windows 7 paths, and obsolete build infrastructure were removed.
 The retained native implementation has been modernized without claiming
@@ -37,7 +40,7 @@ console-host and ConPTY work, is an architectural and behavioral reference.
 Credit belongs to Microsoft and the project's contributors. Its upstream
 [license](https://github.com/microsoft/terminal/blob/main/LICENSE) is MIT.
 
-This rebranding imports no ConPTY implementation. Acknowledging its influence
+I have not imported a ConPTY implementation. Acknowledging its influence
 does not imply that VT7Pty implements its ABI or process-attachment contract.
 Future source reuse must record the exact upstream revision, adapted files,
 changes, and applicable notices when it happens.

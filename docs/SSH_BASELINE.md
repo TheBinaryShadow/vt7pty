@@ -3,11 +3,10 @@
 Status: deferred optional scenario; not a local Milestone 1 acceptance dependency.
 Updated: 2026-10-12.
 
-Earlier testing plans retained SSH and remote full-screen applications as
-an unresolved dependency. The [Milestone 1 fidelity plan](FIDELITY.md) now
-prioritizes local shells, native children and controlled full-screen fixtures.
-A remote endpoint and console SSH client are not required to begin or complete
-that local milestone.
+I've deferred console-SSH and remote full-screen testing while I focus on
+local shells, native children and controlled fixtures in the
+[Milestone 1 fidelity plan](FIDELITY.md). A remote endpoint and console SSH
+client are not required for that milestone.
 
 This scenario would launch a Windows console SSH client inside VT7Pty and
 exercise its input/output path against remote applications such as Vim or

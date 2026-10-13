@@ -2,8 +2,8 @@
 
 Status: the exact `0.5.0` package passed all three Windows 7 tiers and was [published](validation/2026-10-02-0.5.0-publication.md). Updated: 2026-10-02.
 
-VT7Pty uses local VS2022/MSBuild commands, physical Windows 7 acceptance, and a
-reviewed manual GitHub Release. There is no hosted build or test service.
+I build and verify locally, test the exact package on Windows 7, then publish
+a GitHub Release manually. There is no hosted build or test service.
 [CHANGELOG.md](../CHANGELOG.md) records VT7Pty changes; the inherited
 [WinPTY release history](../RELEASES.md) remains historical.
 
@@ -74,7 +74,7 @@ publication.
 
 The [rc7 completion record](validation/2026-09-25-step-0.9-completion.md)
 documents the passing review and all three accepted target runs, including the
-owner's machine-environment disposition. It validates this manual process.
+machine inventory and the acceptance decisions I recorded. It validates this process.
 The exact `0.5.0` package has now passed its own
 [release acceptance](validation/2026-10-02-0.5.0-release-acceptance.md).
 
@@ -96,9 +96,9 @@ and checksums before publication.
 Before publication, review the exact clean commit/tag target, local verification
 and physical records, exports/imports/resources/manifests/symbols, license and
 attribution, changelog, release notes, and every final archive/checksum. Tag
-and GitHub publication are separate user decisions after a concrete reviewable
-result exists. Once authorized, push the tag, upload the four ZIPs, release-set
-manifest, and checksum file, then verify the hosted downloads against SHA-256.
+and GitHub publication are decisions I make after reviewing the final result.
+I push the tag and publish the four ZIPs, release-set manifest and checksum
+file, then verify the hosted downloads against SHA-256.
 
 The `milestone-0-start` tag is a planning marker, not a release tag. Installers
 and code signing remain outside the initial release process.

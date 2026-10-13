@@ -1,10 +1,11 @@
 # Inherited Native Baseline: 2026-09-21
 
-Status: accepted development-host baseline for Roadmap Step 0.1.
+Date: 2026-09-21.
 
-This record captures the unmodified WinPTY-derived native runtime before
-VT7Pty build replacement, component removal, technical rebranding, or source
-modernization. It is comparison evidence, not Windows 7 acceptance.
+I accepted this development-host baseline for Step 0.1. It records the
+unmodified WinPTY-derived runtime before build replacement, component removal,
+renaming or source modernization. It gives me a comparison point; it does not
+establish Windows 7 acceptance.
 
 ## Identity
 

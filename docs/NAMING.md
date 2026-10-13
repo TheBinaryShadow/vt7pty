@@ -2,8 +2,8 @@
 
 Status: implemented in Roadmap Step 0.5. Updated: 2026-09-22.
 
-VT7Pty deliberately uses its own technical identity. The rename from the
-inherited WinPTY surface is a source and binary compatibility break. No WinPTY
+I chose a distinct technical identity for VT7Pty. Renaming the inherited
+WinPTY interface deliberately breaks source and binary compatibility. No WinPTY
 compatibility headers, exported aliases, duplicate binaries, environment
 variable aliases, or endpoint aliases are shipped.
 

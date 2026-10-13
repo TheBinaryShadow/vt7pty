@@ -1,89 +1,64 @@
-# VT7Pty Compatibility Contract
+# Compatibility
 
-Status: approved target contract; exact 0.5.0 release package accepted on all three tiers.
-Updated: 2026-10-12.
+I target Windows 7 SP1 and later on x64. The exact 0.5.0 release passed
+[acceptance on all three Windows 7 tiers](validation/2026-10-02-0.5.0-release-acceptance.md).
+A target platform or a successful build is not, by itself, a tested compatibility
+claim.
 
-This document separates approved targets from verified support. A target is not
-a compatibility claim until an identified build passes the required procedure.
+## Platform and runtime
 
-## Current status
-
-| Area | Current status |
+| Area | Policy or measured status |
 | --- | --- |
-| Source baseline | WinPTY `0.4.4-dev` at upstream commit `7e59fe2` |
-| Development host | Maintained x64 Debug/Release workflow verified and source-debugged on Windows 10 build 19044 |
-| Windows 7 runtime | Steps 0.4 through 0.9 accepted on Windows 7 SP1 x64; recorded evidence dispositions apply |
-| Architectures | x64 is the approved product architecture; inherited x64 smoke tests passed locally |
-| Build interface | VS2022/MSBuild and repository PowerShell entry points; inherited build and packaging paths removed |
-| API and binaries | VT7Pty `0.5.0` exact package accepted on three Windows 7 tiers; API 1.0 and client-agent protocol 1 |
-| ConPTY compatibility | Not implemented; ConPTY is a design and behavioral reference |
-| VT7 integration | Planned; no integration claim |
-| Releases | See [GitHub Releases](https://github.com/TheBinaryShadow/vt7pty/releases) and exact-build validation records for published assets |
+| Minimum system | Windows 7 SP1 x64 |
+| Later targets | Windows 8, 8.1, 10 and 11 on x64 |
+| Outside scope | XP, Vista and x86 |
+| Development evidence | x64 Debug/Release builds and source debugging on Windows 10 build 19044 |
+| Release baseline | 0.5.0, public API 1.0, client-agent protocol 1 |
+| Runtime dependencies | Static MSVC runtime; no compiler or SDK needed on the target |
+| VT7 integration | Planned |
+| ConPTY compatibility | Not implemented |
 
-Historical WinPTY support statements describe upstream releases and do not
-qualify future VT7Pty builds.
+I removed XP/Vista code and obsolete build paths during Milestone 0.
+The build uses _WIN32_WINNT=0x0601 and matching subsystem/manifest settings.
+Later-Windows APIs need a Windows 7-safe capability path with tested fallback
+behavior. Static CRT selection and successful linking do not prove that path works.
 
-## Supported platform policy
+Historical WinPTY support statements describe upstream releases. They do not
+qualify a VT7Pty build.
 
-The approved initial platform contract is:
+## My Windows 7 test machines
 
-- Minimum operating system: Windows 7 SP1 x64.
-- Supported family: Windows 7, Windows 8, Windows 8.1, Windows 10, and Windows
-  11 on x64.
-- Unsupported: Windows XP, Windows Vista, and x86.
-- Build API floor: `_WIN32_WINNT=0x0601` and matching subsystem/manifest
-  configuration.
-- Runtime model: static MSVC runtime initially.
+I use the test environment shared with VT7 and record the actual OS build,
+hardware strings and installed updates with every run.
 
-XP/Vista compatibility code and build paths were removed in Roadmap Steps 0.3
-and 0.4.
-Later-Windows behavior remains in scope. An API newer than Windows 7 may be used
-only through a Windows 7-safe capability path with tested fallback behavior.
-
-The target machine does not need the compiler or Windows SDK. Compiler macros,
-successful linking, subsystem headers, or static CRT selection do not by
-themselves establish runtime compatibility.
-
-## Windows 7 acceptance tiers
-
-VT7Pty uses the same physical environment available for VT7:
-
-| Tier | Configuration | Role |
+| Tier | Machine | Configuration |
 | --- | --- | --- |
-| A | Windows 7 SP1 x64, fully updated with the available non-ESU public update set | Routine target iteration and minimum-floor acceptance |
-| B | Windows 7 SP1 x64, fully updated through ESU | Additional milestone and release-candidate acceptance |
-| C | Windows 7 SP1 x64 with Windows PowerShell 2.0 and without KB3191566 | Legacy update-floor acceptance for release candidates |
+| A: Non-ESU | NESSY | Windows 7 SP1 x64 with the available non-ESU public update set |
+| B: ESU | TURTLE | Windows 7 SP1 x64 updated through ESU |
+| C: Legacy | LEOPARD | Windows 7 SP1 x64, PowerShell 2.0, no KB3191566 |
 
-Every run records the exact OS build and installed-update state. The initial
-acceptance work will determine and document required loader/runtime updates.
-VT7 graphics or managed-runtime prerequisites are not automatically VT7Pty
-prerequisites.
+Routine candidates run on Tier A when target behavior or dependencies change.
+Milestone and release candidates require all three tiers. KB3191566 and
+PowerShell 5.1 are not prerequisites of the tested native runtime; Tier C also
+runs the portable suite using PowerShell 2.0.
 
-Routine candidates run on Tier A. Milestone and release candidates run on all
-three tiers from the Step 0.9 candidate onward. Tier C passed its first
-accepted run on the `0.5.0-dev` rc7 candidate with PowerShell 2.0 and without
-KB3191566; these are not prerequisites of the tested native runtime. Results from one
-tier ordinarily do not stand in for another. Step
-0.4 has a documented owner-approved exception for two declared-tier runs on
-one recorded installation; Step 0.5 has a documented owner-approved temporary
-two-machine treatment despite identical recorded machine metadata. Steps 0.6
-through 0.9 apply the owner's instruction to treat the VMware-reported
-`NESSY` environment as a full-fledged acceptance machine while recording its
-actual inventory. The owner also approved VMware-reported `LEOPARD` as the
-third acceptance machine for Step 0.9. The exact-candidate environment
-disposition is in the [completion record](validation/2026-09-25-step-0.9-completion.md).
+I count NESSY and LEOPARD as full acceptance machines while preserving their
+reported VMware inventory. Early testing had two additional evidence exceptions:
+for [Step 0.4](validation/2026-09-22-step-0.4-completion.md), I accepted two declared-tier
+runs from one recorded installation; for [Step 0.5](validation/2026-09-22-step-0.5-completion.md),
+I temporarily treated two runs with matching machine metadata as separate machines.
+Those decisions do not turn the inventories into proof of distinct hardware or
+update states. The [Step 0.9 review](validation/2026-09-25-step-0.9-completion.md)
+records the later three-machine acceptance.
 
-## Development and build hosts
+VT7 graphics and managed-runtime prerequisites do not automatically apply to
+VT7Pty. Each candidate needs its own loader/runtime evidence.
 
-The approved reference build environment is Visual Studio 2022 17.14, MSVC
-v143 14.44.35207, and Windows SDK 10.0.26100.0. The project uses C++20, x64
-Debug/Release configurations, and MSBuild. Newer compatible toolchain revisions
-may be adopted through an explicit reproducibility and Windows 7 validation
-change.
+## Build hosts
 
-Builds and checks run through maintained local PowerShell and native tools.
-There is no hosted build or test service. Physical target evidence remains the
-authority for the Windows 7 floor.
+My reference build uses VS2022 17.14, MSVC v143 14.44.35207, Windows SDK
+10.0.26100.0, C++20 and x64 Debug/Release. I adopt toolchain changes with
+reproducible results and Windows 7 validation. See [Building](../BUILDING.md).
 
 ## Runtime dependency audit
 
@@ -121,8 +96,8 @@ VT7Pty does not currently expose the ConPTY ABI, emulate
 ConPTY clients. A VT7Pty API for VT7 and a general ConPTY user-mode shim are
 separate goals.
 
-After VT7 readiness, the project may test a user-mode shim against named
-consumers. Compatibility must cover process creation, handle ownership,
+After VT7 readiness, I may test a user-mode shim against named consumers.
+Compatibility must cover process creation, handle ownership,
 lifecycle, streams, resize, and errors. No kernel driver is planned.
 
 ## Publishing compatibility claims

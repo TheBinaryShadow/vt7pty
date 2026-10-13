@@ -1,9 +1,8 @@
 # Manual and research probes
 
-These WinPTY-derived programs preserve focused investigations that need an
-interactive console, controlled timing, a particular Windows version, or
-deliberately disruptive behavior. They are source material for the permanent
-test system in Roadmap Step 0.8 and are not part of routine verification yet.
+I keep these WinPTY-derived probes for investigations that need an interactive
+console, controlled timing, a particular Windows version or deliberately
+disruptive behavior. They are research tools, not routine verification tests.
 
 | Area | Programs |
 | --- | --- |
@@ -16,5 +15,5 @@ test system in Roadmap Step 0.8 and are not part of routine verification yet.
 
 `TestUtil.cc` and `TimeMeasurement.h` are inherited support files used by many
 probes. Converting the included-implementation pattern into ordinary compiled
-support code belongs to their Step 0.8 integration. The destructive cases must
-run only in an isolated test group with explicit cleanup and timeouts.
+support code is work to do if a probe joins the maintained suite. Destructive
+cases must run only in an isolated test group with explicit cleanup and timeouts.

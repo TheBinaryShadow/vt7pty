@@ -1,7 +1,7 @@
 # Step 1.1 rc3 Fidelity Baseline Evidence
 
-Date: 2026-10-12. Implemented corpus characterized on the development host and
-all three designated Windows 7 tiers; broader Step 1.1 scope remains open.
+Date: 2026-10-12. I recorded the implemented corpus on the development host and
+all three Windows 7 tiers; broader Step 1.1 coverage remains open.
 Runtime 0.5.0 is unchanged. Harness version 3 source:
 fa1e68345b5b94fcc367a0e08e2b257657105659.
 

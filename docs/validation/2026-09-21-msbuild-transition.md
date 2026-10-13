@@ -1,12 +1,10 @@
 # MSBuild Transition Validation: 2026-09-21
 
-Status: accepted development-host evidence for the implemented portion of
-Roadmap Step 0.2.
+Date: 2026-09-21.
 
-This record proves that the supported VS2022/MSBuild workflow reproduces the
-inherited native boundary before obsolete build paths or components are
-removed. It is not physical Windows 7 acceptance and does not complete Step
-0.2 by itself.
+I verified that VS2022/MSBuild reproduced the inherited native build before
+removing the old build paths. I accepted this as development-host evidence
+for part of Step 0.2. It did not complete that step or establish Windows 7 support.
 
 ## Identity and environment
 

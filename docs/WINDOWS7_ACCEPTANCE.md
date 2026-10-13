@@ -1,9 +1,8 @@
 # Windows 7 Platform Acceptance
 
-This procedure validates a specific VT7Pty candidate on the three physical
-Windows 7 SP1 x64 tiers defined in [COMPATIBILITY.md](COMPATIBILITY.md). It is
-the target-side gate for milestone and release candidates and remains separate
-from development-host verification.
+I use this procedure to test the exact milestone or release candidate on my
+three [Windows 7 configurations](COMPATIBILITY.md). Local build verification
+comes first; these runs establish how the package behaves on the target machines.
 
 ## Candidate preparation
 

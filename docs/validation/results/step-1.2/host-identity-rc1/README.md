@@ -1,6 +1,6 @@
 # Host identity rc1 evidence
 
-Recorded: 2026-10-13. H1 accepted on the development host and all three designated
+Recorded: 2026-10-13. I accepted H1 after development-host checks and runs on all three
 Windows 7 tiers. See the [target review](../../../2026-10-13-step-1.2-host-identity-rc1-windows7.md).
 
 - [Exact candidate manifest](candidate-manifest.json)

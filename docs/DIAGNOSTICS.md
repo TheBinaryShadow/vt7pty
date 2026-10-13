@@ -1,9 +1,9 @@
 # Diagnostics
 
-VT7Pty diagnostics are designed for repeatable collection on the physical
-Windows 7 machines used for platform acceptance. The diagnostic transport is
-local-only. Copy the candidate package to the target machine, reproduce the
-failure there, and copy the resulting bundle back for analysis.
+I use these tools to collect repeatable failure reports on the Windows 7 test
+machines. The diagnostic transport is local-only. Copy the candidate to the
+target machine, reproduce the failure, then bring back the resulting bundle
+for analysis.
 
 ## Record format and limits
 

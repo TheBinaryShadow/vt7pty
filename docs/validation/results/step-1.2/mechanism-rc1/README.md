@@ -1,6 +1,6 @@
 # Step 1.2 Mechanism rc1 Evidence
 
-Updated: 2026-10-13. Development and all three Windows 7 tiers measured;
+Updated: 2026-10-13. I recorded development-host and three-tier Windows 7 results;
 both public-API probes fail on each target.
 Candidate harness source: 3937d5493e7460b799eb6d75b1c8fcb81a1f614f.
 Runtime: unchanged accepted 0.5.0.

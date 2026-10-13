@@ -1,9 +1,8 @@
 # Step 0.6 Raw Physical Results
 
-These files are the unmodified results supplied for the accepted Step 0.6
-candidate. See the
+I preserve the original results here for the accepted Step 0.6 candidate. See the
 [completion record](../../2026-09-23-step-0.6-completion.md) for interpretation
-and the owner-approved physical-machine disposition.
+and my recorded machine-acceptance decision.
 
 | File | SHA-256 |
 | --- | --- |

@@ -1,9 +1,8 @@
 # Step 0.4 Raw Physical Results
 
-These files are the unmodified results supplied for the accepted Step 0.4
-candidate. See the
+I preserve the original results here for the accepted Step 0.4 candidate. See the
 [completion record](../../2026-09-22-step-0.4-completion.md) for interpretation
-and the accepted evidence deviation.
+and the evidence exception I accepted.
 
 | File | SHA-256 |
 | --- | --- |

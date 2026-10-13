@@ -3,9 +3,9 @@
 Status: Step 1.2 mechanism research in progress; no production cancellation fix.
 Updated: 2026-10-13.
 
-The [rc3 Windows 7 baseline](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
-establishes the defect and the behavior that must survive a fix. CMD and native
-Windows PowerShell editing retain a partially typed command after Ctrl+C.
+I'm investigating a defect recorded in the
+[rc3 Windows 7 baseline](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md):
+CMD and native Windows PowerShell retain a partially typed command after Ctrl+C.
 The same command can execute after Enter. Active-child interruption works:
 handled Ctrl+C arrives once, default-handler termination preserves its status,
 and unprocessed Ctrl+C arrives as a key rather than a control event.
@@ -73,7 +73,7 @@ synchronized to avoid canceling a later call. The
 does not make console-side recovery a consequence of a successful request.
 Availability on Windows 7 is not proof of the required behavior.
 
-## Window-message experiments and disposition
+## What the window-message experiments showed
 
 Test-only development experiments combined a console-window message with one
 control event. WM_CHAR 0x03 retained the typed line and inserted the character.
@@ -95,28 +95,20 @@ on desktop keyboard state. The
 also documents key-state reset and desktop restrictions. These approaches
 remain research findings, not supported product capabilities.
 
-## Console-host design gates
+## What I'm trying next
 
-The [identified version 4 candidate](validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
-has completed its [three-tier mechanism measurements](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md).
-Both measured public-API approaches are rejected for the pending cooked-read
-corpus. Original child guards, PowerShell 7 prompts and target Unicode/resize
-outcomes remain unchanged. This completes the research measurements, not F01.
+I rejected both measured public-API approaches and kept their failed results.
+The [console-host design](HOST_CANCELLATION_DESIGN.md) now separates the work
+into identity, dispatch, cancellation and production stages.
 
-The [console-host design](HOST_CANCELLATION_DESIGN.md) now separates identity,
-dispatch, cancellation and production integration into H1-H4 gates. The
-[H1 probe](HOST_IDENTITY_PROBE.md) implements query-only host identification
-and concurrent-session read isolation. The
-[H1 Windows 7 review](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
-accepts all nine target repetitions. Both observed host threads report GUI state;
-H1 alone cannot select the dispatch context.
-The [H2 probe](HOST_DISPATCH_PROBE.md) uses scoped title-event discovery,
-in-host callback verification, session-bound acknowledgments and rejection/lifetime
-controls. Its [Windows 7 review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
-accepts nine target repetitions and 225 exchanges with preserved input and cleanup.
-H3 cooked-read cancellation is the next unimplemented gate.
-The earlier HWND/thread-hook prototype remains unqualified; the new experiment
-derives its target from independently verified host events and callback execution.
+I've accepted host identity (H1) and actual dispatch (H2) on all three Windows 7
+tiers. Unlike the earlier rejected HWND experiment, H2 verifies the host thread
+through scoped events and actual callback execution. The
+[validation index](validation/README.md) links both reviews.
+
+Next I'll investigate cooked-read cancellation (H3). It must discard the old
+line, deliver one control event, preserve the next read and restore real shell
+prompts. The host design holds the detailed requirements and failure cases.
 
 An application-facing read shim remains a separate alternative. It needs a
 specified launch/load boundary and its own console-read semantics; blindly

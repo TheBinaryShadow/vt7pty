@@ -1,9 +1,8 @@
 # Console mode tools
 
-`tool-conin-mode` and `tool-conout-mode` inspect or update the mode of the
-current console input and output handle. They were inherited from WinPTY's
-`misc` directory and are maintained diagnostics for reproducing console-mode
-behavior.
+I use `tool-conin-mode` and `tool-conout-mode` to inspect or update the mode
+of the current console input and output handle. These diagnostics came from
+WinPTY's `misc` directory and help reproduce console-mode behavior.
 
 Run either program without a mode argument to inspect the current flags. Pass
 a hexadecimal mode value to update the matching console handle for that

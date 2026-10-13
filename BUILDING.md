@@ -1,130 +1,98 @@
 # Building VT7Pty
 
-VT7Pty's supported Visual Studio/MSBuild workflow builds, verifies, packages,
-and source-debugs the inherited native boundary. It is the repository's only
-active build and packaging workflow.
+I use Visual Studio 2022 and MSBuild for the native x64 build. Local commands
+cover compilation, verification, packaging and source debugging. Windows 7
+machines run portable test packages and do not need the compiler or SDK.
 
-See the [development foundation](docs/FOUNDATION.md),
-[roadmap](ROADMAP.md), [compatibility contract](docs/COMPATIBILITY.md), and
-[testing strategy](docs/TESTING.md) before changing the build.
+## Set up the build host
 
-## Supported build
+Install the native C++ workload and import [.vsconfig](.vsconfig) through
+Visual Studio Installer if components are missing. The reference toolchain is:
 
-The maintained build uses:
+| Component | Version or setting |
+| --- | --- |
+| Visual Studio | 2022, with 17.14 as the reference |
+| MSVC | v143, reference 14.44.35207 |
+| Windows SDK | 10.0.26100.0 |
+| Language and architecture | C++20, x64 Debug and Release |
+| Runtime | Static MSVC CRT |
+| Platform floor | Windows 7 SP1, _WIN32_WINNT=0x0601 |
 
-- Visual Studio 2022 and MSBuild
-- MSVC v143, with 14.44.35207 as the initial reference compiler
-- Windows SDK 10.0.26100.0
-- C++20
-- the conforming MSVC preprocessor (`/Zc:preprocessor`)
-- warning level 4 with warnings treated as errors (`/W4 /WX`)
-- the MSVC native code analyzer for Release verification
-- x64 Debug and Release configurations
-- static MSVC runtime initially
-- Windows 7 SP1 as the API and runtime floor
-- repository-owned version and resource generation
+Shared settings live in [Directory.Build.props](Directory.Build.props) and
+[Directory.Build.targets](Directory.Build.targets). Builds use the conforming
+preprocessor, /W4 /WX, version resources and Windows 7-compatible platform
+settings. Release verification also runs MSVC static analysis.
 
-Open `VT7Pty.sln` in Visual Studio 2022 or run the repository commands from
-Windows PowerShell 5.1 or newer. Import `.vsconfig` through Visual Studio
-Installer if the required native workload or SDK is missing.
+## Build and verify
 
-```powershell
+Open [VT7Pty.sln](VT7Pty.sln), or run these commands from the repository root
+in 64-bit Windows PowerShell 5.1:
+
+~~~powershell
 .\Build-VT7Pty.ps1
-.\Analyze-VT7Pty.ps1
 .\Verify-VT7Pty.ps1
-.\Package-VT7Pty.ps1
-```
+~~~
 
-All commands default to the configurations appropriate to their job. Build and
-verify accept `-Configuration Debug`, `Release`, or `All`; package accepts only
-Release and requires a clean source tree. Outputs are written below ignored `artifacts`, with intermediates
-below ignored `build`.
+Both commands default to Debug and Release. Use -Configuration Debug or
+-Configuration Release for one configuration. To run static analysis separately:
 
-The solution contains projects for the client DLL, console-owning agent,
-native debug server, protocol and modern-C++ unit tests, backend integration
-test, nine controlled child-process fixtures, and two console-mode tools. The
-fixture and tool purpose is described
-under [tests/fixtures](tests/fixtures/README.md) and
-[tools/console](tools/console/README.md). Shared compiler and linker settings
-live in `Directory.Build.props`, while generated version identity is wired
-through `Directory.Build.targets`.
+~~~powershell
+.\Analyze-VT7Pty.ps1
+~~~
 
-The project does not use a hosted build or test service. Release qualification
-is a local and physical-machine process described in
-[Releasing](docs/RELEASING.md).
+Outputs go under ignored artifacts; intermediate files go under ignored build.
+[Testing](docs/TESTING.md) explains the checks, result files and optional soak.
+I keep local results separate from [Windows 7 acceptance](docs/WINDOWS7_ACCEPTANCE.md).
 
-## Native identity
+## Package a candidate
 
-Roadmap Step 0.5 established these outputs:
+From a clean source tree:
 
-- `VT7Pty.dll`
-- `VT7Pty-Agent.exe`
-- `VT7Pty-DebugServer.exe`
-- `BackendSmokeTest.exe`, `ProtocolTest.exe`, and the isolated
-  `ProtocolTestAgent.exe` negative-control fixture
+~~~powershell
+.\Package-VT7Pty.ps1 -Configuration Release
+~~~
 
-Their public interface is [vt7pty.h](src/include/vt7pty.h), with API-version
-macros in [vt7pty_version.h](src/include/vt7pty_version.h). See the
-[technical naming map](docs/NAMING.md) for the intentional break from WinPTY.
+Packaging rebuilds Release, runs static analysis and verification, then creates
+runtime, development, symbols and test archives. It checks the extracted files
+against their manifests and writes a release-set manifest and SHA-256 file.
+It refuses a dirty tree or an existing candidate asset.
 
-`Verify-VT7Pty.ps1` runs the modern-C++ utility, protocol, backend, missing-agent,
-incompatible-agent, application, and deterministic fixture checks. It also
-requires x64 images, PE subsystem version 6.01, the expected direct imports,
-the 19 renamed DLL exports, PDBs, generated version resources, and a clean
-Release static-analysis pass. Its
-development-host result is transition evidence and is not physical Windows 7
-acceptance.
+The [release guide](docs/RELEASING.md) explains which archive to use and how I
+review the exact package on the Windows 7 machines. I publish releases manually;
+there is no hosted CI service.
 
-`Package-VT7Pty.ps1` performs a clean Release rebuild, static analysis, and
-local verification, then creates runtime, development, symbols, and standalone
-Windows 7 test archives. It verifies extracted contents against their manifests
-and writes a release-set manifest and SHA-256 file. See
-[Releasing](docs/RELEASING.md) for archive layout and the physical review gate.
-The accepted build boundary and completed developer workflow are recorded in
-the [MSBuild transition validation](docs/validation/2026-09-21-msbuild-transition.md)
-and [Step 0.2 completion validation](docs/validation/2026-09-22-step-0.2-completion.md).
-Step 0.3's removal and regression evidence is recorded in the
-[Step 0.3 completion validation](docs/validation/2026-09-22-step-0.3-completion.md).
+## Find the code
 
-## Retired build paths
+The runtime consists of VT7Pty.dll and VT7Pty-Agent.exe, with
+VT7Pty-DebugServer.exe for diagnostics. The public API is in
+[vt7pty.h](src/include/vt7pty.h); its version is in
+[vt7pty_version.h](src/include/vt7pty_version.h).
 
-Roadmap Step 0.3 removed the inherited GYP, GNU Make, Cygwin/MSYS, MinGW,
-Python 2 packaging, and AppVeyor paths after the maintained workflow reproduced
-their required native boundary. The temporary baseline harness was also
-retired after its results were preserved in the
-[accepted baseline record](docs/validation/2026-09-21-upstream-baseline.md).
-Git history retains every removed file.
+The solution also builds unit and integration tests, controlled
+[fixtures](tests/fixtures/README.md), [console tools](tools/console/README.md)
+and fidelity research probes. See the [architecture](docs/ARCHITECTURE.md)
+and [documentation index](docs/README.md) for those components.
 
-The preserved [upstream README](docs/UPSTREAM_WINPTY_README.md) contains the
-original commands for historical reference.
+## Debug
 
-## Debugging
+Select Debug|x64 in Visual Studio and use BackendSmokeTest as a starting
+project. The diagnostic tools support VT7PTY_DEBUG=trace and
+VT7PTY_SHOW_CONSOLE=1; see [Diagnostics](docs/DIAGNOSTICS.md) for collection
+commands and the restricted debug pipe.
 
-The native debugger uses `VT7Pty-DebugServer.exe`, `VT7PTY_DEBUG=trace`, and
-optionally `VT7PTY_SHOW_CONSOLE=1`. Diagnostic messages use the versioned
-`\\.\pipe\VT7Pty-Debug-v1` endpoint.
+For a repeatable source and caller-line check:
 
-Open `VT7Pty.sln`, select `Debug|x64`, and use `BackendSmokeTest` as a convenient
-debugging startup project. The repository also provides a repeatable command
-line proof that the linked PDBs resolve both library and caller source lines:
-
-```powershell
+~~~powershell
 .\tools\debug\Verify-SourceDebugging.ps1
-```
+~~~
 
-This check uses the x64 `cdb.exe` installed by **Debugging Tools for Windows**,
-available as an optional Windows SDK component. Its transcript is written to
-ignored `artifacts\debugging\source-debugging.txt`.
+This uses x64 cdb.exe from the Windows SDK's optional **Debugging Tools for
+Windows** component. It breaks at vt7pty_config_new and checks source locations
+in vt7pty.cc and BackendSmokeTest.cc. The transcript is written to
+artifacts\debugging\source-debugging.txt.
 
-Every build or behavior result must record:
-
-- source commit and dirty state,
-- package version and artifact hashes,
-- compiler, toolset, SDK, architecture, and configuration,
-- runtime dependency/import inspection,
-- host and target OS and update state,
-- exact verification commands and per-case results.
-
-A pass on a development machine is not Windows 7 acceptance. Physical Windows
-7 procedures and result requirements are defined in
-[Testing](docs/TESTING.md).
+I record the source commit, dirty state, toolchain, package identity and test
+environment with each result. The [validation index](docs/validation/README.md)
+preserves the build transition and later acceptance records. Retired build
+commands remain in the [original WinPTY README](docs/UPSTREAM_WINPTY_README.md)
+for historical reference.

@@ -1,10 +1,20 @@
 # VT7Pty Changelog
 
-This file records VT7Pty changes after the WinPTY `0.4.4-dev` baseline. It does
-not replace or rewrite the preserved [WinPTY release history](RELEASES.md).
+I record VT7Pty changes here, starting from the WinPTY `0.4.4-dev` baseline.
+The original [WinPTY release history](RELEASES.md) remains separate.
 
 The 0.5.x line is pre-stable. Planned roadmap items are not listed as changes
 until implemented.
+
+## Unreleased
+
+### Documentation
+
+- Rewritten project decisions and test reviews in first person.
+- Shortened the README, roadmap and guides; added a documentation index and
+  moved the completed Milestone 0 checklist to its own page.
+- Organized validation history by development stage while preserving raw
+  results, hashes, failed experiments and contributor attribution.
 
 ## 0.5.0
 
@@ -61,7 +71,7 @@ claimed.
 - Resolved the inherited warning baseline, enabled `/W4 /WX`, and added a
   repeatable MSVC native static-analysis gate to Release verification.
 - Accepted the exact Step 0.6 candidate on both Windows 7 tiers, with the
-  owner-approved `NESSY` environment disposition recorded in the validation
+  my recorded acceptance of the `NESSY` environment recorded in the validation
   evidence.
 
 - Established the `0.5.0-dev` VT7Pty technical identity across native
@@ -73,7 +83,7 @@ claimed.
 - Added protocol unit and incompatible-agent negative-control tests and record
   package, API, protocol, and source identities in verification and packages.
 - Accepted the exact Step 0.5 candidate on both declared physical Windows 7
-  tiers, with the owner-approved evidence treatment recorded in the validation
+  tiers, with my decision on how to treat the evidence recorded in the validation
   record.
 
 - Removed the Cygwin/MSYS adapter, GYP, GNU Make, Python 2 packaging,
