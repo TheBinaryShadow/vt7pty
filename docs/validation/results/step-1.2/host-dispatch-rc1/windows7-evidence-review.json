@@ -1,0 +1,3377 @@
+{
+  "SchemaVersion": 1,
+  "RecordedUtc": "2026-10-13T10:43:04.6856801Z",
+  "Scope": "Windows 7 H2 host dispatch research acceptance",
+  "ArchiveName": "VT7Pty-host-dispatch-0.5.0-rc1.zip",
+  "ArchiveBytes": 3069295,
+  "ArchiveSha256": "638d0a0b96f09b33f47e70df7d13ea19d2a3709bb9e80e11eb7ae8550d249cef",
+  "ManifestSha256": "d02fd238bf1d0b11eb525196e8cbe06b124b689c497ef983a4900ebf49ba623d",
+  "HarnessSource": "8b1a20caf969088b1efb01e96a34dea5e63b494f",
+  "Runtime": {
+    "Version": "0.5.0",
+    "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+    "ArchiveSha256": "59554a9cf8246395e60f30875e047d1bfa20d4f3f462c113ef705a86708f5304",
+    "Files": {
+      "VT7Pty.dll": "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167",
+      "VT7Pty-Agent.exe": "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+    }
+  },
+  "NativeAggregateMatches": 9,
+  "VerifiedHostLifetimes": 54,
+  "VerifiedTitleEvents": 3647,
+  "IndependentRequestComparisons": 225,
+  "AcceptedResponses": 126,
+  "RejectedResponses": 90,
+  "ReceiptOnlyOutcomes": 9,
+  "IndependentReadComparisons": 45,
+  "RawFiles": 519,
+  "Windows7EvidencePending": false,
+  "H2Accepted": true,
+  "CancellationImplemented": false,
+  "MilestoneAccepted": false,
+  "BroaderFidelityRerun": false,
+  "Machines": [
+    {
+      "Computer": "NESSY",
+      "Tier": "NonESU",
+      "RunId": "nonesu-20261013-103435-314ced21",
+      "Destination": "nonesu",
+      "Pass": 3,
+      "Fail": 0,
+      "NotRun": 0,
+      "RawFiles": 173,
+      "OS": {
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "Version": "6.1.7601",
+        "ProductType": 1,
+        "ServicePackMajorVersion": 1
+      },
+      "Machine": {
+        "Model": "VMware20,1",
+        "Manufacturer": "VMware, Inc."
+      },
+      "PowerShellVersion": "5.1.14409.1018",
+      "CLRVersion": "4.0.30319.42000",
+      "UpdateEntries": 190,
+      "KB3191566": true,
+      "MatchesPreviousH1Environment": true,
+      "DurationMilliseconds": [
+        9782,
+        9502,
+        9702
+      ],
+      "HostLifetimes": 18,
+      "ExternalWindowOwnerIsAgent": 18,
+      "HostQueryLowBits": [
+        0
+      ],
+      "GuiThreadCounts": [
+        2
+      ],
+      "TitleEventScopes": [
+        1
+      ],
+      "TitleEvents": 1219,
+      "MinimumEventsPerDiscovery": 66,
+      "MaximumEventsPerDiscovery": 70,
+      "DiscoveryOverflow": false
+    },
+    {
+      "Computer": "TURTLE",
+      "Tier": "ESU",
+      "RunId": "esu-20261013-103644-f1826e01",
+      "Destination": "esu",
+      "Pass": 3,
+      "Fail": 0,
+      "NotRun": 0,
+      "RawFiles": 173,
+      "OS": {
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "Version": "6.1.7601",
+        "ProductType": 1,
+        "ServicePackMajorVersion": 1
+      },
+      "Machine": {
+        "Model": "System Product Name",
+        "Manufacturer": "System manufacturer"
+      },
+      "PowerShellVersion": "5.1.14409.1005",
+      "CLRVersion": "4.0.30319.42000",
+      "UpdateEntries": 78,
+      "KB3191566": true,
+      "MatchesPreviousH1Environment": true,
+      "DurationMilliseconds": [
+        7857,
+        7712,
+        7736
+      ],
+      "HostLifetimes": 18,
+      "ExternalWindowOwnerIsAgent": 18,
+      "HostQueryLowBits": [
+        0
+      ],
+      "GuiThreadCounts": [
+        2
+      ],
+      "TitleEventScopes": [
+        1
+      ],
+      "TitleEvents": 1216,
+      "MinimumEventsPerDiscovery": 66,
+      "MaximumEventsPerDiscovery": 68,
+      "DiscoveryOverflow": false
+    },
+    {
+      "Computer": "LEOPARD",
+      "Tier": "Legacy",
+      "RunId": "legacy-20261013-103447-e8813113",
+      "Destination": "legacy",
+      "Pass": 3,
+      "Fail": 0,
+      "NotRun": 0,
+      "RawFiles": 173,
+      "OS": {
+        "Version": "6.1.7601",
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "ServicePackMajorVersion": 1,
+        "ProductType": 1
+      },
+      "Machine": {
+        "Manufacturer": "VMware, Inc.",
+        "Model": "VMware Virtual Platform"
+      },
+      "PowerShellVersion": "2.0",
+      "CLRVersion": "2.0.50727.8806",
+      "UpdateEntries": 203,
+      "KB3191566": false,
+      "MatchesPreviousH1Environment": true,
+      "DurationMilliseconds": [
+        9383,
+        9471,
+        8589
+      ],
+      "HostLifetimes": 18,
+      "ExternalWindowOwnerIsAgent": 18,
+      "HostQueryLowBits": [
+        0
+      ],
+      "GuiThreadCounts": [
+        2
+      ],
+      "TitleEventScopes": [
+        1
+      ],
+      "TitleEvents": 1212,
+      "MinimumEventsPerDiscovery": 66,
+      "MaximumEventsPerDiscovery": 70,
+      "DiscoveryOverflow": false
+    }
+  ],
+  "Counts": [
+    {
+      "Files": 57,
+      "HostLifetimes": 6,
+      "Requests": 25,
+      "Accepted": 14,
+      "Rejected": 10,
+      "ReceiptOnly": 1,
+      "Reads": 5
+    },
+    {
+      "Files": 57,
+      "HostLifetimes": 6,
+      "Requests": 25,
+      "Accepted": 14,
+      "Rejected": 10,
+      "ReceiptOnly": 1,
+      "Reads": 5
+    },
+    {
+      "Files": 57,
+      "HostLifetimes": 6,
+      "Requests": 25,
+      "Accepted": 14,
+      "Rejected": 10,
+      "ReceiptOnly": 1,
+      "Reads": 5
+    },
+    {
+      "Files": 57,
+      "HostLifetimes": 6,
+      "Requests": 25,
+      "Accepted": 14,
+      "Rejected": 10,
+      "ReceiptOnly": 1,
+      "Reads": 5
+    },
+    {
+      "Files": 57,
+      "HostLifetimes": 6,
+      "Requests": 25,
+      "Accepted": 14,
+      "Rejected": 10,
+      "ReceiptOnly": 1,
+      "Reads": 5
+    },
+    {
+      "Files": 57,
+      "HostLifetimes": 6,
+      "Requests": 25,
+      "Accepted": 14,
+      "Rejected": 10,
+      "ReceiptOnly": 1,
+      "Reads": 5
+    },
+    {
+      "Files": 57,
+      "HostLifetimes": 6,
+      "Requests": 25,
+      "Accepted": 14,
+      "Rejected": 10,
+      "ReceiptOnly": 1,
+      "Reads": 5
+    },
+    {
+      "Files": 57,
+      "HostLifetimes": 6,
+      "Requests": 25,
+      "Accepted": 14,
+      "Rejected": 10,
+      "ReceiptOnly": 1,
+      "Reads": 5
+    },
+    {
+      "Files": 57,
+      "HostLifetimes": 6,
+      "Requests": 25,
+      "Accepted": 14,
+      "Rejected": 10,
+      "ReceiptOnly": 1,
+      "Reads": 5
+    }
+  ],
+  "Files": [
+    {
+      "Path": "nonesu/report.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 13859,
+      "Sha256": "c4441c913dfae8636a8bb528d030a2bd8b20c206f9e9dfdba2279827a3f12a36"
+    },
+    {
+      "Path": "nonesu/run-1/A-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 777,
+      "Sha256": "960a871cfa0aabca748697bae4ca40878eb29a7d90086d92cc82d6dfe7654e4e"
+    },
+    {
+      "Path": "nonesu/run-1/A-10-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 785,
+      "Sha256": "732e5013d6383f44a7422836a83f87bcb9e0839603c38808f329d22c698da613"
+    },
+    {
+      "Path": "nonesu/run-1/A-11-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 779,
+      "Sha256": "f6e8ab2a7b9b7fc9810619637fe8e88d6b883402d1e03ae84f9287e4fbae1dd2"
+    },
+    {
+      "Path": "nonesu/run-1/A-12-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 789,
+      "Sha256": "abcecfe77b17f512965fb70ba6a61a7d8e019affcfca0d28d506ac9c4f27be25"
+    },
+    {
+      "Path": "nonesu/run-1/A-13-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 778,
+      "Sha256": "ecb692c937223dc181b380fe322f8eff7fa9136cbc075fcc99fae6e1b53d1d70"
+    },
+    {
+      "Path": "nonesu/run-1/A-2-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 777,
+      "Sha256": "23e01bd5fc345e3372b2482f87ae431ae41a976de862f9986e886fef82ab7825"
+    },
+    {
+      "Path": "nonesu/run-1/A-3-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 782,
+      "Sha256": "228b889940180fbd8e05c5c00c509acc7265d2d11f9432334066a8720a75acd9"
+    },
+    {
+      "Path": "nonesu/run-1/A-4-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 784,
+      "Sha256": "8422d11049f264a935dfce78d12371ae2ec8e4cdcb8f9c2dd08366713eb8047e"
+    },
+    {
+      "Path": "nonesu/run-1/A-5-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 787,
+      "Sha256": "df58ddb84f12d96c3dc4c642c82558ef9da49c110f8af980ace51f146c65bbc6"
+    },
+    {
+      "Path": "nonesu/run-1/A-6-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 794,
+      "Sha256": "3e80399fdff909fad8c1f0f938d0803239c418fed3309d3e7320a3d275b2733c"
+    },
+    {
+      "Path": "nonesu/run-1/A-7-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 780,
+      "Sha256": "2eb1f39415f0ce87b2a6c1962f2034bc017d8b10ae6620299b39f60e8fd0f98a"
+    },
+    {
+      "Path": "nonesu/run-1/A-8-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 785,
+      "Sha256": "6f9801589636d4814cf4105192480e75c7ffc1d5045d3278802bd43f315335ca"
+    },
+    {
+      "Path": "nonesu/run-1/A-9-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 781,
+      "Sha256": "c358a35ae911f5073277c789062ce71ad98ade72e8ad72420a5bfb362d513e59"
+    },
+    {
+      "Path": "nonesu/run-1/A-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7196,
+      "Sha256": "116fe4e5b0f6af09a3282c0608981f1a3cb500e25e09f274b9d5982727dd7e42"
+    },
+    {
+      "Path": "nonesu/run-1/A-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 566,
+      "Sha256": "0ffa96491e057cca4e690fa5f328a29713fe3fe379318a6557d4c9cf87cfba5e"
+    },
+    {
+      "Path": "nonesu/run-1/A-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 921,
+      "Sha256": "71e44675712cd0a8772c2045966fc4348fff7123a745ab7a58016296b0c1c408"
+    },
+    {
+      "Path": "nonesu/run-1/A-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 297,
+      "Sha256": "817c58920527d0ac8780147a36ba771c25be6093fed9f92ec252d381747b625d"
+    },
+    {
+      "Path": "nonesu/run-1/A-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 128,
+      "Sha256": "6665215b8f96cad7bf665ceff223a4fe37cb9ee7af29d5a8f02cfe8fbb8daef6"
+    },
+    {
+      "Path": "nonesu/run-1/B-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 783,
+      "Sha256": "7a13fb8061af5a73a2fcd4b9b2adf26cd93026ab2fc0c89fb044e5c2f2d3c486"
+    },
+    {
+      "Path": "nonesu/run-1/B-2-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 798,
+      "Sha256": "4214fdc9dbf93c298afcba4991ba32103659800a945bcc205d3423e5d6850cb1"
+    },
+    {
+      "Path": "nonesu/run-1/B-3-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 805,
+      "Sha256": "ed1e9f79ff9700ee454b91e583da2cc00be4135214cf2a2aaed7b68b38126172"
+    },
+    {
+      "Path": "nonesu/run-1/B-4-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 784,
+      "Sha256": "793d3d5d942fb3017718f94b3b22ec4ae86a1a3081dcdb3e3f11f7dc44793b8f"
+    },
+    {
+      "Path": "nonesu/run-1/B-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7480,
+      "Sha256": "2707965cb934e731cbd6b8a878d4ef4ee0cfe03f6c8eb08f782d4a59246f2a7c"
+    },
+    {
+      "Path": "nonesu/run-1/B-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 570,
+      "Sha256": "75bca72d1f587c88dc8f6f51728069ca77381ff2e4ddced3fafcc2f85fcf9ef0"
+    },
+    {
+      "Path": "nonesu/run-1/B-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 923,
+      "Sha256": "56d1eb5c62722917fd17af8dc6ab22f069adc720a75ef868833fe77f674b61f6"
+    },
+    {
+      "Path": "nonesu/run-1/B-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 303,
+      "Sha256": "f194daf9bb215791b51c6f86098886f89dda80d77ab25f300d06222b380431a2"
+    },
+    {
+      "Path": "nonesu/run-1/B-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 129,
+      "Sha256": "d97ad5cf5ff8b64a018be5a6e45a40780d47c0e67deddf2d145af3471ea39f4d"
+    },
+    {
+      "Path": "nonesu/run-1/C-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 780,
+      "Sha256": "0ea90659fbb36e5ab9614d7ffd326dc53eaea0a24e5c2d805074414bd78f2703"
+    },
+    {
+      "Path": "nonesu/run-1/C-2-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 795,
+      "Sha256": "d80c6acd8d26ffede50d98ee78d55dca41e26c2a27878156b281d0820a6cbfe9"
+    },
+    {
+      "Path": "nonesu/run-1/C-3-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 792,
+      "Sha256": "1f5730be79a64e96f99b449971082b82d4b199a49d396b72d470c9b4ab93df05"
+    },
+    {
+      "Path": "nonesu/run-1/C-4-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 781,
+      "Sha256": "eb281711a6df37cff77d155a0f8fa85505fbdd27eb970c29b21e3aae4004b092"
+    },
+    {
+      "Path": "nonesu/run-1/C-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7196,
+      "Sha256": "6d231a0e0f4ee67a52f50d5bba5c6d81dc28ba5a1699883a9a5ac112eaf64668"
+    },
+    {
+      "Path": "nonesu/run-1/C-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 567,
+      "Sha256": "6ec943105c13a4d2681e39cafcb3ef5d49a08768e04940543d5b2851a7b351d2"
+    },
+    {
+      "Path": "nonesu/run-1/C-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 920,
+      "Sha256": "b60d41b4798bce4c6fcaa43d87fbd12b43617f4366e28f16263d85c5e4d5930b"
+    },
+    {
+      "Path": "nonesu/run-1/C-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 297,
+      "Sha256": "8dede0d65a7b870f32533e21e6b89384bbeeace25b76695ec98dced6264e7b1c"
+    },
+    {
+      "Path": "nonesu/run-1/C-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 126,
+      "Sha256": "79d210477ee892c3f62e63d6c87a15cb295e010d3a11bc2c92cab682bf320b26"
+    },
+    {
+      "Path": "nonesu/run-1/D-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 779,
+      "Sha256": "27ae635e11fe073e211496bc19f4dfb0fc20c419145c00bf8e3f4a48d44241d9"
+    },
+    {
+      "Path": "nonesu/run-1/D-2-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 800,
+      "Sha256": "2a780202ac02a94b7a1d94ad05771a4b77baf8154faee0a9a7359e53bcdf8488"
+    },
+    {
+      "Path": "nonesu/run-1/D-ambiguity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 120,
+      "Sha256": "d6424cb2cf7e674f54889e1217d34213eedf0e368d3851ac2808e588966873d3"
+    },
+    {
+      "Path": "nonesu/run-1/D-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7412,
+      "Sha256": "34e6879ded8ca1f3ef3c5306a600fab13fe5bd7395ac24206c2a6a840dc37544"
+    },
+    {
+      "Path": "nonesu/run-1/D-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 567,
+      "Sha256": "8b01dc10dc3956a887f609663e474f44a1182c1543c9144634ed0e3e664161a7"
+    },
+    {
+      "Path": "nonesu/run-1/D-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 922,
+      "Sha256": "d64f1e49f646cbcd6aec5cc89fd6600de7d025b48143e88a23578a8d6aaaba62"
+    },
+    {
+      "Path": "nonesu/run-1/D-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 297,
+      "Sha256": "e293bb39532bef67e234d009a686289338a8b14d13ee49170faa73b8e872576c"
+    },
+    {
+      "Path": "nonesu/run-1/D-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 120,
+      "Sha256": "7a79675bcf8aa3d2912ed1e6e1e4ff2cd1b9b40e7942269a9532aa02dc3aad04"
+    },
+    {
+      "Path": "nonesu/run-1/E-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 773,
+      "Sha256": "51648b6c5a51b66aedbc3bef264e32eb47c4cb2cc954d6b8dc6942be6d9c7611"
+    },
+    {
+      "Path": "nonesu/run-1/E-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7130,
+      "Sha256": "ee4d91d7d5cfd93292fae3227b8e02ffb49bd346d0ecb5c60e6d52e6d0e354ea"
+    },
+    {
+      "Path": "nonesu/run-1/E-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 561,
+      "Sha256": "0040a0feca8db4c42d8bf1111de995bb82b88e899123d2f3846e1ab39765ce82"
+    },
+    {
+      "Path": "nonesu/run-1/E-host-exit.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 78,
+      "Sha256": "890c1319d2b81b1575e6bf4ae474fcbcd620301ef665727476299406c2121aed"
+    },
+    {
+      "Path": "nonesu/run-1/E-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 911,
+      "Sha256": "95437da1251eac35c726556d5c6e2fe7af5592886cdd72654eb1ac90220d90d0"
+    },
+    {
+      "Path": "nonesu/run-1/E-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 290,
+      "Sha256": "297257a7380abd2c20cf8b75a1c2983665e0e87df900ca65c95f1d8c3197c121"
+    },
+    {
+      "Path": "nonesu/run-1/E-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 123,
+      "Sha256": "6ceaadd480d90d646e008c3024bc3b7e87b1ea375886676257ca2072567ebf9d"
+    },
+    {
+      "Path": "nonesu/run-1/F-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 779,
+      "Sha256": "58fc0f42eac576df573c4a83268fdca111fa80818dd83bbef56be6831601a5e6"
+    },
+    {
+      "Path": "nonesu/run-1/F-controller-death.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 372,
+      "Sha256": "ac6598d9a710bc70b082f1c09028d760cda2330553ee5d03b31481613de87704"
+    },
+    {
+      "Path": "nonesu/run-1/F-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7698,
+      "Sha256": "7facbd1b6f29146a1c42e755d27b74331aa20bfcf1b1c4db4ca7df7562319482"
+    },
+    {
+      "Path": "nonesu/run-1/F-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 567,
+      "Sha256": "8eaeeb2179b9033b5ee19d0a24f88139b4c38ab6ff33d48519cc217ad4f69432"
+    },
+    {
+      "Path": "nonesu/run-1/F-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 919,
+      "Sha256": "27d11edf544aaea841df6fb69c9d3bf7eb8f77dd99970c6f9c3ea8d392aa16d6"
+    },
+    {
+      "Path": "nonesu/run-1/probe.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 388,
+      "Sha256": "42b1c17d2a7d06f276e26010ed96b1d4b8785d573e533a5e3d4ae880550731be"
+    },
+    {
+      "Path": "nonesu/run-2/A-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 780,
+      "Sha256": "524f249eb64da77f0163a73005fb516c3e0f2427f7176915c461c895bb53821e"
+    },
+    {
+      "Path": "nonesu/run-2/A-10-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 788,
+      "Sha256": "03c284e121e9cab0bc08a35167c9d96d7b3bfb7ac4b33c4dc0f2db498a52cdf9"
+    },
+    {
+      "Path": "nonesu/run-2/A-11-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 782,
+      "Sha256": "2fb28d38fc5139a6388f156de0e823cd257da6df9469632589a005d5806f4ebd"
+    },
+    {
+      "Path": "nonesu/run-2/A-12-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 792,
+      "Sha256": "aaaa0d09ad37883cfb4c4c40c549ff77bc14c437e7e213607ddcf74d768847e2"
+    },
+    {
+      "Path": "nonesu/run-2/A-13-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 781,
+      "Sha256": "9cee6d4ecf2a682b263c533a9577ef3b573a47121f3c2a84d006eec798f6a103"
+    },
+    {
+      "Path": "nonesu/run-2/A-2-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 780,
+      "Sha256": "8c62dc6840abfc3c487f18cd9ec86ad86b2b91b80eb9646364c779b2db7ea6d9"
+    },
+    {
+      "Path": "nonesu/run-2/A-3-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 785,
+      "Sha256": "1fce3090307c084ae7defe3f2d795514a0fb417bace520242899dc63584eade0"
+    },
+    {
+      "Path": "nonesu/run-2/A-4-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 787,
+      "Sha256": "da40a9ac498162517bea7d0ff4fc71130deff43bb1d7473be206b3941f850028"
+    },
+    {
+      "Path": "nonesu/run-2/A-5-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 787,
+      "Sha256": "2b7c69727f6ce3c078258f53bcebeff9ae8dd248d2bc8876023d6f73b63795cd"
+    },
+    {
+      "Path": "nonesu/run-2/A-6-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 797,
+      "Sha256": "18a48e7ea8336422a057d4da21de97c633a5f8eef6bd694fe5cd593a736f1b46"
+    },
+    {
+      "Path": "nonesu/run-2/A-7-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 783,
+      "Sha256": "af5fb2b88d96862c42d995e3cdd00e562979a6acd17c8f343a0d0fdfe134a4eb"
+    },
+    {
+      "Path": "nonesu/run-2/A-8-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 788,
+      "Sha256": "d10151e60f4f1be01f86a9ce47f5aa0d8f2940260aca1ef5531fcb5195dd0c6f"
+    },
+    {
+      "Path": "nonesu/run-2/A-9-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 784,
+      "Sha256": "0a463b6cc3e8acfbc1f9d766684d9cf78a405b5bbb5470938b7d6185bbda7321"
+    },
+    {
+      "Path": "nonesu/run-2/A-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7548,
+      "Sha256": "c0625ef767f68adf25039403568fa6e27dcc8ac066068831ed5c3024977e3a49"
+    },
+    {
+      "Path": "nonesu/run-2/A-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 569,
+      "Sha256": "d4bc40f6a3fbe9fb415febf254b53fc9cfd240466d41b8ba050070add0e3b431"
+    },
+    {
+      "Path": "nonesu/run-2/A-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 923,
+      "Sha256": "e483435a055ea4c3d85d899f4f7431d08763cb75740e6a2ade6da31600f9846f"
+    },
+    {
+      "Path": "nonesu/run-2/A-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 298,
+      "Sha256": "053285f8aeefbff9407c61615951fba98223d3efc78cda75d537a60baf48959e"
+    },
+    {
+      "Path": "nonesu/run-2/A-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 124,
+      "Sha256": "5407bd978dc5e4f487c6f762b2ef63f3146cc5fcc933dd0958337c9846ad1641"
+    },
+    {
+      "Path": "nonesu/run-2/B-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 779,
+      "Sha256": "5b02dd9ff6e5f8141404dad2968a5d61926b3d76f16535bf07af6acdee1354e9"
+    },
+    {
+      "Path": "nonesu/run-2/B-2-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 794,
+      "Sha256": "37e8fbe4f9730213203198e6ab0f6725f114c41a97f1c8ce5ee6b186b940e309"
+    },
+    {
+      "Path": "nonesu/run-2/B-3-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 801,
+      "Sha256": "fac04a5df2b10fa6c339baa5e2dcf6a5af1c1e322fdd7af8b7c752c83f6553cc"
+    },
+    {
+      "Path": "nonesu/run-2/B-4-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 780,
+      "Sha256": "e994349ee21dac95d9e0f4fee4158d7e584b6d84e7894ffeec27ae803592e70c"
+    },
+    {
+      "Path": "nonesu/run-2/B-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7262,
+      "Sha256": "0ee8262ad1c0b5f99700afb94d9b59ae5bdc7e843a44b78772332c109754e901"
+    },
+    {
+      "Path": "nonesu/run-2/B-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 567,
+      "Sha256": "73e3732c2ed33a86e0469f4e7bd5325edec3a57c699ea475ade79fb02a99e91c"
+    },
+    {
+      "Path": "nonesu/run-2/B-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 920,
+      "Sha256": "8cbc0c7a9e22f8695a881c860bc21c4da4fcc1a46f57276ffc0aaddb5a6de219"
+    },
+    {
+      "Path": "nonesu/run-2/B-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 300,
+      "Sha256": "e5a40c8f35350cc4a33e4aee7ed1a67e065ed0925e622522ac6b4b22e7f212d8"
+    },
+    {
+      "Path": "nonesu/run-2/B-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 129,
+      "Sha256": "0dd4a1f77fa6f0acd97b0b2da8c6a8d8ad606304327ad2bc4177ba5fbfc140bc"
+    },
+    {
+      "Path": "nonesu/run-2/C-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 784,
+      "Sha256": "d7bc3269c94c172d8cc7303907984af173de7e64f2b3b9821b535b8395b9cecf"
+    },
+    {
+      "Path": "nonesu/run-2/C-2-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 799,
+      "Sha256": "16c1bb8c4d27532414e399d2d6d712444912b6da34b50841922d121df36f02f4"
+    },
+    {
+      "Path": "nonesu/run-2/C-3-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 796,
+      "Sha256": "6f25141b441a2ef7b194f5e837bfbe93f844a549ec83b1a01cb0def8ced2a701"
+    },
+    {
+      "Path": "nonesu/run-2/C-4-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 785,
+      "Sha256": "0a5603e7bb118d421243ab63764b64606897eba97b2c16aaf98919232e12b78b"
+    },
+    {
+      "Path": "nonesu/run-2/C-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7768,
+      "Sha256": "00d9f7392915fc1674c04387d456f12e6d764c9747ceb1669e25125866880b07"
+    },
+    {
+      "Path": "nonesu/run-2/C-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 571,
+      "Sha256": "8ad18bc3a70d70378e30c2fdfef378135bc8f97ae0ee0df86a3833b8fe011fc4"
+    },
+    {
+      "Path": "nonesu/run-2/C-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 923,
+      "Sha256": "7a3f4c191ee10b38b51064f11d6b15aaf2f58c20cc83f83cd7195b5fe0e5c379"
+    },
+    {
+      "Path": "nonesu/run-2/C-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 300,
+      "Sha256": "bc62f0ebb57e7c73cadd9d823b19f2900c63452de2e02a7f1b048dd3a0952691"
+    },
+    {
+      "Path": "nonesu/run-2/C-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 126,
+      "Sha256": "3c477e0bde990cc7b96339d81a4f0a4f02b614f942b7c3613c4bea383996a742"
+    },
+    {
+      "Path": "nonesu/run-2/D-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 782,
+      "Sha256": "7a91f3b1a7930e43c7e6094d6c2107b2b4782bf4807dd0adc4717250874d0368"
+    },
+    {
+      "Path": "nonesu/run-2/D-2-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 803,
+      "Sha256": "75c3d9e61aee557ce123d697abd9ad3e1967e237e4641bfd069c882a8c53bf6c"
+    },
+    {
+      "Path": "nonesu/run-2/D-ambiguity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 120,
+      "Sha256": "d6424cb2cf7e674f54889e1217d34213eedf0e368d3851ac2808e588966873d3"
+    },
+    {
+      "Path": "nonesu/run-2/D-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7548,
+      "Sha256": "fa67cc5948f615dfb24dccfa58697ad0176d029948276b19d8dd9e7f4294cab2"
+    },
+    {
+      "Path": "nonesu/run-2/D-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 570,
+      "Sha256": "75d0819d85b17b91079053d764f4b851529583516be55d1e9461316157182232"
+    },
+    {
+      "Path": "nonesu/run-2/D-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 923,
+      "Sha256": "98cf19917bc89cd30ff2ad57c71af861ebef2fc9bd3a0bca0fc6ed9d55224258"
+    },
+    {
+      "Path": "nonesu/run-2/D-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 298,
+      "Sha256": "31d92c23c39a501cdfec01b40f2890c2b0100fe7201421cecfa0d61279e13849"
+    },
+    {
+      "Path": "nonesu/run-2/D-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 124,
+      "Sha256": "cb7d4cce47a5f47e3a2e7c28bc29cb30c6b716bb95ee69533c8ebce3c0a39e95"
+    },
+    {
+      "Path": "nonesu/run-2/E-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 780,
+      "Sha256": "14160af324222063682c85aeeb64701b6a546d15472beb796f10c7dd05833bee"
+    },
+    {
+      "Path": "nonesu/run-2/E-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7548,
+      "Sha256": "144cadbcd59868a75a2342675103600a109907cce41fed702f9bda3b561269b1"
+    },
+    {
+      "Path": "nonesu/run-2/E-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 569,
+      "Sha256": "0196287183698ccb0a87aeda7c85c4f7459cc34b8b21a886b92d110dfbf4d426"
+    },
+    {
+      "Path": "nonesu/run-2/E-host-exit.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 78,
+      "Sha256": "890c1319d2b81b1575e6bf4ae474fcbcd620301ef665727476299406c2121aed"
+    },
+    {
+      "Path": "nonesu/run-2/E-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 922,
+      "Sha256": "5f783b39c9f38aa9a2ee726f7ce5c078d43402bfaf962cc06dd315b9c1e21cff"
+    },
+    {
+      "Path": "nonesu/run-2/E-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 296,
+      "Sha256": "7d1c1b35c7e07f73a4d4b76f306e98d6d45ae27e141cde2236422b012cbbe52c"
+    },
+    {
+      "Path": "nonesu/run-2/E-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 123,
+      "Sha256": "2b8f0ac71e14989f7e6a09688f15be5dc3b264fdd52cf30fea83fbc2dd3e666c"
+    },
+    {
+      "Path": "nonesu/run-2/F-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 779,
+      "Sha256": "3f0f11b99c56d24a7b841b1fd927bf64df4fab98fa44181148c7b3db2b8d5dad"
+    },
+    {
+      "Path": "nonesu/run-2/F-controller-death.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 373,
+      "Sha256": "8ee6396530fb4f9fdfe3baddc75db365b7a649e3eac05b1a684218b2ef819798"
+    },
+    {
+      "Path": "nonesu/run-2/F-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7548,
+      "Sha256": "d32bbb9fbc4fd056a4402fba21ac23c2419e035937614f3f69925bf505951204"
+    },
+    {
+      "Path": "nonesu/run-2/F-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 568,
+      "Sha256": "327b294d1c2e47fb3615adf7b67b2bf5fb8e256b8470a87d449ae05c41923311"
+    },
+    {
+      "Path": "nonesu/run-2/F-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 920,
+      "Sha256": "b8efb132102c8aa34b9ae1eaf5ca455f10bcff7c8542be53ed56163447f88621"
+    },
+    {
+      "Path": "nonesu/run-2/probe.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 388,
+      "Sha256": "42b1c17d2a7d06f276e26010ed96b1d4b8785d573e533a5e3d4ae880550731be"
+    },
+    {
+      "Path": "nonesu/run-3/A-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 784,
+      "Sha256": "0bb3f031d827f9bd871dd89b8ddd05e60c5a92111a998c90c65e6ecd62dd6cbc"
+    },
+    {
+      "Path": "nonesu/run-3/A-10-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 792,
+      "Sha256": "827087b01a2d3c998bc587ff2702de3a0701d7e399c91e6aca3d34dbdcca40ef"
+    },
+    {
+      "Path": "nonesu/run-3/A-11-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 786,
+      "Sha256": "992b786b1068d80da486d3be62362e55d114723dd2f48e0197de5c531afc50c3"
+    },
+    {
+      "Path": "nonesu/run-3/A-12-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 796,
+      "Sha256": "0b1042fc5339faaf841b7f353fe320ea361476fb6d9a86ede8632cfc67425d12"
+    },
+    {
+      "Path": "nonesu/run-3/A-13-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 785,
+      "Sha256": "fca6cd148dbcf5b971587088b57fc11f117cca4e6fbdd67d0a048ca69e1ecbd8"
+    },
+    {
+      "Path": "nonesu/run-3/A-2-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 784,
+      "Sha256": "7a2590f25d287699963e24936ca5c86f35d6f5c47d7644253758951bb8869c2d"
+    },
+    {
+      "Path": "nonesu/run-3/A-3-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 789,
+      "Sha256": "c5bfdff100adc3998a96f82462ab89263dd672ba9459bab4ba293ad87da5d520"
+    },
+    {
+      "Path": "nonesu/run-3/A-4-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 791,
+      "Sha256": "dc76bc8b9fb94652205a1a134613cf816ce88bc7ec62eda363331d88acd8d161"
+    },
+    {
+      "Path": "nonesu/run-3/A-5-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 792,
+      "Sha256": "c5738e4058488045ab4e6731eca1232a2f0b507136094344e1982571ade7e524"
+    },
+    {
+      "Path": "nonesu/run-3/A-6-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 801,
+      "Sha256": "95f0d35b4262020060157c8f23950c0d63238c591e5f67aeaa33211c05456ec0"
+    },
+    {
+      "Path": "nonesu/run-3/A-7-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 787,
+      "Sha256": "8c6580c506022c94191e7fb6a9b4310ac4fcc682389bbd1856789978f02b73ef"
+    },
+    {
+      "Path": "nonesu/run-3/A-8-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 792,
+      "Sha256": "7fc92b70cbfdae15bcba69f3a7e622bfd477146d17067bb8f043c30db5a42baf"
+    },
+    {
+      "Path": "nonesu/run-3/A-9-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 788,
+      "Sha256": "cdd48884bc2c83ab1fe3a02d9cfc31a8bb7a8ae7bc8b0dbed16af1f04e861220"
+    },
+    {
+      "Path": "nonesu/run-3/A-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7658,
+      "Sha256": "0b4ff857d0c29663147ecfb6b44c7e93818a66959544670dc78355571572233f"
+    },
+    {
+      "Path": "nonesu/run-3/A-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 571,
+      "Sha256": "8580522ca1f2f5bcb13cee42b9f1281f4738eb32472b1aabcc6bf5a9df974d2b"
+    },
+    {
+      "Path": "nonesu/run-3/A-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 923,
+      "Sha256": "fcd6a1abbf4b09a00718580088cc4b9032c64bc2ae29491c1baf3fbf8290848e"
+    },
+    {
+      "Path": "nonesu/run-3/A-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 298,
+      "Sha256": "0b7950345ed94bb827c04f733b514bcabfa2b2c06a2d8733cf5a3b753242f188"
+    },
+    {
+      "Path": "nonesu/run-3/A-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 128,
+      "Sha256": "93f0020cee732f8b8ea7198ca8556e2d8c450b8aa92e1becc636e1dd69764706"
+    },
+    {
+      "Path": "nonesu/run-3/B-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 779,
+      "Sha256": "53a921e87ccc40694ef2ffb1dc013e90be81527f86095af0ddf098c024da1358"
+    },
+    {
+      "Path": "nonesu/run-3/B-2-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 794,
+      "Sha256": "5d58250d06cd319b9356e9449510f260e69025d215f056796a5b63e2ef317ca8"
+    },
+    {
+      "Path": "nonesu/run-3/B-3-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 801,
+      "Sha256": "4c65ab09a3971f3ef909efab57a880341ed81564128636f67dc9457ec9bb007e"
+    },
+    {
+      "Path": "nonesu/run-3/B-4-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 780,
+      "Sha256": "519c332ff6c2b8b62b86f916387698d720fe21a49cc23e0c2b6f1cbf2411b5f5"
+    },
+    {
+      "Path": "nonesu/run-3/B-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7698,
+      "Sha256": "292efae43546a1c34fc9a441bb46a9b3c87897c1cb72668c017000d5b0aad215"
+    },
+    {
+      "Path": "nonesu/run-3/B-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 566,
+      "Sha256": "a5093f0c525a269e064be91c8a64ab31a9c5bc707d88459ad06c03d354d61428"
+    },
+    {
+      "Path": "nonesu/run-3/B-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 915,
+      "Sha256": "c092bad441afeba38719ecc47c5fb4bab1311b67a47510e777b5dc717d996ec1"
+    },
+    {
+      "Path": "nonesu/run-3/B-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 301,
+      "Sha256": "6874ad543a72a995b33b8c26ea6bb50c7e877192aa619e697a835c2e5eb00d0b"
+    },
+    {
+      "Path": "nonesu/run-3/B-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 129,
+      "Sha256": "3d19aad3bc0da341e50709e81926d95aadf1ed4f2e49a1562fb48331225a75f8"
+    },
+    {
+      "Path": "nonesu/run-3/C-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 783,
+      "Sha256": "b3e776be83e980024f499ac810f0d727d67d592da017f70474fde8237eba82e8"
+    },
+    {
+      "Path": "nonesu/run-3/C-2-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 800,
+      "Sha256": "62b4d53e81c3d4a426d8adb057e4a7439c30882589e33719911b482ef7786c1d"
+    },
+    {
+      "Path": "nonesu/run-3/C-3-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 795,
+      "Sha256": "fd8cfdbcbc05174c03a1fd61baa54e14bc771aaf6864dfd63facc2d0aa1045d5"
+    },
+    {
+      "Path": "nonesu/run-3/C-4-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 784,
+      "Sha256": "d7d9032f3e697f716d80613a87f1fee8c1ce38caab2e1b0ced7e7bc47f182e76"
+    },
+    {
+      "Path": "nonesu/run-3/C-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7328,
+      "Sha256": "80bff615447c2cffed4629f429ffa41a106383b0f1c68185f5477786b5a5d9c7"
+    },
+    {
+      "Path": "nonesu/run-3/C-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 570,
+      "Sha256": "456c02a6a778c49f48eac8586841fb808c10ccb75e823a03b5493668d5e43c10"
+    },
+    {
+      "Path": "nonesu/run-3/C-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 921,
+      "Sha256": "608ae1576362feb527ad5d33d3afef8cd1fed449a1329072db9adac072917cdb"
+    },
+    {
+      "Path": "nonesu/run-3/C-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 298,
+      "Sha256": "bd3f16e413e5f425aea80cf492f91df9139e175831c6bdf409fa0e9612704c5b"
+    },
+    {
+      "Path": "nonesu/run-3/C-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 122,
+      "Sha256": "7f40f1df8bcf4f9451255272e342975a69fb21631eeb55cebd19035346c4a374"
+    },
+    {
+      "Path": "nonesu/run-3/D-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 779,
+      "Sha256": "49cc1e3d12a94ed641fc68ada33a4e6e2a760f5a17cda00a5d1f1b9fe0df8692"
+    },
+    {
+      "Path": "nonesu/run-3/D-2-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 800,
+      "Sha256": "821a61f905d2df40beb5c5f9a325e68af98991f3a2819cb7c56ff8f18692daea"
+    },
+    {
+      "Path": "nonesu/run-3/D-ambiguity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 120,
+      "Sha256": "d6424cb2cf7e674f54889e1217d34213eedf0e368d3851ac2808e588966873d3"
+    },
+    {
+      "Path": "nonesu/run-3/D-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7548,
+      "Sha256": "1f5125aecb976b36c7be547817a8fb1464c5e095af9cce243320133981e62e91"
+    },
+    {
+      "Path": "nonesu/run-3/D-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 568,
+      "Sha256": "5fc4ce7c3058f9194efd2066f0005ec3551cc3de2e33278d2e938473a943e805"
+    },
+    {
+      "Path": "nonesu/run-3/D-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 919,
+      "Sha256": "d31f65ffd443017543d29dc7e51ed972e6c172feda6c8e15fe32870a5c56f017"
+    },
+    {
+      "Path": "nonesu/run-3/D-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 295,
+      "Sha256": "70bf16246e0e7b417e88dcbc3db2691727f7487eb6505f129769c4f05255107c"
+    },
+    {
+      "Path": "nonesu/run-3/D-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 124,
+      "Sha256": "01ee0f1abf307bbcc05e8137e192be8163897f8ce8e7a8282d9021c90e6d5f98"
+    },
+    {
+      "Path": "nonesu/run-3/E-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 782,
+      "Sha256": "455e8bc86e6f60494105c254cb942ac5a08cc5e7062e3f55c8fb5df8fd84b39a"
+    },
+    {
+      "Path": "nonesu/run-3/E-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7328,
+      "Sha256": "c9e23be04fb0b4e4222c8a553d1c37c03aa33b792adcb7c52349c24651093fd3"
+    },
+    {
+      "Path": "nonesu/run-3/E-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 570,
+      "Sha256": "4f198dd8d739c75d65a5d6a4a05ceb33ffacbab109efce5bba1c9ad4b1952bae"
+    },
+    {
+      "Path": "nonesu/run-3/E-host-exit.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 78,
+      "Sha256": "890c1319d2b81b1575e6bf4ae474fcbcd620301ef665727476299406c2121aed"
+    },
+    {
+      "Path": "nonesu/run-3/E-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 922,
+      "Sha256": "ab5ba142d7933cadea7ca2cfa4a29db1a5ffa2fcec284035002f55aa8b6831f4"
+    },
+    {
+      "Path": "nonesu/run-3/E-read.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 297,
+      "Sha256": "019e063d6ab69fb8797604ccfdda1877b1e66f6cd026f775eb133e36c86e472e"
+    },
+    {
+      "Path": "nonesu/run-3/E-stream.bin",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 123,
+      "Sha256": "6c1a43f0c9accc8c09917b8e4228855e5560878ec630168cac75fae4e5dae07a"
+    },
+    {
+      "Path": "nonesu/run-3/F-1-request.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 780,
+      "Sha256": "f48f5aea544492eca8097d23811901ec6b7f268608222c05321db0154b54d171"
+    },
+    {
+      "Path": "nonesu/run-3/F-controller-death.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 374,
+      "Sha256": "f4f9085a60e3d8dbd0eca2f63f90cf8c6f42061ae28df376c1b4338bca43516b"
+    },
+    {
+      "Path": "nonesu/run-3/F-discovery.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 7548,
+      "Sha256": "437dee42ed4a493fd290f822a51ca019cc62a166069c00e16d33de66df68e3c1"
+    },
+    {
+      "Path": "nonesu/run-3/F-hello.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 569,
+      "Sha256": "9b23f702fbba35abdc19624afe8266c685d838c9540df72ae38bfb315df402eb"
+    },
+    {
+      "Path": "nonesu/run-3/F-identity.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 923,
+      "Sha256": "5f44486f261873b7d3e44327fdf3a551c0727f2dfcd0bc77de2ccab2ed46d5c7"
+    },
+    {
+      "Path": "nonesu/run-3/probe.json",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 388,
+      "Sha256": "42b1c17d2a7d06f276e26010ed96b1d4b8785d573e533a5e3d4ae880550731be"
+    },
+    {
+      "Path": "nonesu/summary.txt",
+      "SourceRun": "nonesu-20261013-103435-314ced21",
+      "Bytes": 64,
+      "Sha256": "0b56642e17d31ccda8dcaf8478f647632a250a67aa9381582245abe0e4223e22"
+    },
+    {
+      "Path": "esu/report.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7712,
+      "Sha256": "a5285c4e6146d7e28192d4cfbd57b670ec2ff5f43013f18794ce96859a547e8f"
+    },
+    {
+      "Path": "esu/run-1/A-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 780,
+      "Sha256": "833de13dcd6376eef64aa61867cc40956797d881466284278f35e1968bf769b6"
+    },
+    {
+      "Path": "esu/run-1/A-10-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 788,
+      "Sha256": "64b795868f13ae7e2824a1b514496165018033c4d79c31ec669d60aa233729f8"
+    },
+    {
+      "Path": "esu/run-1/A-11-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 782,
+      "Sha256": "fd55aec23919280b804e66ed2aaccbbb690e7b965304ac53ef86541f06ac9367"
+    },
+    {
+      "Path": "esu/run-1/A-12-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 792,
+      "Sha256": "c197336f93537e379625ecd9596d03f5391eb49fb78cb44a34c2de4195bb08d2"
+    },
+    {
+      "Path": "esu/run-1/A-13-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 781,
+      "Sha256": "20a4ee4c72c286a79c2ab27138602bebbd9fa225fc7a835d9bd27bb539a7eff1"
+    },
+    {
+      "Path": "esu/run-1/A-2-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 780,
+      "Sha256": "a578c3d220236b06b7702ad5fd9f33b3b22230d7a3e84a2a971002a0245f9b57"
+    },
+    {
+      "Path": "esu/run-1/A-3-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 785,
+      "Sha256": "3a07c3e9c842bae835619beefa3a4d493eb12ef60f2f79b524628c2c9ed1fb1a"
+    },
+    {
+      "Path": "esu/run-1/A-4-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 787,
+      "Sha256": "d44d0cf173dc9cfe181586249a527c052445358a2905dad48fad3dff4a2b97df"
+    },
+    {
+      "Path": "esu/run-1/A-5-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 789,
+      "Sha256": "1b79b795f8ef79a370e1b13b5decbc76f2f9176cba18edb90ed8b58242f3b44d"
+    },
+    {
+      "Path": "esu/run-1/A-6-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 797,
+      "Sha256": "2bfea1fcf4cbe3f42f03c8e5ca5f7ade3c11d8fd299c8edf6633749d09ca554a"
+    },
+    {
+      "Path": "esu/run-1/A-7-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 783,
+      "Sha256": "0385af97378dad627aa9be088c455f55be5fad69fedbe04a906c238d0e3051e1"
+    },
+    {
+      "Path": "esu/run-1/A-8-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 788,
+      "Sha256": "cb64273a82bbab274b61ebc6df98acbed63c75e545726c37417ecdd9d1ebda7e"
+    },
+    {
+      "Path": "esu/run-1/A-9-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 784,
+      "Sha256": "36c52fb8fcf686a1e46ce161a13404acc0f243a931a9755c6016027e674e5b1a"
+    },
+    {
+      "Path": "esu/run-1/A-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7328,
+      "Sha256": "d0c55dca5b1d240e4d30bc3403ccc371a8a241cdcb576d667010d1f245433ef1"
+    },
+    {
+      "Path": "esu/run-1/A-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 569,
+      "Sha256": "219ae91ac7109fadf6545678f22d8984abfd76851bb05d33207bf8572d5033e9"
+    },
+    {
+      "Path": "esu/run-1/A-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 923,
+      "Sha256": "bdf20524db5631b3b2b02a1fc49b6092d0bdef0aa6afeef3aa5e7ec37a6b0506"
+    },
+    {
+      "Path": "esu/run-1/A-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 298,
+      "Sha256": "868a63de6d1afb435db04969d14f0f7eb5d52db03fdc12087d2f49536dd3e10d"
+    },
+    {
+      "Path": "esu/run-1/A-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 124,
+      "Sha256": "83c6ff82588125b24619ce174ee2be043e23ac254685c95154be663b72df2801"
+    },
+    {
+      "Path": "esu/run-1/B-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 779,
+      "Sha256": "4cb1cbc96aba4c9f9fb52fa144ecf9ecfb6ca24422081f07514052bd6050f749"
+    },
+    {
+      "Path": "esu/run-1/B-2-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 794,
+      "Sha256": "89492afd6339ff81c7bdb98f412cb967903dd2107f995ef1ef83a1147359c64e"
+    },
+    {
+      "Path": "esu/run-1/B-3-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 801,
+      "Sha256": "1f63e9b6daab1164f90fe2db9c976a153bdc9c1b012d236d7f00a05c8a1d305f"
+    },
+    {
+      "Path": "esu/run-1/B-4-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 780,
+      "Sha256": "0fe0d2aab9af2cf33d9574bc2f27522f5b1eaf28bf0f1ef2d664c7b458122fc9"
+    },
+    {
+      "Path": "esu/run-1/B-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7480,
+      "Sha256": "671a7caa25ace7c5690532939f6fbd7ac32e2eb9c4b6d1ce9720d607d961f2d4"
+    },
+    {
+      "Path": "esu/run-1/B-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 568,
+      "Sha256": "bd38cb385d6a0bd3ad10abdb10ff2985d1f894767e624514d0217d7e5d562119"
+    },
+    {
+      "Path": "esu/run-1/B-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 925,
+      "Sha256": "1d01bbf054ba54367e2fd15a5f9176590140ee7a61b74f64072fe3c51050ccc9"
+    },
+    {
+      "Path": "esu/run-1/B-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 304,
+      "Sha256": "008101d9b91347d3ea55590479d60a03a9520bd6bd2bd58c7af44419cc1e7b17"
+    },
+    {
+      "Path": "esu/run-1/B-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 133,
+      "Sha256": "3ff1488672fc8ec5651852c6edf93d2dfc5e88224395ffe1b94ac7260615445a"
+    },
+    {
+      "Path": "esu/run-1/C-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 782,
+      "Sha256": "2ba1c4af920069724d74075e375a657cc6e78a1f56fc83cc1bf170ed7cf823c7"
+    },
+    {
+      "Path": "esu/run-1/C-2-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 798,
+      "Sha256": "aa717d91050a825f3833c8f0ee3e67444f3925d58b9656d46c9f251adc051320"
+    },
+    {
+      "Path": "esu/run-1/C-3-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 794,
+      "Sha256": "23242d7359afeb9ec22819514154136c6e81c21dd38e126784b91a7340b45f7e"
+    },
+    {
+      "Path": "esu/run-1/C-4-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 783,
+      "Sha256": "ded25294e93e10c3e153f05e16b932cf829381d68ce10981946785b09fcb709a"
+    },
+    {
+      "Path": "esu/run-1/C-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7548,
+      "Sha256": "60a461a8a383a93d888886a010d422a5d86a54964287232f01b70a2ddf352d17"
+    },
+    {
+      "Path": "esu/run-1/C-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 570,
+      "Sha256": "b86e0f6c52c45ff6b4d07f9de9d141f0ad0da482dff2172c9caea9dd4f54f191"
+    },
+    {
+      "Path": "esu/run-1/C-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 923,
+      "Sha256": "41c022205a74e6c609568aa17ccfff15b754961968887d6021cb41cd627a4ce8"
+    },
+    {
+      "Path": "esu/run-1/C-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 300,
+      "Sha256": "b34e1708b6c41d316cc113dd899df18866544e303a1359f0200bd4ec3d22db64"
+    },
+    {
+      "Path": "esu/run-1/C-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 122,
+      "Sha256": "981bbb0066ecb820de5724249f576690bb56b30507d5ea5ecfe62a61f3bce79e"
+    },
+    {
+      "Path": "esu/run-1/D-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 784,
+      "Sha256": "3c5f25b8a4c6a1cfa35aaf6c848c61a2a18d5404c3be699fc767581e65389d0f"
+    },
+    {
+      "Path": "esu/run-1/D-2-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 805,
+      "Sha256": "f01428b64b7580a650ce37670d4d9d365105d725d6d10bff37d3368738759872"
+    },
+    {
+      "Path": "esu/run-1/D-ambiguity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 120,
+      "Sha256": "d6424cb2cf7e674f54889e1217d34213eedf0e368d3851ac2808e588966873d3"
+    },
+    {
+      "Path": "esu/run-1/D-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7548,
+      "Sha256": "11e86bb3d671e222b2c527758a8205714d5122bd33d9af6c01c06ce966195bb4"
+    },
+    {
+      "Path": "esu/run-1/D-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 571,
+      "Sha256": "edefc8167146c317d2976c8b301d13fccd07c3bf72de5917cea9ca485aadfec0"
+    },
+    {
+      "Path": "esu/run-1/D-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 923,
+      "Sha256": "03395e1b0e4acc71247bc6f2b3731640d808ee1a9ab3559dd91a4f2386967f74"
+    },
+    {
+      "Path": "esu/run-1/D-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 298,
+      "Sha256": "2737bab525b06bbc27a0ed13a33341852563acf57d17116f798bdfdab7337005"
+    },
+    {
+      "Path": "esu/run-1/D-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 120,
+      "Sha256": "36bf1c8e69c9da60d2e2e660d009d025ce71f9573f642176358788b8f7fe72b3"
+    },
+    {
+      "Path": "esu/run-1/E-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 780,
+      "Sha256": "bf7c78355e44162c98d8f770236e8a428a84d1c86ceaa88d35337459ba58ac8e"
+    },
+    {
+      "Path": "esu/run-1/E-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7548,
+      "Sha256": "acd91e5c330c649b215cfefe3428282d97454aa12405bd018e6341f2d95cf447"
+    },
+    {
+      "Path": "esu/run-1/E-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 569,
+      "Sha256": "c9d49abb3b81542b52d40ae2f2f32a1dfe2e0db35d179dea822f43aab2f75ade"
+    },
+    {
+      "Path": "esu/run-1/E-host-exit.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 78,
+      "Sha256": "890c1319d2b81b1575e6bf4ae474fcbcd620301ef665727476299406c2121aed"
+    },
+    {
+      "Path": "esu/run-1/E-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 923,
+      "Sha256": "602ca59e1c62b13f963de39a5510e4f42584bc78e085d05a511fe175db53f7ac"
+    },
+    {
+      "Path": "esu/run-1/E-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 297,
+      "Sha256": "37fd298d360e285885022c64c0b66c69a6040085fd755aa94c74a144bbb5956b"
+    },
+    {
+      "Path": "esu/run-1/E-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 119,
+      "Sha256": "b9f85ca186899be1c34525cdb019672f0d1e88e41c555b264d8c926e1c1b9098"
+    },
+    {
+      "Path": "esu/run-1/F-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 784,
+      "Sha256": "84f580dd20fbc86f99f553a1301791f6eb12e026bde521c64170d57aa715f73e"
+    },
+    {
+      "Path": "esu/run-1/F-controller-death.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 374,
+      "Sha256": "301a40f575138a575f6476ebe9823314c76a2885797581b33a884d65d41b19be"
+    },
+    {
+      "Path": "esu/run-1/F-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7548,
+      "Sha256": "898b7025866797ef60d0c355a1e9bc16eed3d2ace21429859512eaa80c022bc7"
+    },
+    {
+      "Path": "esu/run-1/F-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 571,
+      "Sha256": "fbf92eb0188fbf2d548a8410c6c6ba69150a6a45f82880fd0ede87085613c70b"
+    },
+    {
+      "Path": "esu/run-1/F-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 923,
+      "Sha256": "f322d5615e17e1b74f027961bafc91efcbff7be9933b8c4f9857f722a6149790"
+    },
+    {
+      "Path": "esu/run-1/probe.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 388,
+      "Sha256": "42b1c17d2a7d06f276e26010ed96b1d4b8785d573e533a5e3d4ae880550731be"
+    },
+    {
+      "Path": "esu/run-2/A-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 781,
+      "Sha256": "11299817fa79fa10c22845bb7215e804fa9743c806ebd153415ab8f6950f5af8"
+    },
+    {
+      "Path": "esu/run-2/A-10-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 789,
+      "Sha256": "099e2a7732883dec077bec32d8934cef81970c96cda6c720d3534d6d47a6875e"
+    },
+    {
+      "Path": "esu/run-2/A-11-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 783,
+      "Sha256": "324153011cd16a746ed756f068488221129f27561f87a33d534e5201f7d197b5"
+    },
+    {
+      "Path": "esu/run-2/A-12-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 793,
+      "Sha256": "71994036f5a0c1937da416dc474a4477a9909665f9df13532652b8770912234c"
+    },
+    {
+      "Path": "esu/run-2/A-13-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 782,
+      "Sha256": "dbb614852efa08cae2612cbe063b644e1f5840fa6a93c0d165da571d2d376b6b"
+    },
+    {
+      "Path": "esu/run-2/A-2-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 781,
+      "Sha256": "07c9de62c09644fe004859bcfac2a500c9254a5160b058461d857784cb71dc95"
+    },
+    {
+      "Path": "esu/run-2/A-3-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 786,
+      "Sha256": "d59ba13fbc065547b3f5e70c763c5ed3ee7aff97efcc3920fb43335b31c3bc3b"
+    },
+    {
+      "Path": "esu/run-2/A-4-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 788,
+      "Sha256": "a84574f40f4b8febe5ba24d814f5859b31efba3ceb042f0f086c3403728b46c7"
+    },
+    {
+      "Path": "esu/run-2/A-5-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 788,
+      "Sha256": "dddfcc9abe4d5350de833d3a145b29923dff1ae691849d25b5c7106088a034d1"
+    },
+    {
+      "Path": "esu/run-2/A-6-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 798,
+      "Sha256": "089cf2276f541f1be001b526aacae6cd674c25c8cc1bbf335193afc0ede47d78"
+    },
+    {
+      "Path": "esu/run-2/A-7-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 784,
+      "Sha256": "4992fb38db08f1be5056a74402bc0d847241bc2a78ce639756db5af4b60dff44"
+    },
+    {
+      "Path": "esu/run-2/A-8-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 789,
+      "Sha256": "4da5b7d6aa2f58c1b3b9c8298d8741a7dec09f62053cfce86528df73d0885af6"
+    },
+    {
+      "Path": "esu/run-2/A-9-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 785,
+      "Sha256": "6f9258b250d70e706c0a90f57c4a1ec2c58668f0e9d156a54a8f3d34b1e8895c"
+    },
+    {
+      "Path": "esu/run-2/A-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7328,
+      "Sha256": "a68d91bee86d094b6a528e9b2bb9b9c0c302afdcd89c39eeb013c84da5f848cf"
+    },
+    {
+      "Path": "esu/run-2/A-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 570,
+      "Sha256": "6dbf9799c0910bae849e611f3fc3f334f54f41604888ce49677eef0680a0a586"
+    },
+    {
+      "Path": "esu/run-2/A-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 926,
+      "Sha256": "29013e4f17a29687e010e56784063a98c54b2807ae895cac513f784b17ed26fd"
+    },
+    {
+      "Path": "esu/run-2/A-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 300,
+      "Sha256": "121220acb3daf5be5149130733db5cae4c716909df60871d19c97fe75bd7222d"
+    },
+    {
+      "Path": "esu/run-2/A-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 124,
+      "Sha256": "f0e75101e45b4fdc655f27c2877b09c784393303ab67cbee98e1235510a3324b"
+    },
+    {
+      "Path": "esu/run-2/B-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 780,
+      "Sha256": "761657445a3e8ea21a1416c455b45df2b55494da94d9b820af501e261ebe01f2"
+    },
+    {
+      "Path": "esu/run-2/B-2-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 795,
+      "Sha256": "b21f1f6d0eb151b986bd23ef94d039467b0dd12a8310cbe6507b66b15bcc491b"
+    },
+    {
+      "Path": "esu/run-2/B-3-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 802,
+      "Sha256": "c761e59074105a6f7e2b8ac9e6fab79456a3f62f3ec5262a8fc8dd34f2c677cf"
+    },
+    {
+      "Path": "esu/run-2/B-4-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 781,
+      "Sha256": "7459f3fef25c9119faf8ea11b69393cbca231fb45bc801c4f573e5b3544f4f88"
+    },
+    {
+      "Path": "esu/run-2/B-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7262,
+      "Sha256": "5ad73359395dc689aaf27bfc4d3dfea5b524edaaef85f4bc887cc41bb74845e1"
+    },
+    {
+      "Path": "esu/run-2/B-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 568,
+      "Sha256": "0a543bee3f40d13ad0f6c57c897ae6cc331f8500d6c2bc22c0fef5fb7db0f70c"
+    },
+    {
+      "Path": "esu/run-2/B-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 922,
+      "Sha256": "11503eabc4385ffe88e891cc9a14fca6d41f59c3ac6c330079f00ae478c571e0"
+    },
+    {
+      "Path": "esu/run-2/B-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 302,
+      "Sha256": "1d36018e8be5d79f975d9ad3809de14aa49b99edbe94e052f3ac316271af0ba2"
+    },
+    {
+      "Path": "esu/run-2/B-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 133,
+      "Sha256": "ed1deaa4e0de99c154908da8ceea7e48f07cc2d542610f1b0a5ce9ae43e1c6bb"
+    },
+    {
+      "Path": "esu/run-2/C-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 787,
+      "Sha256": "915a3566e83d7221f3d8ae37b97be2ba69dc22236cbea1a86e858faa206fd48f"
+    },
+    {
+      "Path": "esu/run-2/C-2-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 802,
+      "Sha256": "710a50706d7ab675e5efef6a1c91d1dbcfe65c5e96982811a7175163a6e3146b"
+    },
+    {
+      "Path": "esu/run-2/C-3-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 799,
+      "Sha256": "6a4410a22736a1b58bd08c80dfcb928a1170a21720a14164b8d8008f0fc9cdd9"
+    },
+    {
+      "Path": "esu/run-2/C-4-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 788,
+      "Sha256": "b52b162513942079fbd26ccceeb901e50cc40de898a7e34863d090a343988cd2"
+    },
+    {
+      "Path": "esu/run-2/C-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7618,
+      "Sha256": "b1ceaba13dcb97f68831185b0e78c64d72fec33f2e30a75d0f03a38445e867a9"
+    },
+    {
+      "Path": "esu/run-2/C-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 574,
+      "Sha256": "25a7e4e1b17616e64eca0c4ac770826a641cdf564615913a5eb591d4cfddb1d0"
+    },
+    {
+      "Path": "esu/run-2/C-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 924,
+      "Sha256": "7f1e0541c651b8cd8de73ef893f6a463031499526e03fde95680a04773b65ae0"
+    },
+    {
+      "Path": "esu/run-2/C-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 300,
+      "Sha256": "312337b0522187be628cd294176cbad495618912564d2381e5a8b8f234ecb152"
+    },
+    {
+      "Path": "esu/run-2/C-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 122,
+      "Sha256": "fd3b471e212d1baf49078fefc576f7f67fe90516e1c1d03562320f2adc7ad944"
+    },
+    {
+      "Path": "esu/run-2/D-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 782,
+      "Sha256": "4ce04c2141dae151449a8a31763c7cb14c0b7d4de88836c3a1c4a19b5f7dbb7a"
+    },
+    {
+      "Path": "esu/run-2/D-2-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 803,
+      "Sha256": "40ea35d4cef38e8190fe0c6e74f01c396ecaf874b0e9f43dc1353255b574117e"
+    },
+    {
+      "Path": "esu/run-2/D-ambiguity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 120,
+      "Sha256": "d6424cb2cf7e674f54889e1217d34213eedf0e368d3851ac2808e588966873d3"
+    },
+    {
+      "Path": "esu/run-2/D-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7548,
+      "Sha256": "2910faa9eeba8cdd41c898fe52b73add797e8a6e19414481f499d82b9df42042"
+    },
+    {
+      "Path": "esu/run-2/D-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 570,
+      "Sha256": "f135ba8e06b8aa103ef9ff4fc72557a41fd577a4054e469a3b762fba01626873"
+    },
+    {
+      "Path": "esu/run-2/D-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 923,
+      "Sha256": "0174fd69eb03634024545304f4141bcaa0def7fd3ea87dea2b696bb1e15d4902"
+    },
+    {
+      "Path": "esu/run-2/D-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 298,
+      "Sha256": "7b07f5e4f76d5b8d030a2660412b5efdab46489fc133855534aa471d0ba6f915"
+    },
+    {
+      "Path": "esu/run-2/D-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 120,
+      "Sha256": "f6af4af2f3adb22fa9be919ed50262663395b3f26f9923bcc0fa2a8afbe2ffd2"
+    },
+    {
+      "Path": "esu/run-2/E-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 783,
+      "Sha256": "82010a38e98148fa20c18add99c5ccdcfb8607d7ed0590a67e4549648c18d57e"
+    },
+    {
+      "Path": "esu/run-2/E-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7548,
+      "Sha256": "41ac46780be685be018ed74cd997ecf0d3519cec092134c1b059f9727dbf0ef5"
+    },
+    {
+      "Path": "esu/run-2/E-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 571,
+      "Sha256": "8c6297c29d8607c0370fa536e221898e4b8d32b1b879be5693bcf3676fb21f57"
+    },
+    {
+      "Path": "esu/run-2/E-host-exit.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 78,
+      "Sha256": "890c1319d2b81b1575e6bf4ae474fcbcd620301ef665727476299406c2121aed"
+    },
+    {
+      "Path": "esu/run-2/E-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 925,
+      "Sha256": "c3e0395fde2b4bc2c2ea7259873e47cf066751f3506a3ced3882f5e6cba2c996"
+    },
+    {
+      "Path": "esu/run-2/E-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 299,
+      "Sha256": "0de68d812ead8eb69404db9f32e94ca5855175e7539959aa0e703165320811a5"
+    },
+    {
+      "Path": "esu/run-2/E-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 119,
+      "Sha256": "aa4a37ec2c3f0ec2365cd3907aa40f357edb979b972b834533bfea917dbdf35f"
+    },
+    {
+      "Path": "esu/run-2/F-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 778,
+      "Sha256": "ff35cdc4484863fae66d65137a9e3fad35cbba1d4e4f6cbb48c35edcfaf040cd"
+    },
+    {
+      "Path": "esu/run-2/F-controller-death.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 374,
+      "Sha256": "44e24a8c182bb2bf72e3f2ee3852ab229b5842288666d5cb01b46ca219387bc3"
+    },
+    {
+      "Path": "esu/run-2/F-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7548,
+      "Sha256": "c59f1149599a9532c0287193113f268c05af8cc715008670ceb1ef2725aa21bc"
+    },
+    {
+      "Path": "esu/run-2/F-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 568,
+      "Sha256": "09dfe5c69fa5665652d731ffb6d39bce3022ad00d2d0bb2751b012f47b3ccabd"
+    },
+    {
+      "Path": "esu/run-2/F-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 923,
+      "Sha256": "477f22d0a94ea99d4a4fdbd3e83b8c083e77abc7cfb3334eb983f1dbc2d41852"
+    },
+    {
+      "Path": "esu/run-2/probe.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 388,
+      "Sha256": "42b1c17d2a7d06f276e26010ed96b1d4b8785d573e533a5e3d4ae880550731be"
+    },
+    {
+      "Path": "esu/run-3/A-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 782,
+      "Sha256": "a98189977bddbfbea57b40100a127cb58fbda1a88e4c0e49de1d8f99c2f39825"
+    },
+    {
+      "Path": "esu/run-3/A-10-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 790,
+      "Sha256": "d8b3ea5d943a4326cccf9d592986abec2131c62d466d137ceead51808238eb06"
+    },
+    {
+      "Path": "esu/run-3/A-11-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 784,
+      "Sha256": "e7f6c4830c569bf9e7bb527b79e1e1c969f5b7739fccd231189415bad20171f8"
+    },
+    {
+      "Path": "esu/run-3/A-12-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 794,
+      "Sha256": "b4f4a0a52e141a2b9c7cf3c920a7d483db7246b544cb8c584b1f1eb860a842a8"
+    },
+    {
+      "Path": "esu/run-3/A-13-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 783,
+      "Sha256": "60ac239046737ad9b32ba5d9db521c504bc74b99aed09ae9f6849e9dd0205f82"
+    },
+    {
+      "Path": "esu/run-3/A-2-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 782,
+      "Sha256": "f66bea10e677a61706afa771a8244ee6e111c12dbb7e2bfca109dff1bac4d34f"
+    },
+    {
+      "Path": "esu/run-3/A-3-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 787,
+      "Sha256": "e3e8792e2750b3fcce179590bd82267330f0dd23be52c06d7ae6d5cb0ba76466"
+    },
+    {
+      "Path": "esu/run-3/A-4-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 789,
+      "Sha256": "ed77e6d1fafcd6d44893d988a1bfa33195218b61ba5855d3061a8a76d97ed3a1"
+    },
+    {
+      "Path": "esu/run-3/A-5-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 790,
+      "Sha256": "c87fbf96a754813bb8f6b7d10d39162434372914ce3abd70426b437abba33143"
+    },
+    {
+      "Path": "esu/run-3/A-6-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 799,
+      "Sha256": "210d2a88a4d614384b646ef34801699680c720d8a9fc2dd2f5f1d80b4a3468d9"
+    },
+    {
+      "Path": "esu/run-3/A-7-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 785,
+      "Sha256": "0df3d1033399e42a125bd00459eff6a6eaed7ea1b282e3555402e1adb74af375"
+    },
+    {
+      "Path": "esu/run-3/A-8-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 790,
+      "Sha256": "8199c28c98b9c5b30eeb55198f74a5a92f371c5bb20345333ff43c4e44e8f195"
+    },
+    {
+      "Path": "esu/run-3/A-9-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 786,
+      "Sha256": "446f4d47da4cb6697fcadd6019d48c75c76e468a54131dd3b656ec7001ff96f6"
+    },
+    {
+      "Path": "esu/run-3/A-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7548,
+      "Sha256": "f7ef48ef40813df87537e308adaefd5553305d1b6c16ae654d2f2eaa7545feb1"
+    },
+    {
+      "Path": "esu/run-3/A-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 570,
+      "Sha256": "a52affd42318afebe6dfae78648d2c355d58bcacbc41beb141151ad2ac2bacd3"
+    },
+    {
+      "Path": "esu/run-3/A-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 923,
+      "Sha256": "2d6f20e6d0494dba1119c807f686466d8b3424aac2c21f665735bc3500c405e5"
+    },
+    {
+      "Path": "esu/run-3/A-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 298,
+      "Sha256": "e976dfcbf81714756cc3ece032661d2949e1d93db433f248bca6cfd150b61bff"
+    },
+    {
+      "Path": "esu/run-3/A-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 124,
+      "Sha256": "bfb234f585ceb794dd7a49283a149994591a096f3ed93b79c9198ba0b2591cdc"
+    },
+    {
+      "Path": "esu/run-3/B-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 783,
+      "Sha256": "902f7022c67b13763f97988b9bce86a2a58b734478026be73b1a10ec2126c749"
+    },
+    {
+      "Path": "esu/run-3/B-2-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 798,
+      "Sha256": "5e988c68fccac97ad606261b7cc6bda93dc036b4e3b8f36c53b72e4ee460d11f"
+    },
+    {
+      "Path": "esu/run-3/B-3-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 805,
+      "Sha256": "34812d618c75380ab2eb0a9b1dfc4883cf96bb412937700ab945cb27a5494b2c"
+    },
+    {
+      "Path": "esu/run-3/B-4-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 784,
+      "Sha256": "f2fe086bf280928aa826c7ca01d7103c2bc8b6f299aa8139c7a46912f0af689b"
+    },
+    {
+      "Path": "esu/run-3/B-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7548,
+      "Sha256": "f7d3a558aeea5f2e13293db44fa724426fff2b1ba43d81f77cdd6a3fb67618b2"
+    },
+    {
+      "Path": "esu/run-3/B-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 570,
+      "Sha256": "aaa722d866dcdfa92ac833c33fdabbda32451cb82d769a57709a2844e94a1909"
+    },
+    {
+      "Path": "esu/run-3/B-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 921,
+      "Sha256": "87ffcc140b9a565cda9cab03f2bcf82b77bc4dee5a149afd204afb94d0016067"
+    },
+    {
+      "Path": "esu/run-3/B-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 301,
+      "Sha256": "46310377f0ab4ccf4adcd019bf4395424508d4b5e59080feefd54121d5b3f23e"
+    },
+    {
+      "Path": "esu/run-3/B-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 133,
+      "Sha256": "1ce552bad46d37a637c1413bbc1487e5b0059f1e3cf22a0229b45028c42b5e26"
+    },
+    {
+      "Path": "esu/run-3/C-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 783,
+      "Sha256": "e86ba831955323d33c851ab68f17c20b26ffea4658e34fb865cb7ca5af5151ac"
+    },
+    {
+      "Path": "esu/run-3/C-2-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 800,
+      "Sha256": "3236b5e22fa4b2c97ea708da0b50ec62c42a7eeb39c74a978047f4fb83536928"
+    },
+    {
+      "Path": "esu/run-3/C-3-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 795,
+      "Sha256": "84671144fa387b1927f2de76d49f36f8d00a11c3471cd1bd3a87e1ea1d957fae"
+    },
+    {
+      "Path": "esu/run-3/C-4-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 784,
+      "Sha256": "13d9de378722bc8c714956410c4071019074d862faa510a111e59ef3eb0dcb23"
+    },
+    {
+      "Path": "esu/run-3/C-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7548,
+      "Sha256": "41455b5ce0097ed291e0d2d36a1f9a2dbed86006a9f7cbc08c2c20c34334d644"
+    },
+    {
+      "Path": "esu/run-3/C-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 571,
+      "Sha256": "6a20e66516b8f37dec6af346486375f3c58c093b6339e10695d8e1dfd0500606"
+    },
+    {
+      "Path": "esu/run-3/C-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 926,
+      "Sha256": "f0528afab3bb5d48803b4cd3e0dd2f4fcccfa024b9079df4fcf9b8e14381f162"
+    },
+    {
+      "Path": "esu/run-3/C-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 303,
+      "Sha256": "39d5ef294b56270f54bbca530ab3079e0ea3a628635743a292913702ae842440"
+    },
+    {
+      "Path": "esu/run-3/C-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 122,
+      "Sha256": "b082515b63ab7ef873721000e622b0c4c5e7dcce66d4aaa6a1b2d0b992072d32"
+    },
+    {
+      "Path": "esu/run-3/D-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 782,
+      "Sha256": "9025861d2a02d890af3625a3440a3c4809fce961d4062e7715a97bca5c40bf07"
+    },
+    {
+      "Path": "esu/run-3/D-2-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 803,
+      "Sha256": "5f44f103e8508c6cee8b03711e0f5f083ec7b474e2373e5181305a4530d372ab"
+    },
+    {
+      "Path": "esu/run-3/D-ambiguity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 120,
+      "Sha256": "d6424cb2cf7e674f54889e1217d34213eedf0e368d3851ac2808e588966873d3"
+    },
+    {
+      "Path": "esu/run-3/D-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7548,
+      "Sha256": "21864be0e9df0613851b7e33da2c225c8f9a0629406eeccdd33fec4116302d4b"
+    },
+    {
+      "Path": "esu/run-3/D-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 570,
+      "Sha256": "4227ce8790258af6531da9f8166c6b59ba6c2ad132e849874ba8f9243b5b3834"
+    },
+    {
+      "Path": "esu/run-3/D-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 924,
+      "Sha256": "fe71eca36ca09b6607aec1623e755884496182126f225db67bb729be6b56157e"
+    },
+    {
+      "Path": "esu/run-3/D-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 299,
+      "Sha256": "308170d690d1a6e54b2ce59bfd857b2bf7eeba1742881afd59e410ab2e00a284"
+    },
+    {
+      "Path": "esu/run-3/D-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 120,
+      "Sha256": "386822d300555f3165d75947c45220a553d46d3109dcf24257383c0edce0b1fc"
+    },
+    {
+      "Path": "esu/run-3/E-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 782,
+      "Sha256": "28f44f9f23b5fe24fc45f22197e52b2809b34e4218c0d0969dabd4536b6a0cf0"
+    },
+    {
+      "Path": "esu/run-3/E-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7548,
+      "Sha256": "d2b20db4299557e32f5050fd83c32f2ac766707041dbc8c0e90cf5815be6df71"
+    },
+    {
+      "Path": "esu/run-3/E-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 570,
+      "Sha256": "65fdce3e4a30df54746f7568a8493b8b74c809edb71778a7fe32f4421b7e3be6"
+    },
+    {
+      "Path": "esu/run-3/E-host-exit.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 78,
+      "Sha256": "890c1319d2b81b1575e6bf4ae474fcbcd620301ef665727476299406c2121aed"
+    },
+    {
+      "Path": "esu/run-3/E-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 923,
+      "Sha256": "94fcac4096ef382260e414089ee989c6559e9866d1c2ebe0a9912f5a2b9893d9"
+    },
+    {
+      "Path": "esu/run-3/E-read.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 297,
+      "Sha256": "e3163bb5185dfd83c67cf659cd6234e68efcc2263f15af8cec593f90fa74d5f4"
+    },
+    {
+      "Path": "esu/run-3/E-stream.bin",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 119,
+      "Sha256": "c7499118c7735205fcdf83b8d9a07874f9b9cbc2223294909dcdbd519ba3183d"
+    },
+    {
+      "Path": "esu/run-3/F-1-request.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 782,
+      "Sha256": "f9123ea1e9897becbc866536fac3655ee29bf0b6b19df147ae23ea1bd298a77c"
+    },
+    {
+      "Path": "esu/run-3/F-controller-death.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 374,
+      "Sha256": "8840dd7f5ddf3fb6688c7eaea283b5d033bfb092c2db1f0a8d02a3ddf3006c24"
+    },
+    {
+      "Path": "esu/run-3/F-discovery.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 7328,
+      "Sha256": "49e82f0b2e3d3bad9e1e62c5f442809578df48dc2dd8fd8e76880dd69ec67a15"
+    },
+    {
+      "Path": "esu/run-3/F-hello.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 570,
+      "Sha256": "42b61b77b3a199d89473b91cdcee8470ad3683459adad4fc377430ce47dadba9"
+    },
+    {
+      "Path": "esu/run-3/F-identity.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 923,
+      "Sha256": "731aa6e9ae03186eafbfaad992ec4cc1a3e534116cb7cdf060f35d0eb11d78b5"
+    },
+    {
+      "Path": "esu/run-3/probe.json",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 388,
+      "Sha256": "42b1c17d2a7d06f276e26010ed96b1d4b8785d573e533a5e3d4ae880550731be"
+    },
+    {
+      "Path": "esu/summary.txt",
+      "SourceRun": "esu-20261013-103644-f1826e01",
+      "Bytes": 64,
+      "Sha256": "0b56642e17d31ccda8dcaf8478f647632a250a67aa9381582245abe0e4223e22"
+    },
+    {
+      "Path": "legacy/report.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 10723,
+      "Sha256": "27ac326a6939cc863e6ddb2fdc56c7dd30ac81d3094aac14d22e5c050e9ded3e"
+    },
+    {
+      "Path": "legacy/run-1/A-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 780,
+      "Sha256": "959ee7d31fde308778629cb932f591f79e86753fe80318c842539b211a6aa96d"
+    },
+    {
+      "Path": "legacy/run-1/A-10-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 788,
+      "Sha256": "3cbb48d9f31cbc3d2d02ad548ed28e39b32cff623149bc3b3e3207516ddb1599"
+    },
+    {
+      "Path": "legacy/run-1/A-11-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 782,
+      "Sha256": "a16dccba62c4c9b430c6609a0dc2af7ea889930a2780dbb392bae38715242864"
+    },
+    {
+      "Path": "legacy/run-1/A-12-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 792,
+      "Sha256": "835b4d6f3ef4a356e96ef65b6f2bf7f14e147a452e4efbe15e812d82b7dd1465"
+    },
+    {
+      "Path": "legacy/run-1/A-13-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 781,
+      "Sha256": "efb580e18c449721de966a1a6b7450712afc045534a6e066ae2e3a28952d5b89"
+    },
+    {
+      "Path": "legacy/run-1/A-2-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 780,
+      "Sha256": "9ec102ea9cace9fd1b2c29f76e80d447bd8f88c0373b0345480a1d4b7feb2a0d"
+    },
+    {
+      "Path": "legacy/run-1/A-3-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 785,
+      "Sha256": "8bc56ca9bb9dd1fabb12823440bf64cdacf3c73e5e1f00eb9f52721d0c49a616"
+    },
+    {
+      "Path": "legacy/run-1/A-4-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 787,
+      "Sha256": "d6a771fff598ec7a2926b5df8ffc8144d68a53951fb6b604b146e2998befbd74"
+    },
+    {
+      "Path": "legacy/run-1/A-5-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 787,
+      "Sha256": "2d982673da17dd03087f87806319df7a3660788fa8838fbd0cd4c63319132803"
+    },
+    {
+      "Path": "legacy/run-1/A-6-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 797,
+      "Sha256": "da18151368af3bf5e11fc4b7b384c439d70f06a11dcf7d6451e91d2c6823bc31"
+    },
+    {
+      "Path": "legacy/run-1/A-7-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 783,
+      "Sha256": "09781d25bcef75b4c259ab5e9633b3260a4ce08119ca8a89586ff2f3557fbf77"
+    },
+    {
+      "Path": "legacy/run-1/A-8-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 788,
+      "Sha256": "db3a75bf4175bf88703bee20e8f07a9cf9e9db575fa345ed597813dd6e862dd6"
+    },
+    {
+      "Path": "legacy/run-1/A-9-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 784,
+      "Sha256": "bdf6cbdd887424b79a47c20e9b4c89bf8935dd3b5fa68704a2aae1ba4aa1b159"
+    },
+    {
+      "Path": "legacy/run-1/A-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7262,
+      "Sha256": "ec98c045caff8ccfdcd266049b0d2d88c4c210bbb8faaf298ef5bfc33c5ba8e5"
+    },
+    {
+      "Path": "legacy/run-1/A-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 568,
+      "Sha256": "0b6ab5ee6f853fed0efb4cd9e392b8180f98c747e43948278529d88926fde0e2"
+    },
+    {
+      "Path": "legacy/run-1/A-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 922,
+      "Sha256": "c2c27f981897052804dd6ed99a1ed8518afe22d2771a1bd654d20c10d3d510ac"
+    },
+    {
+      "Path": "legacy/run-1/A-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 297,
+      "Sha256": "19b0e1c1edbdd79685b7e153fd8602c36dcff29dbe34fe17ea17ba5fe669e43e"
+    },
+    {
+      "Path": "legacy/run-1/A-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 128,
+      "Sha256": "b074384e62ccd9ae53e10ea4348f6ae97cf73ba3d7254824f420a11f1d74377c"
+    },
+    {
+      "Path": "legacy/run-1/B-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 772,
+      "Sha256": "a2ec8ceaf1267dce337ff0084751aedb2ecad0af84554a93763153e146494794"
+    },
+    {
+      "Path": "legacy/run-1/B-2-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 787,
+      "Sha256": "adea25101946e451e48908bf59f145063400330449177453fd3021d0f4431f9f"
+    },
+    {
+      "Path": "legacy/run-1/B-3-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 794,
+      "Sha256": "a447d944ff4c774007bae013f65d039bcf1baad37904bad14f594263e9a1b4b8"
+    },
+    {
+      "Path": "legacy/run-1/B-4-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 773,
+      "Sha256": "6fa087ee6cfafd6f3c97a0ea52d1694db392f6a581cd4be1ecbb6c3b4850b1bd"
+    },
+    {
+      "Path": "legacy/run-1/B-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7628,
+      "Sha256": "2ffd25324b82bdf4b93eea8fed5537825f9ac2bc25cc68d975c9ef863d604911"
+    },
+    {
+      "Path": "legacy/run-1/B-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 561,
+      "Sha256": "18d419a707238a8f090c1a800df611798f06743edf42f38409c7661b2a13b25f"
+    },
+    {
+      "Path": "legacy/run-1/B-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 913,
+      "Sha256": "6df72492a275e8f0eb2ddd69817b801424a1b364726d7bb7f32a234b6dad278c"
+    },
+    {
+      "Path": "legacy/run-1/B-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 298,
+      "Sha256": "1dae7d84d5c1f6761a81fe644efda7f49ae2348722a475454f42dc13f3fcca74"
+    },
+    {
+      "Path": "legacy/run-1/B-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 133,
+      "Sha256": "7d81f299fa75e8dd6cd8d5d0a81cee2b1eda864f26e0ec59ba70c5c1136a9fce"
+    },
+    {
+      "Path": "legacy/run-1/C-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 782,
+      "Sha256": "0543212c36b0b0c62a8d43629b13a3caff9fec7174e7a721bc50caf9f2a8e652"
+    },
+    {
+      "Path": "legacy/run-1/C-2-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 798,
+      "Sha256": "8708a14666d658755b3a2bdf8dbbbb8d3004691c84fff93ae6164cf6704d877d"
+    },
+    {
+      "Path": "legacy/run-1/C-3-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 794,
+      "Sha256": "330b5d5d21848f80410c487f39d2ece27170e1e5e68d12bdac113d27a40212bf"
+    },
+    {
+      "Path": "legacy/run-1/C-4-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 783,
+      "Sha256": "49535db5fcf14d142bfc08fb81cf345e9badddbb031793656d4de4d7f944abf1"
+    },
+    {
+      "Path": "legacy/run-1/C-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7262,
+      "Sha256": "ea3ca8780885be7384053fcd115ed732fc675ebdf6cc61d227822d11df3f1fb0"
+    },
+    {
+      "Path": "legacy/run-1/C-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 569,
+      "Sha256": "4a2b38e0e93641a8168066af6724601002cfd33e55ce9f41c53b8ed7f8284bd9"
+    },
+    {
+      "Path": "legacy/run-1/C-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 922,
+      "Sha256": "3c81f31b934300876978a8641080c2fcae9f0ed5693f631aeefa033cde8b810f"
+    },
+    {
+      "Path": "legacy/run-1/C-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 299,
+      "Sha256": "508db05ffe5b5b2bb6efe8b960eefe8779cc9763122cf50855c9b269c4fae0b2"
+    },
+    {
+      "Path": "legacy/run-1/C-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 126,
+      "Sha256": "c635faf72819788112a20bc85a5f4ce21928081a186bf4e8236035a22a1f799e"
+    },
+    {
+      "Path": "legacy/run-1/D-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 784,
+      "Sha256": "13c14253c372ed0730e585a8198d0587c6a328d3af254268c1ccb3554419af8b"
+    },
+    {
+      "Path": "legacy/run-1/D-2-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 805,
+      "Sha256": "3cb68ec20afaa1e568ab8e4fbfa820f1b5e9e50a7cbabece530f45033d374a83"
+    },
+    {
+      "Path": "legacy/run-1/D-ambiguity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 120,
+      "Sha256": "d6424cb2cf7e674f54889e1217d34213eedf0e368d3851ac2808e588966873d3"
+    },
+    {
+      "Path": "legacy/run-1/D-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7328,
+      "Sha256": "1ee40dc39d1de3d75964c6cacc3f63cc92f136960be58d28fe5fdeaaaa198ff1"
+    },
+    {
+      "Path": "legacy/run-1/D-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 571,
+      "Sha256": "90c844961409ad82ca426d0b0492975d0e6961aa354d398b291ba0fe2d4b3da4"
+    },
+    {
+      "Path": "legacy/run-1/D-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 923,
+      "Sha256": "b22dfc7e276e643cd1f50f0c7c35936b0904608d727f10bd009a66689bb6d8ab"
+    },
+    {
+      "Path": "legacy/run-1/D-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 298,
+      "Sha256": "b376496e578bfe0e252237e8b544b3e694f7d5a8f886049affbfe1c1c199ed39"
+    },
+    {
+      "Path": "legacy/run-1/D-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 124,
+      "Sha256": "609c99ff18e0f578f3af412c50c6e7e8eda0f8f30b43d786f22ab08b3bb59e82"
+    },
+    {
+      "Path": "legacy/run-1/E-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 780,
+      "Sha256": "87231c51343585f7e547a6b298eb02612a21e257daac92a1b9c80cc2449a7a2c"
+    },
+    {
+      "Path": "legacy/run-1/E-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7548,
+      "Sha256": "e5d980ad6fff311058cfbbcbefb54f18f3f26d9aa29d42eb8000b785b831f670"
+    },
+    {
+      "Path": "legacy/run-1/E-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 569,
+      "Sha256": "4c0547a9c8de39a328e90eb666ff6c79e30e5ad66ead8c8559a57c5ff1d27b77"
+    },
+    {
+      "Path": "legacy/run-1/E-host-exit.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 78,
+      "Sha256": "890c1319d2b81b1575e6bf4ae474fcbcd620301ef665727476299406c2121aed"
+    },
+    {
+      "Path": "legacy/run-1/E-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 922,
+      "Sha256": "cef745ad90361bf22d5d22b24c1acaa24ea381e848ef8e2fb2d24a9343b77fc8"
+    },
+    {
+      "Path": "legacy/run-1/E-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 297,
+      "Sha256": "dcd8c84bb6eb182b4c65cc8b086312a465a992e6aaeb20f470b0af5592a2bed7"
+    },
+    {
+      "Path": "legacy/run-1/E-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 119,
+      "Sha256": "e28f9e7cade3fbc8c19a7ba72baaf959c933e7aaaffe3400918e1b437421a1a1"
+    },
+    {
+      "Path": "legacy/run-1/F-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 779,
+      "Sha256": "9ba7277195d4c061f533e2461f85f4cdc7c3e9b6f637e6ca46933fb8e6130ff0"
+    },
+    {
+      "Path": "legacy/run-1/F-controller-death.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 373,
+      "Sha256": "b77b8d7f2b3de0050ba0612e205a406aca346543e884f215bcbeffd044c8f297"
+    },
+    {
+      "Path": "legacy/run-1/F-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7548,
+      "Sha256": "39dffa9b2b018116bce144f59337d65aeef610098ad811d746a4073bd5fd958e"
+    },
+    {
+      "Path": "legacy/run-1/F-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 568,
+      "Sha256": "d2cd02d5fb8acc8f5ee20086ba17160a7522ed874c20a08ee002bde75a410be7"
+    },
+    {
+      "Path": "legacy/run-1/F-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 920,
+      "Sha256": "eb2f7e6f5c1b8b886b420cbcd972ecb062903659c860325cebf955f1a2b8b873"
+    },
+    {
+      "Path": "legacy/run-1/probe.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 388,
+      "Sha256": "42b1c17d2a7d06f276e26010ed96b1d4b8785d573e533a5e3d4ae880550731be"
+    },
+    {
+      "Path": "legacy/run-2/A-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 778,
+      "Sha256": "726dc847264e60b3f56eb30923803c4656c4972469988ab3c9276ada8b7eb44e"
+    },
+    {
+      "Path": "legacy/run-2/A-10-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 786,
+      "Sha256": "83f503ca927e682efaffdbd479d3279cc8d5daaf0e6425de2bd39cb32f2325fb"
+    },
+    {
+      "Path": "legacy/run-2/A-11-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 780,
+      "Sha256": "5131fcb97f9922a412a5e95507825e14cd34067ead2c8fa7ebe305246e0d2e88"
+    },
+    {
+      "Path": "legacy/run-2/A-12-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 790,
+      "Sha256": "964546865c09099d46ac055d02d71c5c98e9ec01ca96b9e97d5b126b7ec601fc"
+    },
+    {
+      "Path": "legacy/run-2/A-13-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 779,
+      "Sha256": "4d075a41cca1d7f3f33c83b11377496785d4ec051104cd1a26faf492a1c7f250"
+    },
+    {
+      "Path": "legacy/run-2/A-2-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 778,
+      "Sha256": "9c56fc4a03a3cb372fee15a1c0e2c0904fc0fdc234a62619a30c41f75c6e6b1e"
+    },
+    {
+      "Path": "legacy/run-2/A-3-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 783,
+      "Sha256": "200d1e1af3b0803bc000cba11f8a410742479b27a61487172bf209bb5f065401"
+    },
+    {
+      "Path": "legacy/run-2/A-4-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 785,
+      "Sha256": "205f8e9b93e9cb0eea1cab519c845a7ce1d943013b61e5d886c99a7915a08616"
+    },
+    {
+      "Path": "legacy/run-2/A-5-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 787,
+      "Sha256": "3d67e47b7b1a3ebd86059f40f16fc09153de0cf779161c69ce3db2e578653845"
+    },
+    {
+      "Path": "legacy/run-2/A-6-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 795,
+      "Sha256": "9d17efbf90db33f68df0bcd00e577cc4a8a616de120db8bc2ce56a6d5ce36e95"
+    },
+    {
+      "Path": "legacy/run-2/A-7-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 781,
+      "Sha256": "66ea9101c5da170375eaaf4395990fa8fe68576dc119aa0e86c7658d0c6a465f"
+    },
+    {
+      "Path": "legacy/run-2/A-8-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 786,
+      "Sha256": "0f1e4f9a253e3124bbf4ace43d96df7d9cdfa298f571723f9bee560ff4a8fef7"
+    },
+    {
+      "Path": "legacy/run-2/A-9-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 782,
+      "Sha256": "46ad383dd9ba6719a442ee7d9b83f25164ffa58926fbf57da1c2daa597d0dc70"
+    },
+    {
+      "Path": "legacy/run-2/A-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7262,
+      "Sha256": "cdbed953be06655c56d2a701c3b01bf41d78679aab28ec8ee15bb2d85ea83dde"
+    },
+    {
+      "Path": "legacy/run-2/A-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 567,
+      "Sha256": "006aa02d9973bef90af810c21688bc5ef9643c7f72740090284dd63ecb8e5939"
+    },
+    {
+      "Path": "legacy/run-2/A-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 922,
+      "Sha256": "4d2b05e3c42a265da0be5e9ec121f2ee1661816d37e30284f32d236b6967a3dd"
+    },
+    {
+      "Path": "legacy/run-2/A-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 297,
+      "Sha256": "e971ee88bf0ec3ac479ee059ef4a090894be53b40cbef0315964243b5a87fc3e"
+    },
+    {
+      "Path": "legacy/run-2/A-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 128,
+      "Sha256": "5b543331ba77337e786e83bb7a56de7ee2a708b066a27abf9eb6e2b68e9a15d9"
+    },
+    {
+      "Path": "legacy/run-2/B-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 779,
+      "Sha256": "a7b467defa0b66b6dca101c3582af5568679a158a528d3bdeab247959bdc7933"
+    },
+    {
+      "Path": "legacy/run-2/B-2-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 794,
+      "Sha256": "b7158f9a0e8cbfd8cce32227be54cd446b4fabf3f586c9121bca2da2611985d6"
+    },
+    {
+      "Path": "legacy/run-2/B-3-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 801,
+      "Sha256": "af21bad56995ba58a91d41118af44e89f26414e4a5200f130eca1e1f7d7d22d8"
+    },
+    {
+      "Path": "legacy/run-2/B-4-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 780,
+      "Sha256": "b68936f1d7e8c324216b2ef5aaff77d8b50e2d592239ee2d4d5a218d6e4c5955"
+    },
+    {
+      "Path": "legacy/run-2/B-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7328,
+      "Sha256": "c10ba78ce1ba48a11766b9f96c65d72c9275dff44938087c12d7c913d75c84ab"
+    },
+    {
+      "Path": "legacy/run-2/B-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 568,
+      "Sha256": "affa61457ba0cd960967c946e1e9a6da0b0c8cf6c42ca22d1b78202b569ef356"
+    },
+    {
+      "Path": "legacy/run-2/B-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 920,
+      "Sha256": "8d563c138607697ef654d8883410bb4122485c8a219358e8f8114432055b1b14"
+    },
+    {
+      "Path": "legacy/run-2/B-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 300,
+      "Sha256": "6a3b2f5a74f01c6551b5c2199a5f020c3d8ce60d4c4cd780758d07037046d418"
+    },
+    {
+      "Path": "legacy/run-2/B-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 133,
+      "Sha256": "5630cdb4553ab7270b9061c63a6b148bd64c95c297a4d55f5d9e067f61579c1f"
+    },
+    {
+      "Path": "legacy/run-2/C-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 779,
+      "Sha256": "915609bb1f94b5ad715383e85e73f7c29cdb9dcaa20a7b012a6c7d710a10093c"
+    },
+    {
+      "Path": "legacy/run-2/C-2-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 795,
+      "Sha256": "76ba193eec51b5347c6d3b5038be3ab617543c04824adaaa1e3713450a1d9fb2"
+    },
+    {
+      "Path": "legacy/run-2/C-3-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 791,
+      "Sha256": "9413fae454947e96ea61dc2dd25ba93435c358f25c323bb817e7b27665bcac7e"
+    },
+    {
+      "Path": "legacy/run-2/C-4-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 780,
+      "Sha256": "2ac39fc1cc6a916d808ff28928237f73b1c42da9f130cf4c6d8e0c2b02b419ce"
+    },
+    {
+      "Path": "legacy/run-2/C-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7480,
+      "Sha256": "3c6b983d488beea54a63c940243897dbd0ed3c2433fc53182a76f3eb23541016"
+    },
+    {
+      "Path": "legacy/run-2/C-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 567,
+      "Sha256": "4304f33230b3c2bafed9d86e13795f97058b6ccd4e5794064527ec399f5986d9"
+    },
+    {
+      "Path": "legacy/run-2/C-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 920,
+      "Sha256": "444b77defb4984c9d3f8828f4a265eeaa97374d45a86c95605cd2a29c3c7e5b0"
+    },
+    {
+      "Path": "legacy/run-2/C-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 297,
+      "Sha256": "11a22207634e8e62953b1d36aaf231f5ceab3ece899858db2f260b80db1cb204"
+    },
+    {
+      "Path": "legacy/run-2/C-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 126,
+      "Sha256": "93665203a2534a08cf08d99da2419d131239c4cbe9422bd2f8ae0caeb374ba0a"
+    },
+    {
+      "Path": "legacy/run-2/D-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 780,
+      "Sha256": "3aef2934d157b9ddf216488944620afcacb370b7c4e23d0cc4a1b2fd4e49b2ed"
+    },
+    {
+      "Path": "legacy/run-2/D-2-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 801,
+      "Sha256": "83568bac9ae87a31d030d86de31d933129e3165db6a1a1f797ee288ef746d5d1"
+    },
+    {
+      "Path": "legacy/run-2/D-ambiguity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 120,
+      "Sha256": "d6424cb2cf7e674f54889e1217d34213eedf0e368d3851ac2808e588966873d3"
+    },
+    {
+      "Path": "legacy/run-2/D-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7480,
+      "Sha256": "d985c7439850bbcc7aecbdc7c43f5ad983d7df50c2dd788dcbee0f4569e8cbc2"
+    },
+    {
+      "Path": "legacy/run-2/D-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 568,
+      "Sha256": "933ebb430e5507029f0e2e8056b31afbf23bbef39795d0046b2c099a6793d25f"
+    },
+    {
+      "Path": "legacy/run-2/D-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 922,
+      "Sha256": "52f08403cac04b70084ec0ebeb3504c62fa29cf5df541deb9080e902f8352405"
+    },
+    {
+      "Path": "legacy/run-2/D-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 297,
+      "Sha256": "d7ac5529f41fb1d6f35c30b4443490aab06a818c4d00e1fadaad0f6a821eb62b"
+    },
+    {
+      "Path": "legacy/run-2/D-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 124,
+      "Sha256": "825e44822a4ed5be6c51477680c95880a2747b07917d8cc4fd9430081310d45e"
+    },
+    {
+      "Path": "legacy/run-2/E-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 775,
+      "Sha256": "89e533dfd7c6d6dc045f9ad17a16922514a57215087730b1f53a89abeeb13cb7"
+    },
+    {
+      "Path": "legacy/run-2/E-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7410,
+      "Sha256": "ccc3f7c8acc5c08e933c1d847327facec43e3b4ad129d8f076eb01d4e1db518e"
+    },
+    {
+      "Path": "legacy/run-2/E-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 564,
+      "Sha256": "73a8a3cc40392d11f4887e0c20235c254c7f905572c7f8088f87bf6f27d3d4bc"
+    },
+    {
+      "Path": "legacy/run-2/E-host-exit.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 78,
+      "Sha256": "890c1319d2b81b1575e6bf4ae474fcbcd620301ef665727476299406c2121aed"
+    },
+    {
+      "Path": "legacy/run-2/E-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 921,
+      "Sha256": "77405c8fec17c76ff70f3677636fb9eba045b909bbfc758a0010d7da098b59fe"
+    },
+    {
+      "Path": "legacy/run-2/E-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 296,
+      "Sha256": "02e01ca1f1f707d59daeb24118779d0ff1335e7fd18bc6f9cad91657f85ea04c"
+    },
+    {
+      "Path": "legacy/run-2/E-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 123,
+      "Sha256": "e8619e0dde802d7674c57ebe00e293084efe0ae14840fc59d33db3700dbfa690"
+    },
+    {
+      "Path": "legacy/run-2/F-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 781,
+      "Sha256": "79c2089dd7567c621d5aad7c631b01e0d7582338683c2b7ddac275cc6c285151"
+    },
+    {
+      "Path": "legacy/run-2/F-controller-death.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 372,
+      "Sha256": "8366b232a9563b8d7d049dc81e38f12f38e28ab42d1af87a2dfacc0128eceb86"
+    },
+    {
+      "Path": "legacy/run-2/F-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7480,
+      "Sha256": "ce58faa5afd6395420e99262ce3ab692bc47aabc199774d5e5910fafeca17609"
+    },
+    {
+      "Path": "legacy/run-2/F-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 568,
+      "Sha256": "3bc63ca6754b33971e4ec4fd0c3eafa7aa89cfca6ec68aafa6bbcaf291b1f8e3"
+    },
+    {
+      "Path": "legacy/run-2/F-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 919,
+      "Sha256": "bdd93ff131d702525837b2c2c3428fc229c2526dd4542a5f57162e8c9af51c5a"
+    },
+    {
+      "Path": "legacy/run-2/probe.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 388,
+      "Sha256": "42b1c17d2a7d06f276e26010ed96b1d4b8785d573e533a5e3d4ae880550731be"
+    },
+    {
+      "Path": "legacy/run-3/A-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 780,
+      "Sha256": "08db6bd655a07f08ea21c25c59b6f56258249c7d829b7be02d9cb7f4c9e89a0d"
+    },
+    {
+      "Path": "legacy/run-3/A-10-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 788,
+      "Sha256": "84cd34f0904f3eaf61165bbf22a3b67cdc2d7a9c6f5c41ce6cffdcd52d3c94db"
+    },
+    {
+      "Path": "legacy/run-3/A-11-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 782,
+      "Sha256": "a17477fc946a8106f04caf2f46fb0cd5c62e5b3177e4a7d62b39c95e8d04860a"
+    },
+    {
+      "Path": "legacy/run-3/A-12-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 792,
+      "Sha256": "b3f35d8d62891184f317fd09e4232c0ec593c8afc5d7a30148bba14605deeba8"
+    },
+    {
+      "Path": "legacy/run-3/A-13-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 781,
+      "Sha256": "702c26bf632ce013e6747be8544641e39312a734c06f35d8cbc03bdffe4c887d"
+    },
+    {
+      "Path": "legacy/run-3/A-2-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 780,
+      "Sha256": "bddc905f10d389d87ff83b476d9cb1709b5e7e46bd961839e3898fb278bf1fe4"
+    },
+    {
+      "Path": "legacy/run-3/A-3-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 785,
+      "Sha256": "3ea34ae14d2ffcc4589b05333f8c18d833474eafbe6fd02bcedb2a68e874ccf9"
+    },
+    {
+      "Path": "legacy/run-3/A-4-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 787,
+      "Sha256": "3b1b38aba636c2186b25196ca9ecdda56beffa49ef6803825eb56a0aa1ad3cc7"
+    },
+    {
+      "Path": "legacy/run-3/A-5-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 787,
+      "Sha256": "76bc0396b07baa27ec902579291df8895f2fd8f94c3ca4b7ea0c11975d6f56a5"
+    },
+    {
+      "Path": "legacy/run-3/A-6-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 797,
+      "Sha256": "9e3b7bcfb4296230d3a37966d8d2763bef9d468b2a23009ebbb8d5f769837a2d"
+    },
+    {
+      "Path": "legacy/run-3/A-7-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 783,
+      "Sha256": "7ccd6b00839cca06c0832c37fa60775a69264dce3f20c663f424fa6ffc7e0109"
+    },
+    {
+      "Path": "legacy/run-3/A-8-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 788,
+      "Sha256": "2f6824b4c616f7d29f73282e2419153ae027b7b6ebb619cbc0ccc4d7dfca968b"
+    },
+    {
+      "Path": "legacy/run-3/A-9-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 784,
+      "Sha256": "932ce35feaf5482b95246ee058996ad74e85082c40fdf75c0a9a59d35d1702d1"
+    },
+    {
+      "Path": "legacy/run-3/A-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7548,
+      "Sha256": "bf4d87d3556c72460289bc9e16d653a934351e7c67f9485f5881d45b51a2bb67"
+    },
+    {
+      "Path": "legacy/run-3/A-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 569,
+      "Sha256": "0c94f097edbb63cab893b87cd99195ea9c33550864fd05724cbe5ab93ddaf2ea"
+    },
+    {
+      "Path": "legacy/run-3/A-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 922,
+      "Sha256": "a11880a3a7249ef10a5c3b7c0b5822485bfcd5fcdbad77477294880eca54c943"
+    },
+    {
+      "Path": "legacy/run-3/A-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 298,
+      "Sha256": "2d1a4b9aba35bca141575b50a2b6ecb87ecf703e864997110c32b42a573144b2"
+    },
+    {
+      "Path": "legacy/run-3/A-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 124,
+      "Sha256": "7b3df0905376bd75fb9530072891ac2c59ad159dd54723c71642427abda203c0"
+    },
+    {
+      "Path": "legacy/run-3/B-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 777,
+      "Sha256": "0130e7efe0b18e4647649816856b2ee884f2548661a6253e43dae66173c8974e"
+    },
+    {
+      "Path": "legacy/run-3/B-2-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 792,
+      "Sha256": "4868b2ea620be1b92a2fcb765016d27e276fd668ae9ddba1df28cb37aed0edae"
+    },
+    {
+      "Path": "legacy/run-3/B-3-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 799,
+      "Sha256": "7d22079d455e1f10938636022d219660a8c09d3431dd3daab0ad48d0a8f55b66"
+    },
+    {
+      "Path": "legacy/run-3/B-4-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 778,
+      "Sha256": "e2e7dcd6837ccb0ef751435c2239449de66972d288d13617883db5f5d0b37188"
+    },
+    {
+      "Path": "legacy/run-3/B-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7410,
+      "Sha256": "c2c36e2068b97128333ff06bab3ff75a1c91d47eefadf0b62d0d02bbc4c8e9d4"
+    },
+    {
+      "Path": "legacy/run-3/B-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 565,
+      "Sha256": "d12f3aedc43ab5cabafeadc3e9536ed84e7e22d8031d5113217eeaf1001b3c35"
+    },
+    {
+      "Path": "legacy/run-3/B-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 920,
+      "Sha256": "d5ef90659ec963030faa57f32a879addbfc96bb1f0368fb5a3028b2960a31eff"
+    },
+    {
+      "Path": "legacy/run-3/B-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 302,
+      "Sha256": "926bd6ecc6b01373e1f74b87545b2eca63a0eb66524c67ccd3ecda1e759d4517"
+    },
+    {
+      "Path": "legacy/run-3/B-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 133,
+      "Sha256": "b9bc734e12736aff99ef78c5903a94e530c0ebc649e6a77363aaa2119ea75534"
+    },
+    {
+      "Path": "legacy/run-3/C-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 782,
+      "Sha256": "6abe9bd35cb000d342aa97897510c340b056f7ffd4fe0f0481d975e974e1e7cc"
+    },
+    {
+      "Path": "legacy/run-3/C-2-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 798,
+      "Sha256": "d5a9c89b1853411f159e44c228b03f7f804fd4ea20bcb8f687aa1bb67473d8cf"
+    },
+    {
+      "Path": "legacy/run-3/C-3-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 794,
+      "Sha256": "f50db52c6008dc9ce6f0360aae62703916f373306a5c15d3d0351111abab8305"
+    },
+    {
+      "Path": "legacy/run-3/C-4-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 783,
+      "Sha256": "9a5968f3920deceb5a1428f46cfeb4f232342e70020bf1cb19ebec6bf3625bed"
+    },
+    {
+      "Path": "legacy/run-3/C-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7328,
+      "Sha256": "4224139040410672cab5effb733e261ab607d6ac4de3dda1b3b2e51e74b305a3"
+    },
+    {
+      "Path": "legacy/run-3/C-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 570,
+      "Sha256": "4717cbb68fb7328e05843e62182ef226469cd89c1616af8e1b88f01b0e955103"
+    },
+    {
+      "Path": "legacy/run-3/C-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 923,
+      "Sha256": "6ba41f0e83a14950b0eb3e25f48d36a6517ca650e3c5e14546882d0fecbebc9f"
+    },
+    {
+      "Path": "legacy/run-3/C-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 300,
+      "Sha256": "a7dac7d5cfd1c56e9600094f4494f3579fa17291343239980043f1cc1ea77d77"
+    },
+    {
+      "Path": "legacy/run-3/C-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 126,
+      "Sha256": "cb640ce25b5bd4439a62186ca474d98c56fb56acde319edebacd0c284fa5632e"
+    },
+    {
+      "Path": "legacy/run-3/D-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 777,
+      "Sha256": "ce082657e2e9ac55a1f04914495e4bcc988a36d61119e5301b7c00106911eddf"
+    },
+    {
+      "Path": "legacy/run-3/D-2-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 798,
+      "Sha256": "9abbb0ae44cc66e5b6a0df7e841281a403b2439cf6ff73df0509e36963dbdef7"
+    },
+    {
+      "Path": "legacy/run-3/D-ambiguity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 120,
+      "Sha256": "d6424cb2cf7e674f54889e1217d34213eedf0e368d3851ac2808e588966873d3"
+    },
+    {
+      "Path": "legacy/run-3/D-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7478,
+      "Sha256": "cc95f4e38653f90d5e779e0921f381f763bceb8a6a725ce980aa86a8ed3dfa08"
+    },
+    {
+      "Path": "legacy/run-3/D-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 566,
+      "Sha256": "3e8658fd0cb8d8ee7128e25999bac60b3c3b75ed44c06380e9bc8d2a3a0d164e"
+    },
+    {
+      "Path": "legacy/run-3/D-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 921,
+      "Sha256": "5e33aca6da7485604985c1255e93007a4c097450fe97b7193fb0d195a8347571"
+    },
+    {
+      "Path": "legacy/run-3/D-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 297,
+      "Sha256": "6205add4f11ca1d7446ab528f19de7a51cdfdd1be2fe71434a6455c1f833cc8a"
+    },
+    {
+      "Path": "legacy/run-3/D-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 124,
+      "Sha256": "d4465dba0f3e98c0050364d5208743030a2ca6623ab7a59058d94f75535dbc68"
+    },
+    {
+      "Path": "legacy/run-3/E-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 780,
+      "Sha256": "9941a940675254f06be800ae240f9eb0b5b1ff303edca4251efe1df1946843f1"
+    },
+    {
+      "Path": "legacy/run-3/E-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7328,
+      "Sha256": "21634e5ecdfc1ccd330b6eff71e5118bea8869313d378c1a3350759342be8ed2"
+    },
+    {
+      "Path": "legacy/run-3/E-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 569,
+      "Sha256": "33e1830db59ab16963f2a1fcbdc612377e2879d1d3c230536720afb99702f363"
+    },
+    {
+      "Path": "legacy/run-3/E-host-exit.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 78,
+      "Sha256": "890c1319d2b81b1575e6bf4ae474fcbcd620301ef665727476299406c2121aed"
+    },
+    {
+      "Path": "legacy/run-3/E-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 922,
+      "Sha256": "3e94ddd9ae466ce0263b7cfd3eba567d15a1dd025b9ee03633ecde4c08138981"
+    },
+    {
+      "Path": "legacy/run-3/E-read.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 297,
+      "Sha256": "7a406786816d0253b20307aea144e81c1632e56bbcc0b72560106d42c101d98b"
+    },
+    {
+      "Path": "legacy/run-3/E-stream.bin",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 119,
+      "Sha256": "b2dee5f6e597453f8d07a28d75d1667d628998d1f4909b4906a95bd522b6f6bd"
+    },
+    {
+      "Path": "legacy/run-3/F-1-request.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 784,
+      "Sha256": "fd1a9001c0adc735af2e4d37bc603474931e4056c856797fdf9fd069ab1fefd3"
+    },
+    {
+      "Path": "legacy/run-3/F-controller-death.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 374,
+      "Sha256": "c32ef8d6537a3de40a935ba0e00548b42a0084d32ab8cf85f4001b6d966849c6"
+    },
+    {
+      "Path": "legacy/run-3/F-discovery.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 7548,
+      "Sha256": "c6ba2f42d2ba817bb1aea82401121865445723e459b3845b5be36203d6050390"
+    },
+    {
+      "Path": "legacy/run-3/F-hello.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 571,
+      "Sha256": "9a9f7976fefec3872a7b66dffcacb3b1a0a8fda280c7a931a34de9fe37623184"
+    },
+    {
+      "Path": "legacy/run-3/F-identity.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 923,
+      "Sha256": "eb81234fe707e3da1cae42e3b70c317e6963fc55dc209ba5241c6022415814a8"
+    },
+    {
+      "Path": "legacy/run-3/probe.json",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 388,
+      "Sha256": "42b1c17d2a7d06f276e26010ed96b1d4b8785d573e533a5e3d4ae880550731be"
+    },
+    {
+      "Path": "legacy/summary.txt",
+      "SourceRun": "legacy-20261013-103447-e8813113",
+      "Bytes": 64,
+      "Sha256": "0b56642e17d31ccda8dcaf8478f647632a250a67aa9381582245abe0e4223e22"
+    }
+  ],
+  "CopyHashMatches": 519,
+  "DiscoveryBufferCapacity": 128,
+  "ReviewMethod": [
+    "Compare portable and native aggregates, exact candidate manifest/harness/runtime identity and prior H1 machine/OS/PowerShell/CLR/hotfix ID sets.",
+    "Recompute host-query decoding, retained identities, console members, title-event contexts, actual callback and independent pipe peer identity.",
+    "Check every protocol case, mutation, result, accepted sequence, preserved read text and raw stream; check ambiguity, exited-host and controller-death records.",
+    "Validate complete file sets and preserve every returned byte with source and destination SHA-256 equality. Expected rejection/receipt-only controls are not unexpected failures."
+  ]
+}

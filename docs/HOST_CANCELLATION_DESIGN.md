@@ -1,6 +1,6 @@
 # Console-host cancellation design
 
-Status: H1 accepted on Windows 7; H2 prototype implemented, target qualification pending.
+Status: H1 and H2 accepted on all three Windows 7 tiers; H3 cancellation is next.
 Updated: 2026-10-13.
 
 This design follows the [cancellation investigation](INPUT_CANCELLATION.md).
@@ -21,8 +21,10 @@ accepts three repetitions each on NESSY, TURTLE and LEOPARD: 54 consistent
 host observations, 27 ordinary reads, session isolation and cleanup. This
 completes the prerequisite for H2 on those configurations. A failed later gate
 blocks dependent work for that configuration; retain the evidence.
-H2 has a bounded research implementation below; H3 remains unimplemented.
-No production hook mechanism is selected.
+The [H2 target review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
+accepts nine repetitions covering actual host execution, session binding,
+request rejection, input isolation and lifetime/failure controls.
+H3 remains unimplemented. No production hook mechanism is selected.
 
 ## H1 implementation
 
@@ -55,7 +57,7 @@ Record the HWND's reported PID/thread as observations only. Enumerate threads
 belonging to the verified host and record GetGUIThreadInfo results. A GUI-capable
 thread is not proven to be the dispatch thread: all 54 Windows 7 observations
 expose two such threads, and the development host also exposes multiple threads.
-No thread is selected and no host message is sent.
+H1 selects no thread and sends no host message.
 
 A/B coexist with distinct pending cooked reads. Complete and close A, create
 and complete C while B remains pending, then verify B returns BRAVO_KEEP intact.
@@ -68,12 +70,14 @@ This is a controlled consistency experiment, not authentication against a
 malicious application. Class 49 is an internal query/set interface. Production
 must retain agent ownership and validate a host endpoint independently.
 
-## H2 implementation and remaining qualification
+## H2 implementation and acceptance
 
 The test-only [H2 probe](HOST_DISPATCH_PROBE.md) implements the following
 contract. The [rc1 candidate review](validation/2026-10-13-step-1.2-host-dispatch-rc1-candidate.md)
-records three exact-package repetitions establishing the callback on WOLF;
-Windows 7 runs remain required. H3 cancellation is not implemented.
+records three exact-package repetitions establishing the callback on WOLF.
+The [Windows 7 review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
+accepts three more repetitions each on NESSY, TURTLE and LEOPARD.
+H3 cancellation is not implemented.
 
 ### Discovery and loading boundary
 
@@ -92,10 +96,11 @@ discovered thread. Send a bounded WM_NULL to the owned console HWND. The callbac
 must report the exact host PID, creation time, discovered thread and HWND, and
 its private-pipe client PID must independently match the host.
 
-On WOLF, GetWindowThreadProcessId inside the callback reports the actual
-host/thread; externally it reports the agent. Require and record the in-host
-match. A differing Windows 7 observation is a failed research gate to investigate,
-not permission to select arbitrary threads. The prototype requires native x64,
+On WOLF and all 54 Windows 7 target host lifetimes, GetWindowThreadProcessId
+inside the callback reports the actual host/thread; externally it reports the
+agent. Require and record the in-host match. A differing future observation
+fails the gate and requires investigation, never arbitrary thread selection.
+The prototype requires native x64,
 matching user/logon/session, medium integrity and WinSta0/Default. No elevation,
 foreground/focus change, global hook, persistent installation or system patch.
 
@@ -146,8 +151,15 @@ session. No host termination is permitted. Access failures or unfamiliar
 representations fail closed and retain evidence. Broader denial/race/load
 qualification remains required before production in H4.
 
-H2 remains open until the exact package passes all three designated Windows 7
-tiers. Only then proceed to an H3 cancellation candidate.
+The exact package passes all three designated Windows 7 tiers. Independent
+review checks 54 actual callback contexts, 225 exchanges and 45 preserved reads.
+Windows 7 yields 66-70 title events per discovery, versus two on WOLF; all
+3,647 target events identify the expected host thread and stay within the
+128-event buffer without overflow. No one-event-per-change assumption is made.
+Broader event volume and load remain H4 qualification work.
+
+H2 is accepted on those configurations. Proceed next to an H3 cancellation
+prototype; H2 does not prove read cancellation or qualify production use.
 
 
 ## H3 contract, not implemented

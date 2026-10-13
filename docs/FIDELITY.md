@@ -68,9 +68,10 @@ the measured F01 failures remain unresolved.
 The separate [H1 host identity review](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
 accepts controlled host association and ordinary-read isolation on all three
 Windows 7 tiers. It does not rerun this corpus or change its outcomes. The
-[H2 dispatch probe](HOST_DISPATCH_PROBE.md) implements session-bound callback
-research and awaits Windows 7 qualification. H3 cancellation and H4 production
-regressions remain required before a fix can qualify.
+[H2 dispatch probe](HOST_DISPATCH_PROBE.md) has an accepted
+[Windows 7 review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
+covering actual host execution, session binding, rejection and lifetime controls.
+H3 cancellation and H4 production regressions remain required before a fix can qualify.
 
 | ID | Scenario | Required observable result |
 | --- | --- | --- |

@@ -9,8 +9,9 @@ identifies the issued ZIP and passing development evidence. The
 [Windows 7 review](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
 accepts H1 on all three designated tiers, with three successful repetitions
 per machine, including PowerShell 2.0 on LEOPARD. The separate
-[H2 dispatch prototype](HOST_DISPATCH_PROBE.md) is implemented and awaits its
-own Windows 7 qualification.
+[H2 dispatch prototype](HOST_DISPATCH_PROBE.md) also has an accepted
+[three-tier Windows 7 review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md).
+H3 cooked-read cancellation remains unimplemented.
 
 ## Run on Windows 7
 

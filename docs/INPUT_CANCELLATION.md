@@ -109,10 +109,12 @@ dispatch, cancellation and production integration into H1-H4 gates. The
 and concurrent-session read isolation. The
 [H1 Windows 7 review](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
 accepts all nine target repetitions. Both observed host threads report GUI state;
-H2 must establish which context actually dispatches the session's requests.
-The [H2 probe](HOST_DISPATCH_PROBE.md) now implements scoped title-event discovery,
+H1 alone cannot select the dispatch context.
+The [H2 probe](HOST_DISPATCH_PROBE.md) uses scoped title-event discovery,
 in-host callback verification, session-bound acknowledgments and rejection/lifetime
-controls. Windows 7 qualification is pending. H3 cancellation is unimplemented.
+controls. Its [Windows 7 review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
+accepts nine target repetitions and 225 exchanges with preserved input and cleanup.
+H3 cooked-read cancellation is the next unimplemented gate.
 The earlier HWND/thread-hook prototype remains unqualified; the new experiment
 derives its target from independently verified host events and callback execution.
 

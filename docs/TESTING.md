@@ -232,8 +232,13 @@ The separate [H2 package](HOST_DISPATCH_PROBE.md) repeats actual host callback,
 request/acknowledgment and isolation/lifetime checks three times per target.
 It includes an x64 research DLL and keeps the released runtime pinned.
 Its 13-case protocol oracle brings current local verification to 31 checks
-without the optional soak. H2 requires exact-package Windows 7 results before
-acceptance; development passes cannot complete it.
+without the optional soak. The
+[H2 target review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
+accepts all nine repetitions, including PowerShell 2.0 without KB3191566.
+Independent review preserves 519 returned files and checks 54 host lifetimes,
+225 exchanges, 45 reads and 3,647 consistent discovery events without overflow.
+The deliberate receipt-only timeout and rejected requests remain explicit
+controls. H2 does not rerun the broader corpus or establish cancellation.
 
 ## Negative controls
 

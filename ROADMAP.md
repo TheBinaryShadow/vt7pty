@@ -1,6 +1,6 @@
 # VT7Pty Roadmap
 
-Status: Milestone 0 complete; Step 1.2 H1 host identity/isolation accepted on all three Windows 7 tiers; H2 dispatch prototype awaiting Windows 7 qualification; cancellation and broader Step 1.1 coverage remain open. Updated: 2026-10-13.
+Status: Milestone 0 complete; Step 1.2 H1 identity/isolation and H2 host dispatch accepted on all three Windows 7 tiers; H3 cooked-read cancellation is next; broader Step 1.1 coverage remains open. Updated: 2026-10-13.
 
 This file owns milestone scope and completion. It records intended work, not
 implemented capability. Milestones follow technical dependencies rather than
@@ -406,8 +406,9 @@ The later [rc3 target baseline](docs/validation/2026-10-12-step-1.1-rc3-windows7
 records passing active-child policies and six cancellation failures per machine.
 Step 1.2's [H1 host identity review](docs/validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
 accepts the controlled identity/isolation gate on all three tiers. The
-[H2 prototype](docs/HOST_DISPATCH_PROBE.md) implements bounded callback/acknowledgment
-research and awaits target qualification; cancellation remains unimplemented.
+[H2 target review](docs/validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
+accepts bounded callback/acknowledgment research on all three tiers.
+H3 cooked-read cancellation remains unimplemented.
 Broader case recipes remain pending;
 existing Milestone 0 acceptance does not qualify these additional workflows.
 
@@ -470,13 +471,16 @@ followed by an in-host callback and private-pipe peer verification to establish
 actual dispatch context. It tests request rejection, input isolation and
 acknowledgment/lifetime failures. The
 [rc1 candidate review](docs/validation/2026-10-13-step-1.2-host-dispatch-rc1-candidate.md)
-records three passing exact-package development repetitions. Windows 7
-qualification remains pending.
-No production fix or Step 1.2 completion is claimed.
+records three passing exact-package development repetitions. The
+[Windows 7 review](docs/validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
+accepts nine target repetitions: 54 host lifetimes, 225 request checks and
+45 preserved input lines, including failure and cleanup controls. Higher title
+event volume on Windows 7 stays within the bound and retains consistent identity.
+H3 cancellation is next; no production fix or Step 1.2 completion is claimed.
 
 - [x] Complete H1 controlled host identity/isolation on the three designated
   Windows 7 tiers, with linked native observations and preserved input.
-- [ ] Complete H2 actual host dispatch and authenticated session-bound
+- [x] Complete H2 actual host dispatch and authenticated session-bound
   request/acknowledgment, including failure, stale-request and isolation controls.
 - [ ] Complete H3 cooked-read cancellation and real shell prompt checks.
 - [ ] Complete H4 production integration and regression qualification.

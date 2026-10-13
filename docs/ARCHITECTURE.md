@@ -157,7 +157,8 @@ It identifies each controlled session's actual host process; both observed host
 threads expose GUI state, so that observation alone cannot select a dispatch thread.
 The test-only [H2 probe](HOST_DISPATCH_PROBE.md) uses repeated scoped title events,
 a thread-scoped callback and independently verified pipe peers. Session binding,
-rejection and lifetime controls are implemented; Windows 7 qualification is pending.
+rejection and lifetime controls now have accepted
+[three-tier Windows 7 evidence](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md).
 The [H2-H4 design](HOST_CANCELLATION_DESIGN.md) still requires read cancellation
 and production regression qualification before runtime use.
 Broader baseline coverage remains open. Milestone 2 defines the VT7Pty integration API

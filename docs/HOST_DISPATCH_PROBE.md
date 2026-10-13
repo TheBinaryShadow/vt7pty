@@ -6,9 +6,11 @@ request/acknowledgment channel. The VT7Pty runtime is the unchanged released
 
 The [rc1 candidate review](validation/2026-10-13-step-1.2-host-dispatch-rc1-candidate.md)
 identifies the issued ZIP and three passing exact-package development repetitions.
-Windows 7
-qualification remains pending; H2 is not complete until the exact candidate is
-reviewed on NESSY, TURTLE and LEOPARD. See the
+The [Windows 7 review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
+accepts H2 on NESSY, TURTLE and LEOPARD, with three passing repetitions each.
+It preserves 519 files and checks 54 host lifetimes, 225 exchanges and 45 reads.
+Windows 7 emits 66-70 title events per discovery; all identify the expected
+host thread with no buffer overflow. H3 cancellation is next in the
 [staged design](HOST_CANCELLATION_DESIGN.md).
 
 ## Run on Windows 7
