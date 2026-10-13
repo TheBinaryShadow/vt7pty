@@ -22,8 +22,10 @@ installation without KB3191566. See the [release review](docs/validation/2026-10
 
 I'm now working on console fidelity. Ctrl+C at CMD and native Windows PowerShell
 prompts still leaves typed input behind. I've verified host identification and
-a test-only dispatch channel on all three machines. Next I'll use that work
-to investigate actual line cancellation and shell recovery.
+a test-only dispatch channel on all three machines. The first
+[cancellation prototype](docs/HOST_CANCELLATION_PROBE.md) now passes its core local
+workflows on private desktops. Windows 7 testing and the remaining H3 guards
+come before any runtime integration.
 
 VT7 integration comes after the backend and its API are ready. VT7Pty does not
 yet replace ConPTY for unmodified applications. I am not planning a kernel driver.

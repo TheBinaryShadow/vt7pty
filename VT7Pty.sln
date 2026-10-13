@@ -54,6 +54,10 @@ Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostDispatchProbe", "projec
 EndProject
 Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostDispatchHook", "projects\HostDispatchHook.vcxproj", "{17ECD2A7-70E6-4013-8D94-597822336ADB}"
 EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostCancellationProbe", "projects\HostCancellationProbe.vcxproj", "{EA333B41-123C-4E97-9B45-69918C3B752A}"
+EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostCancellationHook", "projects\HostCancellationHook.vcxproj", "{31B1BC40-40E7-4E08-99A4-9EAE10E2F62F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -164,6 +168,14 @@ Global
 		{09578A7E-E18C-4C9E-8FC9-5DDA12AC87A2}.Debug|x64.Build.0 = Debug|x64
 		{09578A7E-E18C-4C9E-8FC9-5DDA12AC87A2}.Release|x64.ActiveCfg = Release|x64
 		{09578A7E-E18C-4C9E-8FC9-5DDA12AC87A2}.Release|x64.Build.0 = Release|x64
+		{EA333B41-123C-4E97-9B45-69918C3B752A}.Debug|x64.ActiveCfg = Debug|x64
+		{EA333B41-123C-4E97-9B45-69918C3B752A}.Debug|x64.Build.0 = Debug|x64
+		{EA333B41-123C-4E97-9B45-69918C3B752A}.Release|x64.ActiveCfg = Release|x64
+		{EA333B41-123C-4E97-9B45-69918C3B752A}.Release|x64.Build.0 = Release|x64
+		{31B1BC40-40E7-4E08-99A4-9EAE10E2F62F}.Debug|x64.ActiveCfg = Debug|x64
+		{31B1BC40-40E7-4E08-99A4-9EAE10E2F62F}.Debug|x64.Build.0 = Debug|x64
+		{31B1BC40-40E7-4E08-99A4-9EAE10E2F62F}.Release|x64.ActiveCfg = Release|x64
+		{31B1BC40-40E7-4E08-99A4-9EAE10E2F62F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

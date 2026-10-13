@@ -106,9 +106,11 @@ tiers. Unlike the earlier rejected HWND experiment, H2 verifies the host thread
 through scoped events and actual callback execution. The
 [validation index](validation/README.md) links both reviews.
 
-Next I'll investigate cooked-read cancellation (H3). It must discard the old
-line, deliver one control event, preserve the next read and restore real shell
-prompts. The host design holds the detailed requirements and failure cases.
+The first [H3 prototype](HOST_CANCELLATION_PROBE.md) now exercises cancellation
+inside verified host callbacks on private desktops. Initial local runs discard
+the line, deliver one event, preserve the next read and recover real shell
+prompts. Windows 7 evidence and remaining guards are still required. The host
+design holds the requirements and production limits.
 
 An application-facing read shim remains a separate alternative. It needs a
 specified launch/load boundary and its own console-read semantics; blindly

@@ -27,7 +27,7 @@ what I've learned from testing it.
 ## Follow current development
 
 I'm working on input cancellation within Milestone 1. Host identity and dispatch
-are verified; actual cooked-read cancellation is next.
+are verified; the first private-desktop cancellation prototype is ready for target testing.
 
 | Guide | Purpose |
 | --- | --- |
@@ -37,6 +37,7 @@ are verified; actual cooked-read cancellation is next.
 | [Console-host design](HOST_CANCELLATION_DESIGN.md) | Identity, dispatch, cancellation and production stages |
 | [Host identity probe](HOST_IDENTITY_PROBE.md) | Run the H1 research package |
 | [Host dispatch probe](HOST_DISPATCH_PROBE.md) | Run the H2 research package |
+| [Host cancellation probe](HOST_CANCELLATION_PROBE.md) | Run the first H3 prototype and see its remaining limits |
 | [Optional SSH testing](SSH_BASELINE.md) | Deferred remote-test prerequisites |
 
 ## Results and project history

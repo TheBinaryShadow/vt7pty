@@ -89,6 +89,8 @@ public-API experiments failed. I'm now following the
   [Results](docs/validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md).
 - [ ] H3: Cancel a pending cooked read, discard the old line, deliver exactly
   one control event, preserve the next read and recover real shell prompts.
+  The first [private-desktop prototype](docs/HOST_CANCELLATION_PROBE.md) is implemented;
+  Windows 7 results and the remaining H3 guards are pending.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.

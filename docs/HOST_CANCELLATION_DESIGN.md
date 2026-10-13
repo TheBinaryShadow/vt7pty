@@ -1,6 +1,6 @@
 # Console-host cancellation design
 
-Status: H1 and H2 accepted on all three Windows 7 tiers; H3 cancellation is next.
+Status: H1 and H2 accepted on Windows 7; the first H3 prototype is implemented, pending target results and remaining coverage.
 Updated: 2026-10-13.
 
 I'm following the [cancellation investigation](INPUT_CANCELLATION.md) with
@@ -24,7 +24,7 @@ blocks dependent work for that configuration; retain the evidence.
 The [H2 target review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
 accepts nine repetitions covering actual host execution, session binding,
 request rejection, input isolation and lifetime/failure controls.
-H3 remains unimplemented. No production hook mechanism is selected.
+The [H3 prototype](HOST_CANCELLATION_PROBE.md) now exercises core cancellation and shell recovery on private desktops. H3 remains open; no production hook mechanism is selected.
 
 ## H1 implementation
 
@@ -77,7 +77,7 @@ contract. The [rc1 candidate review](validation/2026-10-13-step-1.2-host-dispatc
 records three exact-package repetitions establishing the callback on WOLF.
 The [Windows 7 review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
 accepts three more repetitions each on NESSY, TURTLE and LEOPARD.
-H3 cancellation is not implemented.
+The H2 package itself does not implement cancellation.
 
 ### Discovery and loading boundary
 
@@ -158,11 +158,11 @@ Windows 7 yields 66-70 title events per discovery, versus two on WOLF; all
 128-event buffer without overflow. No one-event-per-change assumption is made.
 Broader event volume and load remain H4 qualification work.
 
-H2 is accepted on those configurations. Proceed next to an H3 cancellation
-prototype; H2 does not prove read cancellation or qualify production use.
+H2 is accepted on those configurations. H3 now tests cancellation; H2 alone
+does not prove read cancellation or qualify production use.
 
 
-## H3: Cancel the pending read (next)
+## H3: Cancel the pending read (in progress)
 
 After H2, evaluate the host's normal input-processing path. Define cancellation
 and event delivery as one operation; first measure whether the host already
@@ -182,6 +182,34 @@ Cover repeated requests, empty/partial lines, no pending read, completion races,
 active children, default handlers, raw keys, PS7, two sessions, timeout after
 receipt, denied access and close during a request. Only then consider H4.
 
+### First prototype boundary
+
+I've implemented a separate H3 executable and callback DLL. Each repetition
+uses a private desktop for the cancellation suite and a different private
+desktop for a neighboring pending read. The normal desktop is never switched.
+Private names are random, access is limited to the user/SYSTEM, and all created
+desktops are closed after their owned processes and observed hosts exit.
+
+Before a worker proceeds, the root retains and validates process lifetimes
+and enumerates the exact console HWND on its retained private desktop.
+Cross-desktop GetThreadDesktop is denied on the development host, so that
+call is not used as the root's proof. The callback reports its own desktop
+and verifies it matches its controller; each response must match the assigned
+private desktop. The active input desktop is rejected.
+
+The callback saves all 256 keyboard-state bytes, applies Ctrl without Alt or
+Shift, and sends one synchronous WM_KEYDOWN C to its own verified console
+window. Scope exit restores and compares the full table, including during a
+deliberately thrown pre-delivery failure. It sends no additional control event.
+A receipt-only control withholds the final acknowledgment and disables further
+requests. The controller never retries an ambiguous cancellation.
+
+Separate desktops prevent input-queue attachment between the suite, neighbor
+and normal desktop. This contains the experiment; it does not establish the
+production architecture. The [probe guide](HOST_CANCELLATION_PROBE.md) lists
+the twelve cases and preserves the remaining H3 requirements: target results,
+real completion/close races, actual denied-access behavior, the active-child
+shell matrix and PowerShell 7 guards. H4 remains blocked on those findings.
 ## If an experiment fails
 
 Record the exact failure and reject that approach. Do not relax isolation or
@@ -190,6 +218,10 @@ launch/loading, descendant coverage, APIs, encoding, modes, read ownership and
 cancellation semantics. Blind cancellation of discovered threads is insufficient.
 
 ## References and limits
+
+- [Microsoft: SetKeyboardState](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setkeyboardstate): the calling thread's input-state table.
+- [Microsoft: AttachThreadInput](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-attachthreadinput): shared state, reset behavior and the desktop boundary.
+- [Microsoft: CreateDesktop](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-createdesktopw) and [EnumDesktopWindows](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdesktopwindows): containment and independent window enumeration.
 
 - [Microsoft: NtQueryInformationProcess](https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryinformationprocess): internal and subject to change; resolve dynamically.
 - [System Informer phnt](https://github.com/winsiderss/phnt/blob/master/ntpsapi.h): class 49 and pointer-sized representation; reference only.

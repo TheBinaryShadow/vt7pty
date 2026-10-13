@@ -10,7 +10,8 @@ The [Windows 7 review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7
 accepts H2 on NESSY, TURTLE and LEOPARD, with three passing repetitions each.
 It preserves 519 files and checks 54 host lifetimes, 225 exchanges and 45 reads.
 Windows 7 emits 66-70 title events per discovery; all identify the expected
-host thread with no buffer overflow. H3 cancellation is next in the
+host thread with no buffer overflow. The separate [H3 prototype](HOST_CANCELLATION_PROBE.md)
+now tests cancellation under the
 [staged design](HOST_CANCELLATION_DESIGN.md).
 
 ## Run on Windows 7
@@ -86,7 +87,8 @@ or verified owned clients may be terminated. The host is never terminated.
 ## Developer use
 
 Build-VT7Pty.ps1 builds the executable and callback DLL. Verify-VT7Pty.ps1 checks
-their imports, manifests, resources and the protocol oracle, for 31 local checks
+their imports, manifests, resources and the protocol oracle. The current suite
+has 32 local checks
 without the optional soak. Historical release package counts are unchanged.
 H1 and H2 share HostResearch.h; the existing H1 workflow remains separately tested.
 

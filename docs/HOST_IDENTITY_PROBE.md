@@ -11,7 +11,7 @@ accepts H1 on all three designated tiers, with three successful repetitions
 per machine, including PowerShell 2.0 on LEOPARD. The separate
 [H2 dispatch prototype](HOST_DISPATCH_PROBE.md) also has an accepted
 [three-tier Windows 7 review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md).
-H3 cooked-read cancellation remains unimplemented.
+The separate [H3 prototype](HOST_CANCELLATION_PROBE.md) now tests cooked-read cancellation; target evidence remains pending.
 
 ## Run on Windows 7
 
