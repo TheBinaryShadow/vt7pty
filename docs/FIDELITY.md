@@ -1,7 +1,7 @@
 # Milestone 1 Fidelity Plan
 
 Status: rc3 Step 1.1 corpus measured on the development host and all three Windows 7 tiers; broader coverage pending.
-Updated: 2026-10-12.
+Updated: 2026-10-13.
 
 The [roadmap](../ROADMAP.md) owns completion. This document defines the local
 application corpus, measurements, and evidence needed to improve VT7Pty after
@@ -59,8 +59,11 @@ The existing 30-case suite remains a required regression gate.
 [Step 1.2 cancellation research](INPUT_CANCELLATION.md) retains the version 3
 corpus and adds two version 4 public-API mechanism probes, for 39 entries.
 An empty canceled read is checked separately from reuse of the same input
-buffer. Target results for these experiments are pending; the product runtime
-remains unchanged and the measured F01 failures remain unresolved.
+buffer. The [three-tier mechanism review](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
+records both approaches failing on all Windows 7 targets. Direct cancellation
+returns error 1168; record injection retains the line and adds character 0x03.
+Original outcomes are unchanged. The product runtime remains unchanged and
+the measured F01 failures remain unresolved.
 
 | ID | Scenario | Required observable result |
 | --- | --- | --- |

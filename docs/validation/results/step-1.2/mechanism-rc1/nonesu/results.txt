@@ -1,0 +1,42 @@
+VT7Pty 0.5.0 fidelity characterization: NonESU
+Harness healthy: True; workflow failures: 6; mechanism failures: 2; not run: 0
+ORACLE: Pass 
+JSON_ORACLE: Pass 
+STATE: Pass 
+INPUT: Pass 
+PROCESSED_CTRL_C: Pass 
+UNPROCESSED_CTRL_C: Pass 
+UNICODE: Pass 
+ALTERNATE: Pass 
+RESIZE: Pass 
+DRAIN: Pass 
+CMD_EMPTY: Fail shell prompt cancellation workflow failed
+CMD_PARTIAL: Fail shell prompt cancellation workflow failed
+PS_EMPTY: Fail shell prompt cancellation workflow failed
+PS_PARTIAL: Fail shell prompt cancellation workflow failed
+PS7_EMPTY: Pass 
+PS7_PARTIAL: Pass 
+NEGATIVE_CELL: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_ATTRIBUTE: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_CURSOR: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_PACKET: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_DUPLICATE: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_DRAIN: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_TIMEOUT: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_ORPHAN: Pass Injected fault detected; native failure is intentional.
+CMD_CHILD_HANDLED: Pass 
+CMD_CHILD_DEFAULT: Pass 
+CMD_CHILD_UNPROCESSED: Pass 
+PS_CHILD_HANDLED: Pass 
+PS_CHILD_DEFAULT: Pass 
+PS_CHILD_UNPROCESSED: Pass 
+PS7_CHILD_HANDLED: Pass 
+PS7_CHILD_DEFAULT: Pass 
+PS7_CHILD_UNPROCESSED: Pass 
+READCONSOLE_TRANSPORT: Fail cooked console read cancellation workflow failed
+READCONSOLE_EVENT: Fail cooked console read cancellation workflow failed
+READCONSOLE_RECORD_EVENT: Fail cooked console read cancellation workflow failed
+READCONSOLE_OWNED_CANCEL: Fail cooked console read cancellation workflow failed
+NEGATIVE_CHILD_CONTROL: Pass Injected fault detected; native failure is intentional.
+NEGATIVE_CHILD_EXIT: Pass Injected fault detected; native failure is intentional.
+Pending coverage remains listed in results.json. This run does not accept Milestone 1.

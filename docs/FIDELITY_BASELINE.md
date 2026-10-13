@@ -138,10 +138,12 @@ Preserved metadata and binary snapshots distinguish the initial cancellation,
 second-read readiness, normal completion and recovery.
 
 The [cancellation investigation](INPUT_CANCELLATION.md) records mechanism
-constraints and development findings. MechanismFailures is recorded separately from WorkflowFailures; a failing probe
-also makes the runner return exit code 1. Harness/prerequisite errors and cleanup
-failures in these probes make HarnessHealthy false. Both probes still require
-Windows 7 measurement. Their results do not replace the rc3 target baseline or resolve F01.
+constraints and findings. MechanismFailures is recorded separately from
+WorkflowFailures; a failing probe also makes the runner return exit code 1.
+Harness/prerequisite errors and cleanup failures in these probes make
+HarnessHealthy false. The [Windows 7 review](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
+records both probes failing on all three tiers. Their results supplement
+the rc3 target baseline; F01 remains unresolved.
 
 ## Recorded initial baseline
 
@@ -183,8 +185,14 @@ retain actual failures and obtain their own applicable target evidence.
 contains the version 4 public-API probes and all prior recipes. Its development
 run reports 29 Pass / 10 Fail: the eight prior workflow failures and two mechanism
 failures, with no harness errors. The second-read check detects lost new input
-after an apparently successful direct cancellation. Windows 7 results are pending.
-This is a research candidate with unchanged 0.5.0 runtime, not a production fix.
+after an apparently successful direct cancellation on WOLF.
+The [Windows 7 review](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
+records 31 Pass / 8 Fail on NESSY and TURTLE, and 26 Pass / 8 Fail /
+5 NotApplicable on LEOPARD. Both mechanisms fail; direct cancellation returns
+error 1168 while the read remains pending. After Enter recovery, the next read
+works normally. All original recipe outcomes and applicable child guards match
+rc3, with healthy harnesses and no missing required cases.
+The research runtime remains unchanged 0.5.0 and no production fix is qualified.
 
 ## Development commands
 

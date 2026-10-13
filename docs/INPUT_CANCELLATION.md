@@ -1,7 +1,7 @@
 # Input Cancellation Investigation
 
 Status: Step 1.2 mechanism research in progress; no production cancellation fix.
-Updated: 2026-10-12.
+Updated: 2026-10-13.
 
 The [rc3 Windows 7 baseline](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
 establishes the defect and the behavior that must survive a fix. CMD and native
@@ -58,7 +58,13 @@ and appended character 0x03. CancelSynchronousIo returned the first call with
 BOOL TRUE, error 995 and zero text, but the next read did not complete after
 NEXT_PROBE and Enter. Another Enter recovered only CRLF; the new line was lost.
 This disqualifies that mechanism on this host despite its initially promising
-first-call result. These observations need their own Windows 7 evidence.
+first-call result. The
+[Windows 7 mechanism review](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
+now records both probes failing on NESSY, TURTLE and LEOPARD. Record injection
+retains the typed line and adds character 0x03. Direct cancellation returns
+FALSE with error 1168 (ERROR_NOT_FOUND) while the read stays pending. After
+boundary Enter recovery, the next read returns NEXT_PROBE normally. This is
+distinct from WOLF's successful first-call cancellation and lost following line.
 
 [Microsoft's cancellation guidance](https://learn.microsoft.com/en-us/windows/win32/fileio/canceling-pending-i-o-operations)
 explains that cancellation depends on the underlying operation and must be
@@ -89,16 +95,23 @@ on desktop keyboard state. The
 also documents key-state reset and desktop restrictions. These approaches
 remain research findings, not supported product capabilities.
 
-## Next gate
+## Next design gate
 
 The [identified version 4 candidate](validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
-preserves the full development comparison and independent evidence checks.
-Run it on the Windows 7 tiers. Preserve API
-errors and the second-read result as well as the original failures and guards.
-If neither public-API probe meets the contract, use that evidence to choose
-between further console-host research and an application-facing read shim.
-An application shim would need a specified launch/load boundary and its own
-console-read semantics; blindly canceling discovered threads is not a substitute.
+has completed its [three-tier mechanism measurements](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md).
+Both measured public-API approaches are rejected for the pending cooked-read
+corpus. Original child guards, PowerShell 7 prompts and target Unicode/resize
+outcomes remain unchanged. This completes the research measurements, not F01.
+
+The next recommended design investigates cancellation within one owned console
+host: establish its actual identity, a user-mode request/acknowledgment path,
+failure behavior, cleanup and session isolation. The earlier HWND/thread-hook
+prototype provides no qualified implementation and must not be promoted as a fix.
+
+An application-facing read shim remains a separate alternative. It needs a
+specified launch/load boundary and its own console-read semantics; blindly
+canceling discovered threads is not a substitute. Choosing or implementing
+either mechanism requires a concrete design and new evidence.
 
 A production candidate needs its own version/source identity, actual shell
 prompt regressions, active-child and unprocessed-input checks, isolation/failure

@@ -1,6 +1,6 @@
 # VT7Pty Roadmap
 
-Status: Milestone 0 complete; rc3 three-tier fidelity baseline recorded, six cancellation failures per machine; broader Step 1.1 coverage pending. Updated: 2026-10-12.
+Status: Milestone 0 complete; Step 1.2's two API cancellation candidates rejected on all three Windows 7 tiers; broader Step 1.1 coverage pending. Updated: 2026-10-13.
 
 This file owns milestone scope and completion. It records intended work, not
 implemented capability. Milestones follow technical dependencies rather than
@@ -452,9 +452,12 @@ The [cancellation investigation](docs/INPUT_CANCELLATION.md) starts with the
 measured F01 failures and passing child guards. Harness version 4 adds two
 controlled public-API probes. The
 [mechanism rc1 candidate](docs/validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
-records both probes failing on the development host, unchanged original
-outcomes and passing child guards. Windows 7 measurement is pending.
-No production fix or completion is claimed.
+records the separate development observations. The
+[three-tier mechanism review](docs/validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
+rejects both public-API approaches on Windows 7; all original outcomes and
+applicable child guards remain unchanged. Next is a bounded user-mode
+console-host cancellation design, including identity, acknowledgment and
+session isolation. No production fix or Step 1.2 completion is claimed.
 
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, active-child
   interrupts, processed/unprocessed input, editing, modifiers, text and paste.

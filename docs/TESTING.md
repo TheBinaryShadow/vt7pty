@@ -201,8 +201,12 @@ extension evidence and verifies native/aggregate metadata equality before handof
 The [input cancellation investigation](INPUT_CANCELLATION.md) adds two
 test-only mechanism probes in harness version 4. They record API results,
 pending-read cancellation and a second read before considering runtime changes.
-The fixture owns the canceled thread and does not enumerate application readers.
-Windows 7 mechanism measurements are pending.
+The fixture owns the targeted thread and does not enumerate application readers.
+The [three-tier mechanism results](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
+reject both approaches: direct cancellation returns error 1168 with the read
+pending; records retain the line and add character 0x03. The next read succeeds
+after boundary Enter recovery. All original outcomes and child guards remain
+unchanged. These are failed mechanism measurements, not runtime acceptance.
 
 Console-SSH and remote Vim/htop are deferred optional scenarios, with
 [setup prerequisites](SSH_BASELINE.md) retained for later use. They do not

@@ -1,0 +1,14 @@
+[0m[0KFIDELITY_PS_PROMPT>[0K$m=Get-Module PSReadLine; $mv='none'; $cfg='native-ConsoleHo[0Ks[?25l
+t'; if($m){$mv=$m.Version.ToString(); $o=Get-PSReadLineOption; $cfg=$m.Path+'|'[0K+
+$o.EditMode.ToString()+'|'+$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAll[0KT
+ext('C:\Users\Binary\Desktop\VT7Pty-fidelity-baseline-0.5.0-step-1.2-mechanism-[0Kr
+c1\results\nonesu-20261013-075038-81cc7e4c\PS_PARTIAL\shell-identity.txt',$PSVe[0Kr
+sionTable.PSVersion.ToString()+'|'+$mv+'|'+$Host.Name+'|'+$cfg)[0K
+[0K[?25hFIDELITY_PS_PROMPT>[0K[IO.File]::WriteAllText('C:\Users\Binary\Desktop\VT7Pty-fide[0Kl[?25l
+ity-baseline-0.5.0-step-1.2-mechanism-rc1\results\nonesu-20261013-075038-81cc7e[0K4
+c\PS_PARTIAL\cancelled-command.txt','BAD')[0K[?25h[?25l
+FIDELITY_PS_PROMPT>[0K[?25h[IO.File]::WriteAllText('C:\Users\Binary\Desktop\VT7Pty-fide[0Kl[?25l
+ity-baseline-0.5.0-step-1.2-mechanism-rc1\results\nonesu-20261013-075038-81cc7e[0K4
+c\PS_PARTIAL\continued-command.txt','CONTINUE')[0K
+FIDELITY_PS_PROMPT>[0K[?25hexit 0[0K[?25l
+[0K[?25h

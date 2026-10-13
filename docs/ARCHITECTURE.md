@@ -149,6 +149,10 @@ Step 1.1 coverage remains open. The [rc3 extension](validation/2026-10-12-step-1
 separately measures native-child event/key delivery and cooked-read cancellation;
 the [three-tier target results](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
 confirm passing child policies and retained cooked input after handler delivery.
+The [version 4 mechanism results](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
+reject the two measured direct-API cancellation approaches on all three tiers.
+A later user-mode mechanism needs explicit host/read ownership, acknowledgment,
+failure and session-isolation semantics before runtime use.
 Broader baseline coverage remains open. Milestone 2 defines the VT7Pty integration API
 around the proven backend. That API will borrow useful ConPTY
 conventions but must specify an

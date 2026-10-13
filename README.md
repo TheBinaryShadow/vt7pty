@@ -55,9 +55,13 @@ records six cancellation failures per machine, every applicable active-child
 case passing, and successful native/portable JSON oracles, including PowerShell 2.0.
 The target probes confirm retained cooked input after control-handler delivery.
 [Step 1.2 cancellation research](docs/INPUT_CANCELLATION.md) adds controlled
-public-API mechanism probes with a second-read check; Windows 7 results are
-pending. The [mechanism candidate](docs/validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
-records the new development observations. There is no production cancellation fix yet.
+public-API mechanism probes with a second-read check. Their
+[Windows 7 review](docs/validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
+rejects both approaches on all three tiers while preserving the original guards.
+Direct cancellation returns error 1168 with the read still pending.
+The [mechanism candidate](docs/validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
+retains the separate development observations. A production cancellation fix
+remains open.
 Input, output/Unicode,
 resize, full-screen state and lifecycle improvements follow the measurements.
 Console-SSH testing is deferred optional work. The VT7-facing API and standalone

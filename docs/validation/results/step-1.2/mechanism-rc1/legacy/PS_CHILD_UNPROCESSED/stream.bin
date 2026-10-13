@@ -1,0 +1,21 @@
+[0m[0KFIDELITY_PS_PROMPT>[0K$m=Get-Module PSReadLine; $mv='none'; $cfg='native-ConsoleHo[0Ks[?25l
+t'; if($m){$mv=$m.Version.ToString(); $o=Get-PSReadLineOption; $cfg=$m.Path+'|'[0K+
+$o.EditMode.ToString()+'|'+$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAll[0KT
+ext('C:\Users\Binary\Desktop\VT7Pty-fidelity-baseline-0.5.0-step-1.2-mechanism-[0Kr
+c1\results\legacy-20261013-075032-9e112e1a\PS_CHILD_UNPROCESSED\shell-identity.[0Kt
+xt',$PSVersionTable.PSVersion.ToString()+'|'+$mv+'|'+$Host.Name+'|'+$cfg)[0K
+[0K[?25hFIDELITY_PS_PROMPT>[0K& 'C:\Users\Binary\Desktop\VT7Pty-fidelity-baseline-0.5.0-st[0Ke[?25l
+p-1.2-mechanism-rc1\bin\FidelityFixture.exe' 'CHILD_UNPROCESSED' '\\.\pipe\VT7P[0Kt
+y.Child.4028.93242265' 4028[0K
+[0K[?25h[?25l
+CHILD_READY[0K
+[0K
+CHILD_FINAL_DRAIN[0K
+FIDELITY_PS_PROMPT>[0K[?25h[IO.File]::WriteAllText('C:\Users\Binary\Desktop\VT7Pty-fide[0Kl[?25l
+ity-baseline-0.5.0-step-1.2-mechanism-rc1\results\legacy-20261013-075032-9e112e[0K1
+a\PS_CHILD_UNPROCESSED\child-exit-code.txt',$LASTEXITCODE.ToString()); [IO.File[0K]
+::WriteAllText('C:\Users\Binary\Desktop\VT7Pty-fidelity-baseline-0.5.0-step-1.2[0K-
+mechanism-rc1\results\legacy-20261013-075032-9e112e1a\PS_CHILD_UNPROCESSED\cont[0Ki
+nued-command.txt','CONTINUE')[0K
+[0K[?25hFIDELITY_PS_PROMPT>[0Kexit 0[0K[?25l
+[0K[?25h
