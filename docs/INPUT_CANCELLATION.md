@@ -110,8 +110,11 @@ and concurrent-session read isolation. The
 [H1 Windows 7 review](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
 accepts all nine target repetitions. Both observed host threads report GUI state;
 H2 must establish which context actually dispatches the session's requests.
-H2 dispatch and H3 cancellation remain unimplemented. The earlier HWND/thread-hook
-prototype provides no qualified implementation and must not be promoted as a fix.
+The [H2 probe](HOST_DISPATCH_PROBE.md) now implements scoped title-event discovery,
+in-host callback verification, session-bound acknowledgments and rejection/lifetime
+controls. Windows 7 qualification is pending. H3 cancellation is unimplemented.
+The earlier HWND/thread-hook prototype remains unqualified; the new experiment
+derives its target from independently verified host events and callback execution.
 
 An application-facing read shim remains a separate alternative. It needs a
 specified launch/load boundary and its own console-read semantics; blindly

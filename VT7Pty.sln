@@ -50,12 +50,24 @@ Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "FidelityTest", "projects\Fi
 EndProject
 Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostIdentityProbe", "projects\HostIdentityProbe.vcxproj", "{257986F1-3108-49D6-A235-F77977F18662}"
 EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostDispatchProbe", "projects\HostDispatchProbe.vcxproj", "{6686C022-3FD7-4945-A493-8199FC777DAA}"
+EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostDispatchHook", "projects\HostDispatchHook.vcxproj", "{17ECD2A7-70E6-4013-8D94-597822336ADB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6686C022-3FD7-4945-A493-8199FC777DAA}.Debug|x64.ActiveCfg = Debug|x64
+		{6686C022-3FD7-4945-A493-8199FC777DAA}.Debug|x64.Build.0 = Debug|x64
+		{6686C022-3FD7-4945-A493-8199FC777DAA}.Release|x64.ActiveCfg = Release|x64
+		{6686C022-3FD7-4945-A493-8199FC777DAA}.Release|x64.Build.0 = Release|x64
+		{17ECD2A7-70E6-4013-8D94-597822336ADB}.Debug|x64.ActiveCfg = Debug|x64
+		{17ECD2A7-70E6-4013-8D94-597822336ADB}.Debug|x64.Build.0 = Debug|x64
+		{17ECD2A7-70E6-4013-8D94-597822336ADB}.Release|x64.ActiveCfg = Release|x64
+		{17ECD2A7-70E6-4013-8D94-597822336ADB}.Release|x64.Build.0 = Release|x64
 		{257986F1-3108-49D6-A235-F77977F18662}.Debug|x64.ActiveCfg = Debug|x64
 		{257986F1-3108-49D6-A235-F77977F18662}.Debug|x64.Build.0 = Debug|x64
 		{257986F1-3108-49D6-A235-F77977F18662}.Release|x64.ActiveCfg = Release|x64

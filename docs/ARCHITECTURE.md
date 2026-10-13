@@ -154,10 +154,12 @@ reject the two measured direct-API cancellation approaches on all three tiers.
 The query-only [H1 prototype](HOST_IDENTITY_PROBE.md) now has
 [three-tier identity/isolation evidence](validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md).
 It identifies each controlled session's actual host process; both observed host
-threads expose GUI state, so dispatch-thread selection remains unresolved.
-The [H2-H4 design](HOST_CANCELLATION_DESIGN.md) requires actual dispatch context,
-session-bound acknowledgment, read cancellation and regression qualification
-before runtime use.
+threads expose GUI state, so that observation alone cannot select a dispatch thread.
+The test-only [H2 probe](HOST_DISPATCH_PROBE.md) uses repeated scoped title events,
+a thread-scoped callback and independently verified pipe peers. Session binding,
+rejection and lifetime controls are implemented; Windows 7 qualification is pending.
+The [H2-H4 design](HOST_CANCELLATION_DESIGN.md) still requires read cancellation
+and production regression qualification before runtime use.
 Broader baseline coverage remains open. Milestone 2 defines the VT7Pty integration API
 around the proven backend. That API will borrow useful ConPTY
 conventions but must specify an

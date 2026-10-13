@@ -1,6 +1,6 @@
 # VT7Pty Roadmap
 
-Status: Milestone 0 complete; Step 1.2 H1 host identity/isolation accepted on all three Windows 7 tiers; H2 dispatch next; cancellation and broader Step 1.1 coverage remain open. Updated: 2026-10-13.
+Status: Milestone 0 complete; Step 1.2 H1 host identity/isolation accepted on all three Windows 7 tiers; H2 dispatch prototype awaiting Windows 7 qualification; cancellation and broader Step 1.1 coverage remain open. Updated: 2026-10-13.
 
 This file owns milestone scope and completion. It records intended work, not
 implemented capability. Milestones follow technical dependencies rather than
@@ -405,8 +405,10 @@ records all three tiers and retains four prompt-cancellation failures per machin
 The later [rc3 target baseline](docs/validation/2026-10-12-step-1.1-rc3-windows7-baseline.md)
 records passing active-child policies and six cancellation failures per machine.
 Step 1.2's [H1 host identity review](docs/validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
-accepts the controlled identity/isolation gate on all three tiers; host dispatch
-and cancellation remain unimplemented. Broader case recipes remain pending;
+accepts the controlled identity/isolation gate on all three tiers. The
+[H2 prototype](docs/HOST_DISPATCH_PROBE.md) implements bounded callback/acknowledgment
+research and awaits target qualification; cancellation remains unimplemented.
+Broader case recipes remain pending;
 existing Milestone 0 acceptance does not qualify these additional workflows.
 
 Console-SSH and remote full-screen applications are deferred optional scenarios
@@ -462,9 +464,12 @@ applicable child guards remain unchanged. The
 The [H1 identity/isolation probe](docs/HOST_IDENTITY_PROBE.md) passes three
 [development repetitions](docs/validation/2026-10-13-step-1.2-host-identity-rc1-candidate.md)
 and nine [Windows 7 repetitions](docs/validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
-against exact 0.5.0 binaries. All targets expose two GUI-capable host threads,
-so actual dispatch context still needs proof. No production fix or Step 1.2
-completion is claimed.
+against exact 0.5.0 binaries. All targets expose two GUI-capable host threads.
+The [H2 prototype](docs/HOST_DISPATCH_PROBE.md) uses repeated scoped title events
+followed by an in-host callback and private-pipe peer verification to establish
+actual dispatch context. It tests request rejection, input isolation and
+acknowledgment/lifetime failures. Windows 7 qualification remains pending.
+No production fix or Step 1.2 completion is claimed.
 
 - [x] Complete H1 controlled host identity/isolation on the three designated
   Windows 7 tiers, with linked native observations and preserved input.

@@ -1,6 +1,6 @@
 # Console-host cancellation design
 
-Status: H1 accepted on all three designated Windows 7 tiers; H2 dispatch next.
+Status: H1 accepted on Windows 7; H2 prototype implemented, target qualification pending.
 Updated: 2026-10-13.
 
 This design follows the [cancellation investigation](INPUT_CANCELLATION.md).
@@ -21,7 +21,8 @@ accepts three repetitions each on NESSY, TURTLE and LEOPARD: 54 consistent
 host observations, 27 ordinary reads, session isolation and cleanup. This
 completes the prerequisite for H2 on those configurations. A failed later gate
 blocks dependent work for that configuration; retain the evidence.
-H2/H3 remain unimplemented hypotheses. No production hook mechanism is selected.
+H2 has a bounded research implementation below; H3 remains unimplemented.
+No production hook mechanism is selected.
 
 ## H1 implementation
 
@@ -67,33 +68,86 @@ This is a controlled consistency experiment, not authentication against a
 malicious application. Class 49 is an internal query/set interface. Production
 must retain agent ownership and validate a host endpoint independently.
 
-## H2 contract, not implemented
+## H2 implementation and remaining qualification
 
-Discover the actual dispatch context through evidence inside the verified host.
-Do not choose the first thread, the HWND's reported thread or every GUI thread.
-Start with a callback reporting actual PID/thread and a challenge response.
-Any experimental thread hook must use a nonzero, explicitly verified target.
-No global hook or input to the user's foreground window is allowed.
+The test-only [H2 probe](HOST_DISPATCH_PROBE.md) implements the following
+contract. Development experiments establish the callback on WOLF; exact-candidate
+Windows 7 runs remain required. H3 cancellation is not implemented.
 
-Specify the x64 module's absolute path, exact binary/source identity, loading
-boundary, desktop/user policy and bounded lifetime before loading it.
-No persistent installation or system-binary modification. H1 includes no DLL.
+### Discovery and loading boundary
 
-Use a restricted, fixed-size/schema request channel with an unpredictable
-session nonce, controller/host creation identities, console identity and
-increasing sequence number. Independently check actual execution context and
-peer ownership. Reject stale, forged, duplicate and cross-session requests.
-The host callback cannot block waiting for the controller or pipe connection.
+Repeat a title change through the controlled fixture. Observe only
+EVENT_OBJECT_NAMECHANGE for the verified host and its owned agent, never all
+desktop processes. Record the exact console HWND, object/child IDs, event thread,
+callback thread and independently queried thread owner. Both changes must
+identify the same live host-owned thread; retain its query/synchronization handle.
+WinEvent delivery itself occurs in the controller and is not proof of in-host
+execution. Do not choose the first GUI thread or the externally reported HWND
+owner.
 
-States: Unavailable -> Identified -> Ready -> InFlight -> Completed, plus
-Rejected, OutcomeUnknown and Closing. Record receipt, acknowledgment and
-observed read outcome separately. Never retry a timed-out request or send a
-fallback control event blindly: the first operation may already have happened.
-Disable experimental dispatch until ambiguous state is reconciled.
+Load the colocated x64 HostDispatchHook.dll by absolute path after the portable
+runner has verified its package hash. Install WH_CALLWNDPROC only on the nonzero
+discovered thread. Send a bounded WM_NULL to the owned console HWND. The callback
+must report the exact host PID, creation time, discovered thread and HWND, and
+its private-pipe client PID must independently match the host.
 
-Closing stops new requests, retires the session generation, drains callbacks
-and releases resources. Unhooking alone does not prove no callback is executing.
-Define handle/mapping/module ownership and host/agent/controller death behavior.
+On WOLF, GetWindowThreadProcessId inside the callback reports the actual
+host/thread; externally it reports the agent. Require and record the in-host
+match. A differing Windows 7 observation is a failed research gate to investigate,
+not permission to select arbitrary threads. The prototype requires native x64,
+matching user/logon/session, medium integrity and WinSta0/Default. No elevation,
+foreground/focus change, global hook, persistent installation or system patch.
+
+### Session binding and protocol
+
+The controller creates a first-instance, local-only user/SYSTEM pipe with a
+random 128-bit channel nonce. The atom passed with WM_NULL names this channel;
+it is not secret authentication. The callback opens only the exact local
+research pipe pattern, never waits for a server, and sets PIPE_NOWAIT.
+No callback waits for a controller response or pipe buffer space.
+
+Both peers verify the OS-reported pipe peer PID. The callback checks the
+controller image beside its own module, retained creation identity and matching
+token. Binding verifies the controller -> agent -> fixture parent chain,
+retained client creation times, common host query, actual executing host/thread
+and console HWND. A fixed 112-byte request carries schema, operation, nonce,
+sequence, bounded deadline and all session identities; the 88-byte response
+reports actual callback context and the accepted sequence. Rejections preserve
+the last accepted sequence. The callback cannot rebind after retirement.
+
+This authenticates a controlled endpoint and binds sessions; it is not a
+security boundary against code already compromised under the same Windows user.
+Malformed pipe framing closes the channel. Supported operations are Bind, Ping,
+Close and an explicit test-only receipt-without-final-acknowledgment control.
+No operation cancels a read, synthesizes input or delivers a control event.
+
+### Lifetime, failure and acceptance
+
+States follow Unavailable -> Identified -> Ready -> InFlight -> Completed,
+with Rejected, OutcomeUnknown and Closing/retired outcomes. A missing final
+acknowledgment disables further dispatch; never retry it or issue a fallback
+control event. Record receipt separately from final acknowledgment and read
+completion. Input remains pending throughout these harmless exchanges.
+
+The callback has no worker thread and no asynchronous I/O buffers. Completed
+SendMessageTimeout calls establish return from the synchronous callback.
+Close retires the channel and closes its handles; controller cleanup removes
+the hook and releases only its own module reference. User32 manages the remote
+hook module. A timeout does not prove the callback finished. In that case stop
+dispatch, remove the hook and close owned sessions; retain observed host handles
+until exit. UnhookWindowsHookEx alone is not used as a callback-drain guarantee.
+
+The probe exercises duplicate/forged/stale/cross-session requests, successful
+requests after rejection, replacement sessions, acknowledgment loss, close with
+pending input, host exit and abrupt controller death. All owned clients and
+observed hosts must exit, and B's original line must survive every neighboring
+session. No host termination is permitted. Access failures or unfamiliar
+representations fail closed and retain evidence. Broader denial/race/load
+qualification remains required before production in H4.
+
+H2 remains open until the exact package passes all three designated Windows 7
+tiers. Only then proceed to an H3 cancellation candidate.
+
 
 ## H3 contract, not implemented
 
@@ -127,6 +181,10 @@ cancellation semantics. Blind cancellation of discovered threads is insufficient
 - [Microsoft: NtQueryInformationProcess](https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryinformationprocess): internal and subject to change; resolve dynamically.
 - [System Informer phnt](https://github.com/winsiderss/phnt/blob/master/ntpsapi.h): class 49 and pointer-sized representation; reference only.
 - [Microsoft: GetGUIThreadInfo](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getguithreadinfo): GUI state observation.
+- [Microsoft: SetWinEventHook](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwineventhook): scoped discovery; console events can be delivered out of context.
+- [Microsoft: SendMessageTimeout](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-sendmessagetimeoutw): bounded synchronous notification.
+- [Microsoft: UnhookWindowsHookEx](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-unhookwindowshookex): removal may return while a callback is still executing.
+- [Microsoft: named-pipe wait modes](https://learn.microsoft.com/en-us/windows/win32/ipc/named-pipe-type-read-and-wait-modes): PIPE_NOWAIT read/write behavior.
 - [Microsoft: SetWindowsHookEx](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowshookexw): possible thread-scoped research mechanism and architecture constraints.
 - VT7 reference: src/interactivity/win32/windowproc.cpp, Window::_HandleGetObject
   explains console HWND reassignment. VT7 remains reference-only.

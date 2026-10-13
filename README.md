@@ -64,9 +64,11 @@ retains the separate development observations. A production cancellation fix
 remains open. The [console-host design](docs/HOST_CANCELLATION_DESIGN.md)
 has a [query-only identity/isolation prototype](docs/HOST_IDENTITY_PROBE.md).
 Its [H1 target review](docs/validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md)
-accepts nine repetitions across all three Windows 7 tiers. Actual host dispatch
-and a session-bound request/acknowledgment path are the next research gate;
-cancellation remains unresolved. Input, output/Unicode,
+accepts nine repetitions across all three Windows 7 tiers. The
+[H2 dispatch probe](docs/HOST_DISPATCH_PROBE.md) now implements actual host
+callback verification and a session-bound request/acknowledgment path.
+Windows 7 qualification is pending; cancellation remains unresolved.
+Input, output/Unicode,
 resize, full-screen state and lifecycle improvements follow the measurements.
 Console-SSH testing is deferred optional work. The VT7-facing API and standalone
 consumer follow in Milestone 2, then a versioned handoff in Milestone 3.

@@ -315,6 +315,8 @@ $expectedImports = [ordered]@{
     'VtStateTest.exe' = @('KERNEL32.dll')
     'FidelityFixture.exe' = @('KERNEL32.dll')
     'FidelityTest.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'VT7Pty.dll')
+    'HostDispatchProbe.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll', 'VT7Pty.dll')
+    'HostDispatchHook.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
     'HostIdentityProbe.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll', 'VT7Pty.dll')
     'ProtocolTest.exe' = @('KERNEL32.dll')
     'ProtocolTestAgent.exe' = @('KERNEL32.dll')
@@ -381,6 +383,8 @@ foreach ($configurationName in $configurations) {
         'FidelityFixture.exe', 'FidelityFixture.pdb',
         'FidelityTest.exe', 'FidelityTest.pdb',
         'HostIdentityProbe.exe', 'HostIdentityProbe.pdb',
+        'HostDispatchProbe.exe', 'HostDispatchProbe.pdb',
+        'HostDispatchHook.dll', 'HostDispatchHook.pdb',
         'ProtocolTest.exe', 'ProtocolTest.pdb',
         'ProtocolTestAgent.exe', 'ProtocolTestAgent.pdb',
         'fixture-console-color-grid.exe', 'fixture-console-color-grid.pdb',
@@ -403,6 +407,7 @@ foreach ($configurationName in $configurations) {
     }
 
     $tests = @(
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostDispatchProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostIdentityProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'ModernCppTest.exe') -WorkingDirectory $binaryDirectory
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'ProtocolTest.exe') -WorkingDirectory $binaryDirectory
@@ -463,6 +468,8 @@ foreach ($configurationName in $configurations) {
     foreach ($test in $tests) {
         Assert-NativeTestPassed -Result $test
     }
+    $dispatchOracle = @($tests | Where-Object { $_.Name -eq 'HostDispatchProbe.exe' })
+    if ($dispatchOracle.Count -ne 1 -or $dispatchOracle[0].StandardOutput -ne 'Host dispatch oracle: 13 checks passed') { throw 'Host dispatch oracle did not complete.' }
     $hostOracle = @($tests | Where-Object { $_.Name -eq 'HostIdentityProbe.exe' })
     if ($hostOracle.Count -ne 1 -or $hostOracle[0].StandardOutput -ne 'Host identity oracle: 10 checks passed') { throw 'Host identity oracle did not complete.' }
     $modernCppTest = $tests | Where-Object { $_.Name -eq 'ModernCppTest.exe' }

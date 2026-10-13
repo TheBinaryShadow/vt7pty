@@ -228,6 +228,13 @@ and checks 54 host observations and 27 read results. H1 success does not
 establish cancellation or dispatch; the [design](HOST_CANCELLATION_DESIGN.md)
 defines the subsequent gates. The wider fidelity corpus was not rerun by H1.
 
+The separate [H2 package](HOST_DISPATCH_PROBE.md) repeats actual host callback,
+request/acknowledgment and isolation/lifetime checks three times per target.
+It includes an x64 research DLL and keeps the released runtime pinned.
+Its 13-case protocol oracle brings current local verification to 31 checks
+without the optional soak. H2 requires exact-package Windows 7 results before
+acceptance; development passes cannot complete it.
+
 ## Negative controls
 
 At minimum, demonstrate that the suite fails when:
