@@ -95,7 +95,7 @@ on desktop keyboard state. The
 also documents key-state reset and desktop restrictions. These approaches
 remain research findings, not supported product capabilities.
 
-## Next design gate
+## Console-host design gates
 
 The [identified version 4 candidate](validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
 has completed its [three-tier mechanism measurements](validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md).
@@ -103,9 +103,11 @@ Both measured public-API approaches are rejected for the pending cooked-read
 corpus. Original child guards, PowerShell 7 prompts and target Unicode/resize
 outcomes remain unchanged. This completes the research measurements, not F01.
 
-The next recommended design investigates cancellation within one owned console
-host: establish its actual identity, a user-mode request/acknowledgment path,
-failure behavior, cleanup and session isolation. The earlier HWND/thread-hook
+The [console-host design](HOST_CANCELLATION_DESIGN.md) now separates identity,
+dispatch, cancellation and production integration into H1-H4 gates. The
+[H1 probe](HOST_IDENTITY_PROBE.md) implements query-only host identification
+and concurrent-session read isolation. Windows 7 measurements are pending.
+H2 dispatch and H3 cancellation remain unimplemented. The earlier HWND/thread-hook
 prototype provides no qualified implementation and must not be promoted as a fix.
 
 An application-facing read shim remains a separate alternative. It needs a

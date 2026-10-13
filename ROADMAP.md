@@ -455,9 +455,11 @@ controlled public-API probes. The
 records the separate development observations. The
 [three-tier mechanism review](docs/validation/2026-10-13-step-1.2-mechanism-rc1-windows7.md)
 rejects both public-API approaches on Windows 7; all original outcomes and
-applicable child guards remain unchanged. Next is a bounded user-mode
-console-host cancellation design, including identity, acknowledgment and
-session isolation. No production fix or Step 1.2 completion is claimed.
+applicable child guards remain unchanged. The
+[console-host design](docs/HOST_CANCELLATION_DESIGN.md) defines H1-H4 gates.
+Its [H1 identity/isolation probe](docs/HOST_IDENTITY_PROBE.md) is implemented;
+Windows 7 measurements are pending before host dispatch work. No production
+fix or Step 1.2 completion is claimed.
 
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, active-child
   interrupts, processed/unprocessed input, editing, modifiers, text and paste.

@@ -61,7 +61,9 @@ rejects both approaches on all three tiers while preserving the original guards.
 Direct cancellation returns error 1168 with the read still pending.
 The [mechanism candidate](docs/validation/2026-10-12-step-1.2-mechanism-rc1-candidate.md)
 retains the separate development observations. A production cancellation fix
-remains open.
+remains open. The [console-host design](docs/HOST_CANCELLATION_DESIGN.md)
+now has a [query-only identity/isolation prototype](docs/HOST_IDENTITY_PROBE.md),
+with Windows 7 measurements pending before host dispatch and cancellation work.
 Input, output/Unicode,
 resize, full-screen state and lifecycle improvements follow the measurements.
 Console-SSH testing is deferred optional work. The VT7-facing API and standalone

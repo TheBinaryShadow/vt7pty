@@ -1,7 +1,7 @@
 # VT7Pty Testing Strategy
 
 Status: Milestone 0 accepted; Milestone 1 fidelity execution plan established.
-Updated: 2026-10-12.
+Updated: 2026-10-13.
 
 This document defines how VT7Pty distinguishes preserved WinPTY behavior, new
 regressions, inherited limitations, and accepted improvements. Results must
@@ -212,6 +212,16 @@ Console-SSH and remote Vim/htop are deferred optional scenarios, with
 [setup prerequisites](SSH_BASELINE.md) retained for later use. They do not
 block local Milestone 1 acceptance. VT7's direct SSH transport bypasses this
 backend.
+
+## Console-host research gate
+
+The [H1 probe](HOST_IDENTITY_PROBE.md) has a separate portable package and
+PowerShell 2.0-compatible runner. Each target runs three repetitions covering
+host association, concurrent pending reads and replacement-session isolation.
+The local verifier also checks its imports and ten-case query oracle, making
+30 local checks without the optional soak. Existing acceptance packages retain
+their historical counts. H1 success does not establish cancellation or dispatch;
+the [design](HOST_CANCELLATION_DESIGN.md) defines the subsequent gates.
 
 ## Negative controls
 
