@@ -29,6 +29,12 @@ Do not rerun elevated to work around a failure. Creating a private desktop,
 identifying the host or installing the callback can fail; those outcomes are
 part of the evidence.
 
+Launch rc1 from the normal desktop. A launcher running under an enclosing job
+can cause shell-job assignment to fail on Windows 7. Keep the failed results;
+this needs separate diagnosis from cancellation. The
+[cleanup plan](PROCESS_LIFETIME.md#current-h3-boundary) records this limit and
+the additional scenarios required before 1.0.
+
 ## What the prototype does
 
 The root controller stays on the normal desktop. It creates two private

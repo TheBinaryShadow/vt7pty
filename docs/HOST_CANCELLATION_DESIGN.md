@@ -1,7 +1,7 @@
 # Console-host cancellation design
 
 Status: H1 and H2 accepted on Windows 7; the first H3 prototype is implemented, pending target results and remaining coverage.
-Updated: 2026-10-13.
+Updated: 2026-11-10.
 
 I'm following the [cancellation investigation](INPUT_CANCELLATION.md) with
 four stages. I need correct line cancellation while preserving active-child
@@ -212,6 +212,13 @@ production architecture. The [probe guide](HOST_CANCELLATION_PROBE.md) lists
 the twelve cases and preserves the remaining H3 requirements: target results,
 real completion/close races, actual denied-access behavior, the active-child
 shell matrix and PowerShell 7 guards. H4 remains blocked on those findings.
+
+The [process lifetime plan](PROCESS_LIFETIME.md) adds Windows 7 job inheritance,
+permitted/denied breakaway and descendant-cleanup qualification before 1.0.
+The H3 shell job is test containment; its current checks do not establish a
+production job policy. I'll account for enclosing jobs and applications that
+create their own jobs when defining H4 and the integration contract.
+
 ## If an experiment fails
 
 Record the exact failure and reject that approach. Do not relax isolation or

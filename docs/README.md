@@ -20,6 +20,7 @@ what I've learned from testing it.
 | Guide | Purpose |
 | --- | --- |
 | [Architecture](ARCHITECTURE.md) | Components, input/output flow and resource ownership |
+| [Process lifetime and cleanup](PROCESS_LIFETIME.md) | Windows 7 job limits and required cleanup coverage before 1.0 |
 | [Versioning](VERSIONING.md) | Package, API and client-agent protocol versions |
 | [Naming](NAMING.md) | Migration from WinPTY names to VT7Pty |
 | [Security review](SECURITY_REVIEW.md) | Native boundaries and remaining limitations |

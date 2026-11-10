@@ -1,6 +1,6 @@
 # VT7Pty roadmap
 
-Updated: 2026-10-13.
+Updated: 2026-11-10.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
 behavior in Milestone 1. **Next: test the first H3 cancellation prototype on
@@ -126,6 +126,10 @@ state after resize and exit, without unexplained lasting corruption or hangs.
 
 - [ ] Resolve measured F08-F09 failures in final drain, child status, close,
   failure cleanup, response times and resource stability.
+- [ ] Before 1.0, qualify Windows 7 job inheritance, permitted/denied breakaway,
+  abrupt owner exit and descendant cleanup. Follow the
+  [process lifetime plan](docs/PROCESS_LIFETIME.md), prompted by
+  [VSoft.Process PR #18](https://github.com/VSoftTechnologies/VSoft.Process/pull/18).
 - [ ] Preserve existing lifecycle/stress gates and establish target-derived
   performance budgets before accepting performance changes.
 
@@ -152,8 +156,9 @@ repository. Changes to VT7 itself belong to a separate integration task.
 - [ ] Review VT7's connection requirements as reference material without
   modifying the VT7 repository.
 - [ ] Specify handle ownership, stream encoding, errors, threading, cancellation,
-  resize/close races, output draining, process lifetime, version negotiation,
-  and distribution requirements before freezing an ABI.
+  resize/close races, output draining, process lifetime, job inheritance and
+  breakaway policy, version negotiation, and distribution requirements before
+  freezing an ABI.
 - [ ] Implement documented headers and the API over the proven backend.
 - [ ] Build a standalone consumer and contract tests in this repository.
 - [ ] Validate the contract on Windows 7 and publish examples and migration
