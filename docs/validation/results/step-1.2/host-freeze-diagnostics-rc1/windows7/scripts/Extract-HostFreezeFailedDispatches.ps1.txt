@@ -1,0 +1,38 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$raw=Join-Path $repo 'artifacts\fidelity\returned-host-freeze-diagnostics-rc1-2026-11-13'
+$comparison=Get-Content -LiteralPath (Join-Path $repo 'artifacts\fidelity\h3-freeze-windows7-comparison.json') -Raw | ConvertFrom-Json
+$rows=New-Object 'Collections.Generic.List[object]'
+function Events([string]$Directory,[string]$Prefix,[bool]$Agent) {
+    foreach($file in @(Get-ChildItem -LiteralPath $Directory -Filter ($Prefix+'-*-request.json') -File | Sort-Object {[int]([regex]::Match($_.Name,'-(\d+)-request').Groups[1].Value)})) {
+        $q=Get-Content -LiteralPath $file.FullName -Raw | ConvertFrom-Json
+        if($Agent) {$q.Response.Trace.Events} else {$q.Response.WindowTrace.Events}
+    }
+}
+foreach($failure in @($comparison.FailedCases | Where-Object {-not $_.IntentionalSelection})) {
+    $dir=Join-Path $raw $failure.Directory
+    $requests=@($comparison.KeyEvidence | Where-Object {$_.Machine -eq $failure.Machine -and $_.Order -eq $failure.Order -and $_.Case -eq ('suite\'+$failure.Case) -and $_.Sent -eq 1})
+    foreach($key in $requests) {
+        $q=Get-Content -LiteralPath (Join-Path $dir $key.Request) -Raw | ConvertFrom-Json
+        $before=$q.FixtureBefore;$after=$q.FixtureAfter
+        $windowContext=@();$agentContext=@()
+        if($failure.Role -eq 'Experiment') {
+            $entry=@($q.Response.Trace.Events | Where-Object {$_.Stage -eq 4})[0]
+            $time=[decimal]$entry.Qpc
+            $windowEvents=@(Events $dir 'host' $false)
+            $agentEvents=@(Events $dir 'agent' $true)
+            $windowContext=@($windowEvents | Where-Object {[decimal]$_.Qpc -le $time} | Select-Object -Last 5)+@($windowEvents | Where-Object {[decimal]$_.Qpc -gt $time} | Select-Object -First 5)
+            $agentContext=@($agentEvents | Where-Object {[decimal]$_.Qpc -le $time} | Select-Object -Last 5)+@($agentEvents | Where-Object {[decimal]$_.Qpc -gt $time} | Select-Object -First 5)
+        }
+        $rows.Add([ordered]@{Machine=$failure.Machine;Order=$failure.Order;Role=$failure.Role;Case=$failure.Case;Request=$key.Request;
+            RequestCase=$q.Case;BeforeSelection=$(if($before) {$before.Trace.SelectionFlags} else {$null});BeforeRead=$(if($before) {$before.ReadIndex} else {$null});
+            BeforeControl=$(if($before) {$before.ControlCount} else {$null});AfterSelection=$(if($after) {$after.Trace.SelectionFlags} else {$null});
+            AfterControl=$(if($after) {$after.ControlCount} else {$null});EntryCtrl=$key.EntryCtrl;EntryKeysMatchApplied=$key.EntryKeysMatchApplied;
+            Restored=$key.ReturnedStateRestored;PublicSelectionSampleIsAtomic=$false;WindowContext=$windowContext;AgentContext=$agentContext;Directory=$failure.Directory})
+    }
+}
+$unplanned=@($comparison.FailedCases | Where-Object {-not $_.IntentionalSelection})
+$result=[ordered]@{SchemaVersion=1;Kind='H3FreezeUnplannedFailureDispatches';UnplannedCases=$unplanned.Count;UntracedControlCases=@($unplanned | Where-Object {$_.Role -eq 'Control'}).Count;Requests=$rows.ToArray()}
+[IO.File]::WriteAllText((Join-Path $repo 'artifacts\fidelity\h3-freeze-windows7-failed-dispatches.json'),($result | ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
+$rows | ForEach-Object {[pscustomobject]$_} | Format-Table Machine,Order,Role,Case,RequestCase,BeforeSelection,BeforeControl,AfterSelection,AfterControl

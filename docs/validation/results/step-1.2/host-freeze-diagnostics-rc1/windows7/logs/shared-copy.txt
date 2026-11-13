@@ -1,0 +1,29 @@
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Robust File Copy for Windows                              
+-------------------------------------------------------------------------------
+
+  Started : petak, 13. studenog 2026. 17:58:15
+   Source : \\10.0.0.3\KRMe\VT7_work\results\
+     Dest : D:\Git\vt7pty\artifacts\fidelity\returned-host-freeze-diagnostics-rc1-2026-11-13\
+
+    Files : *.*
+	    
+  Options : *.* /NDL /NFL /S /E /DCOPY:T /COPY:DAT /NP /XJ /R:0 /W:0 
+
+------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------
+
+               Total    Copied   Skipped  Mismatch    FAILED    Extras
+    Dirs :       535       535         0         0         0         0
+   Files :     15262     15262         0         0         0         0
+   Bytes :   57.99 m   57.99 m         0         0         0         0
+   Times :   0:00:33   0:00:31                       0:00:00   0:00:02
+
+
+   Speed :             1937471 Bytes/sec.
+   Speed :             110.862 MegaBytes/min.
+   Ended : petak, 13. studenog 2026. 17:58:49
+

@@ -3,11 +3,12 @@
 Updated: 2026-11-13.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
-behavior in Milestone 1. **Next: run the [scraper coordination experiment](docs/HOST_FREEZE_DIAGNOSTICS.md)
-on all three Windows 7 machines before choosing a cancellation fix.**
-The paired Windows 7 diagnostics found an active selection before both traced
-native delivery failures. Host identity and dispatch remain accepted; H3, the
-runtime cancellation fix and broader coverage remain open.
+behavior in Milestone 1. **Next: apply scrape/resize coordination to the H3
+research prototype and repair neighboring-session trace collection.**
+The [Windows 7 contrasts](docs/validation/2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md)
+pass all 54 quiet/coordinated phases and lose delivery in all 27 held-selection
+phases. Other failures and neighbor trace loss remain. Host identity and dispatch
+stay accepted; H3, the runtime fix and broader coverage remain open.
 
 I check an item only when its stated work and required tests are complete.
 Partial implementations stay unchecked. A local pass does not replace a required
@@ -100,8 +101,8 @@ public-API experiments failed. I'm now following the
   narrows the observation gaps. The [diagnostic candidate](docs/validation/2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md)
   retains one local control failure. The [paired Windows 7 review](docs/validation/2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md)
   completes all 18 trials, with 6/9 controls and 7/9 traced trials passing.
-  Selection is active before both traced native delivery failures. I'll test
-  coordination with the scraper and tighten shell observations before a fix decision.
+  Selection is active before both traced native delivery failures. This led to
+  controlled scraper coordination and stronger shell observations.
   The [historical reassessment](docs/validation/2026-11-13-step-1.2-cancellation-reassessment.md)
   adds controlled selected/unselected contrasts and full freeze/Escape tracing.
   The [new diagnostic package](docs/HOST_FREEZE_DIAGNOSTICS.md) implements those
@@ -109,7 +110,10 @@ public-API experiments failed. I'm now following the
   stronger shell observations. Both earlier control packages remain unchanged.
   The [rc1 candidate](docs/validation/2026-11-13-step-1.2-host-freeze-diagnostics-rc1-candidate.md)
   completed all nine local collections and retains the deliberate selection failures.
-  Windows 7 results are pending.
+  The [Windows 7 review](docs/validation/2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md)
+  verifies all 27 collections: quiet/coordinated phases pass 54/54 and held-selection
+  delivery fails 27/27. Thirteen other case failures remain. The next prototype
+  must extend coordination to the baseline paths and fix neighbor recorder overflow.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.

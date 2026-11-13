@@ -28,9 +28,10 @@ what I've learned from testing it.
 ## Follow current development
 
 I'm working on input cancellation within Milestone 1. Host identity and dispatch
-are verified; the first cancellation candidate has intermittent failures on
-Windows 7. I'm testing selected and selection-free cancellation with a bounded
-scraper gate before runtime integration.
+are verified. Controlled Windows 7 experiments establish selection as a delivery
+blocker and support scrape/resize coordination. The next research prototype needs
+to cover its baseline cancellation paths and repair neighbor trace collection;
+H3 remains open before runtime integration.
 
 | Guide | Purpose |
 | --- | --- |

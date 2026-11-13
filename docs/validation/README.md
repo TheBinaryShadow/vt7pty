@@ -5,15 +5,17 @@ package and test environment. The [roadmap](../../ROADMAP.md) describes current
 progress; each review describes the state at the time it was written.
 
 **Current result:** host identity and dispatch are accepted on all three
-Windows 7 machines. Paired H3 diagnostics completed all 18 trials: 6/9 controls
-and 7/9 traces pass. Both traced native delivery failures sampled an active
-selection before the key request. H3 and the runtime cancellation fix remain open.
+Windows 7 machines. Controlled H3 contrasts complete all 27 collections:
+quiet/coordinated phases pass 54/54 and held-selection delivery fails 27/27.
+The traces establish selection clearing before the agent's later Escape.
+Thirteen other case failures and neighbor recorder overflow remain. H3 and the
+runtime cancellation fix stay open.
 
 ## Current fidelity work
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| H3 scraper coordination | [rc1 candidate, controlled contrasts and retained failures](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-candidate.md) | Pending on all three machines |
+| H3 scraper coordination | [rc1 candidate, controlled contrasts and retained failures](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-candidate.md) | [Reviewed: coordination supported; H3 open](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md) |
 | H3 paired diagnostics | [rc1 candidate and retained local failure](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md) | [Reviewed: selection-state correlation; H3 open](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md) |
 | Host cancellation (H3) | [rc1 prototype and local results](2026-10-13-step-1.2-host-cancellation-rc1-candidate.md) | [Not accepted: five failing repetitions](2026-11-13-step-1.2-host-cancellation-rc1-windows7.md) |
 | Host dispatch (H2) | [rc1 candidate](2026-10-13-step-1.2-host-dispatch-rc1-candidate.md) | [Accepted](2026-10-13-step-1.2-host-dispatch-rc1-windows7.md) |
@@ -26,7 +28,9 @@ The [H3 failure investigation](2026-11-13-step-1.2-host-cancellation-rc1-investi
 compares the original failures with passes. The [paired diagnostic review](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md)
 records the selection-state finding. The [historical reassessment](2026-11-13-step-1.2-cancellation-reassessment.md)
 rechecks the evidence chain and strengthens the next experiment with held-state
-controls, freeze/Escape tracing and separate shell measurements.
+controls, freeze/Escape tracing and separate shell measurements. The
+[controlled Windows 7 review](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md)
+records the resulting contrasts, stale frozen state and neighbor trace limit.
 
 These research bundles use the released 0.5.0 runtime. Passing a research stage
 does not resolve the recorded shell defects or accept Milestone 1.

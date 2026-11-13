@@ -1,0 +1,59 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$stage=Join-Path $repo 'artifacts\fidelity\returned-host-freeze-diagnostics-rc1-2026-11-13'
+$shared='\\10.0.0.3\KRMe\VT7_work\results'
+$target=Join-Path $repo 'docs\validation\results\step-1.2\host-freeze-diagnostics-rc1\windows7'
+$comparison=Get-Content -LiteralPath (Join-Path $repo 'artifacts\fidelity\h3-freeze-windows7-comparison.json') -Raw | ConvertFrom-Json
+$metadata=New-Object 'Collections.Generic.List[object]'
+foreach($machine in $comparison.Machines) {
+    $source=Join-Path $shared $machine.RunId;$local=Join-Path $stage $machine.RunId
+    $sourceList=@(Get-ChildItem -LiteralPath $source -File -Recurse | ForEach-Object {$_.FullName.Substring($source.Length+1).Replace('\','/')+"`t"+$_.Length} | Sort-Object)
+    $localList=@(Get-ChildItem -LiteralPath $local -File -Recurse | ForEach-Object {$_.FullName.Substring($local.Length+1).Replace('\','/')+"`t"+$_.Length} | Sort-Object)
+    if(@(Compare-Object $sourceList $localList -CaseSensitive).Count) {throw 'Shared and staged file inventories differ.'}
+    $paths=@('report.json','summary.txt')+@(1..9 | ForEach-Object {$role=@('control','reference','experiment')[($_-1)%3];$_.ToString('00')+'-'+$role+'/evidence-files.json'})
+    foreach($relative in $paths) {
+        $sourceHash=(Get-FileHash -LiteralPath (Join-Path $source $relative) -Algorithm SHA256).Hash.ToLowerInvariant()
+        $localHash=(Get-FileHash -LiteralPath (Join-Path $local $relative) -Algorithm SHA256).Hash.ToLowerInvariant()
+        if($sourceHash -cne $localHash) {throw 'Shared metadata changed during staging.'}
+        $metadata.Add([ordered]@{RunId=$machine.RunId;Path=$relative;Sha256=$sourceHash;Bytes=(Get-Item -LiteralPath (Join-Path $local $relative)).Length})
+    }
+}
+$integrity=[ordered]@{SchemaVersion=1;Kind='H3FreezeReturnedCollectionIntegrity';ReturnedFiles=$comparison.ReturnedFiles;AuditedDeclaredFileHashes=$comparison.VerifiedEvidenceFiles;
+    SharedAndStagedFileNamesAndLengthsMatch=$true;SharedMetadata=$metadata.ToArray();ArchiveSha256=$comparison.ArchiveSha256;ManifestSha256=$comparison.ManifestSha256}
+$integrityPath=Join-Path $repo 'artifacts\fidelity\h3-freeze-windows7-collection-integrity.json'
+[IO.File]::WriteAllText($integrityPath,($integrity | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+$records=New-Object 'Collections.Generic.List[object]'
+function Copy-Exact([string]$Source,[string]$Relative) {
+    $destination=[IO.Path]::GetFullPath((Join-Path $target $Relative))
+    if(-not $destination.StartsWith($target+'\',[StringComparison]::OrdinalIgnoreCase)) {throw 'Evidence target leaves its directory.'}
+    [IO.Directory]::CreateDirectory((Split-Path -Parent $destination)) | Out-Null
+    $hash=(Get-FileHash -LiteralPath $Source -Algorithm SHA256).Hash.ToLowerInvariant()
+    if(Test-Path -LiteralPath $destination) {
+        if((Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant() -cne $hash) {throw 'Different evidence already exists.'}
+    } else {[IO.File]::Copy($Source,$destination)}
+    if((Get-Item -LiteralPath $destination).Length -ne (Get-Item -LiteralPath $Source).Length -or (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant() -cne $hash) {throw 'Evidence copy changed.'}
+    $records.Add([ordered]@{Path=$Relative.Replace('\','/');Bytes=(Get-Item -LiteralPath $destination).Length;Sha256=$hash})
+}
+foreach($directory in @(Get-ChildItem -LiteralPath $stage -Directory)) {
+    foreach($file in @(Get-ChildItem -LiteralPath $directory.FullName -File -Recurse)) {
+        if($file.Extension -in @('.exe','.dll','.pdb','.lib','.obj','.exp')) {throw 'Unexpected program in returned raw results.'}
+        Copy-Exact $file.FullName ($directory.Name+'\'+$file.FullName.Substring($directory.FullName.Length+1))
+    }
+}
+foreach($machine in $comparison.Machines) {
+    $name=$machine.Machine.ToLowerInvariant()
+    Copy-Exact (Join-Path $repo ('artifacts\fidelity\h3-freeze-windows7-'+$name+'-audit.json')) ('audit\'+$name+'.json')
+    Copy-Exact (Join-Path $repo ('artifacts\h3-freeze-windows7-'+$name+'-audit.log')) ('logs\'+$name+'-audit.txt')
+}
+Copy-Exact (Join-Path $repo 'artifacts\fidelity\h3-freeze-windows7-comparison.json') 'comparison.json'
+Copy-Exact (Join-Path $repo 'artifacts\fidelity\h3-freeze-windows7-failed-dispatches.json') 'failed-dispatches.json'
+Copy-Exact $integrityPath 'audit\collection-integrity.json'
+Copy-Exact (Join-Path $repo 'artifacts\h3-freeze-windows7-copy.log') 'logs\shared-copy.txt'
+Copy-Exact (Join-Path $repo 'artifacts\h3-freeze-windows7-comparison-final.log') 'logs\comparison.txt'
+foreach($name in @('Review-HostFreezeWindows7.ps1','Extract-HostFreezeFailedDispatches.ps1','Preserve-HostFreezeWindows7.ps1')) {Copy-Exact (Join-Path $repo ('artifacts\fidelity\'+$name)) ('scripts\'+$name+'.txt')}
+$inventory=[ordered]@{SchemaVersion=1;Kind='H3FreezeWindows7Preservation';ReviewSourceCommit=$comparison.ReviewSourceCommit;ExperimentSourceCommit=$comparison.ExperimentSourceCommit;
+    ArchiveSha256=$comparison.ArchiveSha256;ReturnedFiles=$comparison.ReturnedFiles;Files=$records.ToArray()}
+[IO.File]::WriteAllText((Join-Path $target 'preserved-files.json'),($inventory | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+$bytes=0L;foreach($record in $records) {$bytes+=[long]$record.Bytes}
+[pscustomobject]@{Files=$records.Count;Bytes=$bytes;OriginalFiles=$comparison.ReturnedFiles;MetadataChecked=$metadata.Count}

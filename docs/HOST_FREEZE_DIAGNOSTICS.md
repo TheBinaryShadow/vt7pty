@@ -5,6 +5,12 @@ consume a cancellation key, and whether its later Escape changes a pending
 read. The [reassessment](validation/2026-11-13-step-1.2-cancellation-reassessment.md)
 defines the questions. This package collects evidence; H3 remains open.
 
+The [Windows 7 review](validation/2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md)
+finds passing quiet/coordinated phases in all 54 attempts and failed delivery in
+all 27 selected challenges. It supports a coordinated research prototype. Other
+case failures remain, and the long-lived neighbors' recorders need periodic
+draining to prevent the observed loss of their early trace history.
+
 ## Run on Windows 7
 
 Extract **VT7Pty-host-freeze-diagnostics-0.5.0-rc1.zip** into a fresh local folder,

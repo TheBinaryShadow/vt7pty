@@ -1,0 +1,133 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$raw=Join-Path $repo 'artifacts\fidelity\returned-host-freeze-diagnostics-rc1-2026-11-13'
+function Read-Json([string]$Path) {[IO.File]::ReadAllText($Path) | ConvertFrom-Json}
+function Require([bool]$Test,[string]$Reason) {if(-not $Test) {throw $Reason}}
+function Record-Events([string]$Directory,[string]$Prefix,[bool]$Agent) {
+    foreach($file in @(Get-ChildItem -LiteralPath $Directory -Filter ($Prefix+'-*-request.json') -File | Sort-Object {[int]([regex]::Match($_.Name,'-(\d+)-request').Groups[1].Value)})) {
+        $q=Read-Json $file.FullName
+        if($Agent) {$q.Response.Trace.Events} else {$q.Response.WindowTrace.Events}
+    }
+}
+$comparison=[ordered]@{SchemaVersion=1;Kind='H3FreezeWindows7Comparison';ReviewSourceCommit=(& git -C $repo rev-parse HEAD).Trim();
+    ManifestSha256='1ee53b275e70c1361eb0a6fc99c62efa8de6810cbbbb752173024df1393e82d0';ArchiveSha256='ed03734b8d6198710f0bfc8ef475b05f36f59949999a08748b9dc34e3aed2371';
+    ExperimentSourceCommit='e01d3577890fa9a33ae3fd67935dda6905473b4a';Machines=@();Trials=@();Phases=@();FailedCases=@();CoverageGaps=@();NeighborLoss=@();KeyEvidence=@();
+    MilestoneAccepted=$false;ProductionCancellationImplemented=$false}
+$hashes=0;$originalFiles=0
+foreach($directory in @(Get-ChildItem -LiteralPath $raw -Directory | Sort-Object Name)) {
+    $report=Read-Json (Join-Path $directory.FullName 'report.json')
+    $name=$report.ComputerName.ToLowerInvariant()
+    $audit=Read-Json (Join-Path $repo ('artifacts\fidelity\h3-freeze-windows7-'+$name+'-audit.json'))
+    Require ($audit.RunId -ceq $report.RunId -and $report.ManifestSha256 -ceq $comparison.ManifestSha256 -and $report.Completed -eq 9) 'Collection identity/completeness'
+    $hashes+=$audit.VerifiedEvidenceFiles
+    $originalFiles+=@(Get-ChildItem -LiteralPath $directory.FullName -File -Recurse).Count
+    $passed=0;$total=0
+    foreach($trial in $report.Trials) {
+        $trialDir=Join-Path $directory.FullName $trial.Directory
+        $native=Join-Path $trialDir 'native'
+        $review=@($audit.Trials | Where-Object {$_.Order -eq $trial.Order})[0]
+        $casePassed=@($trial.Cases.Cases | Where-Object {$_.Passed}).Count
+        $passed+=$casePassed;$total+=$trial.Cases.Cases.Count
+        Require ($trial.CollectionStatus -ceq 'Completed' -and -not $trial.TimedOut -and $trial.Error -ceq '' -and $trial.Observation.OwnedLifetimesCleaned -and $trial.Observation.DesktopIsolationVerified) 'Trial completion/cleanup/isolation'
+        Require (@($trial.Cases.Cases | Where-Object {-not $_.OwnedProcessesCleaned -or -not $_.HostExited -or -not $_.HookRemoved}).Count -eq 0) 'Case cleanup'
+        $comparison.Trials+=@([ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Role=$trial.Role;Rotation=$trial.Rotation;Outcome=$trial.Outcome;CollectionStatus=$trial.CollectionStatus;
+            CasesPassed=$casePassed;Cases=$trial.Cases.Cases.Count;DurationMilliseconds=$trial.DurationMilliseconds;Directory=$report.RunId+'/'+$trial.Directory})
+        foreach($case in @($trial.Cases.Cases | Where-Object {-not $_.Passed})) {
+            $caseDir=Join-Path $native ('suite\'+$case.Case)
+            $record=[ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Role=$trial.Role;Case=$case.Case;IntentionalSelection=($case.Case -in @('focus-completed-selected','focus-pending-selected','focus-selection-bracket'));
+                Directory=$report.RunId+'/'+$trial.Directory+'/native/suite/'+$case.Case;Error=$case.Error;Shell=$null;Packets=@()}
+            if(Test-Path -LiteralPath (Join-Path $caseDir 'shell.json')) {$record.Shell=Read-Json (Join-Path $caseDir 'shell.json')}
+            foreach($file in @(Get-ChildItem -LiteralPath $caseDir -File -Filter '*.json' | Where-Object {$_.Name -match '(read|late|recovery|event-observation|fixture-last|condition|bracket)\.json$'})) {
+                $packet=Read-Json $file.FullName
+                if($packet.PSObject.Properties['Observation']) {$packet=$packet.Observation}
+                if($packet.PSObject.Properties['ControlCount']) {
+                    $record.Packets+=@([ordered]@{File=$file.Name;ReadReturned=$packet.ReadReturned;ReadError=$packet.ReadError;ControlCount=$packet.ControlCount;ControlType=$packet.ControlType;ReadIndex=$packet.ReadIndex;
+                        Text=$packet.Text;Selection=$(if($packet.PSObject.Properties['Trace']) {$packet.Trace.SelectionFlags} else {$null})})
+                }
+            }
+            $comparison.FailedCases+=@($record)
+        }
+        if($trial.Role -eq 'Control') {continue}
+        $core=if($trial.Role -eq 'Experiment') {$review.Review.Core} else {$review.Review}
+        foreach($gap in $core.CoverageGaps) {$comparison.CoverageGaps+=@([ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Scope='Core';Gap=$gap})}
+        foreach($finding in $core.KeyFindings) {
+            $comparison.KeyEvidence+=@([ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Role=$trial.Role;Case=$finding.Case;Request=$finding.Request;Sent=$finding.Sent;
+                EntryCount=$finding.EntryCount;ReturnCount=$finding.ReturnCount;EntryCtrl=$finding.EntryCtrl;EntryLeftCtrl=$finding.EntryLeftCtrl;
+                EntryKeysMatchApplied=$finding.EntryKeysMatchApplied;ReturnedStateRestored=$finding.ReturnedStateRestored})
+        }
+        if($trial.Role -ne 'Experiment') {continue}
+        Require ($review.Review.OperationalIssues.Count -eq 0) 'Experiment operation/resumption issue'
+        foreach($gap in $review.Review.CoverageGaps) {$comparison.CoverageGaps+=@([ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Scope='Freeze';Gap=$gap})}
+        foreach($prefix in @('neighbor','agent')) {
+            $neighborDir=Join-Path $native 'neighbor'
+            $lost=0L;$lastTotal=0L;$first=0L;$retained=0L;$chunks=0
+            foreach($file in @(Get-ChildItem -LiteralPath $neighborDir -File -Filter ($prefix+'-*-request.json') | Sort-Object {[int]([regex]::Match($_.Name,'-(\d+)-request').Groups[1].Value)})) {
+                $q=Read-Json $file.FullName;$t=if($prefix -eq 'agent') {$q.Response.Trace} else {$q.Response.WindowTrace}
+                $lost+=[long]$t.Lost;$lastTotal=[long]$t.Total;$retained+=@($t.Events).Count;$chunks++
+                if(-not $first -and @($t.Events).Count) {$first=[long]$t.Events[0].Sequence}
+            }
+            $comparison.NeighborLoss+=@([ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Recorder=$prefix;LostEvents=$lost;FirstRetainedSequence=$first;RetainedEvents=$retained;LastTotal=$lastTotal;Chunks=$chunks})
+        }
+        foreach($condition in $review.Review.Conditions) {
+            $caseDir=Join-Path $native $condition.Case
+            $phase=$condition.Phase
+            $p=Read-Json (Join-Path $caseDir ($phase+'-condition.json'))
+            $before=Read-Json (Join-Path $caseDir ($phase+'-before.json'))
+            $deadline=Read-Json (Join-Path $caseDir ($phase+'-deadline.json'))
+            $released=Read-Json (Join-Path $caseDir ($phase+'-released.json'))
+            $result=[ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Rotation=$trial.Rotation;Case=$condition.Case;Phase=$phase;Condition=$condition.Condition;PendingRead=$p.PendingRead;
+                OriginalDeadlineMet=$p.OriginalDeadlineMet;CancellationPassed=$p.CancellationPassed;ConditionObserved=$p.ConditionObserved;LeaseActiveAtDeadline=$p.LeaseActiveAtDeadline;
+                SelectionBefore=$before.Trace.SelectionFlags;SelectionAtDeadline=$deadline.Trace.SelectionFlags;SelectionAfterRelease=$released.Trace.SelectionFlags;
+                InputMode=$before.InputMode;ControlBefore=$before.ControlCount;ControlAtDeadline=$deadline.ControlCount;ControlAfterRelease=$released.ControlCount;
+                ExpectedEvents=$p.ExpectedEvents;DeadlineReadReturned=$deadline.ReadReturned;DeadlineReadError=$deadline.ReadError;ReleasedReadReturned=$released.ReadReturned;
+                CachedFrozenAtRelease=$condition.CachedFrozenAtRelease;WorkEventsInsideLease=$condition.WorkEventsInsideLease;ComparableDelayActualMs=$condition.ComparableDelayActualMs;
+                KeyboardRestored=$p.KeyboardRestored;NextReadPreserved=$p.NextReadPreserved;ActivityResumed=$p.ActivityResumed;ResizeResumed=$p.ResizeResumed;
+                Recovery=$null;Late=$null;SelectedSequence=$null;Directory=$report.RunId+'/'+$trial.Directory+'/native/'+$condition.Case.Replace('\','/')}
+            foreach($suffix in @('recovery','late')) {
+                $file=Join-Path $caseDir ($phase+'-'+$suffix+'.json')
+                if(Test-Path -LiteralPath $file) {
+                    $packet=Read-Json $file
+                    if($packet.PSObject.Properties['Observation']) {$packet=$packet.Observation}
+                    $result[$suffix.Substring(0,1).ToUpperInvariant()+$suffix.Substring(1)]=[ordered]@{ReadReturned=$packet.ReadReturned;ReadError=$packet.ReadError;ControlCount=$packet.ControlCount;
+                        Text=$packet.Text;Selection=$packet.Trace.SelectionFlags;Trace=$packet.Trace}
+                }
+            }
+            if($condition.Condition -eq 'selected') {
+                $hostEvents=@(Record-Events $caseDir 'host' $false)
+                $agentEvents=@(Record-Events $caseDir 'agent' $true)
+                $keys=@($hostEvents | Where-Object {$_.Message -eq 256 -and $_.WParam -eq 67 -and $_.Phase -eq 1 -and [decimal]$_.Qpc -ge [decimal]$p.SendQpc -and [decimal]$_.Qpc -lt [decimal]$p.ReleaseBeginQpc})
+                Require ($keys.Count -eq 1) 'One selected key'
+                $key=$keys[0]
+                $keyReturn=@($hostEvents | Where-Object {$_.Message -eq 256 -and $_.Phase -eq 2 -and $_.Request -ceq $key.Request -and [decimal]$_.Qpc -ge [decimal]$key.Qpc -and [decimal]$_.Qpc -le [decimal]$p.ReleaseBeginQpc})
+                Require ($keyReturn.Count -eq 1) 'One selected key return'
+                $release=@($agentEvents | Where-Object {$_.Kind -eq 10 -and [decimal]$_.Qpc -ge [decimal]$p.ReleaseBeginQpc -and [decimal]$_.Qpc -le [decimal]$p.ReleaseEndQpc})
+                Require ($release.Count -eq 1) 'One selected release'
+                $unfreeze=@($agentEvents | Where-Object {$_.Kind -eq 3 -and [decimal]$_.Qpc -gt [decimal]$release[0].Qpc} | Select-Object -First 1)
+                Require ($unfreeze.Count -eq 1) 'Selected release unfreezes'
+                $unfreezeEnd=@($agentEvents | Where-Object {$_.Kind -eq 4 -and [decimal]$_.Qpc -gt [decimal]$unfreeze[0].Qpc} | Select-Object -First 1)
+                Require ($unfreezeEnd.Count -eq 1) 'Selected unfreeze returned'
+                $escapes=@($hostEvents | Where-Object {$_.Message -eq 258 -and $_.WParam -eq 27 -and [decimal]$_.Qpc -ge [decimal]$unfreeze[0].Qpc -and [decimal]$_.Qpc -le [decimal]$unfreezeEnd[0].Qpc})
+                Require (@($escapes | Where-Object {$_.Phase -eq 1}).Count -eq 1 -and @($escapes | Where-Object {$_.Phase -eq 2}).Count -eq 1) 'Matching release Escape entry/return'
+                $earlyEscape=@($hostEvents | Where-Object {$_.Message -eq 258 -and $_.WParam -eq 27 -and $_.Phase -eq 1 -and [decimal]$_.Qpc -ge [decimal]$p.GrantQpc -and [decimal]$_.Qpc -lt [decimal]$p.ReleaseBeginQpc})
+                Require ([decimal]$keyReturn[0].Qpc -lt [decimal]$deadline.Trace.BeginQpc -and [decimal]$deadline.Trace.Qpc -lt [decimal]$p.ReleaseBeginQpc) 'Selection sample follows C and precedes release'
+                $result.SelectedSequence=[ordered]@{KeyEntry=$key.Qpc;KeyReturn=$keyReturn[0].Qpc;DeadlineSampleBegin=$deadline.Trace.BeginQpc;DeadlineSampleEnd=$deadline.Trace.Qpc;
+                    Release=$release[0].Qpc;ReleaseCachedFrozen=$release[0].Frozen;UnfreezeBegin=$unfreeze[0].Qpc;UnfreezeEnd=$unfreezeEnd[0].Qpc;
+                    EscapeEntry=@($escapes | Where-Object {$_.Phase -eq 1})[0].Qpc;EscapeReturn=@($escapes | Where-Object {$_.Phase -eq 2})[0].Qpc;
+                    EscapesDuringHeldInterval=$earlyEscape.Count;EscapeAfterSelectionWasObservedClear=($deadline.Trace.SelectionFlags -eq 0);NoTextBufferSnapshotBeforeEscape=$true}
+            }
+            $comparison.Phases+=@($result)
+        }
+    }
+    $comparison.Machines+=@([ordered]@{Machine=$report.ComputerName;Tier=$report.Tier;RunId=$report.RunId;OS=$report.OS;MachineInfo=$report.Machine;
+        PowerShellVersion=$report.PowerShellVersion;CLRVersion=$report.CLRVersion;KB3191566Present=(@($report.Updates | Where-Object {$_.Id -eq 'KB3191566'}).Count -gt 0);
+        Completed=$report.Completed;PreflightErrors=$report.PreflightErrors;CasesPassed=$passed;Cases=$total;ControlPass=$report.ControlPass;ReferencePass=$report.ReferencePass;
+        VerifiedEvidenceFiles=$audit.VerifiedEvidenceFiles;Audit='audit/'+$name+'.json'})
+}
+Require ($comparison.Phases.Count -eq 99 -and $comparison.Trials.Count -eq 27) 'Complete three-machine comparison'
+$comparison['VerifiedEvidenceFiles']=$hashes;$comparison['ReturnedFiles']=$originalFiles
+$output=Join-Path $repo 'artifacts\fidelity\h3-freeze-windows7-comparison.json'
+[IO.File]::WriteAllText($output,($comparison | ConvertTo-Json -Depth 20),[Text.UTF8Encoding]::new($false))
+$comparison.Machines | ForEach-Object {[pscustomobject]$_} | Format-Table Machine,Tier,Completed,ControlPass,ReferencePass,CasesPassed,Cases,VerifiedEvidenceFiles
+$comparison.Phases | ForEach-Object {[pscustomobject]$_} | Group-Object Condition | ForEach-Object {[pscustomobject]@{Condition=$_.Name;Phases=$_.Count;Passed=@($_.Group | Where-Object {$_.CancellationPassed}).Count}} | Format-Table
+[pscustomobject]@{ReturnedFiles=$originalFiles;VerifiedEvidenceFiles=$hashes;Selected=@($comparison.Phases | Where-Object {$_.Condition -eq 'selected'}).Count;CoverageGaps=$comparison.CoverageGaps.Count}

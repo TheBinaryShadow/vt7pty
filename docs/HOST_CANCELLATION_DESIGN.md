@@ -40,7 +40,11 @@ need controlled testing before a fix decision. The [reassessment](validation/202
 specifies causal state contrasts, freeze/Escape tracing and a gate negotiated
 before host callback entry. The [scraper coordination package](HOST_FREEZE_DIAGNOSTICS.md)
 implements those contrasts in a separate research agent, alongside both
-unchanged earlier packages. Its target runs are pending; H3 remains open.
+unchanged earlier packages. The [Windows 7 review](validation/2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md)
+finds that quiet/coordinated phases pass 54/54 while selected delivery fails 27/27,
+with stale frozen state and a later Escape observed directly. The next research
+prototype needs coordination across its baseline paths and periodic neighbor
+trace collection. Remaining failures and wider guards keep H3 open.
 
 ## H1 implementation
 
