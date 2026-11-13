@@ -1,0 +1,40 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$taskRoot='D:\Git\vt7pty'
+$taskShare='\\10.0.0.3\KRMe\VT7_work\results'
+$taskDestination=Join-Path $taskRoot 'docs\validation\results\step-1.2\host-cancellation-diagnostics-rc1\windows7'
+$taskPackage=Join-Path $taskRoot 'artifacts\fidelity\inspection-host-cancellation-diagnostics-rc1'
+if(Test-Path -LiteralPath $taskDestination){throw 'Review destination exists'}
+if((Get-FileHash -LiteralPath (Join-Path $taskPackage 'manifest.json') -Algorithm SHA256).Hash.ToLowerInvariant() -cne '273ed0c40d20e60c6dd583bdefe5513d7a8840f0d67cb4f882f3b611f106334d'){throw 'Wrong package manifest'}
+$manifest=Get-Content -LiteralPath (Join-Path $taskPackage 'manifest.json') -Raw | ConvertFrom-Json
+foreach($file in $manifest.Files){if((Get-FileHash -LiteralPath (Join-Path $taskPackage $file.Path) -Algorithm SHA256).Hash.ToLowerInvariant() -cne $file.Sha256){throw ('Package changed: '+$file.Path)}}
+[IO.Directory]::CreateDirectory((Join-Path $taskDestination 'audit')) | Out-Null
+$taskFiles=New-Object 'Collections.Generic.List[object]'
+$taskReviews=@()
+foreach($dir in Get-ChildItem -LiteralPath $taskShare -Directory){
+    $report=Get-Content -LiteralPath (Join-Path $dir.FullName 'report.json') -Raw | ConvertFrom-Json
+    if($report.ManifestSha256 -cne '273ed0c40d20e60c6dd583bdefe5513d7a8840f0d67cb4f882f3b611f106334d'){throw ('Wrong returned package: '+$dir.Name)}
+    if($report.ComputerName -notin @('NESSY','TURTLE','LEOPARD')){throw 'Unexpected machine'}
+    $target=Join-Path $taskDestination ('raw\'+$dir.Name)
+    foreach($file in Get-ChildItem -LiteralPath $dir.FullName -Recurse -File){
+        $relative=$file.FullName.Substring($dir.FullName.Length+1)
+        $path=Join-Path $target $relative
+        [IO.Directory]::CreateDirectory((Split-Path $path)) | Out-Null
+        $hash=(Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+        Copy-Item -LiteralPath $file.FullName -Destination $path
+        if((Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() -cne $hash -or (Get-Item -LiteralPath $path).Length -ne $file.Length){throw ('Copy changed: '+$relative)}
+        $taskFiles.Add([ordered]@{Path=('raw/'+$dir.Name+'/'+$relative.Replace('\','/'));Bytes=$file.Length;Sha256=$hash})
+    }
+    $auditPath=Join-Path $taskDestination ('audit\'+$report.ComputerName.ToLowerInvariant()+'.json')
+    $audited=$false;$errorText='';$audit=$null
+    try {
+        $audit=& (Join-Path $taskRoot 'tools\research\Test-HostCancellationDiagnosticEvidence.ps1') -Directory $target -PackageRoot $taskPackage -OutputPath $auditPath
+        $audited=$true
+    } catch {$errorText=$_.Exception.Message}
+    $taskReviews+=@([ordered]@{RunId=$report.RunId;ComputerName=$report.ComputerName;Tier=$report.Tier;AuditCompleted=$audited;AuditError=$errorText;VerifiedEvidenceFiles=$(if($audit){$audit.VerifiedEvidenceFiles}else{0});Completed=$report.Completed;ControlPass=$report.ControlPass;ControlFail=$report.ControlFail;TracePass=$report.TracePass;TraceFail=$report.TraceFail})
+    Write-Host ($report.ComputerName+': audit '+$audited+'; '+$errorText)
+}
+if((@($taskReviews.ComputerName | Sort-Object) -join ',') -ne 'LEOPARD,NESSY,TURTLE'){throw 'Missing or duplicate machine'}
+[IO.File]::WriteAllText((Join-Path $taskDestination 'audit\summary.json'),($taskReviews | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $taskDestination 'raw-files.json'),([ordered]@{SchemaVersion=1;Files=@($taskFiles | Sort-Object {$_.Path});Count=$taskFiles.Count} | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+Write-Host ('Preserved '+$taskFiles.Count+' returned files without changes.')

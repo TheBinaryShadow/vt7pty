@@ -5,15 +5,15 @@ package and test environment. The [roadmap](../../ROADMAP.md) describes current
 progress; each review describes the state at the time it was written.
 
 **Current result:** host identity and dispatch are accepted on all three
-Windows 7 machines. The first cancellation candidate passes four of nine target
-repetitions; five fail with missing control-event observations, including one
-read left pending. H3 is not accepted; the runtime cancellation defect remains open.
+Windows 7 machines. Paired H3 diagnostics completed all 18 trials: 6/9 controls
+and 7/9 traces pass. Both traced native delivery failures sampled an active
+selection before the key request. H3 and the runtime cancellation fix remain open.
 
 ## Current fidelity work
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| H3 paired diagnostics | [rc1 candidate and retained local failure](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md) | Pending on NESSY, TURTLE and LEOPARD |
+| H3 paired diagnostics | [rc1 candidate and retained local failure](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md) | [Reviewed: selection-state correlation; H3 open](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md) |
 | Host cancellation (H3) | [rc1 prototype and local results](2026-10-13-step-1.2-host-cancellation-rc1-candidate.md) | [Not accepted: five failing repetitions](2026-11-13-step-1.2-host-cancellation-rc1-windows7.md) |
 | Host dispatch (H2) | [rc1 candidate](2026-10-13-step-1.2-host-dispatch-rc1-candidate.md) | [Accepted](2026-10-13-step-1.2-host-dispatch-rc1-windows7.md) |
 | Host identity (H1) | [rc1 candidate](2026-10-13-step-1.2-host-identity-rc1-candidate.md) | [Accepted](2026-10-13-step-1.2-host-identity-rc1-windows7.md) |
@@ -22,7 +22,8 @@ read left pending. H3 is not accepted; the runtime cancellation defect remains o
 | Initial shell and fixture baseline | [Step 1.1 initial candidate](2026-10-12-step-1.1-candidate.md) | [Four prompt-cancellation failures per machine](2026-10-12-step-1.1-windows7-baseline.md) |
 
 The [H3 failure investigation](2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
-compares the failed requests with passes and defines the next diagnostic experiment.
+compares the original failures with passes. The [paired diagnostic review](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md)
+records the selection-state finding and the next controlled experiment.
 
 These research bundles use the released 0.5.0 runtime. Passing a research stage
 does not resolve the recorded shell defects or accept Milestone 1.

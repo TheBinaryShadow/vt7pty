@@ -3,11 +3,11 @@
 Updated: 2026-11-13.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
-behavior in Milestone 1. **Next: run the paired H3 diagnostic package on
-Windows 7 and review dispatch, read and handler timing before choosing a fix.**
-The first candidate passes four of nine target repetitions. Host identity and
-dispatch remain accepted; the runtime cancellation fix and broader coverage
-remain open.
+behavior in Milestone 1. **Next: test coordination between screen scraping and
+cancellation, and tighten the shell observations before choosing a fix.**
+The paired Windows 7 diagnostics found an active selection before both traced
+native delivery failures. Host identity and dispatch remain accepted; H3, the
+runtime cancellation fix and broader coverage remain open.
 
 I check an item only when its stated work and required tests are complete.
 Partial implementations stay unchecked. A local pass does not replace a required
@@ -98,9 +98,10 @@ public-API experiments failed. I'm now following the
   H3 guards must be resolved before acceptance. The
   [follow-up investigation](docs/validation/2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
   narrows the observation gaps. The [diagnostic candidate](docs/validation/2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md)
-  is ready for three-machine tracing; one local control failure is preserved.
-  The [run guide](docs/HOST_CANCELLATION_DIAGNOSTICS.md)
-  pairs unchanged rc1 controls with bounded tracing; target results are pending.
+  retains one local control failure. The [paired Windows 7 review](docs/validation/2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md)
+  completes all 18 trials, with 6/9 controls and 7/9 traced trials passing.
+  Selection is active before both traced native delivery failures. I'll test
+  coordination with the scraper and tighten shell observations before a fix decision.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.

@@ -115,8 +115,10 @@ state. The [follow-up investigation](validation/2026-11-13-step-1.2-host-cancell
 compares matching passes, reviews the observation gaps and defines a diagnostic
 experiment before a fix decision. The host design holds the remaining requirements
 and production limits. The [paired diagnostic package](HOST_CANCELLATION_DIAGNOSTICS.md)
-collects the next Windows 7 evidence using unchanged rc1 controls and a separate
-traced build.
+retains unchanged rc1 controls and a separate traced build. Its [Windows 7 review](validation/2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md)
+finds an active selection before both traced native delivery failures. I'll test
+coordination with the agent's scraper, while keeping the separate shell marker
+and prompt-observation issue visible.
 
 An application-facing read shim remains a separate alternative. It needs a
 specified launch/load boundary and its own console-read semantics; blindly

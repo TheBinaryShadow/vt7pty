@@ -6,6 +6,11 @@ This package alternates the exact issued rc1 controls with a separate traced
 build. It is a diagnostic experiment; a traced pass does not replace a failed
 control or accept H3.
 
+The [Windows 7 review](validation/2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md)
+records all 18 completed trials, including the PowerShell 2.0 run. Both traced
+native delivery failures sampled an active selection before dispatch. H3 remains
+open for a controlled scraper/cancellation experiment.
+
 ## Run on Windows 7
 
 Extract **VT7Pty-host-cancellation-diagnostics-0.5.0-rc1.zip** into a fresh local

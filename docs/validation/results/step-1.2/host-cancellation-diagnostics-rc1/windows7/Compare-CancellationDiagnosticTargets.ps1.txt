@@ -1,0 +1,74 @@
+param([string]$EvidenceRoot='D:\Git\vt7pty\docs\validation\results\step-1.2\host-cancellation-diagnostics-rc1\windows7')
+$ErrorActionPreference='Stop'
+function Read-Result([string]$Path){Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json}
+function Packet-Summary($p){
+    if($null -eq $p){return $null}
+    [ordered]@{ReadIndex=$p.ReadIndex;ReadReturned=$p.ReadReturned;ReadSucceeded=$p.ReadSucceeded;ReadError=$p.ReadError;ControlCount=$p.ControlCount;ControlType=$p.ControlType;Text=$p.Text;InputMode=$p.InputMode;BeginQpc=$p.Trace.BeginQpc;Qpc=$p.Trace.Qpc;ReadEntered=$p.Trace.ReadEntered;SelectionFlags=$p.Trace.SelectionFlags;SelectionError=$p.Trace.SelectionError;InputRecords=$p.Trace.InputRecords;InputError=$p.Trace.InputError;CustomHandlerRegistered=$p.Trace.CustomHandlerRegistered;IgnoreAttributeObserved=$p.Trace.IgnoreAttributeObserved}
+}
+$trials=@();$machines=@();$failures=@();$operations=@();$prompts=@();$rawKeys=@();$caseRows=@();$late=@();$sampledSelections=@()
+foreach($run in Get-ChildItem -LiteralPath (Join-Path $EvidenceRoot 'raw') -Directory){
+    $report=Read-Result (Join-Path $run.FullName 'report.json')
+    $audit=Read-Result (Join-Path $EvidenceRoot ('audit\'+$report.ComputerName.ToLowerInvariant()+'.json'))
+    $machines+=@([ordered]@{Machine=$report.ComputerName;RunId=$report.RunId;Tier=$report.Tier;OS=$report.OS;PowerShell=$report.PowerShellVersion;CLR=$report.CLRVersion;KB3191566Present=@($report.Updates | Where-Object {$_.Id -eq 'KB3191566'}).Count -gt 0;PreflightErrors=$report.PreflightErrors;Completed=$report.Completed;ControlPass=$report.ControlPass;ControlFail=$report.ControlFail;TracePass=$report.TracePass;TraceFail=$report.TraceFail;VerifiedEvidenceFiles=$audit.VerifiedEvidenceFiles;TraceReviews=@($audit.Trials | Where-Object {$_.Role -eq 'Trace'} | ForEach-Object {$_.TraceReview | Select-Object Sessions,Requests,KeyOperations,NestedEntries,NestedReturns,ExtendedObservations,CoverageGaps})})
+    foreach($trial in $report.Trials){
+        $trials+=@([ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Role=$trial.Role;Outcome=$trial.Outcome;CollectionStatus=$trial.CollectionStatus})
+        if(-not $trial.Observation.OwnedLifetimesCleaned -or -not $trial.Observation.DesktopIsolationVerified -or $trial.TimedOut -or $trial.Error -or $trial.CollectionStatus -ne 'Completed'){throw 'Containment/collection problem needs separate review'}
+        foreach($case in $trial.Cases.Cases){
+            $caseRows+=@([ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Role=$trial.Role;Case=$case.Case;Passed=$case.Passed})
+            $dir=Join-Path $run.FullName ($trial.Directory+'\native\suite\'+$case.Case)
+            $packets=@();$misc=@();$last=$null
+            if(Test-Path -LiteralPath (Join-Path $dir 'fixture-last.json')){$last=Read-Result (Join-Path $dir 'fixture-last.json')}
+            foreach($file in Get-ChildItem -LiteralPath $dir -File -Filter '*.json'){
+                $v=Read-Result $file.FullName
+                if($null -ne $v.ReadIndex){$packets+=@([ordered]@{File=$file.Name;Observation=(Packet-Summary $v)})}
+                if($file.Name -like '*-late.json'){
+                    $item=[ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Case=$case.Case;File=$file.Name;OriginalDeadlineMet=$v.OriginalDeadlineMet;ExtendedWindowMs=$v.ExtendedWindowMs;PredicateMet=$v.PredicateMetAtExtendedObservation;BeginQpc=$v.BeginQpc;EndQpc=$v.EndQpc;Observation=(Packet-Summary $v.Observation)}
+                    $late+=@($item);$misc+=@($item)
+                }
+                if($file.Name -in @('shell.json','prompt-generations.json')){$misc+=@([ordered]@{File=$file.Name;Data=$v})}
+                if($file.Name -eq 'prompt-generations.json'){$prompts+=@([ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Case=$case.Case;Data=$v})}
+                if($v.Trace -and $null -ne $v.ReadIndex){$sampledSelections+=@([ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Case=$case.Case;File=$file.Name;Selection=$v.Trace.SelectionFlags;SelectionError=$v.Trace.SelectionError})}
+            }
+            if(-not $case.Passed){
+                $continued=Join-Path $dir 'continued-command.txt'
+                $failures+=@([ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Pair=$trial.Pair;Role=$trial.Role;Case=$case.Case;Error=$case.Error;Packets=$packets;OtherRecords=$misc;ContinuedCommandHex=$(if(Test-Path -LiteralPath $continued){[BitConverter]::ToString([IO.File]::ReadAllBytes($continued))}else{''});FinalTimeline=$last.Trace.Events})
+            }
+            if($trial.Role -ne 'Trace'){continue}
+            $sent=@(Get-ChildItem -LiteralPath $dir -Filter '*-request.json' -File | ForEach-Object {$q=Read-Result $_.FullName;if($q.Response.Keyboard.Sent -eq 1){[pscustomobject]@{File=$_.Name;Request=$q}}} | Sort-Object {[int]$_.Request.RequestSequence})
+            for($i=0;$i -lt $sent.Count;$i++){
+                $q=$sent[$i].Request;$events=@($q.Response.Trace.Events);$entry=@($events | Where-Object {$_.Stage -eq 4});$return=@($events | Where-Object {$_.Stage -eq 5})
+                if($entry.Count -ne 1 -or $return.Count -ne 1){throw 'Unexpected trace coverage'}
+                $key=$entry[0];$end=if($i+1 -lt $sent.Count){[decimal](@($sent[$i+1].Request.Response.Trace.Events | Where-Object {$_.Stage -eq 4})[0].Qpc)}elseif($last){[decimal]$last.Trace.Qpc}else{[decimal]$return[0].Qpc}
+                $timeline=@($last.Trace.Events | Where-Object {[decimal]$_.Qpc -ge [decimal]$key.Qpc -and [decimal]$_.Qpc -lt $end} | ForEach-Object {[ordered]@{Kind=$_.Kind;ReadIndex=$_.ReadIndex;Value=$_.Value;Detail=$_.Detail;Error=$_.Error;MillisecondsFromKeyEntry=[Math]::Round(([double]([decimal]$_.Qpc-[decimal]$key.Qpc)*1000/[double]$q.Response.Trace.Frequency),6)}})
+                $type=if($case.Case -eq 'host-key-record'){'RawKey'}elseif($case.Case -eq 'default-handler'){'DefaultExit'}else{'CustomHandler'}
+                $operations+=@([ordered]@{
+                    Machine=$report.ComputerName;Order=$trial.Order;Case=$case.Case;CasePassed=$case.Passed;Request=$sent[$i].File;Label=$q.Case;Operation=$q.RequestOperation;Sequence=$q.RequestSequence;Type=$type
+                    Before=(Packet-Summary $q.FixtureBefore);After=(Packet-Summary $q.FixtureAfter);EntryQpc=$key.Qpc;ReturnQpc=$return[0].Qpc;LastObservationMs=$(if($last){[Math]::Round(([double]([decimal]$last.Trace.Qpc-[decimal]$key.Qpc)*1000/[double]$q.Response.Trace.Frequency),3)}else{$null})
+                    EntryCtrlDown=([int]$key.Ctrl -band 32768) -ne 0;EntryLeftCtrlDown=([int]$key.LeftCtrl -band 32768) -ne 0;EntryShiftDown=([int]$key.Shift -band 32768) -ne 0;EntryAltDown=([int]$key.Alt -band 32768) -ne 0
+                    EntryKeysMatchApplied=$key.Keys -ceq $q.Response.Keyboard.During;ReturnKeysMatchApplied=$return[0].Keys -ceq $q.Response.Keyboard.During;Restored=$q.Response.Keyboard.Restored -eq 1 -and $q.Response.Keyboard.Equal -eq 1;KeyResult=$return[0].Result
+                    KeyDurationMs=[Math]::Round(([double]([decimal]$return[0].Qpc-[decimal]$key.Qpc)*1000/[double]$q.Response.Trace.Frequency),6);EventsUntilNextKeyOrLastObservation=$timeline;HandlerEntries=@($timeline | Where-Object {$_.Kind -eq 4}).Count
+                })
+            }
+            if($case.Case -eq 'host-key-record'){
+                $p=Read-Result (Join-Path $dir 'host-key-record.json')
+                $rawKeys+=@([ordered]@{Machine=$report.ComputerName;Order=$trial.Order;Passed=$case.Passed;Mode=$p.InputMode;ControlCount=$p.ControlCount;Keys=$p.Keys;ScanCodes=$p.Trace.KeyScanCodes})
+            }
+        }
+    }
+}
+$custom=@($operations | Where-Object {$_.Type -eq 'CustomHandler'})
+$summary=[ordered]@{
+    Machines=$machines.Count;Trials=$trials.Count;CollectionsCompleted=@($trials | Where-Object {$_.CollectionStatus -eq 'Completed'}).Count;ControlPass=@($trials | Where-Object {$_.Role -eq 'Control' -and $_.Outcome -eq 'Pass'}).Count;ControlFail=@($trials | Where-Object {$_.Role -eq 'Control' -and $_.Outcome -eq 'Fail'}).Count;TracePass=@($trials | Where-Object {$_.Role -eq 'Trace' -and $_.Outcome -eq 'Pass'}).Count;TraceFail=@($trials | Where-Object {$_.Role -eq 'Trace' -and $_.Outcome -eq 'Fail'}).Count
+    CaseRuns=$caseRows.Count;PassedCases=@($caseRows | Where-Object {$_.Passed}).Count;FailedCases=$failures.Count
+    VerifiedEvidenceFiles=($machines | ForEach-Object {$_.VerifiedEvidenceFiles} | Measure-Object -Sum).Sum
+    RecordedKeySends=$operations.Count;CustomHandlerSends=$custom.Count;RawKeyCases=$rawKeys.Count
+    KeyStateOrRestorationMismatches=@($operations | Where-Object {-not $_.EntryCtrlDown -or -not $_.EntryLeftCtrlDown -or $_.EntryShiftDown -or $_.EntryAltDown -or -not $_.EntryKeysMatchApplied -or -not $_.ReturnKeysMatchApplied -or -not $_.Restored}).Count
+    CustomSelectionGroups=@($custom | Group-Object {$_.Before.SelectionFlags} | ForEach-Object {[ordered]@{SelectionBefore=[int]$_.Name;Requests=$_.Count;WithHandlerEntry=@($_.Group | Where-Object {$_.HandlerEntries -gt 0}).Count;WithoutHandlerEntry=@($_.Group | Where-Object {$_.HandlerEntries -eq 0}).Count}})
+    ExtendedObservations=$late.Count;ExtendedPredicatesMet=@($late | Where-Object {$_.PredicateMet}).Count
+    PowerShellPromptRecords=@($prompts | Where-Object {$_.Data.PowerShellCounter}).Count
+    PowerShellBefore1Deadline2=@($prompts | Where-Object {$_.Data.PowerShellCounter -and $_.Data.Before -eq 1 -and $_.Data.AtOriginalDeadline -eq 2}).Count
+    MilestoneAccepted=$false;ProductionCancellationImplemented=$false
+}
+$out=[ordered]@{SchemaVersion=1;Kind='H3DiagnosticWindows7Comparison';Summary=$summary;Trials=$trials;Machines=$machines;Failures=$failures;Operations=$operations;RawKeys=$rawKeys;PromptGenerations=$prompts;LateObservations=$late;SampledSelections=$sampledSelections;Cases=$caseRows;Interpretation='Selection is sampled before/after, not atomically inside the key handler. Event attribution uses the preserved fixture timeline until the next key or last observation. No causal fix claim.'}
+[IO.File]::WriteAllText((Join-Path $EvidenceRoot 'comparison.json'),($out | ConvertTo-Json -Depth 20),[Text.UTF8Encoding]::new($false))
+$summary | ConvertTo-Json -Depth 6

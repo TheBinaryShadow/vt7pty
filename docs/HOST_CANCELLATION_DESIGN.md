@@ -33,7 +33,10 @@ hook mechanism is selected. The
 records matched keyboard-state comparisons and a diagnostic-only experiment
 for the unobserved dispatch/read/handler boundaries. The
 [diagnostic package](HOST_CANCELLATION_DIAGNOSTICS.md) now implements those
-observations alongside the exact issued rc1 controls. Target results are pending.
+observations alongside the exact issued rc1 controls. The [paired target review](validation/2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md)
+finds active selection before both traced native delivery failures, with Ctrl
+state preserved. Coordination with the scraper and shell-observation barriers
+need controlled testing before a fix decision.
 
 ## H1 implementation
 

@@ -1,0 +1,83 @@
+{
+  "SchemaVersion": 1,
+  "Sources": [
+    {
+      "Repository": "vt7pty",
+      "Path": "src/agent/Win32Console.cc",
+      "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+      "GitBlob": "ed5c2fa73047a29242caa3ab88ee50f6c4102d6e",
+      "Snapshot": "sources/src_agent_Win32Console.cc.txt",
+      "Sha256": "d3e5cea4cf10250ee390b59ea597189bec3c940b1878d68c888b7c87b1aebd73"
+    },
+    {
+      "Repository": "vt7pty",
+      "Path": "src/agent/Win32Console.h",
+      "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+      "GitBlob": "ed83877e99301be3e9288dc071da64a7a9371d2c",
+      "Snapshot": "sources/src_agent_Win32Console.h.txt",
+      "Sha256": "fda3ccf121d45771985a2804e54024413e93e8d070619d65e2f15b0679a82257"
+    },
+    {
+      "Repository": "vt7pty",
+      "Path": "src/agent/Scraper.cc",
+      "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+      "GitBlob": "1bb25746ae4a2c220eaf252a5959882e336a6d0b",
+      "Snapshot": "sources/src_agent_Scraper.cc.txt",
+      "Sha256": "42a3ef904bf8c4a1b5226f07a2409a6ebdf12627a084d673985acfdbcaca61c9"
+    },
+    {
+      "Repository": "vt7pty",
+      "Path": "src/agent/Agent.cc",
+      "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+      "GitBlob": "0a359fd149a9a7e12daceae3bf173491b8469d8a",
+      "Snapshot": "sources/src_agent_Agent.cc.txt",
+      "Sha256": "4fedcc830926e5970d73153f257704b20663b50c8a5001e5cdb90a9b35baebcf"
+    },
+    {
+      "Repository": "vt7pty",
+      "Path": "tests/fidelity/HostCancellationWorker.h",
+      "SourceCommit": "6d5c2ebf27a9640d38af7046ad636a20a1e00fad",
+      "GitBlob": "323a24e4ae073398005e8be0be2abb6f1f6e17f3",
+      "Snapshot": "sources/tests_fidelity_HostCancellationWorker.h.txt",
+      "Sha256": "a0de97c070923fd4ff59c93cfdedb054ff45a7febd2c3c0365d6ed7aea89513d"
+    },
+    {
+      "Repository": "vt7pty",
+      "Path": "tests/fidelity/HostCancellationChannel.h",
+      "SourceCommit": "6d5c2ebf27a9640d38af7046ad636a20a1e00fad",
+      "GitBlob": "4a44a19d3508824af61303462871d49aafe72bd8",
+      "Snapshot": "sources/tests_fidelity_HostCancellationChannel.h.txt",
+      "Sha256": "f92946edaa49e6a705bd7a0ce5ffee38b7b817c308a8026345415f2e193d5aa4"
+    },
+    {
+      "Repository": "vt7pty",
+      "Path": "tests/fidelity/HostCancellationHook.cc",
+      "SourceCommit": "6d5c2ebf27a9640d38af7046ad636a20a1e00fad",
+      "GitBlob": "f07144d71a39cb4c2156fd216ac9ff649746157a",
+      "Snapshot": "sources/tests_fidelity_HostCancellationHook.cc.txt",
+      "Sha256": "b0e9b489e0a4a89865ab8a989b5921622e859503adae7ea6245365b7e78e7ff3"
+    },
+    {
+      "Repository": "vt7pty",
+      "Path": "tests/fidelity/HostCancellationResearch.h",
+      "SourceCommit": "6d5c2ebf27a9640d38af7046ad636a20a1e00fad",
+      "GitBlob": "588b444ae644dffe38068748f84b40ca0e02f9a0",
+      "Snapshot": "sources/tests_fidelity_HostCancellationResearch.h.txt",
+      "Sha256": "4b2de1ad0c021874c203d7acabacf7fa6a1c6d3d9d4be75fdb04bc3367b174c6"
+    },
+    {
+      "Repository": "VT7 reference only",
+      "Path": "src/interactivity/win32/windowio.cpp",
+      "SourceCommit": "3afc719d83299ba5a6b4521043d248459e035fc0",
+      "Snapshot": "sources/VT7_windowio.cpp.txt",
+      "Sha256": "71580830841a950a05267d68f5d54619f1ce892db8acc093be77e759de4f7546",
+      "Limit": "Modern source, not proof of Windows 7 internals"
+    }
+  ],
+  "Documentation": [
+    "https://learn.microsoft.com/en-us/windows/console/getconsoleselectioninfo",
+    "https://learn.microsoft.com/en-us/windows/console/console-selection-info-str"
+  ],
+  "ReviewedDate": "2026-11-13",
+  "RuntimeFilesMatchAcceptedSource": true
+}
