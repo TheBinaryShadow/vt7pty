@@ -170,7 +170,12 @@ int run(const std::wstring &output) {
         a=std::make_unique<Worker>(output+L"\\suite",L"suite");
         check(a->desktop.name!=b->desktop.name && a->desktop.name!=originalDesktop && b->desktop.name!=originalDesktop,"separate desktops");
         uint32_t observed=0;
-        deadline=GetTickCount64()+150000;
+        deadline=GetTickCount64()+
+#ifdef VT7PTY_H3_FREEZE
+            360000;
+#else
+            150000;
+#endif
         while(a->alive() && GetTickCount64()<deadline) {
             a->poll(); b->poll();
             check(b->alive(),"neighbor alive during suite");
@@ -189,9 +194,12 @@ int run(const std::wstring &output) {
     if(b) cleaned=b->stop() && cleaned;
     const bool passed=error.empty() && aExit==0 && bExit==0 && isolated && cleaned;
 #ifdef VT7PTY_H3_DIAGNOSTIC
-    const std::string diagnostic=",\"DiagnosticOnly\":true,\"H3Accepted\":false,\"OriginalDeadlineFailuresRetained\":true,\"KeyOperation\":\"Single synchronous WM_KEYDOWN C\"";
+    std::string diagnostic=",\"DiagnosticOnly\":true,\"H3Accepted\":false,\"OriginalDeadlineFailuresRetained\":true,\"KeyOperation\":\"Single synchronous WM_KEYDOWN C\"";
 #else
     const std::string diagnostic;
+#endif
+#ifdef VT7PTY_H3_FREEZE
+    diagnostic+=",\"ResearchAgent\":true,\"Rotation\":"+std::to_string(freezeRotation())+",\"AgentGateProtocol\":1,\"CharacterizationConditions\":true";
 #endif
     writeFile(output+L"\\probe.json","{\"SchemaVersion\":1,\"Probe\":\"HostCancellation\",\"Version\":"+std::to_string(version)+",\"Status\":"+json(passed ? "Pass" : "Fail")+
         ",\"SuiteExit\":"+std::to_string(aExit)+",\"NeighborExit\":"+std::to_string(bExit)+",\"NeighborPolls\":"+std::to_string(polls)+

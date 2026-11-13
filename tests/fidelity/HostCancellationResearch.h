@@ -6,6 +6,9 @@
 #include "HostCancellationTrace.h"
 #include "HostCancellationTraceJson.h"
 #endif
+#ifdef VT7PTY_H3_FREEZE
+#include "HostFreezeClient.h"
+#endif
 #include "VtState.h"
 #include "../../src/include/vt7pty.h"
 #include <algorithm>
@@ -71,7 +74,13 @@ inline std::wstring imagePath(HANDLE process) {
     return {buffer.data(),length};
 }
 struct IdentityPacket {
-    uint32_t magic=0x33494856,schema=1,processId=0,parentId=0;
+    uint32_t magic=0x33494856,
+#ifdef VT7PTY_H3_FREEZE
+        schema=3,
+#else
+        schema=1,
+#endif
+        processId=0,parentId=0;
     Query query;
     uint64_t window=0;
     uint32_t windowProcess=0,windowThread=0,consoleCount=0;
@@ -83,9 +92,39 @@ struct IdentityPacket {
 #ifdef VT7PTY_H3_DIAGNOSTIC
     h3trace::Observation trace;
 #endif
+#ifdef VT7PTY_H3_FREEZE
+    uint32_t activityWrites=0,activityError=0,columns=0,rows=0;
+#endif
 };
 #ifndef VT7PTY_H3_DIAGNOSTIC
 static_assert(sizeof(IdentityPacket)==680);
+#endif
+#ifdef VT7PTY_H3_FREEZE
+struct Activity {
+    Handle stop,thread;
+    volatile LONG writes=0,error=0;
+    static DWORD WINAPI run(void *value) {
+        auto &self=*static_cast<Activity *>(value);
+        while(WaitForSingleObject(self.stop.value,40)==WAIT_TIMEOUT) {
+            const auto text=L"H3_ACTIVITY_"+std::to_wstring(InterlockedCompareExchange(&self.writes,0,0))+L"\r\n"; DWORD count=0;
+            if(!WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE),text.data(),static_cast<DWORD>(text.size()),&count,nullptr) || count!=text.size()) {
+                InterlockedExchange(&self.error,static_cast<LONG>(GetLastError())); return 1;
+            }
+            InterlockedIncrement(&self.writes);
+        }
+        return 0;
+    }
+    void start() {
+        check(thread.value==INVALID_HANDLE_VALUE,"one activity writer");
+        stop.reset(CreateEventW(nullptr,TRUE,FALSE,nullptr)); check(stop.value!=nullptr,"activity stop");
+        thread.reset(CreateThread(nullptr,0,run,this,0,nullptr)); check(thread.value!=nullptr,"owned activity writer");
+    }
+    void finish() {
+        if(thread.value==INVALID_HANDLE_VALUE) return;
+        SetEvent(stop.value); check(WaitForSingleObject(thread.value,5000)==WAIT_OBJECT_0,"activity writer stopped"); thread.reset();
+    }
+    ~Activity() { if(thread.value!=INVALID_HANDLE_VALUE) { SetEvent(stop.value); if(WaitForSingleObject(thread.value,5000)!=WAIT_OBJECT_0) ExitProcess(124); } }
+};
 #endif
 struct Read {
     bool raw=false; DWORD keyCount=0; Key keys[16]={};
@@ -166,14 +205,25 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
     h3trace::fixtureTimeline.append(h3trace::FixtureReady);
 #endif
     Read read; Handle thread,shell,shellThread,shellJob; uint32_t readIndex=0;
+#ifdef VT7PTY_H3_FREEZE
+    Activity activity;
+#endif
     // Preserve reader storage until completion, or exit this owned fixture.
     try {
-        const ULONGLONG deadline=GetTickCount64()+240000;
+        const ULONGLONG deadline=GetTickCount64()+
+#ifdef VT7PTY_H3_FREEZE
+            480000;
+#else
+            240000;
+#endif
         while(GetTickCount64()<deadline) {
             DWORD available=0; check(PeekNamedPipe(pipe.value,nullptr,0,nullptr,&available,nullptr),"fixture command peek");
             if(!available) { Sleep(2); continue; }
             char command=0; transfer(pipe.value,&command,1,false);
             if(command=='Q') {
+#ifdef VT7PTY_H3_FREEZE
+                activity.finish();
+#endif
                 check(thread.value==INVALID_HANDLE_VALUE || WaitForSingleObject(thread.value,1000)==WAIT_OBJECT_0,"read completed before quit");
                 check(shell.value==INVALID_HANDLE_VALUE || WaitForSingleObject(shell.value,0)==WAIT_OBJECT_0,"shell exited before fixture");
                 return 37;
@@ -225,6 +275,10 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
 #ifdef VT7PTY_H3_DIAGNOSTIC
                 h3trace::fixtureTimeline.append(h3trace::ShellStarted,readIndex,process.dwProcessId);
 #endif
+#ifdef VT7PTY_H3_FREEZE
+            } else if(command=='B') { activity.start();
+            } else if(command=='E') { activity.finish();
+#endif
             } else if(command=='T') {
                 const std::wstring title=L"VT7Pty dispatch research "+std::to_wstring(GetTickCount64());
                 check(SetConsoleTitleW(title.c_str()),"owned console title");
@@ -266,6 +320,13 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
 #ifdef VT7PTY_H3_DIAGNOSTIC
             p.trace.qpc=h3trace::qpc(); // End of the public observation interval.
 #endif
+#ifdef VT7PTY_H3_FREEZE
+            p.activityWrites=static_cast<uint32_t>(InterlockedCompareExchange(&activity.writes,0,0));
+            p.activityError=static_cast<uint32_t>(InterlockedCompareExchange(&activity.error,0,0));
+            CONSOLE_SCREEN_BUFFER_INFO screen={}; check(GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),&screen),"activity screen observation");
+            p.columns=static_cast<uint32_t>(screen.srWindow.Right-screen.srWindow.Left+1); p.rows=static_cast<uint32_t>(screen.srWindow.Bottom-screen.srWindow.Top+1);
+            p.trace.qpc=h3trace::qpc();
+#endif
             transfer(pipe.value,&p,sizeof(p),true);
         }
         throw std::runtime_error("fixture deadline");
@@ -286,6 +347,9 @@ public:
     std::string raw;
     uint64_t lineFeeds=0;
     bool cleanupOkay=true;
+#ifdef VT7PTY_H3_FREEZE
+    std::unique_ptr<h3freeze::Client> gate;
+#endif
 #ifdef VT7PTY_H3_DIAGNOSTIC
     struct OutputFrame { uint64_t qpc,offset,lineFeeds; int x,y; uint32_t epoch; std::u32string row; };
     std::vector<OutputFrame> frames;
@@ -304,15 +368,27 @@ public:
         return result+"]}";
     }
 #endif
-    explicit Session(unsigned int index) {
+    explicit Session(unsigned int index,const std::wstring &researchOutput=L"") {
+#ifndef VT7PTY_H3_FREEZE
+        (void)researchOutput;
+#endif
         try {
             auto *config=vt7pty_config_new(0,nullptr); check(config!=nullptr,"config");
             vt7pty_config_set_initial_size(config,80,25); vt7pty_config_set_agent_timeout(config,5000);
-            pty_=vt7pty_open(config,nullptr); vt7pty_config_free(config); check(pty_!=nullptr,"open session");
+#ifdef VT7PTY_H3_FREEZE
+            std::wstring nonce;
+            { h3freeze::LaunchEnvironment environment; nonce=environment.nonce; pty_=vt7pty_open(config,nullptr); }
+#else
+            pty_=vt7pty_open(config,nullptr);
+#endif
+            vt7pty_config_free(config); check(pty_!=nullptr,"open session");
             check(DuplicateHandle(GetCurrentProcess(),vt7pty_agent_process(pty_),GetCurrentProcess(),&agent.value,0,FALSE,DUPLICATE_SAME_ACCESS),"agent handle");
             input_.reset(CreateFileW(vt7pty_conin_name(pty_),GENERIC_WRITE,0,nullptr,OPEN_EXISTING,FILE_FLAG_OVERLAPPED,nullptr));
             output_.reset(CreateFileW(vt7pty_conout_name(pty_),GENERIC_READ,0,nullptr,OPEN_EXISTING,FILE_FLAG_OVERLAPPED,nullptr));
             check(input_.value!=INVALID_HANDLE_VALUE && output_.value!=INVALID_HANDLE_VALUE,"session pipes");
+#ifdef VT7PTY_H3_FREEZE
+            gate=std::make_unique<h3freeze::Client>(agent.value,nonce,researchOutput);
+#endif
             const std::wstring name=L"\\\\.\\pipe\\VT7Pty-host-cancellation-"+std::to_wstring(GetCurrentProcessId())+L"-"+std::to_wstring(GetTickCount64())+L"-"+std::to_wstring(index);
             pipe_.reset(privateServer(name));
             const std::wstring exe=imagePath(GetCurrentProcess());
@@ -330,7 +406,13 @@ public:
     IdentityPacket observe(char command='I') {
         transfer(pipe_.value,&command,1,true);
         IdentityPacket p; transfer(pipe_.value,&p,sizeof(p),false);
-        check(p.magic==0x33494856 && p.schema==1 && p.processId==GetProcessId(child.value) &&
+        check(p.magic==0x33494856 && p.schema==
+#ifdef VT7PTY_H3_FREEZE
+            3
+#else
+            1
+#endif
+            && p.processId==GetProcessId(child.value) &&
             p.parentId==GetProcessId(agent.value) && p.window!=0 && p.windowThread!=0 &&
             p.consoleCount>0 && p.consoleCount<=16 && p.readReturned<=1 && p.readSucceeded<=1 && p.textCount<=127 && p.keyCount<=16 && p.controlCount<=128,"identity packet");
         const auto contains=[&](DWORD id) { return std::find(p.consoleProcesses,p.consoleProcesses+p.consoleCount,id)!=p.consoleProcesses+p.consoleCount; };
@@ -372,6 +454,9 @@ public:
 #ifdef VT7PTY_H3_DIAGNOSTIC
         observe(); // Final cumulative timeline before the fixture exits normally.
 #endif
+#ifdef VT7PTY_H3_FREEZE
+        if(gate) { check(gate->finish(),"agent trace final collection"); gate.reset(); }
+#endif
         char command='Q'; transfer(pipe_.value,&command,1,true);
         check(until([&] { return WaitForSingleObject(child.value,0)==WAIT_OBJECT_0; }),"fixture quit");
         DWORD code=0; check(GetExitCodeProcess(child.value,&code) && code==37,"fixture exit status");
@@ -379,7 +464,11 @@ public:
     }
     bool cleanup() noexcept {
         if(closed_) return cleanupOkay;
-        closed_=true; pipe_.reset(); input_.reset();
+        closed_=true;
+#ifdef VT7PTY_H3_FREEZE
+        if(gate) { cleanupOkay=gate->finish() && cleanupOkay; gate.reset(); }
+#endif
+        pipe_.reset(); input_.reset();
         if(descendant.value && descendant.value!=INVALID_HANDLE_VALUE && WaitForSingleObject(descendant.value,1000)!=WAIT_OBJECT_0) {
             cleanupOkay=false; TerminateProcess(descendant.value,125); WaitForSingleObject(descendant.value,5000);
         }
@@ -445,7 +534,11 @@ inline std::string guiThreads(DWORD pid) {
 }
 inline std::string packetJson(const IdentityPacket &p) {
 #ifdef VT7PTY_H3_DIAGNOSTIC
-    const auto diagnostic=",\"Trace\":"+h3trace::observationJson(p.trace);
+    auto diagnostic=",\"Trace\":"+h3trace::observationJson(p.trace);
+#ifdef VT7PTY_H3_FREEZE
+    diagnostic+=",\"ActivityWrites\":"+std::to_string(p.activityWrites)+",\"ActivityError\":"+std::to_string(p.activityError)+
+        ",\"Columns\":"+std::to_string(p.columns)+",\"Rows\":"+std::to_string(p.rows);
+#endif
 #else
     const std::string diagnostic;
 #endif

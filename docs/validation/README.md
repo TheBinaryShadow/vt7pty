@@ -13,6 +13,7 @@ selection before the key request. H3 and the runtime cancellation fix remain ope
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
+| H3 scraper coordination | [Experiment and run guide](../HOST_FREEZE_DIAGNOSTICS.md) | Pending on all three machines |
 | H3 paired diagnostics | [rc1 candidate and retained local failure](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md) | [Reviewed: selection-state correlation; H3 open](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md) |
 | Host cancellation (H3) | [rc1 prototype and local results](2026-10-13-step-1.2-host-cancellation-rc1-candidate.md) | [Not accepted: five failing repetitions](2026-11-13-step-1.2-host-cancellation-rc1-windows7.md) |
 | Host dispatch (H2) | [rc1 candidate](2026-10-13-step-1.2-host-dispatch-rc1-candidate.md) | [Accepted](2026-10-13-step-1.2-host-dispatch-rc1-windows7.md) |

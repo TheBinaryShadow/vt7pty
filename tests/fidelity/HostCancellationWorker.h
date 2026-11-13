@@ -5,6 +5,9 @@
 #include <fstream>
 #include <filesystem>
 namespace {
+#ifdef VT7PTY_H3_FREEZE
+void freezeOracle();
+#endif
 
 struct Registration {
     uint32_t kind=1,sequence=0;
@@ -87,6 +90,9 @@ void cancellationOracle() {
     check(h3trace::keyTrace.count==h3trace::capacity && h3trace::keyTrace.overflow==1,"bounded key trace");
     check(h3trace::keyTrace.sequence==9 && h3trace::keyTrace.frequency>0,"key trace correlation");
     puts("Host cancellation trace oracle: 6 checks passed");
+#ifdef VT7PTY_H3_FREEZE
+    freezeOracle();
+#endif
 #endif
 }
 
@@ -139,6 +145,9 @@ std::string fileText(const std::wstring &path) {
     while(!text.empty() && (text.back()=='\r' || text.back()=='\n' || text.back()==' ')) text.pop_back();
     return text;
 }
+#ifdef VT7PTY_H3_FREEZE
+#include "HostFreezeWorker.h"
+#endif
 struct CaseResult { std::string name,error; bool passed=false,cleaned=false,hostExited=false,unhooked=false; };
 CaseResult caseRun(const std::wstring &output,const std::string &name,unsigned int index,
     const std::function<bool(Session &,Channel &,const std::wstring &)> &body) {
@@ -147,13 +156,18 @@ CaseResult caseRun(const std::wstring &output,const std::string &name,unsigned i
     CaseResult result; result.name=name;
     std::unique_ptr<Session> session; std::unique_ptr<Channel> channel;
     try {
-        session=std::make_unique<Session>(index);
+        session=std::make_unique<Session>(index,path);
         channel=std::make_unique<Channel>(*session,path,L"host");
         registerSession(*session,*channel);
         result.passed=body(*session,*channel,path);
         if(!result.passed) result.error="Case did not meet acceptance; inspect its raw records.";
     } catch(const std::exception &e) { result.error=e.what(); }
-    if(channel) { channel->detach(); result.unhooked=channel->unhooked; }
+    if(channel) {
+#ifdef VT7PTY_H3_FREEZE
+        if(!channel->blocked()) { try { channel->snapshot(); } catch(const std::exception &e) { result.error+=e.what(); } }
+#endif
+        channel->detach(); result.unhooked=channel->unhooked;
+    }
     if(session) {
         result.cleaned=session->cleanup();
         result.hostExited=session->host.value && session->host.value!=INVALID_HANDLE_VALUE && WaitForSingleObject(session->host.value,5000)==WAIT_OBJECT_0;
@@ -197,8 +211,15 @@ bool shellCase(Session &s,Channel &c,const std::wstring &out,bool cmd,bool parti
     std::string metadata=cmd ? "System32 cmd.exe" : "";
     if(!cmd) {
         const auto identity=out+L"\\shell-identity.txt";
+#ifdef VT7PTY_H3_FREEZE
+        const uint32_t identityGeneration=appGeneration;
+#endif
         s.input(utf8(L"[IO.File]::WriteAllText("+psLiteral(identity)+L",$PSVersionTable.PSVersion.ToString()+'|'+@((Get-Module PSReadLine)).Count.ToString()+'|'+$Host.Name)\r"));
-        check(s.until([&] { return GetFileAttributesW(identity.c_str())!=INVALID_FILE_ATTRIBUTES && atPrompt(); },10000),"native shell identity");
+        check(s.until([&] { return GetFileAttributesW(identity.c_str())!=INVALID_FILE_ATTRIBUTES && atPrompt()
+#ifdef VT7PTY_H3_FREEZE
+            && appGeneration>identityGeneration && fileText(identity).ends_with("|0|ConsoleHost")
+#endif
+            ; },10000),"native shell identity");
         metadata=fileText(identity); check(metadata.ends_with("|0|ConsoleHost"),"native ConsoleHost editor");
     }
 #ifdef VT7PTY_H3_DIAGNOSTIC
@@ -222,9 +243,16 @@ bool shellCase(Session &s,Channel &c,const std::wstring &out,bool cmd,bool parti
         ",\"Observation\":"+packetJson(s.observe())+"}");
 #endif
     const auto before=s.lineFeeds;
+#ifdef VT7PTY_H3_FREEZE
+    const auto promptBefore=s.promptEpoch;
+#endif
     const auto r=c.exchange(c.next(Op::Cancel),Result::Accepted,"shell-cancel");
     const bool restored=keyboardOkay(r);
-    const bool fresh=s.until([&] { return s.lineFeeds>before && atPrompt(); },2000);
+    const bool fresh=s.until([&] { return s.lineFeeds>before && atPrompt()
+#ifdef VT7PTY_H3_FREEZE
+        && s.promptEpoch>promptBefore && (cmd || appGeneration>beforeGeneration)
+#endif
+        ; },2000);
 #ifdef VT7PTY_H3_DIAGNOSTIC
     const uint32_t deadlineGeneration=appGeneration;
 #endif
@@ -235,11 +263,41 @@ bool shellCase(Session &s,Channel &c,const std::wstring &out,bool cmd,bool parti
 #endif
     // Boundary Enter exposes retained text even when a cosmetic prompt appeared.
     s.input("\r"); settle(s); check(s.until(atPrompt),"boundary prompt");
+#ifdef VT7PTY_H3_FREEZE
+    if(cmd) {
+        promptToken+="_BOUNDARY"; prompt.clear(); for(unsigned char ch:promptToken) prompt+=ch; prompt+=U'>';
+        s.input("prompt "+promptToken+"$G\r"); check(s.until(atPrompt),"command-specific boundary prompt");
+    } else check(s.until([&] { return atPrompt() && appGeneration>deadlineGeneration; }),"new PowerShell boundary generation");
+#endif
 #ifdef VT7PTY_H3_DIAGNOSTIC
     const uint32_t boundaryGeneration=appGeneration;
 #endif
+#ifdef VT7PTY_H3_FREEZE
+    uint64_t firstExists=0,firstComplete=0,firstPrompt=0;
+    const auto continueGeneration=appGeneration;
+    std::wstring continuation=cmd ? L"echo CONTINUE>"+quote(continued) : L"[IO.File]::WriteAllText("+psLiteral(continued)+L",'CONTINUE')";
+    if(cmd) {
+        promptToken+="_CONTINUE"; prompt.clear(); for(unsigned char ch:promptToken) prompt+=ch; prompt+=U'>';
+        continuation+=L" & prompt "; for(unsigned char ch:promptToken) continuation+=static_cast<wchar_t>(ch); continuation+=L"$G";
+    }
+    const auto continueBegin=h3trace::qpc(); s.input(utf8(continuation+L"\r"));
+    const bool usable=s.until([&] {
+        const bool exists=GetFileAttributesW(continued.c_str())!=INVALID_FILE_ATTRIBUTES;
+        if(exists && !firstExists) firstExists=h3trace::qpc();
+        const bool complete=exists && fileText(continued)=="CONTINUE";
+        if(complete && !firstComplete) firstComplete=h3trace::qpc();
+        const bool newPrompt=atPrompt() && (cmd || appGeneration>continueGeneration);
+        if(newPrompt && !firstPrompt) firstPrompt=h3trace::qpc();
+        return complete && newPrompt;
+    });
+    writeFile(out+L"\\shell-barriers.json","{\"PreparedPowerShellGeneration\":"+std::to_string(beforeGeneration)+
+        ",\"ContinueBeginQpc\":"+h3trace::u64(continueBegin)+",\"FirstFileExistsQpc\":"+h3trace::u64(firstExists)+
+        ",\"FirstCompleteContentQpc\":"+h3trace::u64(firstComplete)+",\"FirstNewPromptQpc\":"+h3trace::u64(firstPrompt)+
+        ",\"CompleteContentRequired\":true,\"CommandSpecificPromptRequired\":true,\"ReadBlockedProven\":false}");
+#else
     s.input(utf8((cmd ? L"echo CONTINUE>"+quote(continued) : L"[IO.File]::WriteAllText("+psLiteral(continued)+L",'CONTINUE')")+L"\r"));
     const bool usable=s.until([&] { return GetFileAttributesW(continued.c_str())!=INVALID_FILE_ATTRIBUTES && atPrompt(); });
+#endif
     const bool discarded=GetFileAttributesW(canceled.c_str())==INVALID_FILE_ATTRIBUTES;
     const bool content=usable && fileText(continued)=="CONTINUE";
     const bool alive=WaitForSingleObject(s.descendant.value,0)==WAIT_TIMEOUT;
@@ -368,7 +426,12 @@ int suite(const std::wstring &output) {
     add("host-key-record",[](Session &s,Channel &c,const std::wstring &out) {
         const auto ready=s.observe('K');
         check(!(ready.inputMode&ENABLE_PROCESSED_INPUT) && !ready.readReturned,"host key-record readiness");
+#ifdef VT7PTY_H3_FREEZE
+        const auto responseStorage=c.exchangeOwned(c.next(Op::Cancel),Result::Accepted,"diagnostic-raw-key");
+        const auto &response=*responseStorage;
+#else
         const auto response=c.exchange(c.next(Op::Cancel),Result::Accepted,"diagnostic-raw-key");
+#endif
         IdentityPacket p;
         const bool returned=s.until([&] { p=s.observe(); return p.readReturned!=0; },2000);
         writeFile(out+L"\\host-key-record.json",packetJson(p));
@@ -381,7 +444,18 @@ int suite(const std::wstring &output) {
         }
         c.close(); s.quit(); return passed;
     });
+#ifdef VT7PTY_H3_FREEZE
+    const h3freeze::Command conditions[]={h3freeze::Command::Quiet,h3freeze::Command::Selected,h3freeze::Command::Coordinated,h3freeze::Command::Sham};
+    for(bool pending:{false,true}) for(unsigned int j=0;j<4;++j) {
+        const auto mode=conditions[(j+freezeRotation())%4];
+        add(std::string("focus-")+(pending ? "pending-" : "completed-")+freezeModeName(mode),
+            [=](Session &s,Channel &c,const std::wstring &out) { return freezeCase(s,c,out,mode,pending); });
+    }
+    add("focus-selection-bracket",freezeBracket);
+    bool passed=results.size()==22;
+#else
     bool passed=results.size()==13;
+#endif
 #else
     bool passed=results.size()==12;
 #endif
@@ -397,12 +471,18 @@ int suite(const std::wstring &output) {
     return passed ? 0 : 1;
 }
 int neighbor(const std::wstring &output) {
-    Session s(100); Channel c(s,output,L"neighbor"); registerSession(s,c);
+    Session s(100,output); Channel c(s,output,L"neighbor"); registerSession(s,c);
     startRead(s,"BRAVO_KEEP");
     Registration ready; ready.kind=2; ready.ready=1; transfer(parentPipe,&ready,sizeof(ready),true);
     unsigned int observations=0;
     for(;;) {
-        char command=0; transfer(parentPipe,&command,1,false,180000);
+        char command=0; transfer(parentPipe,&command,1,false,
+#ifdef VT7PTY_H3_FREEZE
+            420000
+#else
+            180000
+#endif
+            );
         const auto p=s.observe();
         check(!p.readReturned && !p.controlCount,"neighbor remains pending without events"); ++observations;
         if(command=='Q') break;

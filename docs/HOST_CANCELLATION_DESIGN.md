@@ -38,7 +38,9 @@ finds active selection before both traced native delivery failures, with Ctrl
 state preserved. Coordination with the scraper and shell-observation barriers
 need controlled testing before a fix decision. The [reassessment](validation/2026-11-13-step-1.2-cancellation-reassessment.md)
 specifies causal state contrasts, freeze/Escape tracing and a gate negotiated
-before host callback entry.
+before host callback entry. The [scraper coordination package](HOST_FREEZE_DIAGNOSTICS.md)
+implements those contrasts in a separate research agent, alongside both
+unchanged earlier packages. Its target runs are pending; H3 remains open.
 
 ## H1 implementation
 

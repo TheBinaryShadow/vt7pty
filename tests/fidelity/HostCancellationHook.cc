@@ -16,6 +16,16 @@ HWND target=nullptr;
 bool bound=false,retired=false;
 volatile LONG entered=0;
 uint32_t validationStage=0;
+#ifdef VT7PTY_H3_FREEZE
+h3freeze::Ring<h3freeze::WindowEvent> windowTrace;
+void recordWindow(HWND window,UINT message,WPARAM wp,LPARAM lp,uint32_t phase,LRESULT result=0) noexcept {
+    if(!bound || window!=target || !((message==WM_SYSCOMMAND && (wp==0xfff5 || wp==0xfff2)) ||
+        (message==WM_CHAR && wp==27) || (message==WM_KEYDOWN && wp=='C'))) return;
+    h3freeze::WindowEvent e; e.qpc=h3freeze::clock(); e.pid=GetCurrentProcessId(); e.thread=GetCurrentThreadId();
+    e.window=reinterpret_cast<uintptr_t>(window); e.message=message; e.wparam=static_cast<uint32_t>(wp); e.lparam=static_cast<uint64_t>(lp);
+    e.request=h3trace::active ? h3trace::keyTrace.sequence : 0; e.phase=phase; e.result=result; e.inSend=InSendMessageEx(nullptr); windowTrace.add(e);
+}
+#endif
 void closeChannel() noexcept {
     for(HANDLE h:{pipe,controller,agent,fixtureProcess}) if(h && h!=INVALID_HANDLE_VALUE) CloseHandle(h);
     pipe=INVALID_HANDLE_VALUE; controller=agent=fixtureProcess=nullptr;
@@ -36,7 +46,10 @@ bool ordinaryDesktop() {
     CloseDesktop(input); return privateDesktop;
 }
 void sendResponse(Result result,const Request *request=nullptr,const KeyboardEvidence *keyboard=nullptr) {
-    Response response; if(keyboard) response.keyboard=*keyboard;
+    auto responseStorage=std::make_unique<Response>(); auto &response=*responseStorage; if(keyboard) response.keyboard=*keyboard;
+#ifdef VT7PTY_H3_FREEZE
+    if(request) windowTrace.read(request->windowCursor,response.windowTrace);
+#endif
 #ifdef VT7PTY_H3_DIAGNOSTIC
     if(keyboard) response.trace=h3trace::keyTrace;
 #endif
@@ -202,7 +215,11 @@ void dispatch(const CWPSTRUCT &message) {
                 (hostQuery(agent).raw&~ULONG_PTR{3})!=binding.identity.host) result=Result::Identity;
         }
         if(result==Result::Accepted && request.operation==Op::DeniedControl) result=Result::AccessDenied;
-        if(result==Result::Accepted) lastSequence=request.sequence;
+        if(result==Result::Accepted
+#ifdef VT7PTY_H3_FREEZE
+            && request.operation!=Op::WindowSnapshot
+#endif
+            ) lastSequence=request.sequence;
     }
     if(result==Result::Accepted && request.operation==Op::SuppressAck) { sendResponse(Result::Received,&request); return; } // Explicit test-only ambiguity control.
     if(result==Result::Accepted && (request.operation==Op::Cancel || request.operation==Op::RestoreControl || request.operation==Op::CancelSuppressAck || request.operation==Op::CancelClose)) {
@@ -224,6 +241,9 @@ void dispatch(const CWPSTRUCT &message) {
 extern "C" __declspec(dllexport) LRESULT CALLBACK HostCancellationCallback(int code,WPARAM wParam,LPARAM lParam) {
     if(code>=0 && lParam) {
         const auto &message=*reinterpret_cast<const CWPSTRUCT *>(lParam);
+#ifdef VT7PTY_H3_FREEZE
+        recordWindow(message.hwnd,message.message,message.wParam,message.lParam,1);
+#endif
 #ifdef VT7PTY_H3_DIAGNOSTIC
         if(h3trace::active && message.hwnd==h3trace::expectedWindow && message.message==WM_KEYDOWN && message.wParam=='C')
             h3trace::sample(h3trace::KeyEntry,message.hwnd,message.message,message.wParam,message.lParam);
@@ -239,6 +259,9 @@ extern "C" __declspec(dllexport) LRESULT CALLBACK HostCancellationCallback(int c
 extern "C" __declspec(dllexport) LRESULT CALLBACK HostCancellationReturnCallback(int code,WPARAM wp,LPARAM lp) {
     if(code>=0 && lp) {
         const auto &m=*reinterpret_cast<const CWPRETSTRUCT *>(lp);
+#ifdef VT7PTY_H3_FREEZE
+        recordWindow(m.hwnd,m.message,m.wParam,m.lParam,2,m.lResult);
+#endif
         if(h3trace::active && m.hwnd==h3trace::expectedWindow && m.message==WM_KEYDOWN && m.wParam=='C')
             h3trace::sample(h3trace::KeyReturn,m.hwnd,m.message,m.wParam,m.lParam,m.lResult);
     }

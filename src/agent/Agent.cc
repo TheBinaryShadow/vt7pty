@@ -19,6 +19,9 @@
 // IN THE SOFTWARE.
 
 #include "Agent.h"
+#ifdef VT7PTY_H3_FREEZE
+#include "../../tests/fidelity/HostFreezeAgent.h"
+#endif
 
 #include <windows.h>
 
@@ -216,6 +219,10 @@ Agent::Agent(LPCWSTR controlPipeName,
     SetConsoleCtrlHandler(consoleCtrlHandler, TRUE);
 
     setPollInterval(25);
+#ifdef VT7PTY_H3_FREEZE
+    m_freezeResearch=std::make_unique<h3freeze::AgentControl>(createNamedPipe(),m_console,
+        [this](int c,int r) { resizeWindow(c,r); });
+#endif
 }
 
 Agent::~Agent()
@@ -267,6 +274,9 @@ NamedPipe &Agent::createDataServerPipe(bool write, const wchar_t *kind)
 
 void Agent::onPipeIo(NamedPipe &namedPipe)
 {
+#ifdef VT7PTY_H3_FREEZE
+    if(m_freezeResearch && m_freezeResearch->ours(namedPipe)) { m_freezeResearch->poll(); return; }
+#endif
     if (&namedPipe == m_conoutPipe || &namedPipe == m_conerrPipe) {
         autoClosePipesForShutdown();
     } else if (&namedPipe == m_coninPipe) {
@@ -498,6 +508,9 @@ void Agent::pollConinPipe()
 
 void Agent::onPollTimeout()
 {
+#ifdef VT7PTY_H3_FREEZE
+    if(m_freezeResearch) m_freezeResearch->tick();
+#endif
     m_consoleInput->updateInputFlags();
     const bool enableMouseMode = m_consoleInput->shouldActivateTerminalMouse();
 
@@ -522,7 +535,11 @@ void Agent::onPollTimeout()
 
     // Scrape for output *after* the above exit-check to ensure that we collect
     // the child process's final output.
-    if (shouldScrapeContent) {
+    if (shouldScrapeContent
+#ifdef VT7PTY_H3_FREEZE
+        && (!m_freezeResearch || !m_freezeResearch->held())
+#endif
+        ) {
         syncConsoleTitle();
         scrapeBuffers();
     }
@@ -577,6 +594,10 @@ std::unique_ptr<Win32ConsoleBuffer> Agent::openPrimaryBuffer()
 
 void Agent::resizeWindow(int cols, int rows)
 {
+#ifdef VT7PTY_H3_FREEZE
+    if(m_freezeResearch && m_freezeResearch->deferResize(cols,rows)) return;
+    h3freeze::AgentScope traceScope(m_console,h3freeze::ResizeBegin,h3freeze::ResizeEnd,cols,rows);
+#endif
     ASSERT(cols >= 1 && rows >= 1);
     cols = std::min(cols, MAX_CONSOLE_WIDTH);
     rows = std::min(rows, MAX_CONSOLE_HEIGHT);
@@ -615,6 +636,9 @@ void Agent::resizeWindow(int cols, int rows)
 
 void Agent::scrapeBuffers()
 {
+#ifdef VT7PTY_H3_FREEZE
+    h3freeze::AgentScope traceScope(m_console,h3freeze::ScrapeBegin,h3freeze::ScrapeEnd);
+#endif
     Win32Console::FreezeGuard guard(m_console, m_console.frozen());
     ConsoleScreenBufferInfo info;
     m_primaryScraper->scrapeBuffer(*openPrimaryBuffer(), info);

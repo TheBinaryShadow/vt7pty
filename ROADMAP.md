@@ -3,8 +3,8 @@
 Updated: 2026-11-13.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
-behavior in Milestone 1. **Next: test coordination between screen scraping and
-cancellation, and tighten the shell observations before choosing a fix.**
+behavior in Milestone 1. **Next: run the [scraper coordination experiment](docs/HOST_FREEZE_DIAGNOSTICS.md)
+on all three Windows 7 machines before choosing a cancellation fix.**
 The paired Windows 7 diagnostics found an active selection before both traced
 native delivery failures. Host identity and dispatch remain accepted; H3, the
 runtime cancellation fix and broader coverage remain open.
@@ -104,6 +104,10 @@ public-API experiments failed. I'm now following the
   coordination with the scraper and tighten shell observations before a fix decision.
   The [historical reassessment](docs/validation/2026-11-13-step-1.2-cancellation-reassessment.md)
   adds controlled selected/unselected contrasts and full freeze/Escape tracing.
+  The [new diagnostic package](docs/HOST_FREEZE_DIAGNOSTICS.md) implements those
+  contrasts with a separately identified research agent, delay controls and
+  stronger shell observations. Both earlier control packages remain unchanged.
+  Windows 7 results are pending; deliberate selection failures remain failures.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.

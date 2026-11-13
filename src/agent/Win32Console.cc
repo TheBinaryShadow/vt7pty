@@ -19,6 +19,9 @@
 // IN THE SOFTWARE.
 
 #include "Win32Console.h"
+#ifdef VT7PTY_H3_FREEZE
+#include "../../tests/fidelity/HostFreezeProtocol.h"
+#endif
 
 #include <windows.h>
 #include <wchar.h>
@@ -84,14 +87,26 @@ void Win32Console::setFrozen(bool frozen) {
     if (frozen == m_frozen) {
         // Do nothing.
     } else if (frozen) {
+#ifdef VT7PTY_H3_FREEZE
+        h3freeze::record(h3freeze::FreezeBegin,m_frozen);
+#endif
         // Enter selection mode by activating either Mark or SelectAll.
         const int command = m_freezeUsesMark ? SC_CONSOLE_MARK
                                              : SC_CONSOLE_SELECT_ALL;
         SendMessage(m_hwnd, WM_SYSCOMMAND, command, 0);
         m_frozen = true;
+#ifdef VT7PTY_H3_FREEZE
+        h3freeze::record(h3freeze::FreezeEnd,m_frozen);
+#endif
     } else {
         // Send Escape to cancel the selection.
+#ifdef VT7PTY_H3_FREEZE
+        h3freeze::record(h3freeze::UnfreezeBegin,m_frozen);
+#endif
         SendMessage(m_hwnd, WM_CHAR, 27, 0x00010001);
         m_frozen = false;
+#ifdef VT7PTY_H3_FREEZE
+        h3freeze::record(h3freeze::UnfreezeEnd,m_frozen);
+#endif
     }
 }

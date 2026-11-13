@@ -31,6 +31,9 @@
 #include "EventLoop.h"
 #include "Win32Console.h"
 
+#ifdef VT7PTY_H3_FREEZE
+namespace h3freeze { class AgentControl; }
+#endif
 class ConsoleInput;
 class NamedPipe;
 class ReadBuffer;
@@ -81,6 +84,9 @@ private:
     std::unique_ptr<Scraper> m_primaryScraper;
     std::unique_ptr<Scraper> m_errorScraper;
     std::unique_ptr<Win32ConsoleBuffer> m_errorBuffer;
+#ifdef VT7PTY_H3_FREEZE
+    std::unique_ptr<h3freeze::AgentControl> m_freezeResearch;
+#endif
     NamedPipe *m_controlPipe = nullptr;
     NamedPipe *m_coninPipe = nullptr;
     NamedPipe *m_conoutPipe = nullptr;

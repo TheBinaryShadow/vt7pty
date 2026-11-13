@@ -93,6 +93,9 @@ public:
     };
 
     std::wstring name() const { return m_name; }
+#ifdef VT7PTY_H3_FREEZE
+    bool researchClientPid(DWORD &pid) const { return GetNamedPipeClientProcessId(m_handle,&pid)!=FALSE; }
+#endif
     void openServerPipe(LPCWSTR pipeName, OpenMode openMode,
                         int outBufferSize, int inBufferSize);
     void connectToServer(LPCWSTR pipeName, OpenMode openMode);

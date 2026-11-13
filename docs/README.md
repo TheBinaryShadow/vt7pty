@@ -29,7 +29,8 @@ what I've learned from testing it.
 
 I'm working on input cancellation within Milestone 1. Host identity and dispatch
 are verified; the first cancellation candidate has intermittent failures on
-Windows 7. I'm investigating those results before runtime integration.
+Windows 7. I'm testing selected and selection-free cancellation with a bounded
+scraper gate before runtime integration.
 
 | Guide | Purpose |
 | --- | --- |
@@ -41,6 +42,7 @@ Windows 7. I'm investigating those results before runtime integration.
 | [Host dispatch probe](HOST_DISPATCH_PROBE.md) | Run the H2 research package |
 | [Host cancellation probe](HOST_CANCELLATION_PROBE.md) | Run the first H3 prototype and see its remaining limits |
 | [Cancellation diagnostics](HOST_CANCELLATION_DIAGNOSTICS.md) | Collect interleaved rc1 control and traced trials |
+| [Scraper coordination experiment](HOST_FREEZE_DIAGNOSTICS.md) | Compare held selection, quiet intervals, activity and delay controls |
 | [Optional SSH testing](SSH_BASELINE.md) | Deferred remote-test prerequisites |
 
 ## Results and project history

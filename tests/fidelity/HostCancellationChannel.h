@@ -3,6 +3,9 @@
 #pragma once
 #include "HostCancellationResearch.h"
 #include "HostCancellationProtocol.h"
+#ifdef VT7PTY_H3_FREEZE
+#include "HostFreezeJson.h"
+#endif
 using namespace fidelity;
 using namespace cancelresearch;
 using namespace hostcancel;
@@ -85,7 +88,10 @@ std::string bytesJson(const BYTE *bytes) {
 }
 std::string responseJson(const Response &r) {
 #ifdef VT7PTY_H3_DIAGNOSTIC
-    const auto diagnostic=",\"Trace\":"+h3trace::keyJson(r.trace);
+    auto diagnostic=",\"Trace\":"+h3trace::keyJson(r.trace);
+#ifdef VT7PTY_H3_FREEZE
+    diagnostic+=",\"WindowTrace\":"+h3freeze::windowJson(r.windowTrace);
+#endif
 #else
     const std::string diagnostic;
 #endif
@@ -123,6 +129,9 @@ class Channel {
     bool disabled=false,closed=false;
     uint64_t sequence=1;
     unsigned int record=0;
+#ifdef VT7PTY_H3_FREEZE
+    uint64_t windowCursor=0,windowTotal=0;
+#endif
     void verifyLive() {
         if(WaitForSingleObject(session.host.value,0)!=WAIT_TIMEOUT || WaitForSingleObject(thread.value,0)!=WAIT_TIMEOUT ||
             WaitForSingleObject(session.agent.value,0)!=WAIT_TIMEOUT || WaitForSingleObject(session.child.value,0)!=WAIT_TIMEOUT) {
@@ -148,7 +157,7 @@ class Channel {
             session.pump(); Sleep(2);
         }
         if(available<sizeof(Response)) { disabled=true; throw std::runtime_error("OutcomeUnknown: acknowledgment deadline"); }
-        Response response;
+        auto storage=std::make_unique<Response>(); auto &response=*storage;
         transfer(server.value,&response,sizeof(response),false);
         check(response.signature==magic && response.schema==version && response.bytes==sizeof(response) &&
             response.nonce[0]==binding.nonce[0] && response.nonce[1]==binding.nonce[1] &&
@@ -223,6 +232,10 @@ public:
         try {
             check(!disabled && !closed,"no dispatch on retired channel");
             verifyLive();
+#ifdef VT7PTY_H3_FREEZE
+            if(expected==Result::Accepted && (request.operation==Op::Cancel || request.operation==Op::RestoreControl || request.operation==Op::CancelClose || request.operation==Op::CancelSuppressAck)) snapshot();
+            request.windowCursor=windowCursor;
+#endif
 #ifdef VT7PTY_H3_DIAGNOSTIC
             const bool observeRequest=expected==Result::Accepted || expected==Result::Received;
             const bool mutation=observeRequest && (request.operation==Op::Cancel || request.operation==Op::RestoreControl ||
@@ -234,6 +247,10 @@ public:
 #endif
             transfer(server.value,&request,sizeof(request),true);
             signal(); const auto response=receive();
+#ifdef VT7PTY_H3_FREEZE
+            check(response.windowTrace.count<=h3freeze::chunkCapacity && response.windowTrace.next>=windowCursor,"window trace cursor");
+            windowCursor=response.windowTrace.next; windowTotal=response.windowTrace.total;
+#endif
 #ifdef VT7PTY_H3_DIAGNOSTIC
             const uint64_t afterTime=h3trace::qpc();
             if(mutation && std::string_view(caseName)!="default-handler" && WaitForSingleObject(session.child.value,0)==WAIT_TIMEOUT) {
@@ -253,7 +270,13 @@ public:
                 ",\"RequestDeadline\":"+std::to_string(request.deadline)+",\"RequestSequence\":"+std::to_string(request.sequence)+",\"RequestOperation\":"+std::to_string(static_cast<uint32_t>(request.operation))+
                 ",\"ExpectedResult\":"+std::to_string(static_cast<uint32_t>(expected))+",\"Response\":"+responseJson(response)+diagnostic+"}");
             check(response.result==expected && response.sequence==request.sequence && response.operation==static_cast<uint32_t>(request.operation),"request outcome");
-            if(expected==Result::Accepted) { ++accepted; ++sequence; check(response.acceptedSequence==sequence-1,"accepted sequence"); }
+            if(expected==Result::Accepted) {
+#ifdef VT7PTY_H3_FREEZE
+                if(request.operation==Op::WindowSnapshot) check(response.acceptedSequence==sequence-1,"snapshot preserves mutation sequence");
+                else
+#endif
+                { ++accepted; ++sequence; check(response.acceptedSequence==sequence-1,"accepted sequence"); }
+            }
             else if(expected==Result::Received) { ++sequence; check(response.acceptedSequence==sequence-1,"receipt sequence"); }
             else { ++rejected; check(response.acceptedSequence==sequence-1,"rejection preserves sequence"); }
             return response;
@@ -273,7 +296,21 @@ public:
         check(refused && blocked(),"closed host rejected before write");
         writeFile(output+L"\\"+label+L"-host-exit.json","{\"HostSignaled\":true,\"DispatchDisabled\":true,\"RequestRefusedBeforeWrite\":true}");
     }
-    void close() { exchange(next(Op::Close),Result::Accepted,"close"); closed=true; detach(); }
+    void close() {
+#ifdef VT7PTY_H3_FREEZE
+        snapshot(); if(session.gate) session.gate->drain();
+#endif
+        exchange(next(Op::Close),Result::Accepted,"close"); closed=true; detach();
+    }
+#ifdef VT7PTY_H3_FREEZE
+    std::unique_ptr<Response> exchangeOwned(Request request,Result expected,const char *name) {
+        return std::make_unique<Response>(exchange(request,expected,name));
+    }
+    void snapshot() {
+        unsigned int blocks=0;
+        do { exchange(next(Op::WindowSnapshot),Result::Accepted,"window-snapshot"); check(++blocks<=512,"bounded host trace snapshot"); } while(windowCursor<windowTotal);
+    }
+#endif
     void detach() noexcept {
         disabled=true;
 #ifdef VT7PTY_H3_DIAGNOSTIC

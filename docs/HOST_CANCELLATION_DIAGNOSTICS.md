@@ -1,5 +1,9 @@
 # H3 cancellation diagnostics
 
+This guide describes the first traced package. The follow-up
+[scraper coordination experiment](HOST_FREEZE_DIAGNOSTICS.md) retains it
+unchanged and adds controlled selection and scraper conditions.
+
 I'm collecting evidence for the intermittent
 [rc1 Windows 7 failures](validation/2026-11-13-step-1.2-host-cancellation-rc1-windows7.md).
 This package alternates the exact issued rc1 controls with a separate traced
