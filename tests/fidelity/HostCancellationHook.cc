@@ -37,6 +37,9 @@ bool ordinaryDesktop() {
 }
 void sendResponse(Result result,const Request *request=nullptr,const KeyboardEvidence *keyboard=nullptr) {
     Response response; if(keyboard) response.keyboard=*keyboard;
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    if(keyboard) response.trace=h3trace::keyTrace;
+#endif
     DWORD desktopBytes=0;
     if(!GetUserObjectInformationW(GetThreadDesktop(GetCurrentThreadId()),UOI_NAME,response.desktop,sizeof(response.desktop),&desktopBytes)) {
         closeChannel(); return;
@@ -72,7 +75,7 @@ void openChannel(const CWPSTRUCT &message) {
     std::vector<wchar_t> dllPath(32768);
     const DWORD length=GetModuleFileNameW(module,dllPath.data(),32768); check(length>0 && length<32768,"callback module path");
     const std::wstring path(dllPath.data(),length);
-    const auto expected=path.substr(0,path.find_last_of(L'\\'))+L"\\HostCancellationProbe.exe";
+    const auto expected=path.substr(0,path.find_last_of(L'\\'))+L"\\"+probeName;
     check(_wcsicmp(imagePath(owner.value).c_str(),expected.c_str())==0,"controller beside exact hook DLL");
     const TokenIdentity ours(GetCurrentProcess()),theirs(owner.value);
     check(ours.same(theirs) && ours.integrity==SECURITY_MANDATORY_MEDIUM_RID && ordinaryDesktop(),"callback desktop and token policy");
@@ -122,12 +125,18 @@ struct KeyboardScope {
     explicit KeyboardScope(KeyboardEvidence &value):e(value) {
         e.captured=GetKeyboardState(e.before)!=FALSE;
         check(e.captured!=0,"capture keyboard state");
+#ifdef VT7PTY_H3_DIAGNOSTIC
+        h3trace::sample(h3trace::Captured,target);
+#endif
     }
     ~KeyboardScope() {
         if(!e.applied) return;
         e.restored=SetKeyboardState(e.before)!=FALSE;
         if(!e.restored) e.error=GetLastError();
         e.equal=GetKeyboardState(e.after) && memcmp(e.before,e.after,256)==0;
+#ifdef VT7PTY_H3_DIAGNOSTIC
+        h3trace::sample(h3trace::Restored,target);
+#endif
     }
     void apply() {
         BYTE keys[256]; memcpy(keys,e.before,256);
@@ -137,18 +146,34 @@ struct KeyboardScope {
         e.applied=SetKeyboardState(keys)!=FALSE;
         check(e.applied!=0,"temporary thread keyboard state");
         check(GetKeyboardState(e.during) && memcmp(keys,e.during,256)==0 && (e.during[VK_LCONTROL]&0x80) && (GetKeyState(VK_CONTROL)&0x8000),"applied Ctrl state");
+#ifdef VT7PTY_H3_DIAGNOSTIC
+        h3trace::sample(h3trace::Applied,target);
+#endif
     }
 };
 KeyboardEvidence cancelRead(bool failureControl) {
     KeyboardEvidence e;
     try {
         KeyboardScope scope(e); scope.apply();
-        if(failureControl) { e.injectedFailure=1; throw std::runtime_error("injected before key delivery"); }
+        if(failureControl) {
+            e.injectedFailure=1;
+#ifdef VT7PTY_H3_DIAGNOSTIC
+            h3trace::sample(h3trace::InjectedFailure,target);
+#endif
+            throw std::runtime_error("injected before key delivery");
+        }
         // Same verified host thread, same HWND. No queue pumping, global input,
         // AttachThreadInput, generated console event, or WM_CHAR duplication.
         const UINT scan=MapVirtualKeyW('C',MAPVK_VK_TO_VSC);
         check(scan!=0 && scan<256,"C scan code");
+#ifdef VT7PTY_H3_DIAGNOSTIC
+        const auto flags=static_cast<LPARAM>((scan<<16)|1u);
+        h3trace::sample(h3trace::BeforeKey,target,WM_KEYDOWN,'C',flags);
+        const LRESULT keyResult=SendMessageW(target,WM_KEYDOWN,'C',flags);
+        h3trace::sample(h3trace::AfterKey,target,WM_KEYDOWN,'C',flags,keyResult);
+#else
         SendMessageW(target,WM_KEYDOWN,'C',static_cast<LPARAM>((scan<<16)|1u));
+#endif
         e.sent=1;
     } catch(...) { if(!e.injectedFailure && !e.error) e.error=GetLastError() ? GetLastError() : ERROR_GEN_FAILURE; }
     return e;
@@ -182,7 +207,13 @@ void dispatch(const CWPSTRUCT &message) {
     if(result==Result::Accepted && request.operation==Op::SuppressAck) { sendResponse(Result::Received,&request); return; } // Explicit test-only ambiguity control.
     if(result==Result::Accepted && (request.operation==Op::Cancel || request.operation==Op::RestoreControl || request.operation==Op::CancelSuppressAck || request.operation==Op::CancelClose)) {
         if(request.operation==Op::CancelSuppressAck) sendResponse(Result::Received,&request);
+#ifdef VT7PTY_H3_DIAGNOSTIC
+        h3trace::begin(request.sequence,target);
+#endif
         const auto keyboard=cancelRead(request.operation==Op::RestoreControl);
+#ifdef VT7PTY_H3_DIAGNOSTIC
+        h3trace::active=false;
+#endif
         if(request.operation!=Op::CancelSuppressAck) sendResponse(result,&request,&keyboard);
         if(request.operation==Op::CancelSuppressAck) retired=true; // Keep the pipe open for the explicit final-ack timeout.
         if(!keyboard.restored || !keyboard.equal || keyboard.error || request.operation==Op::CancelClose) closeChannel();
@@ -193,6 +224,10 @@ void dispatch(const CWPSTRUCT &message) {
 extern "C" __declspec(dllexport) LRESULT CALLBACK HostCancellationCallback(int code,WPARAM wParam,LPARAM lParam) {
     if(code>=0 && lParam) {
         const auto &message=*reinterpret_cast<const CWPSTRUCT *>(lParam);
+#ifdef VT7PTY_H3_DIAGNOSTIC
+        if(h3trace::active && message.hwnd==h3trace::expectedWindow && message.message==WM_KEYDOWN && message.wParam=='C')
+            h3trace::sample(h3trace::KeyEntry,message.hwnd,message.message,message.wParam,message.lParam);
+#endif
         if(message.message==WM_NULL && InterlockedCompareExchange(&entered,1,0)==0) {
             try { dispatch(message); } catch(...) { closeChannel(); }
             InterlockedExchange(&entered,0);
@@ -200,6 +235,16 @@ extern "C" __declspec(dllexport) LRESULT CALLBACK HostCancellationCallback(int c
     }
     return CallNextHookEx(nullptr,code,wParam,lParam);
 }
+#ifdef VT7PTY_H3_DIAGNOSTIC
+extern "C" __declspec(dllexport) LRESULT CALLBACK HostCancellationReturnCallback(int code,WPARAM wp,LPARAM lp) {
+    if(code>=0 && lp) {
+        const auto &m=*reinterpret_cast<const CWPRETSTRUCT *>(lp);
+        if(h3trace::active && m.hwnd==h3trace::expectedWindow && m.message==WM_KEYDOWN && m.wParam=='C')
+            h3trace::sample(h3trace::KeyReturn,m.hwnd,m.message,m.wParam,m.lParam,m.lResult);
+    }
+    return CallNextHookEx(nullptr,code,wp,lp);
+}
+#endif
 BOOL WINAPI DllMain(HINSTANCE instance,DWORD reason,void *) {
     if(reason==DLL_PROCESS_ATTACH) module=instance;
     // Process-scoped handles are closed by explicit retirement or process exit.

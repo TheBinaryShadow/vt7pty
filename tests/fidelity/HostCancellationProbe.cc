@@ -188,12 +188,17 @@ int run(const std::wstring &output) {
     if(a) cleaned=a->stop() && cleaned;
     if(b) cleaned=b->stop() && cleaned;
     const bool passed=error.empty() && aExit==0 && bExit==0 && isolated && cleaned;
-    writeFile(output+L"\\probe.json","{\"SchemaVersion\":1,\"Probe\":\"HostCancellation\",\"Version\":1,\"Status\":"+json(passed ? "Pass" : "Fail")+
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    const std::string diagnostic=",\"DiagnosticOnly\":true,\"H3Accepted\":false,\"OriginalDeadlineFailuresRetained\":true,\"KeyOperation\":\"Single synchronous WM_KEYDOWN C\"";
+#else
+    const std::string diagnostic;
+#endif
+    writeFile(output+L"\\probe.json","{\"SchemaVersion\":1,\"Probe\":\"HostCancellation\",\"Version\":"+std::to_string(version)+",\"Status\":"+json(passed ? "Pass" : "Fail")+
         ",\"SuiteExit\":"+std::to_string(aExit)+",\"NeighborExit\":"+std::to_string(bExit)+",\"NeighborPolls\":"+std::to_string(polls)+
         ",\"DesktopIsolationVerified\":"+(isolated ? "true" : "false")+",\"OwnedLifetimesCleaned\":"+(cleaned ? "true" : "false")+
         ",\"RootDesktop\":"+json(utf8(originalDesktop))+",\"SuiteDesktop\":"+json(a ? utf8(a->desktop.name) : "")+
         ",\"NeighborDesktop\":"+json(b ? utf8(b->desktop.name) : "")+
-        ",\"MilestoneAccepted\":false,\"ProductionCancellationImplemented\":false,\"Error\":"+json(error)+"}");
+        ",\"MilestoneAccepted\":false,\"ProductionCancellationImplemented\":false,\"Error\":"+json(error)+diagnostic+"}");
     printf("Host cancellation probe: %s\n",passed ? "Pass" : "Fail");
     return passed ? 0 : 1;
 }

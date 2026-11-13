@@ -4,8 +4,17 @@
 #include <windows.h>
 #include <cstdint>
 #include <cstring>
+#ifdef VT7PTY_H3_DIAGNOSTIC
+#include "HostCancellationTrace.h"
+#endif
 namespace hostcancel {
+#ifdef VT7PTY_H3_DIAGNOSTIC
+constexpr uint32_t magic=0x44434856,version=2;
+constexpr wchar_t probeName[]=L"HostCancellationTraceProbe.exe",hookName[]=L"HostCancellationTraceHook.dll";
+#else
 constexpr uint32_t magic=0x33434856,version=1;
+constexpr wchar_t probeName[]=L"HostCancellationProbe.exe",hookName[]=L"HostCancellationHook.dll";
+#endif
 enum class Op:uint32_t { Bind=1,Ping=2,Close=3,SuppressAck=4,Cancel=5,RestoreControl=6,CancelSuppressAck=7,CancelClose=8,DeniedControl=9 };
 enum class Result:uint32_t { Hello=0,Accepted=1,Schema=2,Nonce=3,Identity=4,Sequence=5,Expired=6,Operation=7,Closed=8,Received=9,AccessDenied=10 };
 struct Identity {
@@ -29,8 +38,16 @@ struct Response {
     uint32_t host=0,thread=0,operation=0,validationStage=0,windowOwner=0,windowThread=0;
     KeyboardEvidence keyboard;
     wchar_t desktop[128]={};
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    h3trace::KeyTrace trace;
+#endif
 };
-static_assert(sizeof(Identity)==64 && sizeof(Request)==112 && sizeof(Response)==1144);
+static_assert(sizeof(Identity)==64 && sizeof(Request)==112);
+#ifdef VT7PTY_H3_DIAGNOSTIC
+static_assert(sizeof(Response)<16384);
+#else
+static_assert(sizeof(Response)==1144);
+#endif
 inline bool same(const Identity &a,const Identity &b) { return memcmp(&a,&b,sizeof(a))==0; }
 inline Result validate(const Request &r,const Request &bound,uint64_t last,uint64_t now,bool closed) {
     if(r.signature!=magic || r.schema!=version || r.bytes!=sizeof(Request)) return Result::Schema;

@@ -3,8 +3,8 @@
 Updated: 2026-11-13.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
-behavior in Milestone 1. **Next: trace H3 key dispatch, read completion and
-handler delivery on Windows 7 before choosing a fix.**
+behavior in Milestone 1. **Next: run the paired H3 diagnostic package on
+Windows 7 and review dispatch, read and handler timing before choosing a fix.**
 The first candidate passes four of nine target repetitions. Host identity and
 dispatch remain accepted; the runtime cancellation fix and broader coverage
 remain open.
@@ -97,7 +97,8 @@ public-API experiments failed. I'm now following the
   record four passing and five failing repetitions. Failures and remaining
   H3 guards must be resolved before acceptance. The
   [follow-up investigation](docs/validation/2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
-  narrows the observation gaps and specifies a diagnostic experiment.
+  narrows the observation gaps. The [diagnostic package](docs/HOST_CANCELLATION_DIAGNOSTICS.md)
+  pairs unchanged rc1 controls with bounded tracing; target results are pending.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.

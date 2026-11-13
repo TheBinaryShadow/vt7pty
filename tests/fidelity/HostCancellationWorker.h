@@ -50,10 +50,20 @@ void cancellationOracle() {
     bad=p; bad.readError=0; test(!canceledRead(bad,1),"reject normal empty read");
     bad=p; bad.readReturned=0; test(!canceledRead(bad,1),"reject pending read");
     bad=p; bad.controlType=CTRL_BREAK_EVENT; test(!canceledRead(bad,1),"reject Ctrl Break");
-    Response response; auto &e=response.keyboard;
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    auto responseStorage=std::make_unique<Response>(); auto &response=*responseStorage;
+#else
+    Response response;
+#endif
+    auto &e=response.keyboard;
     e.captured=e.applied=e.restored=e.equal=e.sent=1; e.during[VK_CONTROL]=e.during[VK_LCONTROL]=0x80;
     test(keyboardOkay(response),"restored keyboard oracle");
-    auto changed=response; changed.keyboard.after[10]=1; test(!keyboardOkay(changed),"reject mismatching snapshot");
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    auto changedStorage=std::make_unique<Response>(response); auto &changed=*changedStorage;
+#else
+    auto changed=response;
+#endif
+    changed.keyboard.after[10]=1; test(!keyboardOkay(changed),"reject mismatching snapshot");
     changed=response; changed.keyboard.restored=0; test(!keyboardOkay(changed),"reject failed restore");
     changed=response; changed.keyboard.error=5; test(!keyboardOkay(changed),"reject operation error");
     changed=response; changed.keyboard.during[VK_SHIFT]=0x80; test(!keyboardOkay(changed),"reject extra modifier");
@@ -61,18 +71,48 @@ void cancellationOracle() {
     changed.keyboard.injectedFailure=1; test(keyboardOkay(changed,true),"injected failure restores without input");
     changed.keyboard.sent=1; test(!keyboardOkay(changed,true),"reject input during failure control");
     printf("Host cancellation oracle: %u checks passed\n",checks);
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    auto timelineStorage=std::make_unique<h3trace::Timeline>(); auto &timeline=*timelineStorage;
+    timeline.append(h3trace::ReadEntry,3,4,5,6);
+    auto firstStorage=std::make_unique<h3trace::Observation>(); auto &first=*firstStorage; h3trace::observe(timeline,first);
+    check(first.eventCount==1 && first.events[0].index==3 && first.events[0].error==6,"published timeline event");
+    check(first.frequency>0 && first.events[0].qpc>0 && first.events[0].qpc<=first.qpc,"timeline clock");
+    for(unsigned int i=0;i<h3trace::timelineCapacity;++i) timeline.append(h3trace::HandlerEntry);
+    auto fullStorage=std::make_unique<h3trace::Observation>(); auto &full=*fullStorage; h3trace::observe(timeline,full);
+    check(full.eventCount==h3trace::timelineCapacity,"bounded timeline");
+    check(full.overflow==1,"timeline overflow reported");
+    h3trace::begin(9,nullptr);
+    for(unsigned int i=0;i<=h3trace::capacity;++i) h3trace::sample(h3trace::Captured);
+    h3trace::active=false;
+    check(h3trace::keyTrace.count==h3trace::capacity && h3trace::keyTrace.overflow==1,"bounded key trace");
+    check(h3trace::keyTrace.sequence==9 && h3trace::keyTrace.frequency>0,"key trace correlation");
+    puts("Host cancellation trace oracle: 6 checks passed");
+#endif
 }
 
 void settle(Session &s,DWORD ms=200) {
     const auto end=GetTickCount64()+ms;
     s.until([&] { return GetTickCount64()>=end; },ms+1000);
 }
+#ifdef VT7PTY_H3_DIAGNOSTIC
+IdentityPacket diagnosticFollowUp(Session &s,const std::wstring &out,const std::wstring &name,uint32_t events,bool requireRead) {
+    const auto begin=h3trace::qpc(); IdentityPacket p;
+    const bool observed=s.until([&] { p=s.observe(); return p.controlCount>=events && (!requireRead || p.readReturned); },5000);
+    writeFile(out+L"\\"+name+L"-late.json","{\"OriginalDeadlineMet\":false,\"ExtendedWindowMs\":5000,\"PredicateMetAtExtendedObservation\":"+
+        std::string(observed ? "true" : "false")+",\"BeginQpc\":"+h3trace::u64(begin)+",\"EndQpc\":"+h3trace::u64(h3trace::qpc())+
+        ",\"Observation\":"+packetJson(p)+"}");
+    return p;
+}
+#endif
 bool captureCancellation(Session &s,const std::wstring &out,const std::wstring &name,uint32_t events) {
     IdentityPacket p;
     s.until([&] { p=s.observe(); return p.readReturned && p.controlCount>=events; },2000);
     settle(s); p=s.observe();
     writeFile(out+L"\\"+name+L"-read.json",packetJson(p));
     const bool passed=canceledRead(p,events);
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    if(!passed) p=diagnosticFollowUp(s,out,name,events,true);
+#endif
     if(!p.readReturned) {
         // This is recovery after a recorded failure, never a cancellation pass.
         s.input("\r");
@@ -118,6 +158,10 @@ CaseResult caseRun(const std::wstring &output,const std::string &name,unsigned i
         result.cleaned=session->cleanup();
         result.hostExited=session->host.value && session->host.value!=INVALID_HANDLE_VALUE && WaitForSingleObject(session->host.value,5000)==WAIT_OBJECT_0;
         writeFile(path+L"\\stream.bin",session->raw);
+#ifdef VT7PTY_H3_DIAGNOSTIC
+        writeFile(path+L"\\output-trace.json",session->outputTraceJson());
+        if(session->haveObservation) writeFile(path+L"\\fixture-last.json",packetJson(session->lastObservation));
+#endif
     }
     result.passed=result.passed && result.cleaned && result.hostExited && result.unhooked && result.error.empty();
     return result;
@@ -134,8 +178,21 @@ void startOwnedShell(Session &s,Channel &c,bool cmd) {
 }
 bool shellCase(Session &s,Channel &c,const std::wstring &out,bool cmd,bool partial) {
     startOwnedShell(s,c,cmd); IdentityPacket p;
-    const auto prompt=cmd ? U"H3_CMD>" : U"H3_PS>";
+    std::u32string prompt=cmd ? U"H3_CMD>" : U"H3_PS>";
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    uint32_t appGeneration=0;
+    std::string promptToken;
+    auto atPrompt=[&] {
+        const auto row=trim(s.state.row(s.state.y()));
+        if(cmd) return row==prompt;
+        if(!row.starts_with(U"H3_PS[") || !row.ends_with(U"]>") || row.size()<9) return false;
+        uint32_t n=0;
+        for(size_t i=6;i+2<row.size();++i) { if(row[i]<U'0' || row[i]>U'9' || n>100000) return false; n=n*10+(row[i]-U'0'); }
+        appGeneration=n; return n!=0;
+    };
+#else
     auto atPrompt=[&] { return trim(s.state.row(s.state.y()))==prompt; };
+#endif
     check(s.until(atPrompt,20000),"shell initial prompt");
     std::string metadata=cmd ? "System32 cmd.exe" : "";
     if(!cmd) {
@@ -144,6 +201,15 @@ bool shellCase(Session &s,Channel &c,const std::wstring &out,bool cmd,bool parti
         check(s.until([&] { return GetFileAttributesW(identity.c_str())!=INVALID_FILE_ATTRIBUTES && atPrompt(); },10000),"native shell identity");
         metadata=fileText(identity); check(metadata.ends_with("|0|ConsoleHost"),"native ConsoleHost editor");
     }
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    if(cmd) {
+        promptToken="H3_CMD_"+std::to_string(GetProcessId(s.child.value))+"_"+std::to_string(h3trace::qpc());
+        prompt.clear(); for(unsigned char ch:promptToken) prompt+=ch; prompt+=U'>';
+        s.input("prompt "+promptToken+"$G\r");
+        check(s.until(atPrompt,10000),"distinct diagnostic CMD preparation prompt");
+    }
+    const uint32_t beforeGeneration=appGeneration;
+#endif
     const auto canceled=out+L"\\canceled-command.txt",continued=out+L"\\continued-command.txt";
     check(GetFileAttributesW(canceled.c_str())==INVALID_FILE_ATTRIBUTES && GetFileAttributesW(continued.c_str())==INVALID_FILE_ATTRIBUTES,"new shell markers");
     if(partial) {
@@ -151,14 +217,27 @@ bool shellCase(Session &s,Channel &c,const std::wstring &out,bool cmd,bool parti
         check(s.until([&] { return !atPrompt(); }),"partial shell input");
         settle(s);
     }
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    writeFile(out+L"\\shell-ready.json","{\"OutputBytes\":"+std::to_string(s.raw.size())+",\"ObservedPromptEpoch\":"+std::to_string(s.promptEpoch)+
+        ",\"Observation\":"+packetJson(s.observe())+"}");
+#endif
     const auto before=s.lineFeeds;
     const auto r=c.exchange(c.next(Op::Cancel),Result::Accepted,"shell-cancel");
     const bool restored=keyboardOkay(r);
     const bool fresh=s.until([&] { return s.lineFeeds>before && atPrompt(); },2000);
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    const uint32_t deadlineGeneration=appGeneration;
+#endif
     settle(s); p=s.observe();
     writeFile(out+L"\\event-observation.json",packetJson(p));
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    if(!fresh || p.controlCount!=1) diagnosticFollowUp(s,out,L"shell",1,false);
+#endif
     // Boundary Enter exposes retained text even when a cosmetic prompt appeared.
     s.input("\r"); settle(s); check(s.until(atPrompt),"boundary prompt");
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    const uint32_t boundaryGeneration=appGeneration;
+#endif
     s.input(utf8((cmd ? L"echo CONTINUE>"+quote(continued) : L"[IO.File]::WriteAllText("+psLiteral(continued)+L",'CONTINUE')")+L"\r"));
     const bool usable=s.until([&] { return GetFileAttributesW(continued.c_str())!=INVALID_FILE_ATTRIBUTES && atPrompt(); });
     const bool discarded=GetFileAttributesW(canceled.c_str())==INVALID_FILE_ATTRIBUTES;
@@ -168,6 +247,12 @@ bool shellCase(Session &s,Channel &c,const std::wstring &out,bool cmd,bool parti
         ",\"CanceledCommandAbsent\":"+(discarded ? "true" : "false")+",\"NextCommand\":"+(content ? "true" : "false")+
         ",\"ShellAlive\":"+(alive ? "true" : "false")+",\"KeyboardRestored\":"+(restored ? "true" : "false")+
         ",\"FixtureControlCount\":"+std::to_string(p.controlCount)+"}");
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    writeFile(out+L"\\prompt-generations.json","{\"PowerShellCounter\":"+std::string(cmd ? "false" : "true")+",\"CmdPreparedToken\":"+json(promptToken)+
+        ",\"Before\":"+std::to_string(beforeGeneration)+",\"AtOriginalDeadline\":"+std::to_string(deadlineGeneration)+
+        ",\"AfterBoundaryEnter\":"+std::to_string(boundaryGeneration)+",\"AfterContinue\":"+std::to_string(appGeneration)+
+        ",\"ObserverEpochIsReadinessProof\":false,\"ReadBlockedProvenByPrompt\":false}");
+#endif
     c.close(); s.input("exit 0\r");
     check(s.until([&] { return WaitForSingleObject(s.descendant.value,0)==WAIT_OBJECT_0; }),"shell exit");
     DWORD exit=0; check(GetExitCodeProcess(s.descendant.value,&exit) && exit==0,"shell exit status");
@@ -204,6 +289,9 @@ int suite(const std::wstring &output) {
         s.until([&] { return s.observe().controlCount!=0; }); settle(s);
         const auto p=s.observe(); writeFile(out+L"\\no-read.json",packetJson(p));
         passed=passed && p.controlCount==1 && p.controlType==CTRL_C_EVENT && !p.readReturned && p.readIndex==0;
+#ifdef VT7PTY_H3_DIAGNOSTIC
+        if(p.controlCount!=1) diagnosticFollowUp(s,out,L"no-read",1,false);
+#endif
         passed=nextRead(s,out,L"no-read",1) && passed;
         c.close(); s.quit(); return passed;
     });
@@ -213,6 +301,9 @@ int suite(const std::wstring &output) {
         s.until([&] { return s.observe().controlCount!=0; }); settle(s);
         const auto p=s.observe(); writeFile(out+L"\\after.json",packetJson(p));
         passed=passed && p.readSucceeded && !p.readError && std::wstring(p.text,p.textCount)==L"COMPLETED\r\n" && p.controlCount==1;
+#ifdef VT7PTY_H3_DIAGNOSTIC
+        if(p.controlCount!=1) diagnosticFollowUp(s,out,L"completed",1,false);
+#endif
         passed=nextRead(s,out,L"completed",1) && passed;
         c.close(); s.quit(); return passed;
     });
@@ -273,7 +364,27 @@ int suite(const std::wstring &output) {
         add(std::string(cmd ? "cmd-" : "powershell-")+(partial ? "partial" : "empty"),
             [=](Session &s,Channel &c,const std::wstring &out) { return shellCase(s,c,out,cmd,partial); });
     }
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    add("host-key-record",[](Session &s,Channel &c,const std::wstring &out) {
+        const auto ready=s.observe('K');
+        check(!(ready.inputMode&ENABLE_PROCESSED_INPUT) && !ready.readReturned,"host key-record readiness");
+        const auto response=c.exchange(c.next(Op::Cancel),Result::Accepted,"diagnostic-raw-key");
+        IdentityPacket p;
+        const bool returned=s.until([&] { p=s.observe(); return p.readReturned!=0; },2000);
+        writeFile(out+L"\\host-key-record.json",packetJson(p));
+        const bool passed=returned && p.readSucceeded && !p.controlCount && p.keyCount==1 && p.keys[0].virtualKey=='C' &&
+            (p.keys[0].modifiers&LEFT_CTRL_PRESSED) && keyboardOkay(response);
+        if(!returned) p=diagnosticFollowUp(s,out,L"host-key",0,true);
+        if(!p.readReturned) {
+            s.input("z"); check(s.until([&] { p=s.observe(); return p.readReturned!=0; }),"raw diagnostic recovery");
+            writeFile(out+L"\\host-key-recovery.json",packetJson(p));
+        }
+        c.close(); s.quit(); return passed;
+    });
+    bool passed=results.size()==13;
+#else
     bool passed=results.size()==12;
+#endif
     std::string rows="[";
     for(const auto &r:results) {
         if(rows.size()>1) rows+=',';
@@ -302,5 +413,9 @@ int neighbor(const std::wstring &output) {
     writeFile(output+L"\\neighbor.json","{\"Passed\":"+std::string(exited && observations>1 ? "true" : "false")+
         ",\"PendingObservations\":"+std::to_string(observations)+",\"HostExited\":"+(exited ? "true" : "false")+"}");
     writeFile(output+L"\\stream.bin",s.raw);
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    writeFile(output+L"\\output-trace.json",s.outputTraceJson());
+    if(s.haveObservation) writeFile(output+L"\\fixture-last.json",packetJson(s.lastObservation));
+#endif
     return exited && observations>1 ? 0 : 1;
 }

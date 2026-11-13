@@ -114,7 +114,9 @@ records intermittent failures despite acknowledged dispatch and restored keyboar
 state. The [follow-up investigation](validation/2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
 compares matching passes, reviews the observation gaps and defines a diagnostic
 experiment before a fix decision. The host design holds the remaining requirements
-and production limits.
+and production limits. The [paired diagnostic package](HOST_CANCELLATION_DIAGNOSTICS.md)
+collects the next Windows 7 evidence using unchanged rc1 controls and a separate
+traced build.
 
 An application-facing read shim remains a separate alternative. It needs a
 specified launch/load boundary and its own console-read semantics; blindly

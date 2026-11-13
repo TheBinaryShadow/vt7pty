@@ -84,15 +84,20 @@ std::string bytesJson(const BYTE *bytes) {
     return json(text);
 }
 std::string responseJson(const Response &r) {
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    const auto diagnostic=",\"Trace\":"+h3trace::keyJson(r.trace);
+#else
+    const std::string diagnostic;
+#endif
     return "{\"NonceLow\":"+json(std::to_string(r.nonce[0]))+",\"NonceHigh\":"+json(std::to_string(r.nonce[1]))+",\"Result\":"+std::to_string(static_cast<uint32_t>(r.result))+",\"Sequence\":"+std::to_string(r.sequence)+
         ",\"AcceptedSequence\":"+std::to_string(r.acceptedSequence)+",\"Host\":"+std::to_string(r.host)+
         ",\"Thread\":"+std::to_string(r.thread)+",\"HostCreated\":"+json(std::to_string(r.hostCreated))+
-        ",\"Window\":"+std::to_string(r.window)+",\"Operation\":"+std::to_string(r.operation)+",\"ValidationStage\":"+std::to_string(r.validationStage)+",\"WindowOwner\":"+std::to_string(r.windowOwner)+",\"WindowThread\":"+std::to_string(r.windowThread)+",\"ActualDesktop\":"+json(utf8(r.desktop))+",\"Keyboard\":{\"Captured\":"+std::to_string(r.keyboard.captured)+",\"Applied\":"+std::to_string(r.keyboard.applied)+",\"Restored\":"+std::to_string(r.keyboard.restored)+",\"Equal\":"+std::to_string(r.keyboard.equal)+",\"Sent\":"+std::to_string(r.keyboard.sent)+",\"InjectedFailure\":"+std::to_string(r.keyboard.injectedFailure)+",\"Error\":"+std::to_string(r.keyboard.error)+",\"Before\":"+bytesJson(r.keyboard.before)+",\"During\":"+bytesJson(r.keyboard.during)+",\"After\":"+bytesJson(r.keyboard.after)+"}}";
+        ",\"Window\":"+std::to_string(r.window)+",\"Operation\":"+std::to_string(r.operation)+",\"ValidationStage\":"+std::to_string(r.validationStage)+",\"WindowOwner\":"+std::to_string(r.windowOwner)+",\"WindowThread\":"+std::to_string(r.windowThread)+",\"ActualDesktop\":"+json(utf8(r.desktop))+",\"Keyboard\":{\"Captured\":"+std::to_string(r.keyboard.captured)+",\"Applied\":"+std::to_string(r.keyboard.applied)+",\"Restored\":"+std::to_string(r.keyboard.restored)+",\"Equal\":"+std::to_string(r.keyboard.equal)+",\"Sent\":"+std::to_string(r.keyboard.sent)+",\"InjectedFailure\":"+std::to_string(r.keyboard.injectedFailure)+",\"Error\":"+std::to_string(r.keyboard.error)+",\"Before\":"+bytesJson(r.keyboard.before)+",\"During\":"+bytesJson(r.keyboard.during)+",\"After\":"+bytesJson(r.keyboard.after)+"}"+diagnostic+"}";
 }
 void protocolOracle() {
     Request base; base.nonce[0]=1; base.nonce[1]=2; base.sequence=2; base.deadline=2000; base.identity.host=100;
     check(validate(base,base,1,1000,false)==Result::Accepted,"oracle valid request");
-    auto bad=base; bad.schema=2; check(validate(bad,base,1,1000,false)==Result::Schema,"oracle schema");
+    auto bad=base; bad.schema=version+1; check(validate(bad,base,1,1000,false)==Result::Schema,"oracle schema");
     bad=base; bad.bytes=1; check(validate(bad,base,1,1000,false)==Result::Schema,"oracle size");
     bad=base; bad.nonce[1]=3; check(validate(bad,base,1,1000,false)==Result::Nonce,"oracle nonce");
     bad=base; ++bad.identity.host; check(validate(bad,base,1,1000,false)==Result::Identity,"oracle session");
@@ -110,6 +115,9 @@ class Channel {
     std::wstring output,label;
     HMODULE module=nullptr;
     HHOOK hook=nullptr;
+#ifdef VT7PTY_H3_DIAGNOSTIC
+    HHOOK returnHook=nullptr;
+#endif
     ATOM atom=0;
     Handle server,thread;
     bool disabled=false,closed=false;
@@ -177,11 +185,17 @@ public:
             server.reset(privateServer(L"\\\\.\\pipe\\"+nameValue));
             atom=GlobalAddAtomW(nameValue.c_str()); check(atom>=0xc000,"session channel atom");
             // Absolute, colocated x64 module. The portable runner verifies its package hash before this process starts.
-            const auto path=directory()+L"\\HostCancellationHook.dll";
+            const auto path=directory()+L"\\"+hookName;
             module=LoadLibraryExW(path.c_str(),nullptr,LOAD_WITH_ALTERED_SEARCH_PATH); check(module!=nullptr,"research callback DLL");
             HOOKPROC callback=nullptr; const auto proc=GetProcAddress(module,"HostCancellationCallback");
             static_assert(sizeof(callback)==sizeof(proc)); memcpy(&callback,&proc,sizeof(callback)); if(!callback) throw std::runtime_error("callback export unavailable");
             hook=SetWindowsHookExW(WH_CALLWNDPROC,callback,module,tid); check(hook!=nullptr,"thread-scoped research callback");
+#ifdef VT7PTY_H3_DIAGNOSTIC
+            HOOKPROC after=nullptr; const auto afterProc=GetProcAddress(module,"HostCancellationReturnCallback");
+            static_assert(sizeof(after)==sizeof(afterProc)); memcpy(&after,&afterProc,sizeof(after));
+            if(!after) throw std::runtime_error("return callback export unavailable");
+            returnHook=SetWindowsHookExW(WH_CALLWNDPROCRET,after,module,tid); check(returnHook!=nullptr,"thread-scoped return callback");
+#endif
             // CreateFile in the callback completes the pending server connection, never waits for it.
             Handle event(CreateEventW(nullptr,TRUE,FALSE,nullptr)); check(event.value!=nullptr,"connect event");
             OVERLAPPED ov={}; ov.hEvent=event.value;
@@ -209,14 +223,35 @@ public:
         try {
             check(!disabled && !closed,"no dispatch on retired channel");
             verifyLive();
+#ifdef VT7PTY_H3_DIAGNOSTIC
+            const bool observeRequest=expected==Result::Accepted || expected==Result::Received;
+            const bool mutation=observeRequest && (request.operation==Op::Cancel || request.operation==Op::RestoreControl ||
+                request.operation==Op::CancelSuppressAck || request.operation==Op::CancelClose);
+            const uint64_t beforeTime=h3trace::qpc(),beforeBytes=session.raw.size();
+            const uint32_t beforeEpoch=session.promptEpoch;
+            std::string before="null",after="null",afterError;
+            if(mutation) before=packetJson(session.observe());
+#endif
             transfer(server.value,&request,sizeof(request),true);
             signal(); const auto response=receive();
+#ifdef VT7PTY_H3_DIAGNOSTIC
+            const uint64_t afterTime=h3trace::qpc();
+            if(mutation && std::string_view(caseName)!="default-handler" && WaitForSingleObject(session.child.value,0)==WAIT_TIMEOUT) {
+                try { after=packetJson(session.observe()); } catch(const std::exception &e) { afterError=e.what(); }
+            }
+            const std::string diagnostic=",\"ControllerBeforeQpc\":"+h3trace::u64(beforeTime)+",\"ControllerAfterQpc\":"+h3trace::u64(afterTime)+
+                ",\"OutputBytesBefore\":"+std::to_string(beforeBytes)+",\"OutputBytesAfter\":"+std::to_string(session.raw.size())+
+                ",\"PromptEpochBefore\":"+std::to_string(beforeEpoch)+",\"PromptEpochAfter\":"+std::to_string(session.promptEpoch)+
+                ",\"FixtureBefore\":"+before+",\"FixtureAfter\":"+after+",\"AfterObservationError\":"+json(afterError);
+#else
+            const std::string diagnostic;
+#endif
             writeFile(output+L"\\"+label+L"-"+std::to_wstring(++record)+L"-request.json",
                 "{\"Case\":"+json(caseName)+",\"RequestIdentity\":"+identityJson(request.identity)+
                 ",\"RequestSchema\":"+std::to_string(request.schema)+",\"RequestBytes\":"+std::to_string(request.bytes)+
                 ",\"RequestNonceLow\":"+json(std::to_string(request.nonce[0]))+",\"RequestNonceHigh\":"+json(std::to_string(request.nonce[1]))+
                 ",\"RequestDeadline\":"+std::to_string(request.deadline)+",\"RequestSequence\":"+std::to_string(request.sequence)+",\"RequestOperation\":"+std::to_string(static_cast<uint32_t>(request.operation))+
-                ",\"ExpectedResult\":"+std::to_string(static_cast<uint32_t>(expected))+",\"Response\":"+responseJson(response)+"}");
+                ",\"ExpectedResult\":"+std::to_string(static_cast<uint32_t>(expected))+",\"Response\":"+responseJson(response)+diagnostic+"}");
             check(response.result==expected && response.sequence==request.sequence && response.operation==static_cast<uint32_t>(request.operation),"request outcome");
             if(expected==Result::Accepted) { ++accepted; ++sequence; check(response.acceptedSequence==sequence-1,"accepted sequence"); }
             else if(expected==Result::Received) { ++sequence; check(response.acceptedSequence==sequence-1,"receipt sequence"); }
@@ -241,10 +276,17 @@ public:
     void close() { exchange(next(Op::Close),Result::Accepted,"close"); closed=true; detach(); }
     void detach() noexcept {
         disabled=true;
+#ifdef VT7PTY_H3_DIAGNOSTIC
+        bool returnRemoved=true;
+        if(returnHook) { returnRemoved=UnhookWindowsHookEx(returnHook)!=FALSE || WaitForSingleObject(session.host.value,0)==WAIT_OBJECT_0; returnHook=nullptr; }
+#endif
         if(hook) {
             const BOOL result=UnhookWindowsHookEx(hook);
             unhooked=result!=FALSE || WaitForSingleObject(session.host.value,0)==WAIT_OBJECT_0;
             hook=nullptr;
+#ifdef VT7PTY_H3_DIAGNOSTIC
+            unhooked=unhooked && returnRemoved;
+#endif
         }
         server.reset();
         if(atom) { GlobalDeleteAtom(atom); atom=0; }

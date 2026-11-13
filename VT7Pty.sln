@@ -58,6 +58,10 @@ Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostCancellationProbe", "pr
 EndProject
 Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostCancellationHook", "projects\HostCancellationHook.vcxproj", "{31B1BC40-40E7-4E08-99A4-9EAE10E2F62F}"
 EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostCancellationTraceProbe", "projects\HostCancellationTraceProbe.vcxproj", "{82F721CA-38F1-4EDC-921E-AD8E998AB201}"
+EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostCancellationTraceHook", "projects\HostCancellationTraceHook.vcxproj", "{82F721CA-38F1-4EDC-921E-AD8E998AB202}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -176,6 +180,14 @@ Global
 		{31B1BC40-40E7-4E08-99A4-9EAE10E2F62F}.Debug|x64.Build.0 = Debug|x64
 		{31B1BC40-40E7-4E08-99A4-9EAE10E2F62F}.Release|x64.ActiveCfg = Release|x64
 		{31B1BC40-40E7-4E08-99A4-9EAE10E2F62F}.Release|x64.Build.0 = Release|x64
+	{82F721CA-38F1-4EDC-921E-AD8E998AB201}.Debug|x64.ActiveCfg = Debug|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB201}.Debug|x64.Build.0 = Debug|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB201}.Release|x64.ActiveCfg = Release|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB201}.Release|x64.Build.0 = Release|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB202}.Debug|x64.ActiveCfg = Debug|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB202}.Debug|x64.Build.0 = Debug|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB202}.Release|x64.ActiveCfg = Release|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB202}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

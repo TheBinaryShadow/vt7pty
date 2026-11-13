@@ -40,6 +40,7 @@ Windows 7. I'm investigating those results before runtime integration.
 | [Host identity probe](HOST_IDENTITY_PROBE.md) | Run the H1 research package |
 | [Host dispatch probe](HOST_DISPATCH_PROBE.md) | Run the H2 research package |
 | [Host cancellation probe](HOST_CANCELLATION_PROBE.md) | Run the first H3 prototype and see its remaining limits |
+| [Cancellation diagnostics](HOST_CANCELLATION_DIAGNOSTICS.md) | Collect interleaved rc1 control and traced trials |
 | [Optional SSH testing](SSH_BASELINE.md) | Deferred remote-test prerequisites |
 
 ## Results and project history

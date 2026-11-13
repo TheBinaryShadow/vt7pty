@@ -31,7 +31,9 @@ records five failing repetitions out of nine. H3 remains open; no production
 hook mechanism is selected. The
 [follow-up investigation](validation/2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
 records matched keyboard-state comparisons and a diagnostic-only experiment
-for the unobserved dispatch/read/handler boundaries.
+for the unobserved dispatch/read/handler boundaries. The
+[diagnostic package](HOST_CANCELLATION_DIAGNOSTICS.md) now implements those
+observations alongside the exact issued rc1 controls. Target results are pending.
 
 ## H1 implementation
 

@@ -317,6 +317,8 @@ $expectedImports = [ordered]@{
     'FidelityTest.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'VT7Pty.dll')
     'HostCancellationProbe.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll', 'VT7Pty.dll')
     'HostCancellationHook.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
+    'HostCancellationTraceProbe.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll', 'VT7Pty.dll')
+    'HostCancellationTraceHook.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
     'HostDispatchProbe.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll', 'VT7Pty.dll')
     'HostDispatchHook.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
     'HostIdentityProbe.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll', 'VT7Pty.dll')
@@ -387,6 +389,8 @@ foreach ($configurationName in $configurations) {
         'HostIdentityProbe.exe', 'HostIdentityProbe.pdb',
         'HostCancellationProbe.exe', 'HostCancellationProbe.pdb',
         'HostCancellationHook.dll', 'HostCancellationHook.pdb',
+        'HostCancellationTraceProbe.exe', 'HostCancellationTraceProbe.pdb',
+        'HostCancellationTraceHook.dll', 'HostCancellationTraceHook.pdb',
         'HostDispatchProbe.exe', 'HostDispatchProbe.pdb',
         'HostDispatchHook.dll', 'HostDispatchHook.pdb',
         'ProtocolTest.exe', 'ProtocolTest.pdb',
@@ -412,6 +416,7 @@ foreach ($configurationName in $configurations) {
 
     $tests = @(
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostCancellationProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostCancellationTraceProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostDispatchProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostIdentityProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'ModernCppTest.exe') -WorkingDirectory $binaryDirectory
@@ -475,6 +480,9 @@ foreach ($configurationName in $configurations) {
     }
     $cancellationOracle = @($tests | Where-Object { $_.Name -eq 'HostCancellationProbe.exe' })
     if ($cancellationOracle.Count -ne 1 -or $cancellationOracle[0].StandardOutput -ne 'Host cancellation oracle: 33 checks passed') { throw 'Host cancellation oracle did not complete.' }
+    $traceOracle = @($tests | Where-Object { $_.Name -eq 'HostCancellationTraceProbe.exe' })
+    $traceExpected='Host cancellation oracle: 33 checks passed'+[Environment]::NewLine+'Host cancellation trace oracle: 6 checks passed'
+    if($traceOracle.Count -ne 1 -or $traceOracle[0].StandardOutput -ne $traceExpected) { throw 'Host cancellation trace oracle did not complete.' }
     $dispatchOracle = @($tests | Where-Object { $_.Name -eq 'HostDispatchProbe.exe' })
     if ($dispatchOracle.Count -ne 1 -or $dispatchOracle[0].StandardOutput -ne 'Host dispatch oracle: 13 checks passed') { throw 'Host dispatch oracle did not complete.' }
     $hostOracle = @($tests | Where-Object { $_.Name -eq 'HostIdentityProbe.exe' })
