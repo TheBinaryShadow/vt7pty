@@ -1,7 +1,7 @@
 # Input Cancellation Investigation
 
 Status: Step 1.2 mechanism research in progress; no production cancellation fix.
-Updated: 2026-10-13.
+Updated: 2026-11-13.
 
 I'm investigating a defect recorded in the
 [rc3 Windows 7 baseline](validation/2026-10-12-step-1.1-rc3-windows7-baseline.md):
@@ -109,8 +109,10 @@ through scoped events and actual callback execution. The
 The first [H3 prototype](HOST_CANCELLATION_PROBE.md) now exercises cancellation
 inside verified host callbacks on private desktops. Initial local runs discard
 the line, deliver one event, preserve the next read and recover real shell
-prompts. Windows 7 evidence and remaining guards are still required. The host
-design holds the requirements and production limits.
+prompts. The [Windows 7 rc1 review](validation/2026-11-13-step-1.2-host-cancellation-rc1-windows7.md)
+records intermittent failures despite acknowledged dispatch and restored keyboard
+state. I'll investigate those failures before another candidate; the host design
+holds the remaining requirements and production limits.
 
 An application-facing read shim remains a separate alternative. It needs a
 specified launch/load boundary and its own console-read semantics; blindly

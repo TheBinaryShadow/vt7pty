@@ -4,7 +4,10 @@ I've built the first H3 prototype to test actual Ctrl+C cancellation through
 the console host. Initial local runs discard cooked input, deliver one event,
 preserve the next read and restore CMD and native PowerShell prompts.
 The [rc1 review](validation/2026-10-13-step-1.2-host-cancellation-rc1-candidate.md)
-records three passing exact-package repetitions. Windows 7 results are still required.
+records three passing exact-package development repetitions. The
+[Windows 7 review](validation/2026-11-13-step-1.2-host-cancellation-rc1-windows7.md)
+records four passing and five failing target repetitions, including missing
+control events and a read left pending. I have not accepted rc1.
 
 This is a research package using the unchanged released 0.5.0 runtime.
 The callback and its controller are test programs. I have not selected a
@@ -97,7 +100,7 @@ The receipt-only case intentionally has no final keyboard-state acknowledgment.
 
 ## What remains before H3 can close
 
-I still need the three Windows 7 runs and review of the exact package.
+I need to resolve the recorded Windows 7 failures and qualify a new candidate.
 This first candidate covers a completed-read boundary, simulated denial and
 retirement within the request. It does not yet cover truly concurrent
 completion/close races or an actual OS-denied hook installation.

@@ -28,7 +28,8 @@ what I've learned from testing it.
 ## Follow current development
 
 I'm working on input cancellation within Milestone 1. Host identity and dispatch
-are verified; the first private-desktop cancellation prototype is ready for target testing.
+are verified; the first cancellation candidate has intermittent failures on
+Windows 7. I'm investigating those results before runtime integration.
 
 | Guide | Purpose |
 | --- | --- |

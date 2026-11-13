@@ -1,7 +1,7 @@
 # Console-host cancellation design
 
-Status: H1 and H2 accepted on Windows 7; the first H3 prototype is implemented, pending target results and remaining coverage.
-Updated: 2026-11-10.
+Status: H1 and H2 accepted on Windows 7; H3 rc1 has intermittent target failures and is not accepted.
+Updated: 2026-11-13.
 
 I'm following the [cancellation investigation](INPUT_CANCELLATION.md) with
 four stages. I need correct line cancellation while preserving active-child
@@ -24,7 +24,11 @@ blocks dependent work for that configuration; retain the evidence.
 The [H2 target review](validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md)
 accepts nine repetitions covering actual host execution, session binding,
 request rejection, input isolation and lifetime/failure controls.
-The [H3 prototype](HOST_CANCELLATION_PROBE.md) now exercises core cancellation and shell recovery on private desktops. H3 remains open; no production hook mechanism is selected.
+The [H3 prototype](HOST_CANCELLATION_PROBE.md) exercises core cancellation and
+shell recovery on private desktops. The
+[Windows 7 review](validation/2026-11-13-step-1.2-host-cancellation-rc1-windows7.md)
+records five failing repetitions out of nine. H3 remains open; no production
+hook mechanism is selected.
 
 ## H1 implementation
 
@@ -209,8 +213,8 @@ requests. The controller never retries an ambiguous cancellation.
 Separate desktops prevent input-queue attachment between the suite, neighbor
 and normal desktop. This contains the experiment; it does not establish the
 production architecture. The [probe guide](HOST_CANCELLATION_PROBE.md) lists
-the twelve cases and preserves the remaining H3 requirements: target results,
-real completion/close races, actual denied-access behavior, the active-child
+the twelve cases and preserves the remaining H3 requirements: resolution of
+target failures, real completion/close races, actual denied-access behavior, the active-child
 shell matrix and PowerShell 7 guards. H4 remains blocked on those findings.
 
 The [process lifetime plan](PROCESS_LIFETIME.md) adds Windows 7 job inheritance,

@@ -1,0 +1,137 @@
+[CmdletBinding()]
+param()
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$taskRoot='D:\Git\vt7pty'
+$taskEvidence=Join-Path $taskRoot 'docs\validation\results\step-1.2\host-cancellation-rc1'
+$taskRaw=Join-Path $taskEvidence 'windows7'
+$taskAudit=Join-Path $taskEvidence 'windows7-audit'
+[IO.Directory]::CreateDirectory($taskAudit) | Out-Null
+function Require-Review([bool]$Condition,[string]$Reason) { if(-not $Condition) { throw $Reason } }
+function Canonical-Review($Value) {
+    if($null -eq $Value) { return 'null' }
+    if($Value -is [string] -or $Value -is [ValueType]) { return ConvertTo-Json -InputObject $Value -Compress }
+    if($Value -is [Collections.IDictionary]) {
+        $parts=@(foreach($key in @($Value.Keys | Sort-Object)) { (ConvertTo-Json -InputObject ([string]$key) -Compress)+':'+(Canonical-Review $Value[$key]) })
+        return '{'+($parts -join ',')+'}'
+    }
+    if($Value -is [Collections.IEnumerable]) {
+        $parts=@(foreach($item in $Value) { Canonical-Review $item })
+        return '['+($parts -join ',')+']'
+    }
+    $parts=@(foreach($property in @($Value.PSObject.Properties | Sort-Object Name)) {
+        (ConvertTo-Json -InputObject $property.Name -Compress)+':'+(Canonical-Review $property.Value)
+    })
+    return '{'+($parts -join ',')+'}'
+}
+function Write-ReviewJson([string]$Path,$Value) {
+    [IO.File]::WriteAllText($Path,($Value | ConvertTo-Json -Depth 20),[Text.UTF8Encoding]::new($false))
+}
+$taskIdentity=Get-Content -LiteralPath (Join-Path $taskEvidence 'candidate-identity.json') -Raw | ConvertFrom-Json
+$taskAuditor=Join-Path $taskRoot 'tools\research\Test-HostCancellationEvidence.ps1'
+$taskSource=[IO.File]::ReadAllText($taskAuditor)
+# Diagnostic continuation never changes returned records or turns failed gates into passes.
+# The unmodified strict auditor is also invoked separately for every repetition.
+$taskDiagnostic=$taskSource.Replace('Set-StrictMode -Version 2.0',@'
+Set-StrictMode -Off
+$reviewFailures=New-Object 'Collections.Generic.List[string]'
+$reviewMissing=New-Object 'Collections.Generic.List[string]'
+'@)
+$taskDiagnostic=$taskDiagnostic.Replace("    return [IO.File]::ReadAllText((Join-Path "+'$Directory $Relative)) | ConvertFrom-Json',@'
+    if(-not (Test-Path -LiteralPath (Join-Path $Directory $Relative))) {
+        $reviewMissing.Add($Relative); return $null
+    }
+    return [IO.File]::ReadAllText((Join-Path $Directory $Relative)) | ConvertFrom-Json
+'@)
+$taskDiagnostic=$taskDiagnostic.Replace("    if(-not "+'$Condition) { throw (''H3 evidence: ''+$Message) }',@'
+    if(-not $Condition) { $reviewFailures.Add($Message) }
+'@)
+$taskDiagnostic=$taskDiagnostic.Replace('SchemaVersion=1;Passed=$true;Cases=12;HostLifetimes=13;RegisteredShells=$shells;TitleEvents=$events',@'
+    SchemaVersion=1;Passed=($reviewFailures.Count -eq 0 -and $reviewMissing.Count -eq 0);Cases=12;HostLifetimes=$contexts.Count;RegisteredShells=$shells;TitleEvents=$events
+    ReviewMode='DiagnosticContinuation';FailedChecks=@($reviewFailures);MissingRecords=@($reviewMissing)
+'@)
+$taskDiagnostic=$taskDiagnostic.Replace('CanceledReads=5;OrdinaryReads=9;RawReads=1;ShellWorkflows=4;MilestoneAccepted=$false',
+    'ExpectedCanceledReads=5;ExpectedOrdinaryReads=9;ExpectedRawReads=1;ExpectedShellWorkflows=4;MilestoneAccepted=$false')
+Require-Review ($taskDiagnostic.Contains('DiagnosticContinuation') -and $taskDiagnostic.Contains('$reviewMissing.Add') -and
+    $taskDiagnostic.Contains('$reviewFailures.Add($Message)')) 'Diagnostic transformation failed'
+$taskDiagnosticPath=Join-Path $taskAudit 'Diagnostic-Review.ps1.txt'
+[IO.File]::WriteAllText($taskDiagnosticPath,$taskDiagnostic,[Text.UTF8Encoding]::new($false))
+$taskDiagnosticBlock=[scriptblock]::Create($taskDiagnostic)
+$taskRuns=@()
+$taskMachines=@()
+foreach($taskFolder in Get-ChildItem -LiteralPath $taskRaw -Directory | Sort-Object Name) {
+    $taskReport=Get-Content -LiteralPath (Join-Path $taskFolder.FullName 'report.json') -Raw | ConvertFrom-Json
+    Require-Review ($taskReport.SchemaVersion -eq 1 -and $taskReport.Kind -eq 'VT7PtyHostCancellationResults' -and $taskReport.RunId -eq $taskFolder.Name) 'Report identity'
+    Require-Review ($taskReport.ManifestSha256 -ceq $taskIdentity.ManifestSha256 -and
+        (Canonical-Review $taskReport.Harness) -ceq (Canonical-Review $taskIdentity.Harness) -and
+        (Canonical-Review $taskReport.Runtime) -ceq (Canonical-Review $taskIdentity.Runtime)) 'Candidate identity mismatch'
+    Require-Review (@($taskReport.PreflightErrors).Count -eq 0 -and @($taskReport.Results).Count -eq 3 -and $taskReport.NotRun -eq 0) 'Report preflight/repetitions'
+    Require-Review (-not $taskReport.ProductionCancellationImplemented -and -not $taskReport.MilestoneAccepted -and $taskReport.PrivateDesktopResearch) 'Research boundary'
+    $taskMachineRuns=@()
+    foreach($taskResult in $taskReport.Results) {
+        $taskNative=Join-Path $taskFolder.FullName ('run-'+$taskResult.Repetition)
+        $taskProbe=Get-Content -LiteralPath (Join-Path $taskNative 'probe.json') -Raw | ConvertFrom-Json
+        $taskCases=Get-Content -LiteralPath (Join-Path $taskNative 'suite\cases.json') -Raw | ConvertFrom-Json
+        $taskNeighbor=Get-Content -LiteralPath (Join-Path $taskNative 'neighbor\neighbor.json') -Raw | ConvertFrom-Json
+        foreach($taskPair in @(@($taskResult.Observation,$taskProbe),@($taskResult.Cases,$taskCases),@($taskResult.Neighbor,$taskNeighbor))) {
+            Require-Review ((Canonical-Review $taskPair[0]) -ceq (Canonical-Review $taskPair[1])) 'Portable/native aggregate mismatch'
+        }
+        $taskBad=@($taskCases.Cases | Where-Object {-not $_.Passed})
+        Require-Review ($taskCases.Cases.Count -eq 12 -and (($taskResult.Status -eq 'Pass') -eq ($taskBad.Count -eq 0)) -and
+            $taskResult.ExitCode -eq $(if($taskBad.Count) {1} else {0}) -and -not $taskResult.TimedOut -and
+            $taskResult.StandardError -eq '' -and $taskProbe.NeighborExit -eq 0 -and $taskProbe.OwnedLifetimesCleaned -and
+            $taskResult.StandardOutput -eq ('Host cancellation oracle: 33 checks passed'+[Environment]::NewLine+'Host cancellation probe: '+$taskResult.Status)) 'Run status correlation'
+        $taskName=$taskReport.Tier.ToLowerInvariant()+'-run-'+$taskResult.Repetition
+        $taskStrictAccepted=$false; $taskStrictError=''
+        try {
+            $null=& $taskAuditor -Directory $taskNative -OutputPath (Join-Path $taskAudit ($taskName+'-strict.json'))
+            $taskStrictAccepted=$true
+        } catch { $taskStrictError=$_.Exception.Message }
+        Require-Review ($taskStrictAccepted -eq ($taskResult.Status -eq 'Pass')) 'Strict auditor disagrees with run outcome'
+        $null=& $taskDiagnosticBlock -Directory $taskNative -OutputPath (Join-Path $taskAudit ($taskName+'-diagnostic.json'))
+        $taskDiagnosticReport=Get-Content -LiteralPath (Join-Path $taskAudit ($taskName+'-diagnostic.json')) -Raw | ConvertFrom-Json
+        Require-Review ($taskDiagnosticReport.Passed -eq $taskStrictAccepted) 'Diagnostic outcome disagrees with strict outcome'
+        $taskRun=[ordered]@{
+            Tier=$taskReport.Tier;Computer=$taskReport.ComputerName;RunId=$taskReport.RunId;Repetition=$taskResult.Repetition
+            ReportedStatus=$taskResult.Status;StrictAuditorAccepted=$taskStrictAccepted;StrictError=$taskStrictError
+            PassedCases=12-$taskBad.Count;FailedCases=@($taskBad | ForEach-Object {$_.Case});DurationMilliseconds=$taskResult.DurationMilliseconds
+            DiagnosticFailedChecks=@($taskDiagnosticReport.FailedChecks);MissingRecords=@($taskDiagnosticReport.MissingRecords)
+            NativeFiles=@($taskDiagnosticReport.Files).Count;HostLifetimes=$taskDiagnosticReport.HostLifetimes;RegisteredShells=$taskDiagnosticReport.RegisteredShells
+            AcceptedRequests=$taskDiagnosticReport.AcceptedRequests;RejectedRequests=$taskDiagnosticReport.RejectedRequests
+            ReceiptOnlyRequests=$taskDiagnosticReport.ReceiptOnlyRequests;RestoredSnapshots=$taskDiagnosticReport.RestoredSnapshots
+            TitleEvents=$taskDiagnosticReport.TitleEvents;Cleanup=$taskProbe.OwnedLifetimesCleaned;Neighbor=$taskNeighbor.Passed
+        }
+        $taskRuns+=@($taskRun); $taskMachineRuns+=@($taskRun)
+        Write-Output ($taskReport.ComputerName+' run '+$taskResult.Repetition+': '+$taskResult.Status+'; diagnostic checks failed: '+@($taskDiagnosticReport.FailedChecks).Count)
+    }
+    $taskPass=@($taskMachineRuns | Where-Object {$_.StrictAuditorAccepted}).Count
+    Require-Review ($taskReport.Pass -eq $taskPass -and $taskReport.Fail -eq 3-$taskPass) 'Report totals'
+    $taskMachines+=@([ordered]@{
+        Computer=$taskReport.ComputerName;Tier=$taskReport.Tier;RunId=$taskReport.RunId;OS=$taskReport.OS;Machine=$taskReport.Machine
+        PowerShell=$taskReport.PowerShellVersion;CLR=$taskReport.CLRVersion;Updates=@($taskReport.Updates).Count
+        HasKB3191566=@($taskReport.Updates | Where-Object {$_.Id -eq 'KB3191566'}).Count -gt 0
+        RecordedUtc=$taskReport.RecordedUtc;Pass=$taskReport.Pass;Fail=$taskReport.Fail;NotRun=$taskReport.NotRun
+    })
+}
+$taskReview=[ordered]@{
+    SchemaVersion=1;ReviewDate='2026-11-13';CandidateIdentityMatched=$true;PortableNativeAggregatesCompared=27
+    Repetitions=9;PassingRepetitions=@($taskRuns | Where-Object {$_.StrictAuditorAccepted}).Count
+    FailingRepetitions=@($taskRuns | Where-Object {-not $_.StrictAuditorAccepted}).Count
+    PassedCases=($taskRuns | ForEach-Object {$_.PassedCases} | Measure-Object -Sum).Sum
+    FailedCases=($taskRuns | ForEach-Object {$_.FailedCases.Count} | Measure-Object -Sum).Sum
+    RawFiles=1346;NativeFiles=($taskRuns | ForEach-Object {$_.NativeFiles} | Measure-Object -Sum).Sum
+    HostLifetimes=($taskRuns | ForEach-Object {$_.HostLifetimes} | Measure-Object -Sum).Sum
+    RegisteredShells=($taskRuns | ForEach-Object {$_.RegisteredShells} | Measure-Object -Sum).Sum
+    AcceptedRequests=($taskRuns | ForEach-Object {$_.AcceptedRequests} | Measure-Object -Sum).Sum
+    RejectedRequests=($taskRuns | ForEach-Object {$_.RejectedRequests} | Measure-Object -Sum).Sum
+    ReceiptOnlyRequests=($taskRuns | ForEach-Object {$_.ReceiptOnlyRequests} | Measure-Object -Sum).Sum
+    RestoredSnapshots=($taskRuns | ForEach-Object {$_.RestoredSnapshots} | Measure-Object -Sum).Sum
+    TitleEvents=($taskRuns | ForEach-Object {$_.TitleEvents} | Measure-Object -Sum).Sum
+    H3Accepted=$false;ProductionCancellationImplemented=$false;RootCauseConfirmed=$false
+    AuditorSha256=(Get-FileHash -LiteralPath $taskAuditor -Algorithm SHA256).Hash.ToLowerInvariant()
+    DiagnosticReviewerSha256=(Get-FileHash -LiteralPath $taskDiagnosticPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    DiagnosticLimits='Continues after rejected checks and missing records. Expected read totals are requirements, not successful observations. Original strict auditor is also run; no failed run is accepted.'
+    Machines=$taskMachines;Runs=$taskRuns
+}
+Write-ReviewJson (Join-Path $taskAudit 'evidence-review.json') $taskReview
+[pscustomobject]$taskReview | Select-Object Repetitions,PassingRepetitions,FailingRepetitions,PassedCases,FailedCases,NativeFiles,HostLifetimes,RegisteredShells,AcceptedRequests,RejectedRequests,ReceiptOnlyRequests,RestoredSnapshots,TitleEvents | ConvertTo-Json
