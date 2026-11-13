@@ -1,0 +1,8 @@
+
+H3 diagnostic evidence: close defers in-flight resource release
+At D:\Git\vt7pty\tools\research\Test-HostFreezeEvidence.ps1:11 char:82
++ ...  if(-not $Condition) { throw ('H3 diagnostic evidence: '+$Reason) } }
++                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (H3 diagnostic e...esource release:String) [], RuntimeException
+    + FullyQualifiedErrorId : H3 diagnostic evidence: close defers in-flight resource release
+ 

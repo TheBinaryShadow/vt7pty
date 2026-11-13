@@ -17,7 +17,7 @@ its Windows 7 results are pending.
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| H3 guard qualification | [Implementation and runner guide](../HOST_GUARDS.md) | Pending on NESSY, TURTLE and LEOPARD |
+| H3 guard qualification | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-guards-rc1-candidate.md) | Pending on NESSY, TURTLE and LEOPARD |
 | Coordinated H3 prototype | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-coordination-rc1-candidate.md) | [Reviewed: baseline and recording verified; H3 guards remain](2026-11-13-step-1.2-host-coordination-rc1-windows7.md) |
 | H3 scraper coordination | [rc1 candidate, controlled contrasts and retained failures](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-candidate.md) | [Reviewed: coordination supported; H3 open](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md) |
 | H3 paired diagnostics | [rc1 candidate and retained local failure](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md) | [Reviewed: selection-state correlation; H3 open](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md) |

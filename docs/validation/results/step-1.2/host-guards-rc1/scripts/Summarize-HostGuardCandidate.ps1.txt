@@ -1,0 +1,27 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty';$artifact=Join-Path $repo 'artifacts\fidelity'
+$execution=Get-Content -LiteralPath (Join-Path $artifact 'h3-guards-exact-package-execution.json') -Raw|ConvertFrom-Json
+$report=Get-Content -LiteralPath (Join-Path $execution.Results 'report.json') -Raw|ConvertFrom-Json
+$review=Get-Content -LiteralPath (Join-Path $artifact 'h3-guards-exact-package-review.json') -Raw|ConvertFrom-Json
+$rows=New-Object 'Collections.Generic.List[object]';$experiments=New-Object 'Collections.Generic.List[object]'
+foreach($trial in $report.Trials){
+ $r=$review.Trials[$trial.Order-1]
+ $rows.Add([pscustomobject]@{Order=$trial.Order;Role=$trial.Role;Outcome=$trial.Outcome;CollectionStatus=$trial.CollectionStatus;PassedCases=@($trial.Cases.Cases|Where-Object {$_.Passed}).Count;TotalCases=$trial.Cases.Cases.Count;FailedCases=@($trial.Cases.Cases|Where-Object {-not $_.Passed}|ForEach-Object {$_.Case});SemanticError=$r.NativeReviewError})
+ if($trial.Role -eq 'Experiment'){
+  $native=Join-Path $execution.Results ($trial.Directory+'\native')
+  $neighbor=Join-Path $native 'neighbor'
+  $hostLost=0L;$agentLost=0L;$hostTotal=0L;$agentTotal=0L
+  foreach($file in Get-ChildItem -LiteralPath $neighbor -File -Filter '*-request.json'){
+   $q=Get-Content -LiteralPath $file.FullName -Raw|ConvertFrom-Json
+   if($file.Name.StartsWith('neighbor-')){$t=$q.Response.WindowTrace;$hostLost+=[long]$t.Lost;$hostTotal=[Math]::Max($hostTotal,[long]$t.Total)}
+   elseif($file.Name.StartsWith('agent-')){$t=$q.Response.Trace;$agentLost+=[long]$t.Lost;$agentTotal=[Math]::Max($agentTotal,[long]$t.Total)}
+  }
+  $experiments.Add([pscustomobject]@{Trial=$trial.Directory;Qualified=$r.Review.Guards.Qualified;Cases=$trial.Cases.Cases.Count;BaselinePassed=@($trial.Cases.Cases|Where-Object {$_.Passed -and $_.Case -notlike 'race-*' -and $_.Case -notlike 'child-*' -and $_.Case -notlike 'ps7-*' -and $_.Case -ne 'kernel-access-denied'}).Count;OwnedScopes=$r.Review.Coordination.OwnedScopes;ExpiryRefusals=$r.Review.Coordination.ExpiryRefusals;ReceiptOnlyScopes=$r.Review.Coordination.ReceiptOnlyScopes;CompletedContenders=$r.Review.Guards.CompletedContenders;CanceledContenders=$r.Review.Guards.CanceledContenders;NeighborHostEvents=$hostTotal;NeighborAgentEvents=$agentTotal;NeighborHostLost=$hostLost;NeighborAgentLost=$agentLost;Collector=$r.Review.Coordination.NeighborCollector;CoreGaps=$r.Review.Core.CoverageGaps;CoverageGaps=$r.Review.CoverageGaps;OperationalIssues=$r.Review.OperationalIssues})
+ }
+}
+$metrics=[ordered]@{SchemaVersion=1;Kind='H3GuardExactCandidateMetrics';Execution=$execution;VerifiedEvidenceFiles=$review.VerifiedEvidenceFiles;SemanticReviewsCompleted=$review.SemanticReviewsCompleted;Trials=$rows.ToArray();Experiments=$experiments.ToArray();PassingCases=($rows.ToArray()|Measure-Object PassedCases -Sum).Sum;TotalCases=($rows.ToArray()|Measure-Object TotalCases -Sum).Sum;MilestoneAccepted=$false}
+[IO.File]::WriteAllText((Join-Path $artifact 'h3-guards-exact-package-metrics.json'),($metrics|ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
+$metrics|Select-Object VerifiedEvidenceFiles,SemanticReviewsCompleted,PassingCases,TotalCases
+$rows.ToArray()|Format-Table Order,Role,Outcome,PassedCases,TotalCases -AutoSize
+$experiments.ToArray()|Format-Table Trial,Qualified,OwnedScopes,CompletedContenders,CanceledContenders,NeighborHostLost,NeighborAgentLost -AutoSize

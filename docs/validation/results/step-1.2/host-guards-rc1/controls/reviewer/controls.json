@@ -1,0 +1,50 @@
+[
+    {
+        "Name":  "premature-rundown",
+        "File":  "suite\\race-close-completion\\close-race.json",
+        "Rejected":  true,
+        "ExitCode":  1,
+        "ExpectedReason":  "close defers in-flight resource release",
+        "InjectedSha256":  "9cd84a69b6f8f484578d193f336c6d97b43ef9d1439aeb44a0a16bd263ccfdc6"
+    },
+    {
+        "Name":  "receipt-upgraded",
+        "File":  "suite\\race-close-receipt\\close-race.json",
+        "Rejected":  true,
+        "ExitCode":  1,
+        "ExpectedReason":  "receipt stays unacknowledged",
+        "InjectedSha256":  "0bcbbb2767bffd75a20927edfd5f9d37ad07768d4c5f369aeb02aa68a309d3ff"
+    },
+    {
+        "Name":  "fake-kernel-denial",
+        "File":  "suite\\kernel-access-denied\\kernel-access-denied.json",
+        "Rejected":  true,
+        "ExitCode":  1,
+        "ExpectedReason":  "kernel denial without host mutation",
+        "InjectedSha256":  "d8f41ee38fb74831ebefeec05537109f9fb155918dadcd283f817b104a93054c"
+    },
+    {
+        "Name":  "duplicate-child-event",
+        "File":  "suite\\child-cmd-host\\child\\final.json",
+        "Rejected":  true,
+        "ExitCode":  1,
+        "ExpectedReason":  "passing guard contradicts raw evidence",
+        "InjectedSha256":  "abe1f7b1e99f04089ab7ac42b4a1d9a5549f8684cca410709b298505dd2edfb5"
+    },
+    {
+        "Name":  "foreign-fence-key",
+        "File":  "suite\\race-completion-concurrent\\race-fence.json",
+        "Rejected":  true,
+        "ExitCode":  1,
+        "ExpectedReason":  "race guards follow raw input",
+        "InjectedSha256":  "29012fcaf168188a3a3f0d16556ce8b1de3c120615839bec0ffbf7d53014029c"
+    },
+    {
+        "Name":  "wrong-ps7-engine",
+        "File":  "suite\\ps7-native-empty\\shell.json",
+        "Rejected":  true,
+        "ExitCode":  1,
+        "ExpectedReason":  "pinned native PS7 editor and host route",
+        "InjectedSha256":  "45cffb17921bafc5bd10d279c8f30a651600a81de5704c6e32bb9b33b696618b"
+    }
+]

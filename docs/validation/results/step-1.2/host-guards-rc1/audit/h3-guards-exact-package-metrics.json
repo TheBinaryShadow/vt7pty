@@ -1,0 +1,250 @@
+{
+    "SchemaVersion":  1,
+    "Kind":  "H3GuardExactCandidateMetrics",
+    "Execution":  {
+                      "Archive":  "D:\\Git\\vt7pty\\artifacts\\fidelity\\packages\\VT7Pty-host-guards-0.5.0-rc1.zip",
+                      "ArchiveBytes":  35660866,
+                      "ArchiveSha256":  "620cd3e489fdf53f08184207f947414bd50f89a1ff617507c76c7ac20a099ca7",
+                      "ManifestSha256":  "d7f4c97e6ca6952d837b2cca566dd3a5479a44829f2a3ef19f63a11df5b05892",
+                      "SourceCommit":  "1054a9a75e25bd04eb08f100f442d05e03c5eaad",
+                      "SourceTreeClean":  true,
+                      "ExtractedPackage":  "D:\\Git\\vt7pty\\artifacts\\fidelity\\inspection-host-guards-rc1",
+                      "Results":  "D:\\Git\\vt7pty\\artifacts\\fidelity\\inspection-host-guards-rc1\\results\\developmenthost-guards-20261113-224740-735bbb94",
+                      "StartUtc":  "2026-11-13T22:47:39.8248640Z",
+                      "EndUtc":  "2026-11-13T22:55:49.1275255Z",
+                      "OriginalRunnerExitCode":  1,
+                      "Completed":  9,
+                      "ControlPass":  3,
+                      "ReferencePass":  0,
+                      "ExperimentPass":  3,
+                      "ExperimentFail":  0,
+                      "PreflightErrors":  [
+
+                                          ]
+                  },
+    "VerifiedEvidenceFiles":  9494,
+    "SemanticReviewsCompleted":  true,
+    "Trials":  [
+                   {
+                       "Order":  1,
+                       "Role":  "Control",
+                       "Outcome":  "Pass",
+                       "CollectionStatus":  "Completed",
+                       "PassedCases":  12,
+                       "TotalCases":  12,
+                       "FailedCases":  [
+
+                                       ],
+                       "SemanticError":  ""
+                   },
+                   {
+                       "Order":  2,
+                       "Role":  "Reference",
+                       "Outcome":  "Fail",
+                       "CollectionStatus":  "Completed",
+                       "PassedCases":  20,
+                       "TotalCases":  23,
+                       "FailedCases":  [
+                                           "focus-completed-selected",
+                                           "focus-pending-selected",
+                                           "focus-selection-bracket"
+                                       ],
+                       "SemanticError":  ""
+                   },
+                   {
+                       "Order":  3,
+                       "Role":  "Experiment",
+                       "Outcome":  "Pass",
+                       "CollectionStatus":  "Completed",
+                       "PassedCases":  34,
+                       "TotalCases":  34,
+                       "FailedCases":  [
+
+                                       ],
+                       "SemanticError":  ""
+                   },
+                   {
+                       "Order":  4,
+                       "Role":  "Control",
+                       "Outcome":  "Pass",
+                       "CollectionStatus":  "Completed",
+                       "PassedCases":  12,
+                       "TotalCases":  12,
+                       "FailedCases":  [
+
+                                       ],
+                       "SemanticError":  ""
+                   },
+                   {
+                       "Order":  5,
+                       "Role":  "Reference",
+                       "Outcome":  "Fail",
+                       "CollectionStatus":  "Completed",
+                       "PassedCases":  20,
+                       "TotalCases":  23,
+                       "FailedCases":  [
+                                           "focus-completed-selected",
+                                           "focus-pending-selected",
+                                           "focus-selection-bracket"
+                                       ],
+                       "SemanticError":  ""
+                   },
+                   {
+                       "Order":  6,
+                       "Role":  "Experiment",
+                       "Outcome":  "Pass",
+                       "CollectionStatus":  "Completed",
+                       "PassedCases":  34,
+                       "TotalCases":  34,
+                       "FailedCases":  [
+
+                                       ],
+                       "SemanticError":  ""
+                   },
+                   {
+                       "Order":  7,
+                       "Role":  "Control",
+                       "Outcome":  "Pass",
+                       "CollectionStatus":  "Completed",
+                       "PassedCases":  12,
+                       "TotalCases":  12,
+                       "FailedCases":  [
+
+                                       ],
+                       "SemanticError":  ""
+                   },
+                   {
+                       "Order":  8,
+                       "Role":  "Reference",
+                       "Outcome":  "Fail",
+                       "CollectionStatus":  "Completed",
+                       "PassedCases":  20,
+                       "TotalCases":  23,
+                       "FailedCases":  [
+                                           "focus-completed-selected",
+                                           "focus-pending-selected",
+                                           "focus-selection-bracket"
+                                       ],
+                       "SemanticError":  ""
+                   },
+                   {
+                       "Order":  9,
+                       "Role":  "Experiment",
+                       "Outcome":  "Pass",
+                       "CollectionStatus":  "Completed",
+                       "PassedCases":  34,
+                       "TotalCases":  34,
+                       "FailedCases":  [
+
+                                       ],
+                       "SemanticError":  ""
+                   }
+               ],
+    "Experiments":  [
+                        {
+                            "Trial":  "03-experiment",
+                            "Qualified":  true,
+                            "Cases":  34,
+                            "BaselinePassed":  14,
+                            "OwnedScopes":  26,
+                            "ExpiryRefusals":  1,
+                            "ReceiptOnlyScopes":  2,
+                            "CompletedContenders":  2,
+                            "CanceledContenders":  1,
+                            "NeighborHostEvents":  0,
+                            "NeighborAgentEvents":  4580,
+                            "NeighborHostLost":  0,
+                            "NeighborAgentLost":  0,
+                            "Collector":  {
+                                              "SchemaVersion":  1,
+                                              "Periodic":  true,
+                                              "IntervalMs":  250,
+                                              "Drains":  258,
+                                              "MaxGapMs":  500,
+                                              "MaxDrainDurationMs":  16,
+                                              "StorageCapacity":  4096,
+                                              "CapacityIncreased":  false
+                                          },
+                            "CoreGaps":  [
+
+                                         ],
+                            "CoverageGaps":  [
+
+                                             ],
+                            "OperationalIssues":  [
+
+                                                  ]
+                        },
+                        {
+                            "Trial":  "06-experiment",
+                            "Qualified":  true,
+                            "Cases":  34,
+                            "BaselinePassed":  14,
+                            "OwnedScopes":  26,
+                            "ExpiryRefusals":  1,
+                            "ReceiptOnlyScopes":  2,
+                            "CompletedContenders":  2,
+                            "CanceledContenders":  1,
+                            "NeighborHostEvents":  0,
+                            "NeighborAgentEvents":  4566,
+                            "NeighborHostLost":  0,
+                            "NeighborAgentLost":  0,
+                            "Collector":  {
+                                              "SchemaVersion":  1,
+                                              "Periodic":  true,
+                                              "IntervalMs":  250,
+                                              "Drains":  259,
+                                              "MaxGapMs":  500,
+                                              "MaxDrainDurationMs":  16,
+                                              "StorageCapacity":  4096,
+                                              "CapacityIncreased":  false
+                                          },
+                            "CoreGaps":  [
+
+                                         ],
+                            "CoverageGaps":  [
+
+                                             ],
+                            "OperationalIssues":  [
+
+                                                  ]
+                        },
+                        {
+                            "Trial":  "09-experiment",
+                            "Qualified":  true,
+                            "Cases":  34,
+                            "BaselinePassed":  14,
+                            "OwnedScopes":  26,
+                            "ExpiryRefusals":  1,
+                            "ReceiptOnlyScopes":  2,
+                            "CompletedContenders":  2,
+                            "CanceledContenders":  1,
+                            "NeighborHostEvents":  0,
+                            "NeighborAgentEvents":  4584,
+                            "NeighborHostLost":  0,
+                            "NeighborAgentLost":  0,
+                            "Collector":  {
+                                              "SchemaVersion":  1,
+                                              "Periodic":  true,
+                                              "IntervalMs":  250,
+                                              "Drains":  259,
+                                              "MaxGapMs":  485,
+                                              "MaxDrainDurationMs":  16,
+                                              "StorageCapacity":  4096,
+                                              "CapacityIncreased":  false
+                                          },
+                            "CoreGaps":  [
+
+                                         ],
+                            "CoverageGaps":  [
+
+                                             ],
+                            "OperationalIssues":  [
+
+                                                  ]
+                        }
+                    ],
+    "PassingCases":  198,
+    "TotalCases":  207,
+    "MilestoneAccepted":  false
+}

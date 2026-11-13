@@ -1,0 +1,28 @@
+
+VerifiedEvidenceFiles SemanticReviewsCompleted PassingCases TotalCases
+--------------------- ------------------------ ------------ ----------
+                                                                      
+
+
+
+Order Role       Outcome PassedCases TotalCases
+----- ----       ------- ----------- ----------
+    1 Control    Pass             12         12
+    2 Reference  Fail             20         23
+    3 Experiment Pass             34         34
+    4 Control    Pass             12         12
+    5 Reference  Fail             20         23
+    6 Experiment Pass             34         34
+    7 Control    Pass             12         12
+    8 Reference  Fail             20         23
+    9 Experiment Pass             34         34
+
+
+
+Trial         Qualified OwnedScopes CompletedContenders CanceledContenders NeighborHostLost NeighborAgentLost
+-----         --------- ----------- ------------------- ------------------ ---------------- -----------------
+03-experiment      True          26                   2                  1                0                 0
+06-experiment      True          26                   2                  1                0                 0
+09-experiment      True          26                   2                  1                0                 0
+
+

@@ -1,0 +1,49 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty';$root=Join-Path $repo 'artifacts\fidelity\h3-guards-reviewer-controls'
+if(Test-Path -LiteralPath $root){throw 'Reviewer controls already exist.'}
+[IO.Directory]::CreateDirectory($root)|Out-Null
+$clone=Join-Path $root 'native'
+&robocopy (Join-Path $repo 'artifacts\fidelity\h3-guards-debug-child-contract\native') $clone /E /COPY:DAT /DCOPY:T /R:0 /W:0 /XJ /NP /NFL /NDL /LOG:artifacts\h3-guards-reviewer-copy.log
+if($LASTEXITCODE -ge 8){throw 'Could not stage reviewer controls.'}
+$controls=@(
+ @{Name='premature-rundown';File='suite\race-close-completion\close-race.json';Expected='close defers in-flight resource release'},
+ @{Name='receipt-upgraded';File='suite\race-close-receipt\close-race.json';Expected='receipt stays unacknowledged'},
+ @{Name='fake-kernel-denial';File='suite\kernel-access-denied\kernel-access-denied.json';Expected='kernel denial without host mutation'},
+ @{Name='duplicate-child-event';File='suite\child-cmd-host\child\final.json';Expected='passing guard contradicts raw evidence'},
+ @{Name='foreign-fence-key';File='suite\race-completion-concurrent\race-fence.json';Expected='race guards follow raw input'},
+ @{Name='wrong-ps7-engine';File='suite\ps7-native-empty\shell.json';Expected='pinned native PS7 editor and host route'}
+)
+$records=New-Object 'Collections.Generic.List[object]'
+foreach($control in $controls){
+ $path=Join-Path $clone $control.File;$original=[IO.File]::ReadAllBytes($path)
+ try{
+  $p=[IO.File]::ReadAllText($path)|ConvertFrom-Json
+  switch($control.Name){
+   'premature-rundown'{$p.RundownQpc=$p.CloseRequestedQpc}
+   'receipt-upgraded'{$p.FinalAcknowledgmentObserved=$true}
+   'fake-kernel-denial'{$p.KernelDenied=$false}
+   'duplicate-child-event'{$p.ControlCount=2}
+   'foreign-fence-key'{$key=@($p.GuardInput|Where-Object {$_.Down -eq 1 -and $_.VirtualKey -eq 90})[0];$key.VirtualKey=67;$key.Character=3}
+   'wrong-ps7-engine'{$p.ShellIdentity=$p.ShellIdentity.Replace('7.2.24|','7.4.0|')}
+  }
+  [IO.File]::WriteAllText($path,($p|ConvertTo-Json -Depth 24),[Text.UTF8Encoding]::new($false))
+  $saved=Join-Path $root $control.Name;[IO.Directory]::CreateDirectory($saved)|Out-Null
+  [IO.File]::Copy($path,(Join-Path $saved 'injected.json'))
+  $info=New-Object Diagnostics.ProcessStartInfo
+  $info.FileName='C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+  $info.Arguments='-NoProfile -File "'+(Join-Path $repo 'tools\research\Test-HostFreezeEvidence.ps1')+'" -Directory "'+$clone+'"'
+  $info.UseShellExecute=$false;$info.CreateNoWindow=$true;$info.RedirectStandardOutput=$true;$info.RedirectStandardError=$true;$info.WorkingDirectory=$repo
+  $process=New-Object Diagnostics.Process;$process.StartInfo=$info
+  if(-not $process.Start()){throw 'Reviewer did not start.'}
+  $stdout=$process.StandardOutput.ReadToEndAsync();$stderr=$process.StandardError.ReadToEndAsync()
+  if(-not $process.WaitForExit(120000)){$process.Kill();throw 'Reviewer control deadline.'}
+  $text=$stdout.Result+[Environment]::NewLine+$stderr.Result
+  [IO.File]::WriteAllText((Join-Path $saved 'review.txt'),$text,[Text.UTF8Encoding]::new($false))
+  if($process.ExitCode -eq 0 -or -not $text.Contains($control.Expected)){throw ('Reviewer did not reject '+$control.Name+': '+$text)}
+  $records.Add([pscustomobject]@{Name=$control.Name;File=$control.File;Rejected=$true;ExitCode=$process.ExitCode;ExpectedReason=$control.Expected;InjectedSha256=(Get-FileHash (Join-Path $saved 'injected.json') -Algorithm SHA256).Hash.ToLowerInvariant()})
+  $process.Dispose()
+ }finally{[IO.File]::WriteAllBytes($path,$original)}
+}
+[IO.File]::WriteAllText((Join-Path $root 'controls.json'),($records.ToArray()|ConvertTo-Json -Depth 6),[Text.UTF8Encoding]::new($false))
+$records.ToArray()|Format-Table Name,Rejected,ExitCode -AutoSize

@@ -1,0 +1,31 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$root=Join-Path $repo 'artifacts\fidelity\h3-guards-debug-legacy-profile'
+if(Test-Path -LiteralPath $root){throw 'Development run exists.'}
+$bin=Join-Path $root 'bin';$native=Join-Path $root 'native'
+[IO.Directory]::CreateDirectory($bin)|Out-Null;[IO.Directory]::CreateDirectory($native)|Out-Null
+foreach($name in @('HostCancellationGuardProbe.exe','HostCancellationGuardProbe.pdb','HostCancellationGuardHook.dll','HostCancellationGuardHook.pdb')){
+ Copy-Item -LiteralPath (Join-Path $repo ('artifacts\bin\x64\Debug\'+$name)) -Destination (Join-Path $bin $name)
+}
+$reference=Join-Path $repo 'artifacts\fidelity\packages\VT7Pty-host-coordination-0.5.0-rc1\experiment\bin'
+foreach($name in @('VT7Pty.dll')){Copy-Item -LiteralPath (Join-Path $reference $name) -Destination (Join-Path $bin $name)}
+Copy-Item -LiteralPath (Join-Path $repo 'artifacts\bin\x64\Debug\VT7Pty-GuardAgent.exe') -Destination (Join-Path $bin 'VT7Pty-Agent.exe')
+Copy-Item -LiteralPath (Join-Path $repo 'artifacts\bin\x64\Debug\VT7Pty-GuardAgent.pdb') -Destination (Join-Path $bin 'VT7Pty-GuardAgent.pdb')
+$info=New-Object Diagnostics.ProcessStartInfo
+$info.FileName=Join-Path $bin 'HostCancellationGuardProbe.exe';$info.Arguments='"'+$native+'"';$info.WorkingDirectory=$bin
+$info.UseShellExecute=$false;$info.CreateNoWindow=$true;$info.RedirectStandardOutput=$true;$info.RedirectStandardError=$true
+$info.EnvironmentVariables['VT7PTY_H3_GUARD_TIER']='Legacy'
+$info.EnvironmentVariables['VT7PTY_H3_PWSH']=Join-Path $repo 'artifacts\fidelity\applications\PowerShell-7.2.24-win-x64\pwsh.exe'
+$info.EnvironmentVariables['VT7PTY_H3_ROTATION']='0'
+$source=(&git rev-parse HEAD).Trim();$dirty=@(&git status --porcelain)
+$begin=[DateTime]::UtcNow
+$process=New-Object Diagnostics.Process;$process.StartInfo=$info
+if(-not $process.Start()){throw 'Guard probe did not start.'}
+$out=$process.StandardOutput.ReadToEnd();$err=$process.StandardError.ReadToEnd()
+$process.WaitForExit()
+[IO.File]::WriteAllText((Join-Path $root 'stdout.txt'),$out,[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $root 'stderr.txt'),$err,[Text.UTF8Encoding]::new($false))
+$record=[ordered]@{SourceCommit=$source;SourceTreeClean=($dirty.Count -eq 0);SourceChanges=$dirty;Architecture='x64';Configuration='Debug';StartUtc=$begin.ToString('o');EndUtc=[DateTime]::UtcNow.ToString('o');ExitCode=$process.ExitCode;Results=$native;PowerShell7=$info.EnvironmentVariables['VT7PTY_H3_PWSH'];AgentSha256=(Get-FileHash (Join-Path $bin 'VT7Pty-Agent.exe') -Algorithm SHA256).Hash.ToLowerInvariant();RuntimeDllSha256=(Get-FileHash (Join-Path $bin 'VT7Pty.dll') -Algorithm SHA256).Hash.ToLowerInvariant()}
+[IO.File]::WriteAllText((Join-Path $root 'execution.json'),($record|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+$record

@@ -1,0 +1,335 @@
+Microsoft (R) COFF/PE Dumper Version 14.44.35228.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Git\vt7pty\artifacts\bin\x64\Release\FidelityTest.exe
+
+PE signature found
+
+File Type: EXECUTABLE IMAGE
+
+FILE HEADER VALUES
+            8664 machine (x64)
+               7 number of sections
+        CF335235 time date stamp
+               0 file pointer to symbol table
+               0 number of symbols
+              F0 size of optional header
+              22 characteristics
+                   Executable
+                   Application can handle large (>2GB) addresses
+
+OPTIONAL HEADER VALUES
+             20B magic # (PE32+)
+           14.44 linker version
+           41A00 size of code
+           22600 size of initialized data
+               0 size of uninitialized data
+           1ED8C entry point (000000014001ED8C) wmainCRTStartup
+            1000 base of code
+       140000000 image base (0000000140000000 to 0000000140067FFF)
+            1000 section alignment
+             200 file alignment
+            6.01 operating system version
+            0.00 image version
+            6.01 subsystem version
+               0 Win32 version
+           68000 size of image
+             400 size of headers
+               0 checksum
+               3 subsystem (Windows CUI)
+            8160 DLL characteristics
+                   High Entropy Virtual Addresses
+                   Dynamic base
+                   NX compatible
+                   Terminal Server Aware
+          100000 size of stack reserve
+            1000 size of stack commit
+          100000 size of heap reserve
+            1000 size of heap commit
+               0 loader flags
+              10 number of directories
+               0 [       0] RVA [size] of Export Directory
+           5B03C [      50] RVA [size] of Import Directory
+           66000 [     6B0] RVA [size] of Resource Directory
+           61000 [    3108] RVA [size] of Exception Directory
+               0 [       0] RVA [size] of Certificates Directory
+           67000 [     B6C] RVA [size] of Base Relocation Directory
+           53960 [      70] RVA [size] of Debug Directory
+               0 [       0] RVA [size] of Architecture Directory
+               0 [       0] RVA [size] of Global Pointer Directory
+               0 [       0] RVA [size] of Thread Storage Directory
+           53820 [     140] RVA [size] of Load Configuration Directory
+               0 [       0] RVA [size] of Bound Import Directory
+           43000 [     408] RVA [size] of Import Address Table Directory
+               0 [       0] RVA [size] of Delay Import Directory
+               0 [       0] RVA [size] of COM Descriptor Directory
+               0 [       0] RVA [size] of Reserved Directory
+
+
+SECTION HEADER #1
+   .text name
+   418E0 virtual size
+    1000 virtual address (0000000140001000 to 00000001400428DF)
+   41A00 size of raw data
+     400 file pointer to raw data (00000400 to 00041DFF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+60000020 flags
+         Code
+         Execute Read
+
+SECTION HEADER #2
+  .rdata name
+   18E48 virtual size
+   43000 virtual address (0000000140043000 to 000000014005BE47)
+   19000 size of raw data
+   41E00 file pointer to raw data (00041E00 to 0005ADFF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+40000040 flags
+         Initialized Data
+         Read Only
+
+  Debug Directories
+
+        Time Type        Size      RVA  Pointer
+    -------- ------- -------- -------- --------
+    CF335235 cv            51 00055A58    54858    Format: RSDS, {7AC3FEF7-D9A4-4B8B-513D-64BAAFAAC74C}, 1, D:\Git\vt7pty\artifacts\bin\x64\Release\FidelityTest.pdb
+    CF335235 feat          14 00055AAC    548AC    Counts: Pre-VC++ 11.00=0, C/C++=287, /GS=287, /sdl=1, guardN=286
+    CF335235 coffgrp      398 00055AC0    548C0
+    CF335235 repro         24 00055E80    54C80    F7 FE C3 7A A4 D9 8B 4B 51 3D 64 BA AF AA C7 4C 49 4F 2E EC EF 89 4B 44 4A B1 F3 F2 35 52 33 CF
+
+  Section contains the following imports:
+
+    ADVAPI32.dll
+             140043000 Import Address Table
+             14005B090 Import Name Table
+                     0 time date stamp
+                     0 Index of first forwarder reference
+
+                         15B GetTokenInformation
+                          7B ConvertSidToStringSidW
+                          81 ConvertStringSecurityDescriptorToSecurityDescriptorW
+                         211 OpenProcessToken
+
+    KERNEL32.dll
+             140043028 Import Address Table
+             14005B0B8 Import Name Table
+                     0 time date stamp
+                     0 Index of first forwarder reference
+
+                          E6 CreateFileW
+                         270 GetFileAttributesW
+                         4A9 ReadFile
+                         660 WriteFile
+                          9D CloseHandle
+                         14F DuplicateHandle
+                         28D GetLastError
+                          B4 ConnectNamedPipe
+                         454 PeekNamedPipe
+                          F8 CreateNamedPipeW
+                         2C7 GetOverlappedResult
+                          89 CancelIoEx
+                         625 WaitForSingleObject
+                          D9 CreateEventW
+                         5C8 Sleep
+                         241 GetCurrentProcess
+                         242 GetCurrentProcessId
+                         186 ExitProcess
+                         5D8 TerminateProcess
+                         267 GetExitCodeProcess
+                         2E6 GetProcessId
+                         43F OpenProcess
+                         33D GetTickCount64
+                         311 GetSystemDirectoryW
+                         2A1 GetModuleFileNameW
+                         402 LocalFree
+                         47A QueryFullProcessImageNameW
+                         2AB GetNamedPipeClientProcessId
+                         64C WideCharToMultiByte
+                         118 CreateToolhelp32Snapshot
+                         45F Process32FirstW
+                         461 Process32NextW
+                         556 SetEndOfFile
+                         65F WriteConsoleW
+                         385 HeapSize
+                         2E4 GetProcessHeap
+                         593 SetStdHandle
+                         55A SetEnvironmentVariableW
+                         1D3 FreeEnvironmentStringsW
+                         262 GetEnvironmentStringsW
+                         2C6 GetOEMCP
+                         1DB GetACP
+                         3BE IsValidCodePage
+                         1B4 FindNextFileW
+                         1A3 FindFirstFileExW
+                         19D FindClose
+                         157 EnterCriticalSection
+                         3F0 LeaveCriticalSection
+                         397 InitializeCriticalSectionEx
+                         12F DeleteCriticalSection
+                         153 EncodePointer
+                         128 DecodePointer
+                         423 MultiByteToWideChar
+                         3E3 LCMapStringEx
+                         308 GetStringTypeW
+                         1EA GetCPInfo
+                         509 RtlCaptureContext
+                         511 RtlLookupFunctionEntry
+                         518 RtlVirtualUnwind
+                         5FB UnhandledExceptionFilter
+                         5B8 SetUnhandledExceptionFilter
+                         3B8 IsProcessorFeaturePresent
+                         481 QueryPerformanceCounter
+                         246 GetCurrentThreadId
+                         31A GetSystemTimeAsFileTime
+                         39A InitializeSListHead
+                         3B0 IsDebuggerPresent
+                         301 GetStartupInfoW
+                         2A5 GetModuleHandleW
+                         513 RtlPcToFileHeader
+                         498 RaiseException
+                         517 RtlUnwindEx
+                         578 SetLastError
+                         396 InitializeCriticalSectionAndSpinCount
+                         5EA TlsAlloc
+                         5EC TlsGetValue
+                         5EE TlsSetValue
+                         5EB TlsFree
+                         1D4 FreeLibrary
+                         2DD GetProcAddress
+                         3F6 LoadLibraryExW
+                         303 GetStdHandle
+                         2A4 GetModuleHandleExW
+                         1FF GetCommandLineA
+                         200 GetCommandLineW
+                         380 HeapFree
+                         37C HeapAlloc
+                         1C2 FlsAlloc
+                         1C4 FlsGetValue
+                         1C6 FlsSetValue
+                         1C3 FlsFree
+                         61A VirtualProtect
+                          B3 CompareStringW
+                         3E4 LCMapStringW
+                         291 GetLocaleInfoW
+                         3C0 IsValidLocale
+                         349 GetUserDefaultLCID
+                         17B EnumSystemLocalesW
+                         27A GetFileType
+                         1C8 FlushFileBuffers
+                         229 GetConsoleOutputCP
+                         225 GetConsoleMode
+                         278 GetFileSizeEx
+                         569 SetFilePointerEx
+                         4A6 ReadConsoleW
+                         383 HeapReAlloc
+                         516 RtlUnwind
+
+    VT7Pty.dll
+             140043388 Import Address Table
+             14005B418 Import Name Table
+                     0 time date stamp
+                     0 Index of first forwarder reference
+
+                           F vt7pty_set_size
+                          10 vt7pty_spawn
+                          11 vt7pty_spawn_config_free
+                          12 vt7pty_spawn_config_new
+                           8 vt7pty_conout_name
+                           7 vt7pty_conin_name
+                           C vt7pty_free
+                           E vt7pty_open
+                           4 vt7pty_config_set_agent_timeout
+                           5 vt7pty_config_set_initial_size
+                           2 vt7pty_config_free
+                           3 vt7pty_config_new
+                           A vt7pty_error_free
+                           B vt7pty_error_msg
+                           0 vt7pty_agent_process
+
+SECTION HEADER #3
+   .data name
+    4CC0 virtual size
+   5C000 virtual address (000000014005C000 to 0000000140060CBF)
+    3800 size of raw data
+   5AE00 file pointer to raw data (0005AE00 to 0005E5FF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+C0000040 flags
+         Initialized Data
+         Read Write
+
+SECTION HEADER #4
+  .pdata name
+    3108 virtual size
+   61000 virtual address (0000000140061000 to 0000000140064107)
+    3200 size of raw data
+   5E600 file pointer to raw data (0005E600 to 000617FF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+40000040 flags
+         Initialized Data
+         Read Only
+
+SECTION HEADER #5
+.fptable name
+     100 virtual size
+   65000 virtual address (0000000140065000 to 00000001400650FF)
+     200 size of raw data
+   61800 file pointer to raw data (00061800 to 000619FF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+C0000040 flags
+         Initialized Data
+         Read Write
+
+SECTION HEADER #6
+   .rsrc name
+     6B0 virtual size
+   66000 virtual address (0000000140066000 to 00000001400666AF)
+     800 size of raw data
+   61A00 file pointer to raw data (00061A00 to 000621FF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+40000040 flags
+         Initialized Data
+         Read Only
+
+SECTION HEADER #7
+  .reloc name
+     B6C virtual size
+   67000 virtual address (0000000140067000 to 0000000140067B6B)
+     C00 size of raw data
+   62200 file pointer to raw data (00062200 to 00062DFF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+42000040 flags
+         Initialized Data
+         Discardable
+         Read Only
+
+  Summary
+
+        5000 .data
+        1000 .fptable
+        4000 .pdata
+       19000 .rdata
+        1000 .reloc
+        1000 .rsrc
+       42000 .text

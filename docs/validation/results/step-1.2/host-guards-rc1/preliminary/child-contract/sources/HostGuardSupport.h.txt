@@ -1,0 +1,147 @@
+// Copyright (c) 2026 VT7Pty contributors
+// SPDX-License-Identifier: MIT
+#pragma once
+#include <atomic>
+namespace h3guards {
+inline std::string boolean(bool value) {return value ? "true" : "false";}
+enum class Shell { Native,PowerShell7,ReadLine7 };
+inline Shell shell=Shell::Native;
+inline bool powerShell7Required() {return cancelresearch::guardEnvironment(L"VT7PTY_H3_GUARD_TIER")!=L"Legacy";}
+inline std::vector<BYTE> tokenValue(HANDLE token,TOKEN_INFORMATION_CLASS kind) {
+    DWORD size=0; GetTokenInformation(token,kind,nullptr,0,&size);
+    check(size>0 && size<=65536,"guard token information bound"); std::vector<BYTE> value(size);
+    check(GetTokenInformation(token,kind,value.data(),size,&size),"guard token information"); return value;
+}
+struct Impersonation {
+    bool active=false;
+    explicit Impersonation(HANDLE token) {
+        Handle existing; SetLastError(ERROR_SUCCESS);
+        const BOOL present=OpenThreadToken(GetCurrentThread(),TOKEN_QUERY,TRUE,&existing.value);
+        check(!present && GetLastError()==ERROR_NO_TOKEN,"guard starts without impersonation");
+        check(ImpersonateLoggedOnUser(token),"restricted-token impersonation"); active=true;
+    }
+    void revert() {
+        if(active) {if(!RevertToSelf()) ExitProcess(124);active=false;}
+    }
+    ~Impersonation() {revert();}
+};
+// A real kernel access check on the same thread-open path as ordinary channel setup.
+// Only the controller's temporary credentials change. The host DACL is untouched.
+[[noreturn]] inline void deniedThread(DWORD tid,DWORD host,const std::wstring &path) {
+    constexpr DWORD rights=THREAD_QUERY_LIMITED_INFORMATION|SYNCHRONIZE;
+    Handle before(OpenThread(rights,FALSE,tid));
+    check(before.value && GetProcessIdOfThread(before.value)==host,"positive host-thread access control");
+    Handle token,restricted; check(OpenProcessToken(GetCurrentProcess(),TOKEN_DUPLICATE|TOKEN_QUERY,&token.value),"restriction source token");
+    SID_IDENTIFIER_AUTHORITY authority=SECURITY_NT_AUTHORITY;
+    struct Sid {PSID value=nullptr;~Sid(){if(value)FreeSid(value);}} sid;
+    check(AllocateAndInitializeSid(&authority,4,21,GetCurrentProcessId(),static_cast<DWORD>(GetTickCount64()),tid,0,0,0,0,&sid.value),"private restricting SID");
+    SID_AND_ATTRIBUTES entry={sid.value,0};
+    check(CreateRestrictedToken(token.value,DISABLE_MAX_PRIVILEGE,0,nullptr,0,nullptr,1,&entry,&restricted.value),"restricted token");
+    check(IsTokenRestricted(restricted.value),"kernel reports restricting SIDs");
+    const auto originalUser=tokenValue(token.value,TokenUser),restrictedUser=tokenValue(restricted.value,TokenUser);
+    check(EqualSid(reinterpret_cast<const TOKEN_USER *>(originalUser.data())->User.Sid,
+        reinterpret_cast<const TOKEN_USER *>(restrictedUser.data())->User.Sid),"restriction retains authenticated user");
+    const auto limits=tokenValue(restricted.value,TokenRestrictedSids);
+    const auto *groups=reinterpret_cast<const TOKEN_GROUPS *>(limits.data());
+    check(groups->GroupCount==1 && EqualSid(groups->Groups[0].Sid,sid.value),"exact private restriction");
+    HANDLE result=nullptr; DWORD error=0;
+    {
+        Impersonation scope(restricted.value);
+        SetLastError(ERROR_SUCCESS); result=OpenThread(rights,FALSE,tid); error=result ? ERROR_SUCCESS : GetLastError();
+        scope.revert();
+    }
+    Handle unexpected(result);
+    Handle restored(OpenThread(rights,FALSE,tid));
+    const bool recovered=restored.value && GetProcessIdOfThread(restored.value)==host;
+    Handle current; SetLastError(ERROR_SUCCESS);
+    const BOOL impersonating=OpenThreadToken(GetCurrentThread(),TOKEN_QUERY,TRUE,&current.value);
+    const bool reverted=!impersonating && GetLastError()==ERROR_NO_TOKEN;
+    const bool denied=!result && error==ERROR_ACCESS_DENIED;
+    writeFile(path,"{\"SchemaVersion\":1,\"Kind\":\"H3KernelAccessDenial\",\"Thread\":"+std::to_string(tid)+
+        ",\"Host\":"+std::to_string(host)+",\"DesiredAccess\":"+std::to_string(rights)+",\"Win32Error\":"+std::to_string(error)+
+        ",\"KernelDenied\":"+boolean(denied)+",\"TokenRestricted\":true,\"SameAuthenticatedUser\":true,\"RestrictingSids\":1"+
+        ",\"ImpersonationReverted\":"+boolean(reverted)+",\"OriginalAccessRestored\":"+boolean(recovered)+
+        ",\"HostSecurityChanged\":false,\"HookInstalled\":false,\"HostWriteStarted\":false,\"InjectedProtocolDenial\":false}");
+    check(denied && recovered && reverted,"actual denial and credential restoration");
+    throw std::runtime_error("AccessDenied: retained discovery thread (Win32 5)");
+}
+struct Flight {
+    std::atomic<bool> &active,&closing; bool &disabled;
+    Flight(std::atomic<bool> &a,std::atomic<bool> &c,bool &d):active(a),closing(c),disabled(d) {check(!active.exchange(true),"one in-flight mutation");}
+    ~Flight() {active=false;if(closing.load())disabled=true;}
+};
+struct InputRace {
+    std::function<void()> action;
+    Handle start,ready,done,thread;
+    std::atomic<bool> abort=false;
+    DWORD enterDelay=0,signalDelay=0;
+    uint64_t readyQpc=0,publishedQpc=0,enterBegin=0,enterEnd=0,signalBegin=0,signalEnd=0;
+    std::string error;
+    static DWORD WINAPI run(void *pointer) {
+        auto &r=*static_cast<InputRace *>(pointer);
+        r.readyQpc=h3trace::qpc(); SetEvent(r.ready.value);
+        if(WaitForSingleObject(r.start.value,10000)==WAIT_OBJECT_0 && !r.abort.load()) {
+            try {if(r.enterDelay)Sleep(r.enterDelay);r.enterBegin=h3trace::qpc();r.action();r.enterEnd=h3trace::qpc();}
+            catch(const std::exception &e){r.error=e.what();}
+        } else if(!r.abort.load()) r.error="completion-race start deadline";
+        SetEvent(r.done.value); return 0;
+    }
+    InputRace(std::function<void()> operation,DWORD enterMs,DWORD signalMs):action(std::move(operation)),enterDelay(enterMs),signalDelay(signalMs) {
+        start.reset(CreateEventW(nullptr,TRUE,FALSE,nullptr));ready.reset(CreateEventW(nullptr,TRUE,FALSE,nullptr));done.reset(CreateEventW(nullptr,TRUE,FALSE,nullptr));
+        check(start.value && ready.value && done.value,"completion-race events");
+        thread.reset(CreateThread(nullptr,0,run,this,0,nullptr));check(thread.value!=nullptr,"completion contender");
+        if(WaitForSingleObject(ready.value,5000)!=WAIT_OBJECT_0){abort=true;SetEvent(start.value);if(WaitForSingleObject(thread.value,5000)!=WAIT_OBJECT_0)ExitProcess(124);check(false,"completion contender armed");}
+    }
+    void publish() {publishedQpc=h3trace::qpc();check(SetEvent(start.value),"release completion contender");if(signalDelay)Sleep(signalDelay);}
+    void join() {check(WaitForSingleObject(done.value,5000)==WAIT_OBJECT_0 && WaitForSingleObject(thread.value,5000)==WAIT_OBJECT_0,"completion contender joined");check(error.empty(),"completion input operation");}
+    ~InputRace(){abort=true;SetEvent(start.value);if(thread.value && WaitForSingleObject(thread.value,5000)!=WAIT_OBJECT_0)ExitProcess(124);}
+};
+enum class ClosePhase { Published,Completion };
+struct CloseRace {
+    std::atomic<bool> &closing,&active;
+    ClosePhase phase;
+    std::function<void()> closeOperation;
+    Handle start,ready,resume,thread;
+    std::atomic<bool> abort=false;
+    uint64_t readyQpc=0,publishedQpc=0,completionQpc=0,closeQpc=0,resumeQpc=0,ackQpc=0,endQpc=0,rundownQpc=0;
+    bool sawFlight=false;
+    static DWORD WINAPI run(void *pointer) {
+        auto &r=*static_cast<CloseRace *>(pointer);
+        r.readyQpc=h3trace::qpc();SetEvent(r.ready.value);
+        if(WaitForSingleObject(r.start.value,10000)==WAIT_OBJECT_0 && !r.abort.load()) {
+            r.sawFlight=r.active.load();r.closeQpc=h3trace::qpc();r.closeOperation();
+        }
+        SetEvent(r.resume.value);return 0;
+    }
+    CloseRace(std::atomic<bool> &c,std::atomic<bool> &a,ClosePhase p,std::function<void()> operation):closing(c),active(a),phase(p),closeOperation(std::move(operation)) {
+        start.reset(CreateEventW(nullptr,TRUE,FALSE,nullptr));ready.reset(CreateEventW(nullptr,TRUE,FALSE,nullptr));resume.reset(CreateEventW(nullptr,TRUE,FALSE,nullptr));
+        check(start.value && ready.value && resume.value,"close-race events");
+        thread.reset(CreateThread(nullptr,0,run,this,0,nullptr));check(thread.value!=nullptr,"concurrent close requester");
+        if(WaitForSingleObject(ready.value,5000)!=WAIT_OBJECT_0){abort=true;SetEvent(start.value);if(WaitForSingleObject(thread.value,5000)!=WAIT_OBJECT_0)ExitProcess(124);check(false,"close requester armed");}
+    }
+    void pause() {check(SetEvent(start.value) && WaitForSingleObject(resume.value,2000)==WAIT_OBJECT_0,"concurrent close boundary");resumeQpc=h3trace::qpc();check(sawFlight && closing.load() && closeQpc,"close overlaps active request");}
+    void published(){publishedQpc=h3trace::qpc();if(phase==ClosePhase::Published)pause();}
+    void completed(HANDLE event){if(phase==ClosePhase::Completion){check(WaitForSingleObject(event,2000)==WAIT_OBJECT_0,"keyboard-scope boundary before close");completionQpc=h3trace::qpc();pause();}}
+    void join(){check(WaitForSingleObject(thread.value,5000)==WAIT_OBJECT_0,"concurrent close joined");}
+    ~CloseRace(){abort=true;SetEvent(start.value);if(thread.value && WaitForSingleObject(thread.value,5000)!=WAIT_OBJECT_0)ExitProcess(124);}
+};
+inline uint64_t eventTime(const cancelresearch::IdentityPacket &p,uint32_t kind,uint32_t index) {
+    for(uint32_t i=0;i<p.trace.eventCount;++i)if(p.trace.events[i].kind==kind && p.trace.events[i].index==index)return p.trace.events[i].qpc;
+    return 0;
+}
+inline bool completedRace(const cancelresearch::IdentityPacket &p) {
+    return p.readReturned && p.readSucceeded && !p.readError && std::wstring(p.text,p.textCount)==L"racekeep\r\n" && p.controlCount==1 && p.controlType==CTRL_C_EVENT;
+}
+inline bool fenceOkay(const cancelresearch::IdentityPacket &p) {
+    if(!p.readReturned || !p.readSucceeded || p.readError || p.controlCount!=1 || !p.guardInputCount || p.guardInputCount>32)return false;
+    unsigned int enterDown=0,enterUp=0,markerDown=0,markerUp=0;
+    for(uint32_t i=0;i<p.guardInputCount;++i) {
+        const auto &r=p.guardInput[i];if(r.type!=KEY_EVENT)continue;
+        if(r.down && r.repeat!=1)return false;
+        if(r.virtualKey==VK_RETURN){if(r.down)++enterDown;else ++enterUp;}
+        else if(r.virtualKey=='Z'){if(r.down && r.character=='z')++markerDown;else if(!r.down)++markerUp;else return false;}
+        else if(r.down)return false; // Never discard a foreign key-down to make the next read pass.
+    }
+    return enterDown<=1 && enterUp<=1 && markerDown==1 && markerUp==1;
+}
+} // namespace h3guards

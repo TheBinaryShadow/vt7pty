@@ -1,0 +1,227 @@
+// Copyright (c) 2026 VT7Pty contributors
+// SPDX-License-Identifier: MIT
+#pragma once
+void guardOracle() {
+    unsigned int count=0;const auto test=[&](bool ok,const char *name){check(ok,name);++count;};
+    auto p=std::make_unique<IdentityPacket>();
+    p->readReturned=p->readSucceeded=1;p->controlCount=1;p->controlType=CTRL_C_EVENT;
+    const std::wstring complete=L"racekeep\r\n";p->textCount=static_cast<uint32_t>(complete.size());std::copy(complete.begin(),complete.end(),p->text);
+    test(h3guards::completedRace(*p),"completed contender retains exact completed text");
+    p->textCount--;test(!h3guards::completedRace(*p),"reject truncated race completion");p->textCount++;
+    p->controlCount=2;test(!h3guards::completedRace(*p),"reject duplicate race event");p->controlCount=1;
+    p->readError=ERROR_OPERATION_ABORTED;test(!h3guards::completedRace(*p),"do not call aborted text a completion");p->readError=0;
+    p->readReturned=0;test(!h3guards::completedRace(*p),"reject pending contender");p->readReturned=1;
+    p->guardInputCount=2;p->guardInput[0]={KEY_EVENT,1,'z','Z',0,0,1};p->guardInput[1]={KEY_EVENT,0,'z','Z',0,0,1};
+    test(h3guards::fenceOkay(*p),"owned input fence");
+    p->guardInput[0].virtualKey='C';test(!h3guards::fenceOkay(*p),"never drain a foreign C key");p->guardInput[0].virtualKey='Z';
+    p->guardInput[1].down=1;test(!h3guards::fenceOkay(*p),"require marker key release");p->guardInput[1].down=0;
+    p->guardInputCount=3;p->guardInput[2]={KEY_EVENT,1,VK_RETURN,VK_RETURN,0,0,1};
+    test(h3guards::fenceOkay(*p),"one planned completion Enter");
+    p->guardInputCount=4;p->guardInput[3]=p->guardInput[2];test(!h3guards::fenceOkay(*p),"reject duplicate completion Enter");
+    p->guardInputCount=2;p->controlCount=2;test(!h3guards::fenceOkay(*p),"fence preserves event count");
+    p->controlCount=1;p->readError=1;test(!h3guards::fenceOkay(*p),"fence read error remains failure");
+    p->readError=0;p->guardInput[0].repeat=2;test(!h3guards::fenceOkay(*p),"reject repeated fence character");
+    printf("Host guard oracle: %u checks passed\n",count);
+}
+inline unsigned int completedContenders=0,canceledContenders=0;
+bool completionRace(Session &s,Channel &c,const std::wstring &out,DWORD enterDelay,DWORD signalDelay) {
+    startRead(s,"racekeep");settle(s);
+    h3guards::InputRace race([&]{s.input("\r");},enterDelay,signalDelay);c.inputRace=&race;
+    const auto response=c.exchangeOwned(c.next(Op::Cancel),Result::Accepted,"completion-race");
+    c.inputRace=nullptr;race.join();
+    auto p=std::make_unique<IdentityPacket>();
+    const bool observed=s.until([&]{*p=s.observe();return p->readReturned && p->controlCount>=1;},2000);
+    const bool aborted=canceledRead(*p,1),completed=h3guards::completedRace(*p);
+    if(aborted)++canceledContenders;if(completed)++completedContenders;
+    uint64_t key=0;for(uint32_t i=0;i<response->trace.count;++i)if(response->trace.samples[i].stage==h3trace::KeyEntry)key=response->trace.samples[i].qpc;
+    const auto returned=h3guards::eventTime(*p,h3trace::ReadReturn,1),handled=h3guards::eventTime(*p,h3trace::HandlerExit,1);
+    const bool deadline=observed && key && returned && handled && returned<=key+2*h3trace::frequency() && handled<=key+2*h3trace::frequency();
+    writeFile(out+L"\\race-read.json",packetJson(*p));
+    if(!p->readReturned) {s.input("\r");check(s.until([&]{*p=s.observe();return p->readReturned!=0;}),"failed race recovery");writeFile(out+L"\\race-recovery.json",packetJson(*p));}
+    // Consume only the explicit contender's possible remaining Enter and this fence.
+    // Keep the console mode unchanged and retain every raw record; never FlushConsoleInputBuffer.
+    const auto ready=s.observe('F');check(!ready.readReturned && ready.trace.readEntered,"race input-fence readiness");
+    s.input("z");check(s.until([&]{*p=s.observe();return p->readReturned!=0;}),"race input fence");
+    writeFile(out+L"\\race-fence.json",packetJson(*p));const bool fence=h3guards::fenceOkay(*p);
+    const bool next=nextRead(s,out,L"race",1);
+    writeFile(out+L"\\completion-race.json","{\"SchemaVersion\":1,\"Kind\":\"H3CompletionRace\",\"EnterDelayMs\":"+std::to_string(enterDelay)+
+        ",\"SignalDelayMs\":"+std::to_string(signalDelay)+",\"ContenderReadyQpc\":"+h3trace::u64(race.readyQpc)+
+        ",\"RequestPublishedQpc\":"+h3trace::u64(race.publishedQpc)+",\"EnterBeginQpc\":"+h3trace::u64(race.enterBegin)+",\"EnterEndQpc\":"+h3trace::u64(race.enterEnd)+
+        ",\"SignalBeginQpc\":"+h3trace::u64(race.signalBegin)+",\"SignalEndQpc\":"+h3trace::u64(race.signalEnd)+",\"KeyEntryQpc\":"+h3trace::u64(key)+
+        ",\"ReadReturnQpc\":"+h3trace::u64(returned)+",\"HandlerExitQpc\":"+h3trace::u64(handled)+",\"Frequency\":"+h3trace::u64(h3trace::frequency())+
+        ",\"Outcome\":"+json(aborted ? "Canceled" : completed ? "Completed" : "Invalid")+",\"OriginalDeadlineMet\":"+h3guards::boolean(deadline)+
+        ",\"InputFencePassed\":"+h3guards::boolean(fence)+",\"NextReadPreserved\":"+h3guards::boolean(next)+
+        ",\"ConcurrentControllerRequests\":true,\"SimultaneousKernelExecutionClaimed\":false,\"CancellationDispatches\":1,\"CompletionEnters\":1,\"FallbackControlSent\":false}");
+    c.close();s.quit();return deadline && (aborted || completed) && keyboardOkay(*response) && fence && next;
+}
+bool closeRace(Session &s,Channel &c,const std::wstring &out,h3guards::ClosePhase phase,bool receipt) {
+    startRead(s,"closepending");
+    h3guards::CloseRace race(c.closingRequested,c.inFlight,phase,[&]{c.requestClose();});c.closeRace=&race;
+    const auto response=c.exchangeOwned(c.next(receipt ? Op::CancelSuppressAck : Op::Cancel),receipt ? Result::Received : Result::Accepted,"concurrent-close");
+    race.join();const bool blocked=c.blocked() && !c.inFlight.load();
+    bool refused=false;try{c.exchange(c.next(),Result::Accepted,"must-not-send-after-concurrent-close");}catch(...){refused=true;}
+    if(receipt)c.ambiguityControl(true,true);
+    const bool canceled=captureCancellation(s,out,L"close-race",1),next=nextRead(s,out,L"close-race",1);
+    c.closeRace=nullptr;c.detach();race.rundownQpc=h3trace::qpc();
+    writeFile(out+L"\\close-race.json","{\"SchemaVersion\":1,\"Kind\":\"H3ConcurrentClose\",\"Phase\":"+json(phase==h3guards::ClosePhase::Published ? "PublishedBeforeNotify" : "CompletionBeforeAckConsumption")+
+        ",\"RequesterReadyQpc\":"+h3trace::u64(race.readyQpc)+",\"RequestPublishedQpc\":"+h3trace::u64(race.publishedQpc)+
+        ",\"KeyboardCompletionObservedQpc\":"+h3trace::u64(race.completionQpc)+",\"CloseRequestedQpc\":"+h3trace::u64(race.closeQpc)+
+        ",\"DispatchResumedQpc\":"+h3trace::u64(race.resumeQpc)+",\"ResponseConsumedQpc\":"+h3trace::u64(race.ackQpc)+
+        ",\"RequestEndedQpc\":"+h3trace::u64(race.endQpc)+",\"RundownQpc\":"+h3trace::u64(race.rundownQpc)+
+        ",\"CloseSawActiveRequest\":"+h3guards::boolean(race.sawFlight)+",\"DispatchDisabled\":"+h3guards::boolean(blocked)+
+        ",\"FurtherRequestRefused\":"+h3guards::boolean(refused)+",\"ReceiptOnly\":"+h3guards::boolean(receipt)+
+        ",\"FinalAcknowledgmentObserved\":"+h3guards::boolean(!receipt)+",\"ReadCanceled\":"+h3guards::boolean(canceled)+
+        ",\"NextReadPreserved\":"+h3guards::boolean(next)+",\"CancellationDispatches\":1,\"FallbackControlSent\":false,\"HostCallbackWaitAdded\":false}");
+    s.quit();return canceled && next && blocked && refused && (receipt || keyboardOkay(*response));
+}
+bool kernelDenial(Session &s,Channel &c,const std::wstring &out) {
+    startRead(s,"accesskept");c.close();
+    bool denied=false;
+    try{Channel other(s,out,L"denied",true);}catch(const std::exception &e){denied=std::string(e.what())=="AccessDenied: retained discovery thread (Win32 5)";}
+    const auto before=s.observe();writeFile(out+L"\\denial-read.json",packetJson(before));
+    const bool untouched=!before.readReturned && !before.controlCount;
+    finishRead(s,L"accesskept",out,L"denial-recovery");
+    const bool next=nextRead(s,out,L"denial",0);
+    writeFile(out+L"\\denial.json","{\"KernelDenied\":"+h3guards::boolean(denied)+",\"PendingReadPreserved\":"+h3guards::boolean(untouched)+
+        ",\"OriginalTextPreserved\":true,\"NextReadPreserved\":"+h3guards::boolean(next)+",\"CancellationDispatches\":0,\"RetrySent\":false,\"FallbackControlSent\":false}");
+    s.quit();return denied && untouched && next;
+}
+struct GuardShell {
+    Session &s;bool cmd;h3guards::Shell kind;uint32_t generation=0,commandIndex=0;
+    std::u32string prompt=U"H3_CMD>";std::string token,metadata;
+    GuardShell(Session &session,Channel &channel,const std::wstring &out,bool commandPrompt,h3guards::Shell variant):s(session),cmd(commandPrompt),kind(variant) {
+        h3guards::shell=variant;startOwnedShell(s,channel,cmd);
+        check(s.until([&]{return atPrompt();},20000),"guard shell initial prompt");
+        if(cmd){token="H3_CMD_GUARD_"+std::to_string(GetProcessId(s.child.value));setCmdPrompt();metadata="System32 cmd.exe";}
+        else {
+            const auto path=out+L"\\guard-shell-identity.txt";const auto previous=generation;
+            const auto query=L"$m=Get-Module PSReadLine; $v='none'; $cfg='native'; if($m){$v=$m.Version.ToString();$o=Get-PSReadLineOption;$cfg=$m.Path+'|'+$o.EditMode.ToString()+'|'+$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAllText("+
+                psLiteral(path)+L",$PSVersionTable.PSVersion.ToString()+'|'+$v+'|'+$Host.Name+'|'+$cfg)";
+            s.input(utf8(query+L"\r"));
+            check(s.until([&]{metadata=fileText(path);return metadata.find("|ConsoleHost|")!=std::string::npos && atPrompt() && generation>previous;},10000),"guard shell editor identity");
+            if(kind!=h3guards::Shell::Native)check(metadata.starts_with("7.2.24|"),"pinned PowerShell 7 engine");
+            if(kind==h3guards::Shell::ReadLine7)check(metadata.find("|none|")==std::string::npos && metadata.ends_with("|Windows|SaveNothing"),"bundled PSReadLine configuration");
+            else check(metadata.find("|none|ConsoleHost|native")!=std::string::npos,"native ConsoleHost configuration");
+        }
+    }
+    ~GuardShell(){h3guards::shell=h3guards::Shell::Native;}
+    bool atPrompt() {
+        const auto row=trim(s.state.row(s.state.y()));if(cmd)return row==prompt;
+        if(!row.starts_with(U"H3_PS[") || !row.ends_with(U"]>"))return false;
+        uint32_t value=0;for(size_t i=6;i+2<row.size();++i){if(row[i]<U'0'||row[i]>U'9'||value>100000)return false;value=value*10+(row[i]-U'0');}
+        generation=value;return value!=0;
+    }
+    void setCmdPrompt(){prompt.clear();for(unsigned char ch:token)prompt+=ch;prompt+=U'>';s.input("prompt "+token+"$G\r");check(s.until([&]{return atPrompt();}),"guard CMD prompt barrier");}
+    bool continueCommand(const std::wstring &out) {
+        const auto path=out+L"\\parent-continued.txt";const auto previous=generation;
+        auto line=cmd ? L"echo CONTINUE>"+quote(path) : L"[IO.File]::WriteAllText("+psLiteral(path)+L",'CONTINUE')";
+        if(cmd){token+="_"+std::to_string(++commandIndex);prompt.clear();for(unsigned char ch:token)prompt+=ch;prompt+=U'>';line+=L" & prompt ";for(unsigned char ch:token)line+=static_cast<wchar_t>(ch);line+=L"$G";}
+        s.input(utf8(line+L"\r"));
+        return s.until([&]{return fileText(path)=="CONTINUE" && atPrompt() && (cmd || generation>previous);});
+    }
+    void quit(){s.input("exit 0\r");check(s.until([&]{return WaitForSingleObject(s.descendant.value,0)==WAIT_OBJECT_0;}),"guard shell quit");DWORD status=1;check(GetExitCodeProcess(s.descendant.value,&status)&&status==0,"guard shell status");}
+};
+struct GuardChild {
+    Session &s;Handle pipe;std::wstring out;DWORD pid=0;
+    GuardChild(Session &session,Channel &channel,GuardShell &,const std::wstring &path):s(session),out(path) {
+        check(CreateDirectoryW(out.c_str(),nullptr),"guard child observations directory");
+        const auto name=L"\\\\.\\pipe\\VT7Pty-H3-child-"+std::to_wstring(GetCurrentProcessId())+L"-"+std::to_wstring(h3trace::qpc());
+        pipe.reset(privateServer(name));const auto exe=imagePath(GetCurrentProcess());
+        s.input(utf8(quote(exe)+L" --fixture "+quote(name)+L" "+std::to_wstring(GetCurrentProcessId())+L"\r"));
+        connect(pipe.value);ULONG peer=0;check(GetNamedPipeClientProcessId(pipe.value,&peer),"guard child pipe peer");pid=peer;
+        Handle child(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION|SYNCHRONIZE|PROCESS_TERMINATE,FALSE,pid));
+        check(child.value && parentProcessId(pid)==GetProcessId(s.descendant.value) && _wcsicmp(imagePath(child.value).c_str(),exe.c_str())==0 &&
+            agrees(hostQuery(child.value),hostQuery(s.agent.value)),"owned native grandchild");
+        const TokenIdentity ours(GetCurrentProcess()),theirs(child.value);check(ours.same(theirs),"guard child token");
+        s.guardChild.reset(child.value);child.value=INVALID_HANDLE_VALUE;registerSession(s,channel);
+        const auto identity=observe();
+        writeFile(out+L"\\identity.json","{\"Identity\":"+packetJson(identity)+",\"Created\":"+h3trace::u64(creation(s.guardChild.value))+
+            ",\"ParentShell\":"+std::to_string(GetProcessId(s.descendant.value))+",\"Image\":"+json(utf8(exe))+",\"SameUserLogonIntegritySession\":true}");
+    }
+    IdentityPacket observe(char command='I') {
+        transfer(pipe.value,&command,1,true);IdentityPacket p;transfer(pipe.value,&p,sizeof(p),false);
+        check(p.magic==0x33494856 && p.schema==5 && p.processId==pid && p.parentId==GetProcessId(s.descendant.value) &&
+            p.textCount<=127 && p.keyCount<=16 && p.trace.eventCount<=64 && p.guardInputCount<=32 &&
+            (p.query.raw&~ULONG_PTR{3})==GetProcessId(s.host.value),"guard child packet");
+        check(p.consoleCount==4 && std::find(p.consoleProcesses,p.consoleProcesses+4,GetProcessId(s.child.value))!=p.consoleProcesses+4 &&
+            std::find(p.consoleProcesses,p.consoleProcesses+4,pid)!=p.consoleProcesses+4,"guard child shared console");
+        return p;
+    }
+    void quit(){char command='Q';transfer(pipe.value,&command,1,true);check(s.until([&]{return WaitForSingleObject(s.guardChild.value,0)==WAIT_OBJECT_0;}),"guard child quit");DWORD status=0;check(GetExitCodeProcess(s.guardChild.value,&status)&&status==37,"guard child exit status");}
+};
+bool childGuard(Session &s,Channel &c,const std::wstring &out,bool cmd,h3guards::Shell variant,bool hostPath) {
+    GuardShell shell(s,c,out,cmd,variant);GuardChild child(s,c,shell,out+L"\\child");
+    auto p=std::make_unique<IdentityPacket>(child.observe('R'));check(!p->readReturned && (p->inputMode&ENABLE_PROCESSED_INPUT),"active-child processed read");
+    s.input("childpending");check(s.until([&]{return s.state.contains(U"HOST_INPUT>childpending");}),"active child input echo");
+    *p=child.observe();check(!p->readReturned && p->trace.readEntered && !p->controlCount,"active child pending barrier");
+    writeFile(out+L"\\child\\pending.json",packetJson(*p));std::unique_ptr<Response> response;
+    if(hostPath)response=c.exchangeOwned(c.next(Op::Cancel),Result::Accepted,"active-child-cancel");else s.input("\x03");
+    const bool original=s.until([&]{*p=child.observe();return p->readReturned && p->controlCount>=1;},2000);
+    writeFile(out+L"\\child\\canceled.json",packetJson(*p));const bool canceled=original && canceledRead(*p,1);
+    if(!p->readReturned){s.input("\r");check(s.until([&]{*p=child.observe();return p->readReturned!=0;}),"failed child read recovery");writeFile(out+L"\\child\\recovery.json",packetJson(*p));}
+    *p=child.observe('R');check(!p->readReturned,"child next read starts pending");s.input("GUARD_NEXT\r");
+    const bool next=s.until([&]{*p=child.observe();return p->readReturned!=0;});
+    writeFile(out+L"\\child\\next.json",packetJson(*p));
+    const bool preserved=next && p->readSucceeded && !p->readError && p->controlCount==1 && std::wstring(p->text,p->textCount)==L"GUARD_NEXT\r\n";
+    child.quit();const bool parentPrompt=s.until([&]{return shell.atPrompt();},10000);
+    const bool continued=shell.continueCommand(out),alive=WaitForSingleObject(s.descendant.value,0)==WAIT_TIMEOUT;
+    s.until([&]{return s.observe().controlCount>=1;},2000);settle(s);const auto root=s.observe();
+    writeFile(out+L"\\parent-events.json",packetJson(root));
+    writeFile(out+L"\\child-guard.json","{\"SchemaVersion\":1,\"ShellIdentity\":"+json(shell.metadata)+",\"InputRoute\":"+json(hostPath ? "HostCancellation" : "PublicETX")+
+        ",\"Child\":"+std::to_string(child.pid)+",\"ParentShell\":"+std::to_string(GetProcessId(s.descendant.value))+
+        ",\"OriginalDeadlineMet\":"+h3guards::boolean(original)+",\"ChildCanceled\":"+h3guards::boolean(canceled)+
+        ",\"ChildNextReadPreserved\":"+h3guards::boolean(preserved)+",\"ParentPrompt\":"+h3guards::boolean(parentPrompt)+
+        ",\"ParentContinued\":"+h3guards::boolean(continued)+",\"ParentAlive\":"+h3guards::boolean(alive)+",\"FixtureControlCount\":"+std::to_string(root.controlCount)+
+        ",\"CancellationDispatches\":"+std::to_string(hostPath ? 1 : 0)+",\"PublicETXWrites\":"+std::to_string(hostPath ? 0 : 1)+",\"FallbackControlSent\":false}");
+    c.close();shell.quit();s.quit();return canceled && preserved && parentPrompt && continued && alive && root.controlCount==1 && (!hostPath || keyboardOkay(*response));
+}
+bool readlineGuard(Session &s,Channel &c,const std::wstring &out,bool partial) {
+    GuardShell shell(s,c,out,false,h3guards::Shell::ReadLine7);const auto bad=out+L"\\canceled-command.txt";
+    if(partial){s.input(utf8(L"[IO.File]::WriteAllText("+psLiteral(bad)+L",'BAD')"));check(s.until([&]{return !shell.atPrompt();}),"PSReadLine partial input echo");}
+    settle(s);const auto before=s.observe();const auto generation=shell.generation;
+    const bool raw=(before.inputMode&ENABLE_PROCESSED_INPUT)==0;writeFile(out+L"\\editor-before.json",packetJson(before));
+    s.input("\x03");const bool fresh=s.until([&]{return shell.atPrompt() && shell.generation>generation;},2000);
+    // A boundary Enter exposes a retained partial command. It is not cancellation.
+    s.input("\r");const bool continued=shell.continueCommand(out);settle(s);const auto after=s.observe();
+    writeFile(out+L"\\editor-after.json",packetJson(after));const bool discarded=GetFileAttributesW(bad.c_str())==INVALID_FILE_ATTRIBUTES;
+    const bool alive=WaitForSingleObject(s.descendant.value,0)==WAIT_TIMEOUT;
+    writeFile(out+L"\\editor-guard.json","{\"SchemaVersion\":1,\"ShellIdentity\":"+json(shell.metadata)+",\"RawInputObserved\":"+h3guards::boolean(raw)+
+        ",\"FreshPrompt\":"+h3guards::boolean(fresh)+",\"CanceledCommandAbsent\":"+h3guards::boolean(discarded)+",\"NextCommand\":"+h3guards::boolean(continued)+
+        ",\"ShellAlive\":"+h3guards::boolean(alive)+",\"FixtureControlCount\":"+std::to_string(after.controlCount)+
+        ",\"CancellationDispatches\":0,\"PublicETXWrites\":1,\"FallbackControlSent\":false}");
+    c.close();shell.quit();s.quit();return raw && fresh && discarded && continued && alive && !after.controlCount;
+}
+template<class Add> void addGuardCases(Add &add,const std::wstring &output) {
+    add("race-completion-enter-biased",[](Session &s,Channel &c,const std::wstring &out){return completionRace(s,c,out,0,100);});
+    add("race-completion-concurrent",[](Session &s,Channel &c,const std::wstring &out){return completionRace(s,c,out,0,0);});
+    add("race-completion-cancel-biased",[](Session &s,Channel &c,const std::wstring &out){return completionRace(s,c,out,100,0);});
+    add("race-completion-outcomes",[](Session &s,Channel &c,const std::wstring &out){
+        const bool passed=completedContenders>=1 && canceledContenders>=1 && completedContenders+canceledContenders==3;
+        writeFile(out+L"\\race-coverage.json","{\"Completed\":"+std::to_string(completedContenders)+",\"Canceled\":"+std::to_string(canceledContenders)+",\"RequiredCases\":3,\"BothOutcomesObserved\":"+h3guards::boolean(passed)+"}");
+        c.close();s.quit();return passed;
+    });
+    add("race-close-published",[](Session &s,Channel &c,const std::wstring &out){return closeRace(s,c,out,h3guards::ClosePhase::Published,false);});
+    add("race-close-completion",[](Session &s,Channel &c,const std::wstring &out){return closeRace(s,c,out,h3guards::ClosePhase::Completion,false);});
+    add("race-close-receipt",[](Session &s,Channel &c,const std::wstring &out){return closeRace(s,c,out,h3guards::ClosePhase::Completion,true);});
+    add("kernel-access-denied",kernelDenial);
+    for(bool cmd:{true,false})for(bool host:{false,true})
+        add(std::string("child-")+(cmd ? "cmd-" : "powershell-")+(host ? "host" : "etx"),[=](Session &s,Channel &c,const std::wstring &out){return childGuard(s,c,out,cmd,h3guards::Shell::Native,host);});
+    const bool ps7=h3guards::powerShell7Required();
+    if(ps7) {
+        for(auto variant:{h3guards::Shell::PowerShell7,h3guards::Shell::ReadLine7})for(bool host:{false,true})
+            add(std::string("child-")+(variant==h3guards::Shell::PowerShell7 ? "ps7-native-" : "ps7-readline-")+(host ? "host" : "etx"),
+                [=](Session &s,Channel &c,const std::wstring &out){return childGuard(s,c,out,false,variant,host);});
+        for(bool partial:{false,true}) {
+            add(std::string("ps7-native-")+(partial ? "partial" : "empty"),[=](Session &s,Channel &c,const std::wstring &out){
+                h3guards::shell=h3guards::Shell::PowerShell7;
+                struct Reset {~Reset(){h3guards::shell=h3guards::Shell::Native;}} reset;
+                return shellCase(s,c,out,false,partial);
+            });
+            add(std::string("ps7-readline-")+(partial ? "partial" : "empty"),[=](Session &s,Channel &c,const std::wstring &out){return readlineGuard(s,c,out,partial);});
+        }
+    }
+    writeFile(output+L"\\guard-applicability.json","{\"SchemaVersion\":1,\"Tier\":"+json(utf8(guardEnvironment(L"VT7PTY_H3_GUARD_TIER")))+
+        ",\"PowerShell7Required\":"+h3guards::boolean(ps7)+",\"PowerShell7Cases\":"+std::to_string(ps7 ? 8 : 0)+",\"PowerShell7NotApplicableCases\":"+
+        std::to_string(ps7 ? 0 : 8)+",\"Reason\":"+json(ps7 ? "Designated pinned 7.2.24 application matrix" : "Legacy tier requires installed shell and native guards; PowerShell 7 is not a prerequisite")+
+        ",\"CharacterizationContrastsRunInUnchangedReference\":true,\"ExpectedCases\":"+std::to_string(ps7 ? 34 : 26)+"}");
+}

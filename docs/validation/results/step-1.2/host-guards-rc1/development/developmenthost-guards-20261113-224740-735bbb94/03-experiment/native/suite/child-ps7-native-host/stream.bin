@@ -1,0 +1,18 @@
+[0m[0K]0;VT7Pty dispatch research 102512125]0;VT7Pty dispatch research 102512640H3_PS[1]>[0K$m=Get-Module PSReadLine; $v='none'; $cfg='native'; if($m){$v=$m.Versi[0Ko[?25l
+n.ToString();$o=Get-PSReadLineOption;$cfg=$m.Path+'|'+$o.EditMode.ToString()+'|[0K'
++$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAllText('D:\Git\vt7pty\artifa[0Kc
+ts\fidelity\inspection-host-guards-rc1\results\developmenthost-guards-20261113-[0K2
+24740-735bbb94\03-experiment\native\suite\child-ps7-native-host\guard-shell-ide[0Kn
+tity.txt',$PSVersionTable.PSVersion.ToString()+'|'+$v+'|'+$Host.Name+'|'+$cfg)[0K
+H3_PS[2]>[0K[?25h& "D:\Git\vt7pty\artifacts\fidelity\inspection-host-guards-rc1\experim[0Ke[?25l
+nt\bin\HostCancellationGuardProbe.exe" --fixture "\\.\pipe\VT7Pty-H3-child-5134[0K0
+-1025139205416" 51340[0K
+[0K[?25hHOST_INPUT>childpending[0KHOST_INPUT>GUARD_NEXT[0K[?25l
+[0K[?25hH3_PS[3]>[0K[IO.File]::WriteAllText('D:\Git\vt7pty\artifacts\fidelity\inspection-h[0Ko[?25l
+st-guards-rc1\results\developmenthost-guards-20261113-224740-735bbb94\03-experi[0Km
+ent\native\suite\child-ps7-native-host\parent-child-exit.txt',$LASTEXITCODE.ToS[0Kt
+ring()); [IO.File]::WriteAllText('D:\Git\vt7pty\artifacts\fidelity\inspection-h[0Ko
+st-guards-rc1\results\developmenthost-guards-20261113-224740-735bbb94\03-experi[0Km
+ent\native\suite\child-ps7-native-host\parent-continued.txt','CONTINUE')[0K
+H3_PS[4]>[0K[?25hexit 0[0K[?25l
+[0K[?25h

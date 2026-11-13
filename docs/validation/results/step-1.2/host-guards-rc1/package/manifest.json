@@ -1,0 +1,782 @@
+{
+    "SchemaVersion":  1,
+    "Kind":  "VT7PtyHostGuardDiagnostics",
+    "DiagnosticOnly":  true,
+    "Control":  {
+                    "Version":  "1",
+                    "SourceCommit":  "464b3546e2402cbd419b328e055291f85a4dcb14",
+                    "ArchiveSha256":  "19d2755ad052744953efaed46c91a3fda18694aa6337086808682e22aaf71c1c",
+                    "ManifestSha256":  "67b715e9ac7913d6b520ac5bfe99d67b942fb1e8b161d764bd4319c6f85145e7",
+                    "OriginalFiles":  18
+                },
+    "Reference":  {
+                      "Version":  "4",
+                      "SourceCommit":  "84911454a5cd93704868bbfd31f65a49d7b7a402",
+                      "ArchiveSha256":  "c36e4aab77bfdd37804c0a79252ffc5a0c7adb63ec3177bd7872faff08f6ae6b",
+                      "ManifestSha256":  "9c29ebbfddaec3111c32f626b83d6fb14fd2cbff16f83afa7e1a4ab667e2fedc",
+                      "OriginalFiles":  107
+                  },
+    "Experiment":  {
+                       "Version":  "5",
+                       "AgentGateProtocol":  1,
+                       "ResearchAgent":  true,
+                       "BaselineCoordinated":  true,
+                       "NeighborDrainIntervalMs":  250,
+                       "CallbackCompletionMarker":  true,
+                       "SourceCommit":  "1054a9a75e25bd04eb08f100f442d05e03c5eaad",
+                       "SourceTreeClean":  true,
+                       "Architecture":  "x64",
+                       "Configuration":  "Release",
+                       "VerificationSha256":  "1d2d5115439560dc42d7618ddee1d97c7e23c555011efaaae7e25d3eeed95eda",
+                       "Toolchain":  {
+                                         "DumpbinPath":  "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\dumpbin.exe",
+                                         "DumpbinFileVersion":  "14.44.35228.0",
+                                         "ManifestToolPath":  "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe",
+                                         "ManifestToolFileVersion":  "10.0.26100.8249 (WinBuild.160101.0800)"
+                                     },
+                       "KeyTraceCapacity":  16,
+                       "FixtureTimelineCapacity":  64,
+                       "OutputFrameCapacity":  512,
+                       "WindowRingCapacity":  4096,
+                       "ChunkCapacity":  32,
+                       "AgentSha256":  "d7e7645431547fbf0636050a1dca37ce6c90154670d95998e59d724512c25084",
+                       "RuntimeDllSha256":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167",
+                       "AgentOriginalFilename":  "VT7Pty-GuardAgent.exe",
+                       "CasesByTier":  {
+                                           "DevelopmentHost":  34,
+                                           "NonESU":  34,
+                                           "ESU":  34,
+                                           "Legacy":  26
+                                       },
+                       "PowerShell7Version":  "7.2.24",
+                       "PowerShell7RequiredTiers":  [
+                                                        "DevelopmentHost",
+                                                        "NonESU",
+                                                        "ESU"
+                                                    ],
+                       "PowerShell7NotApplicableCasesOnLegacy":  8,
+                       "GuardQualification":  true,
+                       "CharacterizationConditions":  false
+                   },
+    "Runtime":  {
+                    "Version":  "0.5.0",
+                    "SourceCommit":  "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+                    "ArchiveSha256":  "59554a9cf8246395e60f30875e047d1bfa20d4f3f462c113ef705a86708f5304",
+                    "Files":  {
+                                  "VT7Pty.dll":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167",
+                                  "VT7Pty-Agent.exe":  "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+                              }
+                },
+    "Files":  [
+                  {
+                      "Path":  "control/bin/HostCancellationHook.dll",
+                      "Bytes":  156672,
+                      "Sha256":  "270cc6174f0257f70a12e9b170a28be9ab02101fab0e1becff627577983956fe"
+                  },
+                  {
+                      "Path":  "control/bin/HostCancellationHook.pdb",
+                      "Bytes":  4665344,
+                      "Sha256":  "7082ab5019d986eed69643ffd7da6c5ce4a20bf02bae0aa8a4e5c444901fc00b"
+                  },
+                  {
+                      "Path":  "control/bin/HostCancellationProbe.exe",
+                      "Bytes":  499200,
+                      "Sha256":  "aebccd26377c35b57c372b838eaa9bc4d08baf514c41ee987db0d88bcf44aa19"
+                  },
+                  {
+                      "Path":  "control/bin/HostCancellationProbe.pdb",
+                      "Bytes":  8015872,
+                      "Sha256":  "0b0b043baefd9a380c5e0550a2fea2683707a96cada2bda7d2d673ee37d4c1f7"
+                  },
+                  {
+                      "Path":  "control/bin/VT7Pty.dll",
+                      "Bytes":  507904,
+                      "Sha256":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167"
+                  },
+                  {
+                      "Path":  "control/bin/VT7Pty-Agent.exe",
+                      "Bytes":  628736,
+                      "Sha256":  "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+                  },
+                  {
+                      "Path":  "control/CREDITS.md",
+                      "Bytes":  2612,
+                      "Sha256":  "b09fa585b37eeb95c6fa37c99c921afb2c47d7d3fa9ac07c5328bf8cc1b9172f"
+                  },
+                  {
+                      "Path":  "control/HOST_CANCELLATION_DESIGN.md",
+                      "Bytes":  16326,
+                      "Sha256":  "8bd9af254e9f48291dc985e1a31edd71769579dc5bb713338df03232c228815b"
+                  },
+                  {
+                      "Path":  "control/LICENSE.txt",
+                      "Bytes":  1144,
+                      "Sha256":  "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+                  },
+                  {
+                      "Path":  "control/manifest.json",
+                      "Bytes":  5822,
+                      "Sha256":  "67b715e9ac7913d6b520ac5bfe99d67b942fb1e8b161d764bd4319c6f85145e7"
+                  },
+                  {
+                      "Path":  "control/README.md",
+                      "Bytes":  6836,
+                      "Sha256":  "8b27dbe3d7ebc5f24ade741f1e4142bcc5ceab5f1501e29027ab0c1ec434a19e"
+                  },
+                  {
+                      "Path":  "control/RUN-HOST-CANCELLATION-ESU.cmd",
+                      "Bytes":  307,
+                      "Sha256":  "36e6dd61c5af19a7393a55e79b3540a645019498c99302f3717c097d185ec5ab"
+                  },
+                  {
+                      "Path":  "control/RUN-HOST-CANCELLATION-LEGACY.cmd",
+                      "Bytes":  310,
+                      "Sha256":  "289c51860eb159107b991d8de8387c1b34e31cc9345da3b04513e65e10988df8"
+                  },
+                  {
+                      "Path":  "control/RUN-HOST-CANCELLATION-NONESU.cmd",
+                      "Bytes":  310,
+                      "Sha256":  "53604542ee2ff13d26b71f8af623eae6b8f3ee8d439e9e04952a6c482e6dd72e"
+                  },
+                  {
+                      "Path":  "control/runtime-manifest.json",
+                      "Bytes":  2288,
+                      "Sha256":  "db1b7d067987d1f155f91c1e196e577f62fb530e68f179615793b3c136a231b1"
+                  },
+                  {
+                      "Path":  "control/tools/platform/Windows7Compat.ps1",
+                      "Bytes":  3716,
+                      "Sha256":  "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+                  },
+                  {
+                      "Path":  "control/tools/research/Invoke-HostCancellationProbe.ps1",
+                      "Bytes":  9596,
+                      "Sha256":  "dc73f702036d76381268c5b24eb299efe4bff7eb0401f74d304c01d53c268482"
+                  },
+                  {
+                      "Path":  "control/UPSTREAM.md",
+                      "Bytes":  3236,
+                      "Sha256":  "62411e9234083f7dc35404f32e14992677adb9a8f761b65ba82589a8a3e9a060"
+                  },
+                  {
+                      "Path":  "CREDITS.md",
+                      "Bytes":  2612,
+                      "Sha256":  "b09fa585b37eeb95c6fa37c99c921afb2c47d7d3fa9ac07c5328bf8cc1b9172f"
+                  },
+                  {
+                      "Path":  "experiment/bin/HostCancellationGuardHook.dll",
+                      "Bytes":  167424,
+                      "Sha256":  "1a2da806521a5378b2e5ebc23fc65e4e5c91c2f1544f57acd21294831db74abf"
+                  },
+                  {
+                      "Path":  "experiment/bin/HostCancellationGuardHook.pdb",
+                      "Bytes":  4583424,
+                      "Sha256":  "ec75a349cb4ad432790e91c5c97ba3abd62c574a0893a32bd49eb890b1539dfb"
+                  },
+                  {
+                      "Path":  "experiment/bin/HostCancellationGuardProbe.exe",
+                      "Bytes":  753664,
+                      "Sha256":  "2a7b169999c63163c89a01fc3e20b6839980422da865e8f352bdb315b15ef839"
+                  },
+                  {
+                      "Path":  "experiment/bin/HostCancellationGuardProbe.pdb",
+                      "Bytes":  9531392,
+                      "Sha256":  "343b42861029ed38d6134ec96957e7dc2f788078da07c79dcf0999b6c9c8189d"
+                  },
+                  {
+                      "Path":  "experiment/bin/VT7Pty.dll",
+                      "Bytes":  507904,
+                      "Sha256":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167"
+                  },
+                  {
+                      "Path":  "experiment/bin/VT7Pty-Agent.exe",
+                      "Bytes":  647168,
+                      "Sha256":  "d7e7645431547fbf0636050a1dca37ce6c90154670d95998e59d724512c25084"
+                  },
+                  {
+                      "Path":  "experiment/bin/VT7Pty-GuardAgent.pdb",
+                      "Bytes":  8458240,
+                      "Sha256":  "b5c336995fd47b6df77db8fb9cfc6efb32e358838f09bebdba0bcf7b2becfd87"
+                  },
+                  {
+                      "Path":  "HOST_CANCELLATION_DESIGN.md",
+                      "Bytes":  20656,
+                      "Sha256":  "b8079724c9f3322fc0d66418e5198c0b46a4b44853157e738e79b02fe23cc89a"
+                  },
+                  {
+                      "Path":  "LICENSE.txt",
+                      "Bytes":  1144,
+                      "Sha256":  "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+                  },
+                  {
+                      "Path":  "README.md",
+                      "Bytes":  7232,
+                      "Sha256":  "177fbd0be8e412dcc1929251af4b7eaa1d1fd254cb623afb450af555c735df47"
+                  },
+                  {
+                      "Path":  "reference/control/bin/HostCancellationHook.dll",
+                      "Bytes":  156672,
+                      "Sha256":  "270cc6174f0257f70a12e9b170a28be9ab02101fab0e1becff627577983956fe"
+                  },
+                  {
+                      "Path":  "reference/control/bin/HostCancellationHook.pdb",
+                      "Bytes":  4665344,
+                      "Sha256":  "7082ab5019d986eed69643ffd7da6c5ce4a20bf02bae0aa8a4e5c444901fc00b"
+                  },
+                  {
+                      "Path":  "reference/control/bin/HostCancellationProbe.exe",
+                      "Bytes":  499200,
+                      "Sha256":  "aebccd26377c35b57c372b838eaa9bc4d08baf514c41ee987db0d88bcf44aa19"
+                  },
+                  {
+                      "Path":  "reference/control/bin/HostCancellationProbe.pdb",
+                      "Bytes":  8015872,
+                      "Sha256":  "0b0b043baefd9a380c5e0550a2fea2683707a96cada2bda7d2d673ee37d4c1f7"
+                  },
+                  {
+                      "Path":  "reference/control/bin/VT7Pty.dll",
+                      "Bytes":  507904,
+                      "Sha256":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167"
+                  },
+                  {
+                      "Path":  "reference/control/bin/VT7Pty-Agent.exe",
+                      "Bytes":  628736,
+                      "Sha256":  "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+                  },
+                  {
+                      "Path":  "reference/control/CREDITS.md",
+                      "Bytes":  2612,
+                      "Sha256":  "b09fa585b37eeb95c6fa37c99c921afb2c47d7d3fa9ac07c5328bf8cc1b9172f"
+                  },
+                  {
+                      "Path":  "reference/control/HOST_CANCELLATION_DESIGN.md",
+                      "Bytes":  16326,
+                      "Sha256":  "8bd9af254e9f48291dc985e1a31edd71769579dc5bb713338df03232c228815b"
+                  },
+                  {
+                      "Path":  "reference/control/LICENSE.txt",
+                      "Bytes":  1144,
+                      "Sha256":  "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+                  },
+                  {
+                      "Path":  "reference/control/manifest.json",
+                      "Bytes":  5822,
+                      "Sha256":  "67b715e9ac7913d6b520ac5bfe99d67b942fb1e8b161d764bd4319c6f85145e7"
+                  },
+                  {
+                      "Path":  "reference/control/README.md",
+                      "Bytes":  6836,
+                      "Sha256":  "8b27dbe3d7ebc5f24ade741f1e4142bcc5ceab5f1501e29027ab0c1ec434a19e"
+                  },
+                  {
+                      "Path":  "reference/control/RUN-HOST-CANCELLATION-ESU.cmd",
+                      "Bytes":  307,
+                      "Sha256":  "36e6dd61c5af19a7393a55e79b3540a645019498c99302f3717c097d185ec5ab"
+                  },
+                  {
+                      "Path":  "reference/control/RUN-HOST-CANCELLATION-LEGACY.cmd",
+                      "Bytes":  310,
+                      "Sha256":  "289c51860eb159107b991d8de8387c1b34e31cc9345da3b04513e65e10988df8"
+                  },
+                  {
+                      "Path":  "reference/control/RUN-HOST-CANCELLATION-NONESU.cmd",
+                      "Bytes":  310,
+                      "Sha256":  "53604542ee2ff13d26b71f8af623eae6b8f3ee8d439e9e04952a6c482e6dd72e"
+                  },
+                  {
+                      "Path":  "reference/control/runtime-manifest.json",
+                      "Bytes":  2288,
+                      "Sha256":  "db1b7d067987d1f155f91c1e196e577f62fb530e68f179615793b3c136a231b1"
+                  },
+                  {
+                      "Path":  "reference/control/tools/platform/Windows7Compat.ps1",
+                      "Bytes":  3716,
+                      "Sha256":  "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+                  },
+                  {
+                      "Path":  "reference/control/tools/research/Invoke-HostCancellationProbe.ps1",
+                      "Bytes":  9596,
+                      "Sha256":  "dc73f702036d76381268c5b24eb299efe4bff7eb0401f74d304c01d53c268482"
+                  },
+                  {
+                      "Path":  "reference/control/UPSTREAM.md",
+                      "Bytes":  3236,
+                      "Sha256":  "62411e9234083f7dc35404f32e14992677adb9a8f761b65ba82589a8a3e9a060"
+                  },
+                  {
+                      "Path":  "reference/CREDITS.md",
+                      "Bytes":  2612,
+                      "Sha256":  "b09fa585b37eeb95c6fa37c99c921afb2c47d7d3fa9ac07c5328bf8cc1b9172f"
+                  },
+                  {
+                      "Path":  "reference/experiment/bin/HostCancellationCoordinatedHook.dll",
+                      "Bytes":  167424,
+                      "Sha256":  "13302a94769d68577e56fa84636c82e6e0fc5cd8f0a2326e723482c839632beb"
+                  },
+                  {
+                      "Path":  "reference/experiment/bin/HostCancellationCoordinatedHook.pdb",
+                      "Bytes":  4591616,
+                      "Sha256":  "f44ca1866ff111b6aaed6729a71df129478d46c696e29fb45fe546ffc09d1bbc"
+                  },
+                  {
+                      "Path":  "reference/experiment/bin/HostCancellationCoordinatedProbe.exe",
+                      "Bytes":  655872,
+                      "Sha256":  "f5671b44c5763231a549c26ec1cafcfad63455744e6c845a0c36f0e62ac74d26"
+                  },
+                  {
+                      "Path":  "reference/experiment/bin/HostCancellationCoordinatedProbe.pdb",
+                      "Bytes":  8835072,
+                      "Sha256":  "905f2371151196ed555ee1bd71d632e286d3fa1a22f32a7afc31c6acaed0fdbc"
+                  },
+                  {
+                      "Path":  "reference/experiment/bin/VT7Pty.dll",
+                      "Bytes":  507904,
+                      "Sha256":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167"
+                  },
+                  {
+                      "Path":  "reference/experiment/bin/VT7Pty-Agent.exe",
+                      "Bytes":  647168,
+                      "Sha256":  "9d146b7b0b828cf92c6a50d428e4850eeb7f43fd187b4c993b328ea4dbfed3f3"
+                  },
+                  {
+                      "Path":  "reference/experiment/bin/VT7Pty-CoordinatedAgent.pdb",
+                      "Bytes":  8441856,
+                      "Sha256":  "43a0d739473e2db2c042a0927bd798f0094b8e8b296e93bfef602f1909a6b2a8"
+                  },
+                  {
+                      "Path":  "reference/HOST_CANCELLATION_DESIGN.md",
+                      "Bytes":  19676,
+                      "Sha256":  "212d1573efca017fd9d85de27b344d4eb23c9c4a3e1a065f846db9e38c13bfff"
+                  },
+                  {
+                      "Path":  "reference/LICENSE.txt",
+                      "Bytes":  1144,
+                      "Sha256":  "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+                  },
+                  {
+                      "Path":  "reference/manifest.json",
+                      "Bytes":  31106,
+                      "Sha256":  "9c29ebbfddaec3111c32f626b83d6fb14fd2cbff16f83afa7e1a4ab667e2fedc"
+                  },
+                  {
+                      "Path":  "reference/README.md",
+                      "Bytes":  5752,
+                      "Sha256":  "eea3bbd8a3f62e783fb38f9bfba51f626258346ee88fb50d2d1fc3f6b50283ae"
+                  },
+                  {
+                      "Path":  "reference/reference/control/bin/HostCancellationHook.dll",
+                      "Bytes":  156672,
+                      "Sha256":  "270cc6174f0257f70a12e9b170a28be9ab02101fab0e1becff627577983956fe"
+                  },
+                  {
+                      "Path":  "reference/reference/control/bin/HostCancellationHook.pdb",
+                      "Bytes":  4665344,
+                      "Sha256":  "7082ab5019d986eed69643ffd7da6c5ce4a20bf02bae0aa8a4e5c444901fc00b"
+                  },
+                  {
+                      "Path":  "reference/reference/control/bin/HostCancellationProbe.exe",
+                      "Bytes":  499200,
+                      "Sha256":  "aebccd26377c35b57c372b838eaa9bc4d08baf514c41ee987db0d88bcf44aa19"
+                  },
+                  {
+                      "Path":  "reference/reference/control/bin/HostCancellationProbe.pdb",
+                      "Bytes":  8015872,
+                      "Sha256":  "0b0b043baefd9a380c5e0550a2fea2683707a96cada2bda7d2d673ee37d4c1f7"
+                  },
+                  {
+                      "Path":  "reference/reference/control/bin/VT7Pty.dll",
+                      "Bytes":  507904,
+                      "Sha256":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167"
+                  },
+                  {
+                      "Path":  "reference/reference/control/bin/VT7Pty-Agent.exe",
+                      "Bytes":  628736,
+                      "Sha256":  "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+                  },
+                  {
+                      "Path":  "reference/reference/control/CREDITS.md",
+                      "Bytes":  2612,
+                      "Sha256":  "b09fa585b37eeb95c6fa37c99c921afb2c47d7d3fa9ac07c5328bf8cc1b9172f"
+                  },
+                  {
+                      "Path":  "reference/reference/control/HOST_CANCELLATION_DESIGN.md",
+                      "Bytes":  16326,
+                      "Sha256":  "8bd9af254e9f48291dc985e1a31edd71769579dc5bb713338df03232c228815b"
+                  },
+                  {
+                      "Path":  "reference/reference/control/LICENSE.txt",
+                      "Bytes":  1144,
+                      "Sha256":  "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+                  },
+                  {
+                      "Path":  "reference/reference/control/manifest.json",
+                      "Bytes":  5822,
+                      "Sha256":  "67b715e9ac7913d6b520ac5bfe99d67b942fb1e8b161d764bd4319c6f85145e7"
+                  },
+                  {
+                      "Path":  "reference/reference/control/README.md",
+                      "Bytes":  6836,
+                      "Sha256":  "8b27dbe3d7ebc5f24ade741f1e4142bcc5ceab5f1501e29027ab0c1ec434a19e"
+                  },
+                  {
+                      "Path":  "reference/reference/control/RUN-HOST-CANCELLATION-ESU.cmd",
+                      "Bytes":  307,
+                      "Sha256":  "36e6dd61c5af19a7393a55e79b3540a645019498c99302f3717c097d185ec5ab"
+                  },
+                  {
+                      "Path":  "reference/reference/control/RUN-HOST-CANCELLATION-LEGACY.cmd",
+                      "Bytes":  310,
+                      "Sha256":  "289c51860eb159107b991d8de8387c1b34e31cc9345da3b04513e65e10988df8"
+                  },
+                  {
+                      "Path":  "reference/reference/control/RUN-HOST-CANCELLATION-NONESU.cmd",
+                      "Bytes":  310,
+                      "Sha256":  "53604542ee2ff13d26b71f8af623eae6b8f3ee8d439e9e04952a6c482e6dd72e"
+                  },
+                  {
+                      "Path":  "reference/reference/control/runtime-manifest.json",
+                      "Bytes":  2288,
+                      "Sha256":  "db1b7d067987d1f155f91c1e196e577f62fb530e68f179615793b3c136a231b1"
+                  },
+                  {
+                      "Path":  "reference/reference/control/tools/platform/Windows7Compat.ps1",
+                      "Bytes":  3716,
+                      "Sha256":  "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+                  },
+                  {
+                      "Path":  "reference/reference/control/tools/research/Invoke-HostCancellationProbe.ps1",
+                      "Bytes":  9596,
+                      "Sha256":  "dc73f702036d76381268c5b24eb299efe4bff7eb0401f74d304c01d53c268482"
+                  },
+                  {
+                      "Path":  "reference/reference/control/UPSTREAM.md",
+                      "Bytes":  3236,
+                      "Sha256":  "62411e9234083f7dc35404f32e14992677adb9a8f761b65ba82589a8a3e9a060"
+                  },
+                  {
+                      "Path":  "reference/reference/CREDITS.md",
+                      "Bytes":  2612,
+                      "Sha256":  "b09fa585b37eeb95c6fa37c99c921afb2c47d7d3fa9ac07c5328bf8cc1b9172f"
+                  },
+                  {
+                      "Path":  "reference/reference/experiment/bin/HostCancellationFreezeHook.dll",
+                      "Bytes":  166912,
+                      "Sha256":  "76f21364021c38aa619c0f0c3a13062dcebf9f1bedd4f0873adb9d96e308a86a"
+                  },
+                  {
+                      "Path":  "reference/reference/experiment/bin/HostCancellationFreezeHook.pdb",
+                      "Bytes":  4583424,
+                      "Sha256":  "c23e03937a8bfeb94a72b54f24b1957732461d200051141f062f18165739b48b"
+                  },
+                  {
+                      "Path":  "reference/reference/experiment/bin/HostCancellationFreezeProbe.exe",
+                      "Bytes":  628736,
+                      "Sha256":  "52b58abda4e294ce85c4ba8b9bd31c7b162d5fd82cc2497a17643a23299f5525"
+                  },
+                  {
+                      "Path":  "reference/reference/experiment/bin/HostCancellationFreezeProbe.pdb",
+                      "Bytes":  8679424,
+                      "Sha256":  "4db524bde58eeb2181bf7fc54d5fe939731e5b1553f97a5f3e1d0c8e9f6cb144"
+                  },
+                  {
+                      "Path":  "reference/reference/experiment/bin/VT7Pty.dll",
+                      "Bytes":  507904,
+                      "Sha256":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167"
+                  },
+                  {
+                      "Path":  "reference/reference/experiment/bin/VT7Pty-Agent.exe",
+                      "Bytes":  647168,
+                      "Sha256":  "116dc297f65afccccc2cdc14ba59e8af0717de0ee06a6aebf90ea4e43a4e70e3"
+                  },
+                  {
+                      "Path":  "reference/reference/experiment/bin/VT7Pty-FreezeAgent.pdb",
+                      "Bytes":  8441856,
+                      "Sha256":  "de586490f6c86a04204d3bf1d9e98504632cf09636f744945bb3ec5a12a8caec"
+                  },
+                  {
+                      "Path":  "reference/reference/HOST_CANCELLATION_DESIGN.md",
+                      "Bytes":  18919,
+                      "Sha256":  "b61e4c581887f5610cc53a7a151d8ad924b067c015d885c55caca427c6572cac"
+                  },
+                  {
+                      "Path":  "reference/reference/LICENSE.txt",
+                      "Bytes":  1144,
+                      "Sha256":  "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+                  },
+                  {
+                      "Path":  "reference/reference/manifest.json",
+                      "Bytes":  21198,
+                      "Sha256":  "1ee53b275e70c1361eb0a6fc99c62efa8de6810cbbbb752173024df1393e82d0"
+                  },
+                  {
+                      "Path":  "reference/reference/README.md",
+                      "Bytes":  6478,
+                      "Sha256":  "7f5a9174568338e92c92eec4e3fe51bbd96b67c22351f1ad782d6a9b625b36f0"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/bin/HostCancellationHook.dll",
+                      "Bytes":  156672,
+                      "Sha256":  "270cc6174f0257f70a12e9b170a28be9ab02101fab0e1becff627577983956fe"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/bin/HostCancellationHook.pdb",
+                      "Bytes":  4665344,
+                      "Sha256":  "7082ab5019d986eed69643ffd7da6c5ce4a20bf02bae0aa8a4e5c444901fc00b"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/bin/HostCancellationProbe.exe",
+                      "Bytes":  499200,
+                      "Sha256":  "aebccd26377c35b57c372b838eaa9bc4d08baf514c41ee987db0d88bcf44aa19"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/bin/HostCancellationProbe.pdb",
+                      "Bytes":  8015872,
+                      "Sha256":  "0b0b043baefd9a380c5e0550a2fea2683707a96cada2bda7d2d673ee37d4c1f7"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/bin/VT7Pty.dll",
+                      "Bytes":  507904,
+                      "Sha256":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/bin/VT7Pty-Agent.exe",
+                      "Bytes":  628736,
+                      "Sha256":  "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/CREDITS.md",
+                      "Bytes":  2612,
+                      "Sha256":  "b09fa585b37eeb95c6fa37c99c921afb2c47d7d3fa9ac07c5328bf8cc1b9172f"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/HOST_CANCELLATION_DESIGN.md",
+                      "Bytes":  16326,
+                      "Sha256":  "8bd9af254e9f48291dc985e1a31edd71769579dc5bb713338df03232c228815b"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/LICENSE.txt",
+                      "Bytes":  1144,
+                      "Sha256":  "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/manifest.json",
+                      "Bytes":  5822,
+                      "Sha256":  "67b715e9ac7913d6b520ac5bfe99d67b942fb1e8b161d764bd4319c6f85145e7"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/README.md",
+                      "Bytes":  6836,
+                      "Sha256":  "8b27dbe3d7ebc5f24ade741f1e4142bcc5ceab5f1501e29027ab0c1ec434a19e"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/RUN-HOST-CANCELLATION-ESU.cmd",
+                      "Bytes":  307,
+                      "Sha256":  "36e6dd61c5af19a7393a55e79b3540a645019498c99302f3717c097d185ec5ab"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/RUN-HOST-CANCELLATION-LEGACY.cmd",
+                      "Bytes":  310,
+                      "Sha256":  "289c51860eb159107b991d8de8387c1b34e31cc9345da3b04513e65e10988df8"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/RUN-HOST-CANCELLATION-NONESU.cmd",
+                      "Bytes":  310,
+                      "Sha256":  "53604542ee2ff13d26b71f8af623eae6b8f3ee8d439e9e04952a6c482e6dd72e"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/runtime-manifest.json",
+                      "Bytes":  2288,
+                      "Sha256":  "db1b7d067987d1f155f91c1e196e577f62fb530e68f179615793b3c136a231b1"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/tools/platform/Windows7Compat.ps1",
+                      "Bytes":  3716,
+                      "Sha256":  "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/tools/research/Invoke-HostCancellationProbe.ps1",
+                      "Bytes":  9596,
+                      "Sha256":  "dc73f702036d76381268c5b24eb299efe4bff7eb0401f74d304c01d53c268482"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/control/UPSTREAM.md",
+                      "Bytes":  3236,
+                      "Sha256":  "62411e9234083f7dc35404f32e14992677adb9a8f761b65ba82589a8a3e9a060"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/CREDITS.md",
+                      "Bytes":  2612,
+                      "Sha256":  "b09fa585b37eeb95c6fa37c99c921afb2c47d7d3fa9ac07c5328bf8cc1b9172f"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/HOST_CANCELLATION_DESIGN.md",
+                      "Bytes":  17952,
+                      "Sha256":  "8d77bc9a0c0340676ba75234b73d17b05a4e0d429acfcf3d44011176a522abf2"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/LICENSE.txt",
+                      "Bytes":  1144,
+                      "Sha256":  "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/manifest.json",
+                      "Bytes":  10769,
+                      "Sha256":  "273ed0c40d20e60c6dd583bdefe5513d7a8840f0d67cb4f882f3b611f106334d"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/README.md",
+                      "Bytes":  6317,
+                      "Sha256":  "404a0bb5f049177a233d783fbd77ddf961b92567d6f1291cb66097bfd2ce2c98"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/RUN-HOST-CANCELLATION-DIAGNOSTICS-ESU.cmd",
+                      "Bytes":  547,
+                      "Sha256":  "baa3075ad16c5ff64689606a6a8a83facdc2f81e3bf7f9212e29da4db838553b"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/RUN-HOST-CANCELLATION-DIAGNOSTICS-LEGACY.cmd",
+                      "Bytes":  550,
+                      "Sha256":  "f50a6caae4a924b215bc25f2ddc2c1c9c2211f1477f0d1676014b4b4a6040d2c"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/RUN-HOST-CANCELLATION-DIAGNOSTICS-NONESU.cmd",
+                      "Bytes":  550,
+                      "Sha256":  "a46b510c5f0a6bc85d7c2fb73ad96f4514c2b9f2d67092efefff0664f1b1fa92"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/tools/platform/Windows7Compat.ps1",
+                      "Bytes":  3716,
+                      "Sha256":  "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/tools/research/Invoke-HostCancellationDiagnostics.ps1",
+                      "Bytes":  12224,
+                      "Sha256":  "1017a57205fb08162565b519113080e5d0a147fe9b0ecb11f3a219d4d93e31fd"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/trace/bin/HostCancellationTraceHook.dll",
+                      "Bytes":  161792,
+                      "Sha256":  "2aeaac9db74fcaf9fb2b76a3866dc0fbbf3244eb0b41f2d64083c6dbb800b2a8"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/trace/bin/HostCancellationTraceHook.pdb",
+                      "Bytes":  4567040,
+                      "Sha256":  "304744bd0aeb4101170d1d7bcc11f583e3f64c2a46b5c1c40ea841ba01410834"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/trace/bin/HostCancellationTraceProbe.exe",
+                      "Bytes":  556544,
+                      "Sha256":  "5b9748587d46ccb802dc0eda0aa228597127870a51045ebb50531fa1478c13e5"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/trace/bin/HostCancellationTraceProbe.pdb",
+                      "Bytes":  8196096,
+                      "Sha256":  "5b0ecb68bee70cced8ddf3312ee640c963a8a09882d748060b30da2aa709116b"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/trace/bin/VT7Pty.dll",
+                      "Bytes":  507904,
+                      "Sha256":  "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/trace/bin/VT7Pty-Agent.exe",
+                      "Bytes":  628736,
+                      "Sha256":  "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2"
+                  },
+                  {
+                      "Path":  "reference/reference/reference/UPSTREAM.md",
+                      "Bytes":  3236,
+                      "Sha256":  "62411e9234083f7dc35404f32e14992677adb9a8f761b65ba82589a8a3e9a060"
+                  },
+                  {
+                      "Path":  "reference/reference/RUN-HOST-FREEZE-DIAGNOSTICS-ESU.cmd",
+                      "Bytes":  505,
+                      "Sha256":  "af707380979e4f38cf4948ff24ee4cd5fa0c2fd951f390936dec9f5720b27f7b"
+                  },
+                  {
+                      "Path":  "reference/reference/RUN-HOST-FREEZE-DIAGNOSTICS-LEGACY.cmd",
+                      "Bytes":  508,
+                      "Sha256":  "0558263c01e48bb65dd995580301a0f2817b98378c0ff4267a14d2aa09c84d30"
+                  },
+                  {
+                      "Path":  "reference/reference/RUN-HOST-FREEZE-DIAGNOSTICS-NONESU.cmd",
+                      "Bytes":  508,
+                      "Sha256":  "129a6db1e9b1d1d37a38de678cb02fc5d24ff8e9a449862ac4f319e356add9f4"
+                  },
+                  {
+                      "Path":  "reference/reference/tools/platform/Windows7Compat.ps1",
+                      "Bytes":  3716,
+                      "Sha256":  "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+                  },
+                  {
+                      "Path":  "reference/reference/tools/research/Invoke-HostFreezeDiagnostics.ps1",
+                      "Bytes":  15212,
+                      "Sha256":  "cb1d80ce53f1cc6600d65314e10c5ce7b90cbf7bc803673d4ec7481227c2d06a"
+                  },
+                  {
+                      "Path":  "reference/reference/UPSTREAM.md",
+                      "Bytes":  3236,
+                      "Sha256":  "62411e9234083f7dc35404f32e14992677adb9a8f761b65ba82589a8a3e9a060"
+                  },
+                  {
+                      "Path":  "reference/RUN-HOST-COORDINATION-ESU.cmd",
+                      "Bytes":  524,
+                      "Sha256":  "2fd0791fa6cf542c8d4b4c391bb48f83a4781c88e8f99a94fc17c979f3780328"
+                  },
+                  {
+                      "Path":  "reference/RUN-HOST-COORDINATION-LEGACY.cmd",
+                      "Bytes":  527,
+                      "Sha256":  "59d4ddad7c149e0a71c4bafe55ccdd6cd81801f91c9858aa6afdf4db1600f918"
+                  },
+                  {
+                      "Path":  "reference/RUN-HOST-COORDINATION-NONESU.cmd",
+                      "Bytes":  527,
+                      "Sha256":  "285254f91cfb544b781061fdfe2e5739a3747d373ba3357f7929639ad0f74ea8"
+                  },
+                  {
+                      "Path":  "reference/tools/platform/Windows7Compat.ps1",
+                      "Bytes":  3716,
+                      "Sha256":  "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+                  },
+                  {
+                      "Path":  "reference/tools/research/Invoke-HostCoordination.ps1",
+                      "Bytes":  16044,
+                      "Sha256":  "43c06dc4ac168e8535ec8c5a1b29b654e9a6aa24469603d90b217b0a3eabdcdd"
+                  },
+                  {
+                      "Path":  "reference/UPSTREAM.md",
+                      "Bytes":  3236,
+                      "Sha256":  "62411e9234083f7dc35404f32e14992677adb9a8f761b65ba82589a8a3e9a060"
+                  },
+                  {
+                      "Path":  "RUN-HOST-GUARDS-ESU.cmd",
+                      "Bytes":  518,
+                      "Sha256":  "e70f12a1014f017830aa21443bb8bd3851d4bedb246d8c8e648cb71416ee6535"
+                  },
+                  {
+                      "Path":  "RUN-HOST-GUARDS-LEGACY.cmd",
+                      "Bytes":  521,
+                      "Sha256":  "75a7efe959c2eebd91be62888ca460fabb186624a003bc7ca2ad24606c37eb9f"
+                  },
+                  {
+                      "Path":  "RUN-HOST-GUARDS-NONESU.cmd",
+                      "Bytes":  521,
+                      "Sha256":  "ad6cab9d6b265abb60de4311cae85179b96086a8a29e71dfeda27e3a491a03d8"
+                  },
+                  {
+                      "Path":  "tools/platform/Windows7Compat.ps1",
+                      "Bytes":  3716,
+                      "Sha256":  "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+                  },
+                  {
+                      "Path":  "tools/research/Invoke-HostGuards.ps1",
+                      "Bytes":  20171,
+                      "Sha256":  "5e855843a9be5a3ef43315c82854a2cc14d596e537624fb9db80b74d7a1cc8ba"
+                  },
+                  {
+                      "Path":  "UPSTREAM.md",
+                      "Bytes":  3236,
+                      "Sha256":  "62411e9234083f7dc35404f32e14992677adb9a8f761b65ba82589a8a3e9a060"
+                  }
+              ]
+}

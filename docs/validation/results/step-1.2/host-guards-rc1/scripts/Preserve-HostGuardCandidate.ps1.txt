@@ -1,0 +1,58 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty';$artifact=Join-Path $repo 'artifacts\fidelity'
+$target=Join-Path $repo 'docs\validation\results\step-1.2\host-guards-rc1'
+if(Test-Path -LiteralPath $target){throw 'Guard evidence already preserved.'}
+$execution=Get-Content -LiteralPath (Join-Path $artifact 'h3-guards-exact-package-execution.json') -Raw|ConvertFrom-Json
+$review=Get-Content -LiteralPath (Join-Path $artifact 'h3-guards-exact-package-review.json') -Raw|ConvertFrom-Json
+if(-not $execution.SourceTreeClean -or $execution.Completed -ne 9 -or $execution.ExperimentPass -ne 3 -or -not $review.SemanticReviewsCompleted){throw 'Exact candidate is not qualified for issue.'}
+$sha=[Security.Cryptography.SHA256]::Create();$records=New-Object 'Collections.Generic.List[object]'
+function Hash-File([string]$Path){$stream=[IO.File]::OpenRead($Path);try{return ([BitConverter]::ToString($sha.ComputeHash($stream))).Replace('-','').ToLowerInvariant()}finally{$stream.Dispose()}}
+function Copy-Exact([string]$Source,[string]$Relative){
+ $destination=[IO.Path]::GetFullPath((Join-Path $target $Relative))
+ if(-not $destination.StartsWith($target+'\',[StringComparison]::OrdinalIgnoreCase)){throw 'Evidence path leaves target.'}
+ [IO.Directory]::CreateDirectory((Split-Path -Parent $destination))|Out-Null
+ $hash=Hash-File $Source;$length=(Get-Item -LiteralPath $Source).Length
+ [IO.File]::Copy($Source,$destination)
+ if((Get-Item -LiteralPath $destination).Length -ne $length -or (Hash-File $destination) -cne $hash){throw 'Evidence copy differs.'}
+ $records.Add([pscustomobject]@{Path=$Relative.Replace('\','/');Bytes=$length;Sha256=$hash})
+}
+function Copy-Tree([string]$Source,[string]$Relative){
+ $base=[IO.Path]::GetFullPath($Source).TrimEnd('\')
+ foreach($file in Get-ChildItem -LiteralPath $base -File -Recurse){
+  if($file.Extension -in @('.exe','.dll','.pdb','.lib','.exp','.obj')){continue}
+  Copy-Exact $file.FullName (Join-Path $Relative $file.FullName.Substring($base.Length+1))
+ }
+}
+Copy-Tree $execution.Results ('development\'+(Split-Path $execution.Results -Leaf))
+foreach($item in @(
+ @('h3-guards-debug-initial','preliminary\controller-admission'),
+ @('h3-guards-debug-wiring-fixed','preliminary\child-contract'),
+ @('h3-guards-debug-child-contract','prepackage\debug'),
+ @('h3-guards-debug-legacy-profile','prepackage\legacy-profile'))){
+ Copy-Tree (Join-Path $artifact $item[0]) $item[1]
+}
+foreach($name in @('h3-guards-debug-child-contract-audit.json','h3-guards-debug-legacy-profile-audit.json','h3-guards-exact-package-execution.json','h3-guards-exact-package-review.json','h3-guards-exact-package-metrics.json','h3-guards-exact-package-stdout.txt','h3-guards-exact-package-stderr.txt')){
+ Copy-Exact (Join-Path $artifact $name) ('audit\'+$name)
+}
+$controls=Join-Path $artifact 'h3-guards-reviewer-controls'
+Copy-Exact (Join-Path $controls 'controls.json') 'controls\reviewer\controls.json'
+foreach($dir in Get-ChildItem -LiteralPath $controls -Directory|Where-Object {$_.Name -ne 'native'}){Copy-Tree $dir.FullName ('controls\reviewer\'+$dir.Name)}
+$integrity=Join-Path $artifact 'h3-guards-integrity-controls'
+foreach($file in Get-ChildItem -LiteralPath $integrity -File){Copy-Exact $file.FullName ('controls\integrity\'+$file.Name)}
+foreach($config in @('Debug','Release')){Copy-Tree (Join-Path $repo ('artifacts\verification\x64\'+$config)) ('verification\'+$config.ToLowerInvariant())}
+$package=Join-Path $artifact 'packages\VT7Pty-host-guards-0.5.0-rc1'
+foreach($entry in @(@('manifest.json','manifest.json'),@('control\manifest.json','control-manifest.json'),@('reference\manifest.json','reference-manifest.json'),@('README.md','README.md.txt'))){
+ Copy-Exact (Join-Path $package $entry[0]) ('package\'+$entry[1])
+}
+Copy-Exact ($execution.Archive+'.sha256') 'package\VT7Pty-host-guards-0.5.0-rc1.zip.sha256'
+foreach($script in @('Run-HostGuardsDevelopment.ps1','Run-HostGuardsDevelopment2.ps1','Run-HostGuardsDevelopment3.ps1','Run-HostGuardsLegacyProfile.ps1','Run-HostGuardsIssuedCandidate.ps1','Test-HostGuardReviewerControls.ps1','Test-HostGuardIntegrity.ps1','Preserve-HostGuardCandidate.ps1','Summarize-HostGuardCandidate.ps1','Check-HostGuardEvidenceIndex.ps1')){
+ Copy-Exact (Join-Path $artifact $script) ('scripts\'+$script+'.txt')
+}
+foreach($file in Get-ChildItem -LiteralPath (Join-Path $repo 'artifacts') -File -Filter 'h3-guards-*.log'|Where-Object {$_.Name -notmatch '(stage|commit|preserv|index)'}){
+ Copy-Exact $file.FullName ('logs\'+$file.BaseName+'.txt')
+}
+$inventory=[ordered]@{SchemaVersion=1;Kind='H3GuardCandidatePreservation';SourceCommit=$execution.SourceCommit;ArchiveSha256=$execution.ArchiveSha256;Files=$records.ToArray()}
+[IO.File]::WriteAllText((Join-Path $target 'preserved-files.json'),($inventory|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+$sha.Dispose()
+[pscustomobject]@{Files=$records.Count;Bytes=($records.ToArray()|Measure-Object Bytes -Sum).Sum;Directory=$target}

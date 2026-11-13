@@ -1,0 +1,32 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty';$artifact=Join-Path $repo 'artifacts\fidelity'
+$zip=Join-Path $artifact 'packages\VT7Pty-host-guards-0.5.0-rc1.zip'
+$package=Join-Path $artifact 'inspection-host-guards-rc1'
+if(Test-Path -LiteralPath $package){throw 'Exact candidate extraction already exists.'}
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[IO.Compression.ZipFile]::ExtractToDirectory($zip,$package)
+$manifest=Get-Content -LiteralPath (Join-Path $package 'manifest.json') -Raw|ConvertFrom-Json
+$info=New-Object Diagnostics.ProcessStartInfo
+$info.FileName='C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+$info.Arguments='-NoProfile -File "'+(Join-Path $package 'tools\research\Invoke-HostGuards.ps1')+'" -Tier DevelopmentHost -PackageRoot "'+$package+'" -PowerShell7Path "'+(Join-Path $artifact 'applications\PowerShell-7.2.24-win-x64\pwsh.exe')+'"'
+$info.WorkingDirectory=$package;$info.UseShellExecute=$false;$info.CreateNoWindow=$true;$info.RedirectStandardOutput=$true;$info.RedirectStandardError=$true
+$begin=[DateTime]::UtcNow;$process=New-Object Diagnostics.Process;$process.StartInfo=$info
+if(-not $process.Start()){throw 'Exact candidate runner did not start.'}
+$stdout=$process.StandardOutput.ReadToEndAsync();$stderr=$process.StandardError.ReadToEndAsync()
+if(-not $process.WaitForExit(2400000)){$process.Kill();throw 'Exact candidate runner deadline.'}
+[IO.File]::WriteAllText((Join-Path $artifact 'h3-guards-exact-package-stdout.txt'),$stdout.Result,[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $artifact 'h3-guards-exact-package-stderr.txt'),$stderr.Result,[Text.UTF8Encoding]::new($false))
+$dirs=@(Get-ChildItem -LiteralPath (Join-Path $package 'results') -Directory)
+if($dirs.Count -ne 1){throw 'Expected one exact-package result collection.'}
+$report=Get-Content -LiteralPath (Join-Path $dirs[0].FullName 'report.json') -Raw|ConvertFrom-Json
+$record=[ordered]@{Archive=$zip;ArchiveBytes=(Get-Item -LiteralPath $zip).Length;ArchiveSha256=(Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant();ManifestSha256=(Get-FileHash (Join-Path $package 'manifest.json') -Algorithm SHA256).Hash.ToLowerInvariant();SourceCommit=$manifest.Experiment.SourceCommit;SourceTreeClean=$manifest.Experiment.SourceTreeClean;ExtractedPackage=$package;Results=$dirs[0].FullName;StartUtc=$begin.ToString('o');EndUtc=[DateTime]::UtcNow.ToString('o');OriginalRunnerExitCode=$process.ExitCode;Completed=$report.Completed;ControlPass=$report.ControlPass;ReferencePass=$report.ReferencePass;ExperimentPass=$report.ExperimentPass;ExperimentFail=$report.ExperimentFail;PreflightErrors=$report.PreflightErrors}
+[IO.File]::WriteAllText((Join-Path $artifact 'h3-guards-exact-package-execution.json'),($record|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+$process.Dispose()
+if($report.PreflightErrors.Count -ne 0 -or $report.Completed -ne 9){throw 'Exact candidate collection did not complete.'}
+& (Join-Path $repo 'tools\research\Test-HostGuardEvidence.ps1') -Directory $dirs[0].FullName -PackageRoot $package -OutputPath (Join-Path $artifact 'h3-guards-exact-package-review.json') > (Join-Path $artifact 'h3-guards-exact-package-review.txt')
+$review=Get-Content -LiteralPath (Join-Path $artifact 'h3-guards-exact-package-review.json') -Raw|ConvertFrom-Json
+$experiments=@($review.Trials|Where-Object {$_.Role -eq 'Experiment'})
+if(-not $review.SemanticReviewsCompleted -or $experiments.Count -ne 3 -or $report.ExperimentPass -ne 3){throw 'Exact candidate guard qualification failed; preserve all outcomes.'}
+foreach($trial in $experiments){if(-not $trial.Review.Guards.Qualified -or $trial.Review.Core.CoverageGaps.Count -or $trial.Review.CoverageGaps.Count -or $trial.Review.OperationalIssues.Count){throw 'Exact candidate guard evidence is incomplete.'}}
+$record

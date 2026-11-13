@@ -1,0 +1,34 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty';$artifact=Join-Path $repo 'artifacts\fidelity'
+$source=Join-Path $artifact 'packages\VT7Pty-host-guards-0.5.0-rc1'
+$root=Join-Path $artifact 'h3-guards-integrity-controls';$clone=Join-Path $root 'package'
+if(Test-Path -LiteralPath $root){throw 'Integrity controls already exist.'}
+[IO.Directory]::CreateDirectory($root)|Out-Null
+&robocopy $source $clone /E /COPY:DAT /DCOPY:T /R:0 /W:0 /XJ /NP /NFL /NDL /LOG:artifacts\h3-guards-integrity-copy.log
+if($LASTEXITCODE -ge 8){throw 'Integrity control staging failed.'}
+$manifestPath=Join-Path $clone 'manifest.json';$originalManifest=[IO.File]::ReadAllBytes($manifestPath)
+$rows=New-Object 'Collections.Generic.List[object]'
+foreach($control in @(@{Name='control';File='control/bin/HostCancellationProbe.exe';Expected='Original rc1 control changed'},@{Name='reference';File='reference/experiment/bin/VT7Pty-Agent.exe';Expected='Original trace reference changed'})){
+ $path=Join-Path $clone $control.File;$original=[IO.File]::ReadAllBytes($path)
+ try{
+  $bytes=[byte[]]$original.Clone();$bytes[$bytes.Length-1]=$bytes[$bytes.Length-1] -bxor 1;[IO.File]::WriteAllBytes($path,$bytes)
+  $manifest=[Text.Encoding]::UTF8.GetString($originalManifest)|ConvertFrom-Json
+  $entry=@($manifest.Files|Where-Object {$_.Path -ceq $control.File})[0];$entry.Sha256=(Get-FileHash $path -Algorithm SHA256).Hash.ToLowerInvariant()
+  [IO.File]::WriteAllText($manifestPath,($manifest|ConvertTo-Json -Depth 16),[Text.UTF8Encoding]::new($false))
+  [IO.File]::Copy($manifestPath,(Join-Path $root ($control.Name+'-altered-manifest.json')))
+  $info=New-Object Diagnostics.ProcessStartInfo;$info.FileName='C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+  $info.Arguments='-NoProfile -File "'+(Join-Path $clone 'tools\research\Invoke-HostGuards.ps1')+'" -Tier DevelopmentHost -PackageRoot "'+$clone+'"'
+  $info.WorkingDirectory=$clone;$info.UseShellExecute=$false;$info.CreateNoWindow=$true;$info.RedirectStandardOutput=$true;$info.RedirectStandardError=$true
+  $process=New-Object Diagnostics.Process;$process.StartInfo=$info;if(-not $process.Start()){throw 'Integrity runner did not start.'}
+  $stdout=$process.StandardOutput.ReadToEndAsync();$stderr=$process.StandardError.ReadToEndAsync()
+  if(-not $process.WaitForExit(30000)){$process.Kill();throw 'Integrity control deadline.'}
+  $text=$stdout.Result+[Environment]::NewLine+$stderr.Result
+  [IO.File]::WriteAllText((Join-Path $root ($control.Name+'-review.txt')),$text,[Text.UTF8Encoding]::new($false))
+  if($process.ExitCode -eq 0 -or -not $text.Contains($control.Expected) -or (Test-Path -LiteralPath (Join-Path $clone 'results'))){throw 'Corrupted preserved package was not rejected before execution.'}
+  $rows.Add([pscustomobject]@{Name=$control.Name;File=$control.File;RejectedBeforeNativeExecution=$true;OuterFileHashUpdated=$true;ExpectedReason=$control.Expected;OriginalSha256=(@((Get-Content -LiteralPath (Join-Path $source 'manifest.json') -Raw|ConvertFrom-Json).Files|Where-Object {$_.Path -ceq $control.File})[0]).Sha256;AlteredSha256=$entry.Sha256})
+  $process.Dispose()
+ }finally{[IO.File]::WriteAllBytes($path,$original);[IO.File]::WriteAllBytes($manifestPath,$originalManifest)}
+}
+[IO.File]::WriteAllText((Join-Path $root 'controls.json'),($rows.ToArray()|ConvertTo-Json -Depth 6),[Text.UTF8Encoding]::new($false))
+$rows.ToArray()

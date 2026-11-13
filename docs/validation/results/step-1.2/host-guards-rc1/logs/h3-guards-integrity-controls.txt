@@ -1,0 +1,22 @@
+
+ Log File : D:\Git\vt7pty\artifacts\h3-guards-integrity-copy.log
+
+
+Name                          : control
+File                          : control/bin/HostCancellationProbe.exe
+RejectedBeforeNativeExecution : True
+OuterFileHashUpdated          : True
+ExpectedReason                : Original rc1 control changed
+OriginalSha256                : aebccd26377c35b57c372b838eaa9bc4d08baf514c41ee987db0d88bcf44aa19
+AlteredSha256                 : 889197818ee06c37bb159e0a6440e338c2e3972b5b3f336c8270a9f473629f30
+
+Name                          : reference
+File                          : reference/experiment/bin/VT7Pty-Agent.exe
+RejectedBeforeNativeExecution : True
+OuterFileHashUpdated          : True
+ExpectedReason                : Original trace reference changed
+OriginalSha256                : 9d146b7b0b828cf92c6a50d428e4850eeb7f43fd187b4c993b328ea4dbfed3f3
+AlteredSha256                 : d75b394f1784a7a15c2c145f8564541eb779eae7a47f5b61e60fdc33cc3b6bba
+
+
+

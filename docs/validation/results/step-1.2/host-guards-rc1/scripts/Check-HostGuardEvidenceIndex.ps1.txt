@@ -1,0 +1,17 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty';$prefix='docs/validation/results/step-1.2/host-guards-rc1'
+$inventory=Get-Content -LiteralPath (Join-Path $repo ($prefix+'/preserved-files.json')) -Raw|ConvertFrom-Json
+$paths=@($inventory.Files|ForEach-Object {$prefix+'/'+$_.Path})+@($prefix+'/preserved-files.json')
+$list=Join-Path $repo 'artifacts\fidelity\h3-guards-index-paths.txt'
+[IO.File]::WriteAllLines($list,[string[]]$paths,[Text.UTF8Encoding]::new($false))
+$index=@{}
+foreach($line in @(&git ls-files --stage -- $prefix)){
+ if($line -notmatch '^100644 ([0-9a-f]{40}) 0\t(.+)$'){throw 'Unexpected evidence index entry.'}
+ $index[$matches[2]]=$matches[1]
+}
+if($LASTEXITCODE -ne 0 -or $index.Count -ne $paths.Count){throw 'Evidence inventory and index differ.'}
+$hashes=@(Get-Content -LiteralPath $list|&git hash-object --no-filters --stdin-paths)
+if($LASTEXITCODE -ne 0 -or $hashes.Count -ne $paths.Count){throw 'Could not hash raw evidence for Git.'}
+for($i=0;$i -lt $paths.Count;$i++){if($index[$paths[$i]] -cne $hashes[$i]){throw ('Git transforms evidence bytes: '+$paths[$i])}}
+[pscustomobject]@{Files=$paths.Count;UnfilteredGitBlobMatches=$hashes.Count;SourceCommit=$inventory.SourceCommit;ArchiveSha256=$inventory.ArchiveSha256}|ConvertTo-Json
