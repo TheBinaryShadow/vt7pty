@@ -1,0 +1,20 @@
+
+  VT7Pty-CoordinatedAgent.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-CoordinatedAgent.exe
+  HostCancellationHook.cc
+  VT7Pty.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty.dll
+  HostCancellationCoordinatedHook.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationCoordinatedHook.dll
+  HostCancellationProbe.cc
+D:\Git\vt7pty\tests\fidelity\HostCoordinationGuard.h(21,5): error C2280: 'fidelity::Handle::Handle(const fidelity::Handle &)': attempting to reference a deleted function [D:\Git\vt7pty\projects\HostCancellationCoordinatedProbe.vcxproj]
+  (compiling source file '../tests/fidelity/HostCancellationProbe.cc')
+      D:\Git\vt7pty\tests\fidelity\WinTest.h(24,5):
+      see declaration of 'fidelity::Handle::Handle'
+      D:\Git\vt7pty\tests\fidelity\WinTest.h(24,5):
+      'fidelity::Handle::Handle(const fidelity::Handle &)': function was explicitly deleted
+  
+D:\Git\vt7pty\tests\fidelity\HostCancellationChannel.h(207,23): error C2280: 'fidelity::Handle &fidelity::Handle::operator =(const fidelity::Handle &)': attempting to reference a deleted function [D:\Git\vt7pty\projects\HostCancellationCoordinatedProbe.vcxproj]
+  (compiling source file '../tests/fidelity/HostCancellationProbe.cc')
+      D:\Git\vt7pty\tests\fidelity\WinTest.h(25,13):
+      see declaration of 'fidelity::Handle::operator ='
+      D:\Git\vt7pty\tests\fidelity\WinTest.h(25,13):
+      'fidelity::Handle &fidelity::Handle::operator =(const fidelity::Handle &)': function was explicitly deleted
+  

@@ -116,7 +116,9 @@ public-API experiments failed. I'm now following the
   must extend coordination to the baseline paths and fix neighbor recorder overflow.
   The [version-4 research candidate](docs/HOST_COORDINATION_PROBE.md) now implements
   that work with a callback completion marker, an expiry refusal control and
-  periodic neighbor draining. Windows 7 qualification is pending.
+  periodic neighbor draining. The [rc1 candidate](docs/validation/2026-11-13-step-1.2-host-coordination-rc1-candidate.md)
+  completes all nine local collections and passes all 42 prototype baseline/expiry
+  cases. Windows 7 qualification is pending.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.

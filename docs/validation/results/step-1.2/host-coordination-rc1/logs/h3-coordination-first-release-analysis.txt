@@ -1,0 +1,48 @@
+
+  HostCancellationHook.cc
+  AgentLocation.cc
+  vt7pty.cc
+  Buffer.cc
+  DebugClient.cc
+  GenRandom.cc
+  Agent.cc
+  OwnedHandle.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  ConsoleFont.cc
+  WindowsVersion.cc
+  Assert.cc
+  Exception.cc
+  ConsoleInput.cc
+  ConsoleInputReencoding.cc
+  ConsoleLine.cc
+  Version.cc
+  DebugShowInput.cc
+  DefaultInputMap.cc
+  EventLoop.cc
+  InputMap.cc
+  LargeConsoleRead.cc
+  main.cc
+  NamedPipe.cc
+  Scraper.cc
+  Terminal.cc
+  Win32Console.cc
+  Win32ConsoleBuffer.cc
+  Buffer.cc
+  DebugClient.cc
+  GenRandom.cc
+  OwnedHandle.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  WindowsVersion.cc
+  Assert.cc
+  Exception.cc
+  Version.cc
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty.lib and object D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty.exp
+  VT7Pty.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty.dll
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Release\HostCancellationCoordinatedHook.lib and object D:\Git\vt7pty\artifacts\bin\x64\Release\HostCancellationCoordinatedHook.exp
+  VT7Pty-CoordinatedAgent.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty-CoordinatedAgent.exe
+  HostCancellationCoordinatedHook.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\HostCancellationCoordinatedHook.dll
+  HostCancellationProbe.cc
+  HostCancellationCoordinatedProbe.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\HostCancellationCoordinatedProbe.exe
+D:\Git\vt7pty\tests\fidelity\HostCoordinationWorker.h(33): error C6387: 'event.value' could be '0':  this does not adhere to the specification for the function 'WaitForSingleObject'.  [D:\Git\vt7pty\projects\HostCancellationCoordinatedProbe.vcxproj]

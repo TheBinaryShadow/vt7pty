@@ -1,0 +1,17 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$archive=Join-Path $repo 'artifacts\fidelity\packages\VT7Pty-host-coordination-0.5.0-rc1.zip'
+$extract=Join-Path $repo 'artifacts\fidelity\inspection-host-coordination-rc1'
+if(Test-Path -LiteralPath $extract) {throw 'Use a fresh extraction.'}
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[IO.Compression.ZipFile]::ExtractToDirectory($archive,$extract)
+$runner=Join-Path $extract 'tools\research\Invoke-HostCoordination.ps1'
+& 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' -NoLogo -NoProfile -ExecutionPolicy Bypass -File $runner -Tier DevelopmentHost -PackageRoot $extract *> (Join-Path $repo 'artifacts\h3-coordination-exact-package-run.log')
+$runnerExit=$LASTEXITCODE
+$results=@(Get-ChildItem -LiteralPath (Join-Path $extract 'results') -Directory)
+if($results.Count -ne 1) {throw 'Expected one first-run result directory.'}
+$record=[ordered]@{Archive=$archive;ArchiveSha256=(Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant();Extraction=$extract;Results=$results[0].FullName;PortableRunnerExit=$runnerExit}
+[IO.File]::WriteAllText((Join-Path $repo 'artifacts\fidelity\h3-coordination-exact-package-execution.json'),($record | ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+$record
+exit 0

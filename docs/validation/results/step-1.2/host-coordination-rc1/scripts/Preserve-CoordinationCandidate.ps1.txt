@@ -1,0 +1,50 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$target=Join-Path $repo 'docs\validation\results\step-1.2\host-coordination-rc1'
+$execution=Get-Content -LiteralPath (Join-Path $repo 'artifacts\fidelity\h3-coordination-exact-package-execution.json') -Raw | ConvertFrom-Json
+$package=Join-Path $repo 'artifacts\fidelity\packages\VT7Pty-host-coordination-0.5.0-rc1'
+$manifest=Get-Content -LiteralPath (Join-Path $package 'manifest.json') -Raw | ConvertFrom-Json
+$records=New-Object 'Collections.Generic.List[object]'
+function Copy-Exact([string]$Source,[string]$Relative) {
+    $destination=[IO.Path]::GetFullPath((Join-Path $target $Relative))
+    if(-not $destination.StartsWith($target+'\',[StringComparison]::OrdinalIgnoreCase)) {throw 'Evidence target leaves its directory.'}
+    [IO.Directory]::CreateDirectory((Split-Path -Parent $destination)) | Out-Null
+    $hash=(Get-FileHash -LiteralPath $Source -Algorithm SHA256).Hash.ToLowerInvariant()
+    if(Test-Path -LiteralPath $destination) {if((Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant() -cne $hash) {throw 'Different evidence already exists.'}}
+    else {[IO.File]::Copy($Source,$destination)}
+    if((Get-Item -LiteralPath $destination).Length -ne (Get-Item -LiteralPath $Source).Length -or (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant() -cne $hash) {throw 'Evidence copy differs.'}
+    $records.Add([ordered]@{Path=$Relative.Replace('\','/');Bytes=(Get-Item -LiteralPath $destination).Length;Sha256=$hash})
+}
+function Copy-Tree([string]$Source,[string]$Relative,[bool]$SkipPrograms=$false) {
+    $sourcePath=[IO.Path]::GetFullPath($Source).TrimEnd('\')
+    foreach($file in @(Get-ChildItem -LiteralPath $sourcePath -File -Recurse)) {
+        if($SkipPrograms -and $file.Extension -in @('.exe','.dll','.pdb','.lib','.obj','.exp')) {continue}
+        Copy-Exact $file.FullName (Join-Path $Relative $file.FullName.Substring($sourcePath.Length+1))
+    }
+}
+Copy-Tree $execution.Results ('development\'+(Split-Path $execution.Results -Leaf))
+foreach($entry in @(@('first-debug','preliminary\first-debug'),@('debug-soak','prepackage\debug-soak'))) {
+    $source=Join-Path $repo ('artifacts\fidelity\h3-coordination-'+$entry[0])
+    Copy-Tree (Join-Path $source 'native') ($entry[1]+'\native')
+    foreach($name in @('stdout.txt','stderr.txt','execution.json')) {Copy-Exact (Join-Path $source $name) ($entry[1]+'\'+$name)}
+}
+Copy-Exact (Join-Path $repo 'artifacts\fidelity\h3-coordination-debug-soak\audit.json') 'prepackage\debug-soak\audit.json'
+foreach($configuration in @('Debug','Release')) {Copy-Tree (Join-Path $repo ('artifacts\verification\x64\'+$configuration)) ('verification\'+$configuration.ToLowerInvariant()) $true}
+foreach($name in @('review','execution','metrics')) {Copy-Exact (Join-Path $repo ('artifacts\fidelity\h3-coordination-exact-package-'+$name+'.json')) ('audit\'+$name+'.json')}
+Copy-Exact (Join-Path $package 'manifest.json') 'package\manifest.json'
+Copy-Exact (Join-Path $package 'control\manifest.json') 'package\control-manifest.json'
+Copy-Exact (Join-Path $package 'reference\manifest.json') 'package\reference-manifest.json'
+Copy-Exact ($execution.Archive+'.sha256') 'package\VT7Pty-host-coordination-0.5.0-rc1.zip.sha256'
+$integrity=Join-Path $repo 'artifacts\fidelity\h3-coordination-integrity-controls'
+foreach($name in @('controls.json','control-stdout.txt','control-stderr.txt','reference-stdout.txt','reference-stderr.txt','control-altered-manifest.json','reference-altered-manifest.json')) {Copy-Exact (Join-Path $integrity $name) ('controls\integrity\'+$name)}
+$reviewer=Join-Path $repo 'artifacts\fidelity\h3-coordination-reviewer-controls'
+Copy-Exact (Join-Path $reviewer 'controls.json') 'controls\reviewer\controls.json'
+$controls=Get-Content -LiteralPath (Join-Path $reviewer 'controls.json') -Raw | ConvertFrom-Json
+foreach($control in $controls) {Copy-Exact (Join-Path (Join-Path $reviewer $control.Name) $control.File) ('controls\reviewer\'+$control.Name+'\'+$control.File)}
+foreach($name in @('Run-CoordinationDevelopment.ps1','Run-CoordinationIssuedCandidate.ps1','Review-CoordinationIssuedCandidate.ps1','Test-CoordinationReviewerControls.ps1','Test-CoordinationPackageIntegrity.ps1','Preserve-CoordinationCandidate.ps1')) {Copy-Exact (Join-Path $repo ('artifacts\fidelity\'+$name)) ('scripts\'+$name+'.txt')}
+foreach($file in @(Get-ChildItem -LiteralPath (Join-Path $repo 'artifacts') -File -Filter 'h3-coordination-*.log' | Where-Object {$_.Name -notmatch '(stage|commit|preserv|index)'})) {Copy-Exact $file.FullName ('logs\'+$file.BaseName+'.txt')}
+$inventory=[ordered]@{SchemaVersion=1;SourceCommit=$manifest.Experiment.SourceCommit;ArchiveSha256=$execution.ArchiveSha256;Files=$records.ToArray()}
+[IO.File]::WriteAllText((Join-Path $target 'preserved-files.json'),($inventory | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+$bytes=0L;foreach($entry in $records) {$bytes+=[long]$entry.Bytes}
+[pscustomobject]@{Files=$records.Count;Bytes=$bytes;Directory=$target}

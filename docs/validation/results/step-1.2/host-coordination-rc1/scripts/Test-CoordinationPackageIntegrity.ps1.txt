@@ -1,0 +1,38 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$archive=Join-Path $repo 'artifacts\fidelity\packages\VT7Pty-host-coordination-0.5.0-rc1.zip'
+$output=Join-Path $repo 'artifacts\fidelity\h3-coordination-integrity-controls'
+if(Test-Path -LiteralPath $output) {throw 'Use a fresh integrity directory.'}
+[IO.Directory]::CreateDirectory($output) | Out-Null
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$records=New-Object 'Collections.Generic.List[object]'
+foreach($role in @('control','reference')) {
+    $copy=Join-Path $output $role;[IO.Compression.ZipFile]::ExtractToDirectory($archive,$copy)
+    $relative=if($role -eq 'control') {'control/bin/HostCancellationProbe.exe'} else {'reference/experiment/bin/VT7Pty-Agent.exe'}
+    $path=Join-Path $copy $relative
+    $before=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
+    $bytes=[IO.File]::ReadAllBytes($path);$offset=$bytes.Length-1;$bytes[$offset]=$bytes[$offset] -bxor 1;[IO.File]::WriteAllBytes($path,$bytes)
+    $after=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
+    $manifest=Get-Content -LiteralPath (Join-Path $copy 'manifest.json') -Raw | ConvertFrom-Json
+    $entry=@($manifest.Files | Where-Object {$_.Path -ceq $relative})
+    if($entry.Count -ne 1) {throw 'Wrong outer manifest entry.'};$entry[0].Sha256=$after
+    [IO.File]::WriteAllText((Join-Path $copy 'manifest.json'),($manifest | ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
+    $start=New-Object Diagnostics.ProcessStartInfo
+    $start.FileName='C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+    $start.Arguments='-NoLogo -NoProfile -ExecutionPolicy Bypass -File "'+(Join-Path $copy 'tools\research\Invoke-HostCoordination.ps1')+'" -Tier DevelopmentHost -PackageRoot "'+$copy+'"'
+    $start.WorkingDirectory=$copy;$start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+    $p=New-Object Diagnostics.Process;$p.StartInfo=$start
+    if(-not $p.Start()) {throw 'Cannot start integrity control.'}
+    $stdout=$p.StandardOutput.ReadToEndAsync();$stderr=$p.StandardError.ReadToEndAsync()
+    if(-not $p.WaitForExit(30000)) {$p.Kill();$p.WaitForExit();throw 'Integrity check exceeded deadline.'}
+    $text=$stderr.Result
+    foreach($stream in @('stdout','stderr')) {$value=if($stream -eq 'stdout') {$stdout.Result} else {$text};[IO.File]::WriteAllText((Join-Path $output ($role+'-'+$stream+'.txt')),$value,[Text.UTF8Encoding]::new($false))}
+    $expected=if($role -eq 'control') {'Original rc1 control changed:'} else {'Original trace reference changed:'}
+    $rejected=$p.ExitCode -ne 0 -and $text.Contains($expected) -and -not (Test-Path -LiteralPath (Join-Path $copy 'results'))
+    $records.Add([ordered]@{Role=$role;File=$relative;Offset=$offset;BeforeSha256=$before;AfterSha256=$after;OuterManifestUpdated=$true;ExitCode=$p.ExitCode;RejectedBeforeResults=$rejected;ExpectedReason=$expected})
+    $p.Close();Copy-Item -LiteralPath (Join-Path $copy 'manifest.json') -Destination (Join-Path $output ($role+'-altered-manifest.json'))
+    if(-not $rejected) {throw 'Altered reference/control was not refused.'}
+}
+[IO.File]::WriteAllText((Join-Path $output 'controls.json'),($records.ToArray() | ConvertTo-Json -Depth 7),[Text.UTF8Encoding]::new($false))
+$records | ForEach-Object {[pscustomobject]$_} | Format-Table Role,RejectedBeforeResults,ExitCode

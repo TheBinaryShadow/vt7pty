@@ -1,0 +1,64 @@
+{
+    "NativeExit":  1,
+    "NativeStatus":  "Fail",
+    "Cases":  23,
+    "FailedCases":  [
+                        {
+                            "Case":  "focus-completed-selected",
+                            "Passed":  false,
+                            "OwnedProcessesCleaned":  true,
+                            "HostExited":  true,
+                            "HookRemoved":  true,
+                            "Error":  "Case did not meet acceptance; inspect its raw records."
+                        },
+                        {
+                            "Case":  "focus-pending-selected",
+                            "Passed":  false,
+                            "OwnedProcessesCleaned":  true,
+                            "HostExited":  true,
+                            "HookRemoved":  true,
+                            "Error":  "Case did not meet acceptance; inspect its raw records."
+                        },
+                        {
+                            "Case":  "focus-selection-bracket",
+                            "Passed":  false,
+                            "OwnedProcessesCleaned":  true,
+                            "HostExited":  true,
+                            "HookRemoved":  true,
+                            "Error":  "Case did not meet acceptance; inspect its raw records."
+                        }
+                    ],
+    "Root":  {
+                 "SchemaVersion":  1,
+                 "Probe":  "HostCancellation",
+                 "Version":  4,
+                 "Status":  "Fail",
+                 "SuiteExit":  1,
+                 "NeighborExit":  0,
+                 "NeighborPolls":  28,
+                 "DesktopIsolationVerified":  true,
+                 "OwnedLifetimesCleaned":  true,
+                 "RootDesktop":  "Default",
+                 "SuiteDesktop":  "VT7Pty-H3-e64fd149bb9b194d71e6a34d6891604c",
+                 "NeighborDesktop":  "VT7Pty-H3-06fb553c741b995e15e34830cd137acb",
+                 "MilestoneAccepted":  false,
+                 "ProductionCancellationImplemented":  false,
+                 "Error":  "",
+                 "DiagnosticOnly":  true,
+                 "H3Accepted":  false,
+                 "OriginalDeadlineFailuresRetained":  true,
+                 "KeyOperation":  "Single synchronous WM_KEYDOWN C",
+                 "ResearchAgent":  true,
+                 "Rotation":  0,
+                 "AgentGateProtocol":  1,
+                 "CharacterizationConditions":  true,
+                 "BaselineCoordinated":  true,
+                 "NeighborPeriodicDrain":  true,
+                 "NeighborSoakMs":  90000
+             },
+    "SourceCommit":  "5cdd45418ea6764e8ec8eb0c40fb228a17ca3f0f",
+    "SourceTreeClean":  false,
+    "Configuration":  "Debug",
+    "Rotation":  0,
+    "NeighborSoakMs":  90000
+}

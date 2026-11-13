@@ -1,0 +1,24 @@
+[
+    {
+        "Role":  "control",
+        "File":  "control/bin/HostCancellationProbe.exe",
+        "Offset":  499199,
+        "BeforeSha256":  "aebccd26377c35b57c372b838eaa9bc4d08baf514c41ee987db0d88bcf44aa19",
+        "AfterSha256":  "889197818ee06c37bb159e0a6440e338c2e3972b5b3f336c8270a9f473629f30",
+        "OuterManifestUpdated":  true,
+        "ExitCode":  1,
+        "RejectedBeforeResults":  true,
+        "ExpectedReason":  "Original rc1 control changed:"
+    },
+    {
+        "Role":  "reference",
+        "File":  "reference/experiment/bin/VT7Pty-Agent.exe",
+        "Offset":  647167,
+        "BeforeSha256":  "116dc297f65afccccc2cdc14ba59e8af0717de0ee06a6aebf90ea4e43a4e70e3",
+        "AfterSha256":  "1a8335a0acdee3742da2a0ef01fd3067555b0df33fe6a161bacaf0b70dcdd2c4",
+        "OuterManifestUpdated":  true,
+        "ExitCode":  1,
+        "RejectedBeforeResults":  true,
+        "ExpectedReason":  "Original trace reference changed:"
+    }
+]

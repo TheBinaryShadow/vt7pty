@@ -1,0 +1,24 @@
+param([string]$Source='D:\Git\vt7pty\artifacts\fidelity\h3-coordination-debug-soak\native',[string]$Output='D:\Git\vt7pty\artifacts\fidelity\h3-coordination-reviewer-controls')
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+if(Test-Path -LiteralPath $Output) {throw 'Use a fresh control directory.'}
+[IO.Directory]::CreateDirectory($Output) | Out-Null
+$rows=New-Object 'Collections.Generic.List[object]'
+foreach($name in @('premature-completion','ungated-baseline','expiry-host-write')) {
+    $copy=Join-Path $Output $name;Copy-Item -LiteralPath $Source -Destination $copy -Recurse
+    if($name -eq 'expiry-host-write') {$dir=Join-Path $copy 'suite\coordination-expiry'} else {$dir=Join-Path $copy 'suite\cooked-repeated'}
+    $file=Get-ChildItem -LiteralPath $dir -File -Filter 'coordination-*.json' | Where-Object {$_.Name -cmatch '^coordination-\d+\.json$'} | Select-Object -First 1
+    $p=Get-Content -LiteralPath $file.FullName -Raw | ConvertFrom-Json
+    $before=(Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+    if($name -eq 'premature-completion') {$p.CompletionQpc='1'}
+    elseif($name -eq 'ungated-baseline') {$p.OwnedLease=$false;$p.Released=$false}
+    else {$p.HostWriteStarted=$true}
+    [IO.File]::WriteAllText($file.FullName,($p | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+    $errorText=''
+    try {$null=& 'D:\Git\vt7pty\tools\research\Test-HostFreezeEvidence.ps1' -Directory $copy} catch {$errorText=$_.Exception.Message}
+    if(-not $errorText) {throw ('Reviewer missed control: '+$name)}
+    $rows.Add([ordered]@{Name=$name;Detected=$true;File=$file.FullName.Substring($copy.Length+1);BeforeSha256=$before;
+        AfterSha256=(Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant();Error=$errorText})
+}
+[IO.File]::WriteAllText((Join-Path $Output 'controls.json'),($rows.ToArray() | ConvertTo-Json -Depth 7),[Text.UTF8Encoding]::new($false))
+$rows | ForEach-Object {[pscustomobject]$_} | Format-Table Name,Detected,Error

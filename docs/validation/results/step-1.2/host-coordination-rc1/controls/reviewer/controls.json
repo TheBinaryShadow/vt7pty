@@ -1,0 +1,26 @@
+[
+    {
+        "Name":  "premature-completion",
+        "Detected":  true,
+        "File":  "suite\\cooked-repeated\\coordination-1.json",
+        "BeforeSha256":  "7e5659bea56cb39c4172d1037c989ee03677f986ccca470b9c227710e34a8d02",
+        "AfterSha256":  "8a9cb703cbc60b935e0c2da75276b10bbce544eb3a6329f366292383c87c4a68",
+        "Error":  "H3 diagnostic evidence: permit binding and completion boundary"
+    },
+    {
+        "Name":  "ungated-baseline",
+        "Detected":  true,
+        "File":  "suite\\cooked-repeated\\coordination-1.json",
+        "BeforeSha256":  "7e5659bea56cb39c4172d1037c989ee03677f986ccca470b9c227710e34a8d02",
+        "AfterSha256":  "b1e2a80e0da96b743dac35a482c89c243582a7e290e3ea69b7c8454e28413e64",
+        "Error":  "H3 diagnostic evidence: only explicit contrasts borrow a lease"
+    },
+    {
+        "Name":  "expiry-host-write",
+        "Detected":  true,
+        "File":  "suite\\coordination-expiry\\coordination-1.json",
+        "BeforeSha256":  "83f1d6fee61c896c7dafc0e9136c14d4b180b9c84d22c79aa8ec0f29afcc9c1b",
+        "AfterSha256":  "cc8d209d1ed99237515eb353410052d37e28d1d37b94d6f2c77e68b7a708343f",
+        "Error":  "H3 diagnostic evidence: expired lease refuses before a host write"
+    }
+]
