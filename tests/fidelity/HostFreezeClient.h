@@ -28,6 +28,7 @@ class Client {
     uint64_t nonce_[2]={},sequence_=0,cursor_=0,total_=0,created_=0,ownerCreated_=0;
     unsigned int record_=0;
     bool held_=false,active_=false,finished_=false;
+    uint64_t lease_=0;
     static uint64_t creation(HANDLE h) {
         FILETIME a={},b={},c={},d={}; fidelity::check(GetProcessTimes(h,&a,&b,&c,&d),"gate process time"); return (uint64_t{a.dwHighDateTime}<<32)|a.dwLowDateTime;
     }
@@ -48,18 +49,22 @@ public:
         exchange(Command::Bind); drain();
     }
     ~Client() { finish(); }
-    Response exchange(Command command,int cols=0,int rows=0) {
+    bool active() const noexcept { return active_; }
+    uint64_t lease() const noexcept { return lease_; }
+    bool alive() const noexcept { return WaitForSingleObject(agent_,0)==WAIT_TIMEOUT; }
+    void resolveExitedLease() { fidelity::check(!alive(),"exited research agent"); held_=active_=false; lease_=0; }
+    Response exchange(Command command,int cols=0,int rows=0,uint32_t leaseMs=20000) {
         fidelity::check(!finished_ && WaitForSingleObject(agent_,0)==WAIT_TIMEOUT,"live research agent");
         Request q; q.command=static_cast<uint32_t>(command); q.sequence=++sequence_; q.cursor=cursor_; q.deadline=GetTickCount64()+4000;
         q.nonce[0]=nonce_[0]; q.nonce[1]=nonce_[1]; q.agent=GetProcessId(agent_); q.controller=GetCurrentProcessId();
-        q.agentCreated=created_; q.controllerCreated=ownerCreated_; q.leaseMs=20000; q.cols=cols; q.rows=rows;
+        q.agentCreated=created_; q.controllerCreated=ownerCreated_; q.leaseMs=leaseMs; q.cols=cols; q.rows=rows;
         const auto before=clock(); fidelity::transfer(pipe_.value,&q,sizeof(q),true);
         Response r; fidelity::transfer(pipe_.value,&r,sizeof(r),false);
         const auto after=clock();
         fidelity::check(r.signature==magic && r.schema==version && r.bytes==sizeof(r) && r.sequence==q.sequence && r.agent==q.agent &&
             r.controller==q.controller && r.created==created_ && r.nonce[0]==nonce_[0] && r.nonce[1]==nonce_[1] && r.frequency>0 &&
             r.trace.count<=chunkCapacity && r.trace.next>=cursor_ && r.trace.next<=r.trace.total,"research response identity/framing");
-        cursor_=r.trace.next; total_=r.trace.total; held_=r.held!=0; active_=r.lease!=0;
+        cursor_=r.trace.next; total_=r.trace.total; held_=r.held!=0; active_=r.lease!=0; lease_=r.lease;
         fidelity::writeFile(out_+L"\\agent-"+std::to_wstring(++record_)+L"-request.json",
             "{\"Command\":"+std::to_string(q.command)+",\"RequestSequence\":"+number(q.sequence)+",\"ControllerCreated\":"+number(ownerCreated_)+
             ",\"AgentCreated\":"+number(created_)+",\"NonceLow\":"+number(nonce_[0])+",\"NonceHigh\":"+number(nonce_[1])+
@@ -68,7 +73,7 @@ public:
         fidelity::check(r.status==0,"research command accepted"); return r;
     }
     void drain() { unsigned int blocks=0; do { exchange(Command::Snapshot); fidelity::check(++blocks<=512,"bounded agent trace snapshot"); } while(cursor_<total_); }
-    Response acquire(Command mode) { drain(); const auto r=exchange(mode); drain(); return r; }
+    Response acquire(Command mode,uint32_t leaseMs=20000) { drain(); const auto r=exchange(mode,0,0,leaseMs); drain(); return r; }
     void release() { exchange(Command::Release); drain(); }
     bool finish() noexcept {
         if(finished_) return true;

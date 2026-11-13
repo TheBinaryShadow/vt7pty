@@ -46,7 +46,12 @@ public:
         if(!owner_.value) throw std::runtime_error("research controller handle");
         std::vector<wchar_t> image(32768); DWORD length=static_cast<DWORD>(image.size());
         fidelity::check(QueryFullProcessImageNameW(owner_.value,0,image.data(),&length),"research controller image");
-        fidelity::check(_wcsicmp(std::wstring(image.data(),length).c_str(),(fidelity::directory()+L"\\HostCancellationFreezeProbe.exe").c_str())==0,"exact research controller");
+        #ifdef VT7PTY_H3_COORDINATED
+        const auto expected=fidelity::directory()+L"\\HostCancellationCoordinatedProbe.exe";
+#else
+        const auto expected=fidelity::directory()+L"\\HostCancellationFreezeProbe.exe";
+#endif
+        fidelity::check(_wcsicmp(std::wstring(image.data(),length).c_str(),expected.c_str())==0,"exact research controller");
         ownerCreated_=creation(owner_.value); created_=creation(GetCurrentProcess());
         nonce_[0]=_wcstoui64(std::wstring(text,16).c_str(),nullptr,16); nonce_[1]=_wcstoui64(text+16,nullptr,16);
         pipe_.openServerPipe((L"\\\\.\\pipe\\VT7Pty-H3-freeze-"+std::to_wstring(GetCurrentProcessId())+L"-"+text).c_str(),NamedPipe::OpenMode::Duplex,65536,65536);

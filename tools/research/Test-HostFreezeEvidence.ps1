@@ -43,13 +43,14 @@ function Review-TraceNative([string]$Native) {
     $root=Read-TraceJson (Join-Path $Native 'probe.json')
     $cases=Read-TraceJson (Join-Path $Native 'suite\cases.json')
     $neighbor=Read-TraceJson (Join-Path $Native 'neighbor\neighbor.json')
-    Require-Trace ($root.SchemaVersion -eq 1 -and $root.Probe -eq 'HostCancellation' -and $root.Version -eq 3 -and $root.ResearchAgent -eq $true -and $root.AgentGateProtocol -eq 1 -and
+    Require-Trace ($root.SchemaVersion -eq 1 -and $root.Probe -eq 'HostCancellation' -and $root.Version -in @(3,4) -and $root.ResearchAgent -eq $true -and $root.AgentGateProtocol -eq 1 -and
         $root.DiagnosticOnly -and -not $root.H3Accepted -and -not $root.MilestoneAccepted -and
         -not $root.ProductionCancellationImplemented -and $root.OriginalDeadlineFailuresRetained) 'trace identity and research boundary'
     Require-Trace ($root.Rotation -in @(0,1,2)) 'rotation'
     $names=@('cooked-repeated','no-pending-read','completed-before-cancel','receipt-without-ack','close-in-request','default-handler','raw-input-guard','shell-owner-exit','cmd-empty','cmd-partial','powershell-empty','powershell-partial','host-key-record')
     foreach($read in @('completed','pending')) { foreach($position in 0..3) { $names+=@('focus-'+$read+'-'+@('quiet','selected','coordinated','delay-control')[($position+$root.Rotation)%4]) } }
     $names+=@('focus-selection-bracket')
+    if($root.Version -eq 4) {$names+=@('coordination-expiry')}
     Require-Trace ((@($cases.Cases | ForEach-Object {$_.Case}) -join '|') -ceq ($names -join '|')) 'trace case inventory'
     Require-Trace ($root.SuiteDesktop -cmatch '^VT7Pty-H3-[0-9a-f]{32}$' -and
         $root.NeighborDesktop -cmatch '^VT7Pty-H3-[0-9a-f]{32}$' -and $root.SuiteDesktop -cne $root.NeighborDesktop -and $root.RootDesktop -eq 'Default') 'private desktop identity'
@@ -86,7 +87,7 @@ function Review-TraceNative([string]$Native) {
         foreach($file in @(Get-ChildItem -LiteralPath $dir -Filter ($location.Label+'-*-request.json') -File | Sort-Object {[int]([regex]::Match($_.Name,'-(\d+)-request').Groups[1].Value)})) {
             $q=Read-TraceJson $file.FullName; $r=$q.Response; $requests++
             Same-TraceIdentity $q.RequestIdentity $id
-            Require-Trace ($q.RequestSchema -eq 3 -and $q.RequestBytes -eq 120 -and $q.RequestNonceLow -ceq $hello.Response.NonceLow -and
+            Require-Trace ($q.RequestSchema -eq $root.Version -and $q.RequestBytes -eq 120 -and $q.RequestNonceLow -ceq $hello.Response.NonceLow -and
                 $q.RequestNonceHigh -ceq $hello.Response.NonceHigh -and $r.NonceLow -ceq $hello.Response.NonceLow -and
                 $r.NonceHigh -ceq $hello.Response.NonceHigh -and $r.Result -eq $q.ExpectedResult -and
                 $r.Sequence -eq $q.RequestSequence -and $r.Operation -eq $q.RequestOperation) 'bound request/response'
@@ -298,7 +299,12 @@ function Review-FreezeNative([string]$Native) {
             if([decimal]$v.FirstCompleteContentQpc -gt 0) {Require-Trace ([decimal]$v.FirstCompleteContentQpc -ge [decimal]$v.FirstFileExistsQpc) 'file content cannot precede first existence observation'}
         }
     }
-    return [ordered]@{SchemaVersion=1;Kind='H3FreezeNativeReview';Core=$core;HostMessages=$windows;AgentEvents=$agentEvents;FreezeMessageEntries=$freezeMessages;
+    $coordination=$null
+    if($root.Version -eq 4) {
+        . (Join-Path $PSScriptRoot 'HostCoordinationEvidence.ps1')
+        $coordination=Review-CoordinationNative $Native $root $locations
+    }
+    return [ordered]@{SchemaVersion=1;Kind='H3FreezeNativeReview';Version=$root.Version;Coordination=$coordination;Core=$core;HostMessages=$windows;AgentEvents=$agentEvents;FreezeMessageEntries=$freezeMessages;
         EscapeMessageEntries=$escapeMessages;ConditionPhases=$leaseChecks;Conditions=$conditions;CoverageGaps=@($gaps);OperationalIssues=@($issues);
         MilestoneAccepted=$false;ProductionCancellationImplemented=$false}
 }

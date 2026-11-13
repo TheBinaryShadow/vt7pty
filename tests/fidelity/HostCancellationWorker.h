@@ -147,6 +147,9 @@ std::string fileText(const std::wstring &path) {
 }
 #ifdef VT7PTY_H3_FREEZE
 #include "HostFreezeWorker.h"
+#ifdef VT7PTY_H3_COORDINATED
+#include "HostCoordinationWorker.h"
+#endif
 #endif
 struct CaseResult { std::string name,error; bool passed=false,cleaned=false,hostExited=false,unhooked=false; };
 CaseResult caseRun(const std::wstring &output,const std::string &name,unsigned int index,
@@ -452,7 +455,12 @@ int suite(const std::wstring &output) {
             [=](Session &s,Channel &c,const std::wstring &out) { return freezeCase(s,c,out,mode,pending); });
     }
     add("focus-selection-bracket",freezeBracket);
+#ifdef VT7PTY_H3_COORDINATED
+    add("coordination-expiry",coordinationExpiry);
+    bool passed=results.size()==23;
+#else
     bool passed=results.size()==22;
+#endif
 #else
     bool passed=results.size()==13;
 #endif
@@ -475,7 +483,13 @@ int neighbor(const std::wstring &output) {
     startRead(s,"BRAVO_KEEP");
     Registration ready; ready.kind=2; ready.ready=1; transfer(parentPipe,&ready,sizeof(ready),true);
     unsigned int observations=0;
+#ifdef VT7PTY_H3_COORDINATED
+    NeighborCollector collector{s,c}; collector.service();
+#endif
     for(;;) {
+#ifdef VT7PTY_H3_COORDINATED
+        const char command=collector.command();
+#else
         char command=0; transfer(parentPipe,&command,1,false,
 #ifdef VT7PTY_H3_FREEZE
             420000
@@ -483,11 +497,15 @@ int neighbor(const std::wstring &output) {
             180000
 #endif
             );
+#endif
         const auto p=s.observe();
         check(!p.readReturned && !p.controlCount,"neighbor remains pending without events"); ++observations;
         if(command=='Q') break;
         check(command=='I',"neighbor observation command");
     }
+    #ifdef VT7PTY_H3_COORDINATED
+    collector.service(); collector.write(output);
+#endif
     c.close(); finishRead(s,L"BRAVO_KEEP",output,L"neighbor-read"); s.quit();
     const bool exited=WaitForSingleObject(s.host.value,5000)==WAIT_OBJECT_0;
     writeFile(output+L"\\neighbor.json","{\"Passed\":"+std::string(exited && observations>1 ? "true" : "false")+

@@ -16,6 +16,9 @@ HWND target=nullptr;
 bool bound=false,retired=false;
 volatile LONG entered=0;
 uint32_t validationStage=0;
+#ifdef VT7PTY_H3_COORDINATED
+HANDLE completion=nullptr;
+#endif
 #ifdef VT7PTY_H3_FREEZE
 h3freeze::Ring<h3freeze::WindowEvent> windowTrace;
 void recordWindow(HWND window,UINT message,WPARAM wp,LPARAM lp,uint32_t phase,LRESULT result=0) noexcept {
@@ -29,6 +32,9 @@ void recordWindow(HWND window,UINT message,WPARAM wp,LPARAM lp,uint32_t phase,LR
 void closeChannel() noexcept {
     for(HANDLE h:{pipe,controller,agent,fixtureProcess}) if(h && h!=INVALID_HANDLE_VALUE) CloseHandle(h);
     pipe=INVALID_HANDLE_VALUE; controller=agent=fixtureProcess=nullptr;
+#ifdef VT7PTY_H3_COORDINATED
+    if(completion) { CloseHandle(completion); completion=nullptr; }
+#endif
     retired=true;
 }
 bool processOkay(HANDLE h,uint32_t pid,uint64_t created) {
@@ -94,6 +100,11 @@ void openChannel(const CWPSTRUCT &message) {
     check(ours.same(theirs) && ours.integrity==SECURITY_MANDATORY_MEDIUM_RID && ordinaryDesktop(),"callback desktop and token policy");
     for(size_t i=0;i<2;++i) binding.nonce[i]=_wcstoui64(value.substr(prefix.size()+i*16,16).c_str(),nullptr,16);
     binding.identity.controller=pid; binding.identity.controllerCreated=creation(owner.value);
+#ifdef VT7PTY_H3_COORDINATED
+    Handle boundary(OpenEventW(EVENT_MODIFY_STATE,FALSE,(L"Local\\"+value+L"-completion").c_str()));
+    check(boundary.value!=nullptr,"owned completion event");
+    completion=boundary.value; boundary.value=INVALID_HANDLE_VALUE;
+#endif
     controller=owner.value; owner.value=INVALID_HANDLE_VALUE;
     pipe=candidate.value; candidate.value=INVALID_HANDLE_VALUE;
     channelAtom=atom; target=message.hwnd;
@@ -230,6 +241,11 @@ void dispatch(const CWPSTRUCT &message) {
         const auto keyboard=cancelRead(request.operation==Op::RestoreControl);
 #ifdef VT7PTY_H3_DIAGNOSTIC
         h3trace::active=false;
+#endif
+#ifdef VT7PTY_H3_COORDINATED
+        // Nonblocking completion marker, after cancelRead's keyboard scope has unwound.
+        // This carries no outcome/evidence and does not replace a missing final acknowledgment.
+        if(!completion || !SetEvent(completion)) { closeChannel(); return; }
 #endif
         if(request.operation!=Op::CancelSuppressAck) sendResponse(result,&request,&keyboard);
         if(request.operation==Op::CancelSuppressAck) retired=true; // Keep the pipe open for the explicit final-ack timeout.

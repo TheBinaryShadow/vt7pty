@@ -16,6 +16,7 @@ replace release acceptance. The [roadmap](../ROADMAP.md) records what is complet
 | Test the cancellation prototype | Private-desktop research package | [H3 probe](HOST_CANCELLATION_PROBE.md) |
 | Investigate cancellation failures | Interleaved unchanged controls and traced trials | [Diagnostic package](HOST_CANCELLATION_DIAGNOSTICS.md) |
 | Test scraper coordination | Unchanged controls, trace reference and controlled freeze conditions | [Freeze experiment](HOST_FREEZE_DIAGNOSTICS.md) |
+| Qualify coordinated cancellation | Original control, unchanged version 3 and coordinated version 4 | [Coordinated prototype](HOST_COORDINATION_PROBE.md) |
 | Collect failure details | Diagnostic tools | [Diagnostics](DIAGNOSTICS.md) |
 
 The target runners support Windows PowerShell 2.0 without KB3191566.
@@ -41,7 +42,7 @@ exports, PDBs, resources and embedded compatibility manifests. It rejects
 delay-loaded DLLs and a maintained list of post-Windows 7 direct imports.
 Release verification also runs static analysis under /W4 /WX.
 
-The current local suite has 34 checks without the optional soak, including the
+The current local suite has 35 checks without the optional soak, including the
 33-check H3 oracle, six trace checks, three freeze-ring checks and the H1 and H2
 logic checks. Historical release bundles retain their own counts;
 the published 0.5.0 acceptance bundle has 30 cases including its full soak.

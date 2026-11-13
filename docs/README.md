@@ -29,9 +29,9 @@ what I've learned from testing it.
 
 I'm working on input cancellation within Milestone 1. Host identity and dispatch
 are verified. Controlled Windows 7 experiments establish selection as a delivery
-blocker and support scrape/resize coordination. The next research prototype needs
-to cover its baseline cancellation paths and repair neighbor trace collection;
-H3 remains open before runtime integration.
+blocker and support scrape/resize coordination. The coordinated research prototype
+now covers its baseline paths and collects neighbor traces periodically. Windows 7
+qualification remains before H3 acceptance and runtime integration.
 
 | Guide | Purpose |
 | --- | --- |
@@ -44,6 +44,7 @@ H3 remains open before runtime integration.
 | [Host cancellation probe](HOST_CANCELLATION_PROBE.md) | Run the first H3 prototype and see its remaining limits |
 | [Cancellation diagnostics](HOST_CANCELLATION_DIAGNOSTICS.md) | Collect interleaved rc1 control and traced trials |
 | [Scraper coordination experiment](HOST_FREEZE_DIAGNOSTICS.md) | Compare held selection, quiet intervals, activity and delay controls |
+| [Coordinated cancellation prototype](HOST_COORDINATION_PROBE.md) | Qualify baseline coordination, callback completion, expiry and neighbor collection |
 | [Optional SSH testing](SSH_BASELINE.md) | Deferred remote-test prerequisites |
 
 ## Results and project history

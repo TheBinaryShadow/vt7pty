@@ -3,8 +3,8 @@
 Updated: 2026-11-13.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
-behavior in Milestone 1. **Next: apply scrape/resize coordination to the H3
-research prototype and repair neighboring-session trace collection.**
+behavior in Milestone 1. **Next: qualify the [coordinated H3 candidate](docs/HOST_COORDINATION_PROBE.md)
+on all three Windows 7 machines.**
 The [Windows 7 contrasts](docs/validation/2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md)
 pass all 54 quiet/coordinated phases and lose delivery in all 27 held-selection
 phases. Other failures and neighbor trace loss remain. Host identity and dispatch
@@ -114,6 +114,9 @@ public-API experiments failed. I'm now following the
   verifies all 27 collections: quiet/coordinated phases pass 54/54 and held-selection
   delivery fails 27/27. Thirteen other case failures remain. The next prototype
   must extend coordination to the baseline paths and fix neighbor recorder overflow.
+  The [version-4 research candidate](docs/HOST_COORDINATION_PROBE.md) now implements
+  that work with a callback completion marker, an expiry refusal control and
+  periodic neighbor draining. Windows 7 qualification is pending.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.

@@ -3,6 +3,9 @@
 #pragma once
 #include "HostCancellationResearch.h"
 #include "HostCancellationProtocol.h"
+#ifdef VT7PTY_H3_COORDINATED
+#include "HostCoordinationGuard.h"
+#endif
 #ifdef VT7PTY_H3_FREEZE
 #include "HostFreezeJson.h"
 #endif
@@ -129,6 +132,10 @@ class Channel {
     bool disabled=false,closed=false;
     uint64_t sequence=1;
     unsigned int record=0;
+#ifdef VT7PTY_H3_COORDINATED
+    unsigned int coordinationRecord=0;
+    Handle completion;
+#endif
 #ifdef VT7PTY_H3_FREEZE
     uint64_t windowCursor=0,windowTotal=0;
 #endif
@@ -146,7 +153,11 @@ class Channel {
         DWORD_PTR result=0;
         SetLastError(ERROR_SUCCESS);
         if(!SendMessageTimeoutW(reinterpret_cast<HWND>(binding.identity.window),WM_NULL,atom,binding.identity.controller,
-            SMTO_ABORTIFHUNG|SMTO_BLOCK,1000,&result)) { disabled=true; throw std::runtime_error("OutcomeUnknown: WM_NULL delivery timeout/failure"); }
+            SMTO_ABORTIFHUNG|SMTO_BLOCK
+#ifdef VT7PTY_H3_COORDINATED
+            |SMTO_ERRORONEXIT
+#endif
+            ,1000,&result)) { disabled=true; throw std::runtime_error("OutcomeUnknown: WM_NULL delivery timeout/failure"); }
     }
     Response receive(DWORD timeout=2000) {
         const auto end=GetTickCount64()+timeout;
@@ -192,6 +203,9 @@ public:
             wchar_t suffix[33]={}; swprintf_s(suffix,L"%016llx%016llx",binding.nonce[0],binding.nonce[1]);
             const std::wstring nameValue=L"VT7Pty-H3-"+std::to_wstring(GetCurrentProcessId())+L"-"+suffix;
             server.reset(privateServer(L"\\\\.\\pipe\\"+nameValue));
+#ifdef VT7PTY_H3_COORDINATED
+            completion.reset(h3coord::completionEvent(L"Local\\"+nameValue+L"-completion"));
+#endif
             atom=GlobalAddAtomW(nameValue.c_str()); check(atom>=0xc000,"session channel atom");
             // Absolute, colocated x64 module. The portable runner verifies its package hash before this process starts.
             const auto path=directory()+L"\\"+hookName;
@@ -229,6 +243,9 @@ public:
         auto request=binding; request.operation=op; request.sequence=sequence; request.deadline=GetTickCount64()+4000; return request;
     }
     Response exchange(Request request,Result expected,const char *caseName) {
+#ifdef VT7PTY_H3_COORDINATED
+        std::unique_ptr<h3coord::Guard> coordination;
+#endif
         try {
             check(!disabled && !closed,"no dispatch on retired channel");
             verifyLive();
@@ -240,13 +257,35 @@ public:
             const bool observeRequest=expected==Result::Accepted || expected==Result::Received;
             const bool mutation=observeRequest && (request.operation==Op::Cancel || request.operation==Op::RestoreControl ||
                 request.operation==Op::CancelSuppressAck || request.operation==Op::CancelClose);
+#ifdef VT7PTY_H3_COORDINATED
+            if(mutation) {
+                check(session.gate!=nullptr,"coordination client available");
+                coordination=std::make_unique<h3coord::Guard>(*session.gate,output,label+L"-"+std::to_wstring(record+1)+L"-request.json",
+                    ++coordinationRecord,request,caseName);
+                coordination->begin();
+            }
+#endif
             const uint64_t beforeTime=h3trace::qpc(),beforeBytes=session.raw.size();
             const uint32_t beforeEpoch=session.promptEpoch;
             std::string before="null",after="null",afterError;
-            if(mutation) before=packetJson(session.observe());
+            if(mutation) {
+                const auto observation=session.observe();
+#ifdef VT7PTY_H3_COORDINATED
+                if(coordination->protects()) check(!observation.trace.selectionError && !observation.trace.inputError && !observation.trace.selectionFlags,
+                    "CoordinationUnavailable: selection active before dispatch");
+#endif
+                before=packetJson(observation);
+            }
+#endif
+            #ifdef VT7PTY_H3_COORDINATED
+            if(coordination) { check(ResetEvent(completion.value),"reset callback boundary"); coordination->beforeWrite(); }
 #endif
             transfer(server.value,&request,sizeof(request),true);
-            signal(); const auto response=receive();
+            signal();
+#ifdef VT7PTY_H3_COORDINATED
+            if(coordination) coordination->signalReturned();
+#endif
+            const auto response=receive();
 #ifdef VT7PTY_H3_FREEZE
             check(response.windowTrace.count<=h3freeze::chunkCapacity && response.windowTrace.next>=windowCursor,"window trace cursor");
             windowCursor=response.windowTrace.next; windowTotal=response.windowTrace.total;
@@ -279,8 +318,18 @@ public:
             }
             else if(expected==Result::Received) { ++sequence; check(response.acceptedSequence==sequence-1,"receipt sequence"); }
             else { ++rejected; check(response.acceptedSequence==sequence-1,"rejection preserves sequence"); }
+            #ifdef VT7PTY_H3_COORDINATED
+            if(coordination) { coordination->observeCompletion(completion.value); coordination->complete(expected); }
+#endif
             return response;
-        } catch(...) { disabled=true; throw; }
+        } catch(const std::exception &error) {
+#ifdef VT7PTY_H3_COORDINATED
+            if(coordination) coordination->fail(error.what());
+#else
+            (void)error;
+#endif
+            disabled=true; throw;
+        }
     }
     void ambiguityControl(bool cancel=false) {
         exchange(next(cancel ? Op::CancelSuppressAck : Op::SuppressAck),Result::Received,"receipt-without-final-ack");

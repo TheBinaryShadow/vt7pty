@@ -184,6 +184,10 @@ int run(const std::wstring &output) {
         }
         check(!a->alive(),"suite deadline");
         a->poll(); check(GetExitCodeProcess(a->process.value,&aExit),"suite exit");
+#ifdef VT7PTY_H3_COORDINATED
+        const auto soakEnd=GetTickCount64()+neighborSoakMs();
+        while(GetTickCount64()<soakEnd) { b->poll(); check(b->alive(),"neighbor alive during development soak"); Sleep(2); }
+#endif
         b->command('Q');
         deadline=GetTickCount64()+15000;
         while(b->alive() && GetTickCount64()<deadline) { b->poll(); Sleep(2); }
@@ -200,6 +204,9 @@ int run(const std::wstring &output) {
 #endif
 #ifdef VT7PTY_H3_FREEZE
     diagnostic+=",\"ResearchAgent\":true,\"Rotation\":"+std::to_string(freezeRotation())+",\"AgentGateProtocol\":1,\"CharacterizationConditions\":true";
+#endif
+#ifdef VT7PTY_H3_COORDINATED
+    diagnostic+=",\"BaselineCoordinated\":true,\"NeighborPeriodicDrain\":true,\"NeighborSoakMs\":"+std::to_string(neighborSoakMs());
 #endif
     writeFile(output+L"\\probe.json","{\"SchemaVersion\":1,\"Probe\":\"HostCancellation\",\"Version\":"+std::to_string(version)+",\"Status\":"+json(passed ? "Pass" : "Fail")+
         ",\"SuiteExit\":"+std::to_string(aExit)+",\"NeighborExit\":"+std::to_string(bExit)+",\"NeighborPolls\":"+std::to_string(polls)+

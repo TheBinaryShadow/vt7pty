@@ -75,7 +75,9 @@ inline std::wstring imagePath(HANDLE process) {
 }
 struct IdentityPacket {
     uint32_t magic=0x33494856,
-#ifdef VT7PTY_H3_FREEZE
+#if defined(VT7PTY_H3_COORDINATED)
+        schema=4,
+#elif defined(VT7PTY_H3_FREEZE)
         schema=3,
 #else
         schema=1,
@@ -407,7 +409,9 @@ public:
         transfer(pipe_.value,&command,1,true);
         IdentityPacket p; transfer(pipe_.value,&p,sizeof(p),false);
         check(p.magic==0x33494856 && p.schema==
-#ifdef VT7PTY_H3_FREEZE
+#if defined(VT7PTY_H3_COORDINATED)
+            4
+#elif defined(VT7PTY_H3_FREEZE)
             3
 #else
             1

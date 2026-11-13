@@ -44,7 +44,10 @@ unchanged earlier packages. The [Windows 7 review](validation/2026-11-13-step-1.
 finds that quiet/coordinated phases pass 54/54 while selected delivery fails 27/27,
 with stale frozen state and a later Escape observed directly. The next research
 prototype needs coordination across its baseline paths and periodic neighbor
-trace collection. Remaining failures and wider guards keep H3 open.
+trace collection. The [coordinated research candidate](HOST_COORDINATION_PROBE.md)
+implements those changes with an explicit keyboard-scope completion marker and
+an expiry refusal control. It awaits Windows 7 qualification. Remaining failures
+and wider guards keep H3 open.
 
 ## H1 implementation
 
