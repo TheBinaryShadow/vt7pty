@@ -20,6 +20,9 @@ read left pending. H3 is not accepted; the runtime cancellation defect remains o
 | Active-child and cooked-read baseline | [Step 1.1 rc3](2026-10-12-step-1.1-rc3-candidate.md) | [Six cancellation failures per machine](2026-10-12-step-1.1-rc3-windows7-baseline.md) |
 | Initial shell and fixture baseline | [Step 1.1 initial candidate](2026-10-12-step-1.1-candidate.md) | [Four prompt-cancellation failures per machine](2026-10-12-step-1.1-windows7-baseline.md) |
 
+The [H3 failure investigation](2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
+compares the failed requests with passes and defines the next diagnostic experiment.
+
 These research bundles use the released 0.5.0 runtime. Passing a research stage
 does not resolve the recorded shell defects or accept Milestone 1.
 

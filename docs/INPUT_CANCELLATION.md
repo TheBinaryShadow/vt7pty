@@ -111,8 +111,10 @@ inside verified host callbacks on private desktops. Initial local runs discard
 the line, deliver one event, preserve the next read and recover real shell
 prompts. The [Windows 7 rc1 review](validation/2026-11-13-step-1.2-host-cancellation-rc1-windows7.md)
 records intermittent failures despite acknowledged dispatch and restored keyboard
-state. I'll investigate those failures before another candidate; the host design
-holds the remaining requirements and production limits.
+state. The [follow-up investigation](validation/2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
+compares matching passes, reviews the observation gaps and defines a diagnostic
+experiment before a fix decision. The host design holds the remaining requirements
+and production limits.
 
 An application-facing read shim remains a separate alternative. It needs a
 specified launch/load boundary and its own console-read semantics; blindly

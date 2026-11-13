@@ -1,0 +1,49 @@
+$ErrorActionPreference='Stop'
+$taskRoot='D:\Git\vt7pty'
+$taskPackage=Join-Path $taskRoot 'artifacts\fidelity\inspection-host-cancellation-rc1'
+$taskOutput=Join-Path $taskRoot 'artifacts\fidelity\h3-investigation-20261113\local-rc1-repeat'
+if(Test-Path -LiteralPath $taskOutput) { throw 'Investigation output already exists' }
+[IO.Directory]::CreateDirectory($taskOutput) | Out-Null
+$taskManifest=Get-Content -LiteralPath (Join-Path $taskPackage 'manifest.json') -Raw | ConvertFrom-Json
+foreach($taskFile in $taskManifest.Files) {
+    $taskPath=Join-Path $taskPackage $taskFile.Path
+    if((Get-Item -LiteralPath $taskPath).Length -ne $taskFile.Bytes -or (Get-FileHash -LiteralPath $taskPath -Algorithm SHA256).Hash -ne $taskFile.Sha256) { throw ('Package changed: '+$taskFile.Path) }
+}
+$taskRuns=@()
+foreach($taskIndex in 1..6) {
+    $taskRun=Join-Path $taskOutput ('run-'+$taskIndex)
+    [IO.Directory]::CreateDirectory($taskRun) | Out-Null
+    $taskStart=New-Object Diagnostics.ProcessStartInfo
+    $taskStart.FileName=Join-Path $taskPackage 'bin\HostCancellationProbe.exe'
+    $taskStart.WorkingDirectory=Join-Path $taskPackage 'bin'
+    $taskStart.UseShellExecute=$false; $taskStart.CreateNoWindow=$true
+    $taskStart.RedirectStandardOutput=$true; $taskStart.RedirectStandardError=$true
+    $taskStart.Arguments='"'+$taskRun+'"'
+    $taskProcess=New-Object Diagnostics.Process
+    $taskProcess.StartInfo=$taskStart
+    $taskWatch=[Diagnostics.Stopwatch]::StartNew()
+    if(-not $taskProcess.Start()) { throw 'Local probe did not start' }
+    $taskTimeout=-not $taskProcess.WaitForExit(210000)
+    if($taskTimeout) { $taskProcess.Kill(); [void]$taskProcess.WaitForExit(10000) }
+    $taskWatch.Stop()
+    $taskStdout=$taskProcess.StandardOutput.ReadToEnd()
+    $taskStderr=$taskProcess.StandardError.ReadToEnd()
+    $taskExit=$taskProcess.ExitCode
+    $taskProcess.Dispose()
+    $taskAccepted=$false; $taskAuditError=''
+    try {
+        $null=& (Join-Path $taskRoot 'tools\research\Test-HostCancellationEvidence.ps1') -Directory $taskRun -OutputPath (Join-Path $taskOutput ('run-'+$taskIndex+'-audit.json'))
+        $taskAccepted=$true
+    } catch { $taskAuditError=$_.Exception.Message }
+    $taskRuns+=@([ordered]@{Repetition=$taskIndex;ExitCode=$taskExit;TimedOut=$taskTimeout;DurationMs=$taskWatch.ElapsedMilliseconds;AuditorAccepted=$taskAccepted;AuditError=$taskAuditError;Stdout=$taskStdout;Stderr=$taskStderr})
+    [IO.File]::WriteAllText((Join-Path $taskOutput 'summary.json'),([ordered]@{
+        SchemaVersion=1;RecordedUtc=[DateTime]::UtcNow.ToString('o');Computer=$env:COMPUTERNAME
+        OS=(Get-WmiObject Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber)
+        PowerShell=$PSVersionTable.PSVersion.ToString()
+        ManifestSha256=(Get-FileHash -LiteralPath (Join-Path $taskPackage 'manifest.json') -Algorithm SHA256).Hash.ToLowerInvariant()
+        PackageFilesVerified=@($taskManifest.Files).Count
+        Runs=$taskRuns
+    } | ConvertTo-Json -Depth 9),[Text.UTF8Encoding]::new($false))
+    Write-Output ('Unchanged rc1 local repetition '+$taskIndex+': exit '+$taskExit+', strict audit '+$taskAccepted+', '+$taskWatch.ElapsedMilliseconds+' ms')
+    if($taskTimeout -or $taskExit -ne 0 -or -not $taskAccepted) { break }
+}

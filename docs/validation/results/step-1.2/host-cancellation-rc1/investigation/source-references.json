@@ -1,0 +1,82 @@
+{
+  "RecordedDate": "2026-11-13",
+  "VT7Reference": {
+    "Commit": "3afc719d83299ba5a6b4521043d248459e035fc0",
+    "SelectedFilesClean": true,
+    "Files": [
+      {
+        "Path": "src/interactivity/win32/windowio.cpp",
+        "Sha256": "71580830841a950a05267d68f5d54619f1ce892db8acc093be77e759de4f7546"
+      },
+      {
+        "Path": "src/host/input.cpp",
+        "Sha256": "ce1fda62cd5a6840ddf3dfb788c125901bef5250fb663e829c2b974c8a750606"
+      },
+      {
+        "Path": "src/host/handle.cpp",
+        "Sha256": "852b9d68c12f769d9dabf33d5eaf896d5d439307f868457102834911ea3a772b"
+      }
+    ]
+  },
+  "MicrosoftTerminalReference": [
+    {
+      "Path": "src/host/input.cpp",
+      "BlobSha": "cfc009b3096ee54e0751572a94ee4440f37038c2",
+      "ReadLines": "95-150"
+    },
+    {
+      "Path": "src/host/handle.cpp",
+      "BlobSha": "d77068ffd18f27f1266b8c5f1c55677db2f339c2",
+      "ReadLines": "1-35"
+    },
+    {
+      "Path": "src/interactivity/win32/windowio.cpp",
+      "BlobSha": "72da80130a08dd8409ae357918a763e726348635",
+      "ReadLines": "310-410"
+    }
+  ],
+  "Limits": "Modern console code and VT7 are reference material, not Windows 7 conhost source or proof of its internal behavior.",
+  "Docs": [
+    "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-sendmessage",
+    "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getkeyboardstate",
+    "https://learn.microsoft.com/en-us/windows/console/setconsolectrlhandler",
+    "https://learn.microsoft.com/en-us/windows/console/handlerroutine",
+    "https://learn.microsoft.com/en-us/windows/console/getconsoleselectioninfo",
+    "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-insendmessageex",
+    "https://github.com/rprichard/winpty/issues/116"
+  ],
+  "VT7PtySource": [
+    {
+      "Path": "tests/fidelity/HostCancellationHook.cc",
+      "Sha256": "36d0f242070c008036040a76a15b339b2059b6b906a564928c1ee67fa806bed1"
+    },
+    {
+      "Path": "tests/fidelity/HostCancellationResearch.h",
+      "Sha256": "1ddf9539ebbfe808b6878bce10010d8554ceca398c0dcdbe397eb5d5b07091d8"
+    },
+    {
+      "Path": "tests/fidelity/HostCancellationWorker.h",
+      "Sha256": "1d4fecc8df76c3931417273b1524e7848d544160df1c920b866998e7c266792c"
+    },
+    {
+      "Path": "tests/fidelity/HostCancellationChannel.h",
+      "Sha256": "a05bd876fb542e85c395bd1d4a4eeaac4043a0cd30e454c7e9f31a6e92f3ccd2"
+    },
+    {
+      "Path": "tests/fidelity/HostCancellationProtocol.h",
+      "Sha256": "50e795bb9d483874063dea38498187198e0999baf42769cd83bde6e90e20b539"
+    },
+    {
+      "Path": "tests/fidelity/WinTest.h",
+      "Sha256": "4dc938d9ac05ae72c4b439e19639d16a93c8aed3474a9eea6ec79b088ace4b9f"
+    },
+    {
+      "Path": "src/agent/Agent.cc",
+      "Sha256": "4fedcc830926e5970d73153f257704b20663b50c8a5001e5cdb90a9b35baebcf"
+    },
+    {
+      "Path": "src/agent/ConsoleInput.cc",
+      "Sha256": "757d02331dc897e593047cffb9d1bf960eb6da165b53c809aeaa4fd783335a4f"
+    }
+  ]
+}

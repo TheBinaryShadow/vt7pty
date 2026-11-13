@@ -1,0 +1,75 @@
+{
+    "SchemaVersion":  1,
+    "RecordedUtc":  "2026-11-13T03:56:37.6251333Z",
+    "Computer":  "WOLF",
+    "OS":  {
+               "Caption":  "Microsoft Windows 10 IoT Enterprise LTSC",
+               "Version":  "10.0.19044",
+               "BuildNumber":  "19044"
+           },
+    "PowerShell":  "5.1.19041.7844",
+    "ManifestSha256":  "67b715e9ac7913d6b520ac5bfe99d67b942fb1e8b161d764bd4319c6f85145e7",
+    "PackageFilesVerified":  17,
+    "Runs":  [
+                 {
+                     "Repetition":  1,
+                     "ExitCode":  0,
+                     "TimedOut":  false,
+                     "DurationMs":  23554,
+                     "AuditorAccepted":  true,
+                     "AuditError":  "",
+                     "Stdout":  "Host cancellation oracle: 33 checks passed\r\nHost cancellation probe: Pass\r\n",
+                     "Stderr":  ""
+                 },
+                 {
+                     "Repetition":  2,
+                     "ExitCode":  0,
+                     "TimedOut":  false,
+                     "DurationMs":  22791,
+                     "AuditorAccepted":  true,
+                     "AuditError":  "",
+                     "Stdout":  "Host cancellation oracle: 33 checks passed\r\nHost cancellation probe: Pass\r\n",
+                     "Stderr":  ""
+                 },
+                 {
+                     "Repetition":  3,
+                     "ExitCode":  0,
+                     "TimedOut":  false,
+                     "DurationMs":  22489,
+                     "AuditorAccepted":  true,
+                     "AuditError":  "",
+                     "Stdout":  "Host cancellation oracle: 33 checks passed\r\nHost cancellation probe: Pass\r\n",
+                     "Stderr":  ""
+                 },
+                 {
+                     "Repetition":  4,
+                     "ExitCode":  0,
+                     "TimedOut":  false,
+                     "DurationMs":  22545,
+                     "AuditorAccepted":  true,
+                     "AuditError":  "",
+                     "Stdout":  "Host cancellation oracle: 33 checks passed\r\nHost cancellation probe: Pass\r\n",
+                     "Stderr":  ""
+                 },
+                 {
+                     "Repetition":  5,
+                     "ExitCode":  0,
+                     "TimedOut":  false,
+                     "DurationMs":  22917,
+                     "AuditorAccepted":  true,
+                     "AuditError":  "",
+                     "Stdout":  "Host cancellation oracle: 33 checks passed\r\nHost cancellation probe: Pass\r\n",
+                     "Stderr":  ""
+                 },
+                 {
+                     "Repetition":  6,
+                     "ExitCode":  0,
+                     "TimedOut":  false,
+                     "DurationMs":  22622,
+                     "AuditorAccepted":  true,
+                     "AuditError":  "",
+                     "Stdout":  "Host cancellation oracle: 33 checks passed\r\nHost cancellation probe: Pass\r\n",
+                     "Stderr":  ""
+                 }
+             ]
+}

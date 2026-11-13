@@ -3,8 +3,8 @@
 Updated: 2026-11-13.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
-behavior in Milestone 1. **Next: investigate intermittent H3 cancellation and
-control-event failures on Windows 7, then finish its remaining guards.**
+behavior in Milestone 1. **Next: trace H3 key dispatch, read completion and
+handler delivery on Windows 7 before choosing a fix.**
 The first candidate passes four of nine target repetitions. Host identity and
 dispatch remain accepted; the runtime cancellation fix and broader coverage
 remain open.
@@ -95,7 +95,9 @@ public-API experiments failed. I'm now following the
   [rc1 passes three local repetitions](docs/validation/2026-10-13-step-1.2-host-cancellation-rc1-candidate.md);
   [Windows 7 rc1 results](docs/validation/2026-11-13-step-1.2-host-cancellation-rc1-windows7.md)
   record four passing and five failing repetitions. Failures and remaining
-  H3 guards must be resolved before acceptance.
+  H3 guards must be resolved before acceptance. The
+  [follow-up investigation](docs/validation/2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
+  narrows the observation gaps and specifies a diagnostic experiment.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.

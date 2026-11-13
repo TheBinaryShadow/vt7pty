@@ -28,7 +28,10 @@ The [H3 prototype](HOST_CANCELLATION_PROBE.md) exercises core cancellation and
 shell recovery on private desktops. The
 [Windows 7 review](validation/2026-11-13-step-1.2-host-cancellation-rc1-windows7.md)
 records five failing repetitions out of nine. H3 remains open; no production
-hook mechanism is selected.
+hook mechanism is selected. The
+[follow-up investigation](validation/2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
+records matched keyboard-state comparisons and a diagnostic-only experiment
+for the unobserved dispatch/read/handler boundaries.
 
 ## H1 implementation
 
