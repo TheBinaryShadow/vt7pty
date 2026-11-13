@@ -5,17 +5,17 @@ package and test environment. The [roadmap](../../ROADMAP.md) describes current
 progress; each review describes the state at the time it was written.
 
 **Current result:** host identity and dispatch are accepted on all three
-Windows 7 machines. Controlled H3 contrasts complete all 27 collections:
-quiet/coordinated phases pass 54/54 and held-selection delivery fails 27/27.
-The traces establish selection clearing before the agent's later Escape.
-Thirteen other case failures and neighbor recorder overflow remain. H3 and the
-runtime cancellation fix stay open.
+Windows 7 machines. The coordinated H3 prototype completes all 27 collections,
+passing 126/126 baseline/expiry cases and 54/54 protected focused phases with no
+prototype trace loss. Unprotected contrasts and unchanged controls retain their
+failures. Remaining race, access-denied, active-child and PowerShell 7 guards
+keep H3 and the runtime cancellation fix open.
 
 ## Current fidelity work
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| Coordinated H3 prototype | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-coordination-rc1-candidate.md) | Pending on all three machines |
+| Coordinated H3 prototype | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-coordination-rc1-candidate.md) | [Reviewed: baseline and recording verified; H3 guards remain](2026-11-13-step-1.2-host-coordination-rc1-windows7.md) |
 | H3 scraper coordination | [rc1 candidate, controlled contrasts and retained failures](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-candidate.md) | [Reviewed: coordination supported; H3 open](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md) |
 | H3 paired diagnostics | [rc1 candidate and retained local failure](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md) | [Reviewed: selection-state correlation; H3 open](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md) |
 | Host cancellation (H3) | [rc1 prototype and local results](2026-10-13-step-1.2-host-cancellation-rc1-candidate.md) | [Not accepted: five failing repetitions](2026-11-13-step-1.2-host-cancellation-rc1-windows7.md) |

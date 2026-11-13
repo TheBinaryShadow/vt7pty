@@ -3,12 +3,12 @@
 Updated: 2026-11-13.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
-behavior in Milestone 1. **Next: qualify the [coordinated H3 candidate](docs/HOST_COORDINATION_PROBE.md)
-on all three Windows 7 machines.**
-The [Windows 7 contrasts](docs/validation/2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md)
-pass all 54 quiet/coordinated phases and lose delivery in all 27 held-selection
-phases. Other failures and neighbor trace loss remain. Host identity and dispatch
-stay accepted; H3, the runtime fix and broader coverage remain open.
+behavior in Milestone 1. **Next: complete the remaining H3 race, access-denied,
+active-child and PowerShell 7 guards.** The
+[coordinated Windows 7 review](docs/validation/2026-11-13-step-1.2-host-coordination-rc1-windows7.md)
+passes all 126 prototype baseline/expiry cases and 54 protected focused phases,
+with no prototype trace loss. Unprotected contrasts and unchanged controls
+retain their failures. H3, the runtime fix and broader coverage remain open.
 
 I check an item only when its stated work and required tests are complete.
 Partial implementations stay unchecked. A local pass does not replace a required
@@ -118,7 +118,11 @@ public-API experiments failed. I'm now following the
   that work with a callback completion marker, an expiry refusal control and
   periodic neighbor draining. The [rc1 candidate](docs/validation/2026-11-13-step-1.2-host-coordination-rc1-candidate.md)
   completes all nine local collections and passes all 42 prototype baseline/expiry
-  cases. Windows 7 qualification is pending.
+  cases. The [Windows 7 review](docs/validation/2026-11-13-step-1.2-host-coordination-rc1-windows7.md)
+  verifies all 27 collections, with 126/126 prototype baseline/expiry cases and
+  54/54 protected focused phases passing and no prototype trace loss. The two
+  failed delay controls leave scraping active. Remaining race, access-denied,
+  active-child and PowerShell 7 guards keep H3 open.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.

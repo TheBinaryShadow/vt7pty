@@ -1,0 +1,108 @@
+[CmdletBinding()]
+param(
+    [string]$StageRoot='D:\Git\vt7pty\artifacts\fidelity\returned-host-coordination-rc1-2026-11-13',
+    [string]$AuditRoot='D:\Git\vt7pty\artifacts\fidelity',
+    [string]$OutputPath='D:\Git\vt7pty\artifacts\fidelity\h3-coordination-windows7-comparison.json'
+)
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+function Read-Json([string]$Path) { [IO.File]::ReadAllText($Path) | ConvertFrom-Json }
+function Trace-Stats([string]$Directory,[string]$Prefix,[bool]$Agent) {
+    $total=[decimal]0;$lost=[decimal]0;$retained=0
+    foreach($file in Get-ChildItem -LiteralPath $Directory -File -Filter ($Prefix+'-*-request.json')) {
+        $q=Read-Json $file.FullName
+        if($Agent) {$t=$q.Response.Trace} else {$t=$q.Response.WindowTrace}
+        if([decimal]$t.Total -gt $total) {$total=[decimal]$t.Total}
+        $lost+=[decimal]$t.Lost;$retained+=@($t.Events).Count
+    }
+    [ordered]@{Total=$total;Lost=$lost;Retained=$retained}
+}
+function Request-Index([string]$Path) { [int]([regex]::Match($Path,'-(\d+)-request').Groups[1].Value) }
+$runs=New-Object 'Collections.Generic.List[object]'
+$failures=New-Object 'Collections.Generic.List[object]'
+$phases=New-Object 'Collections.Generic.List[object]'
+$dispatches=New-Object 'Collections.Generic.List[object]'
+foreach($runDir in Get-ChildItem -LiteralPath $StageRoot -Directory | Sort-Object Name) {
+    $report=Read-Json (Join-Path $runDir.FullName 'report.json')
+    $machine=$report.ComputerName
+    $auditPath=Join-Path $AuditRoot ('h3-coordination-windows7-'+$machine.ToLowerInvariant()+'-audit.json')
+    if(-not (Test-Path -LiteralPath $auditPath)) {$auditPath=Join-Path $AuditRoot ($machine.ToLowerInvariant()+'.json')}
+    $audit=Read-Json $auditPath
+    $trialRows=New-Object 'Collections.Generic.List[object]'
+    foreach($trial in $report.Trials) {
+        $review=$audit.Trials[$trial.Order-1].Review
+        $native=Join-Path $runDir.FullName ($trial.Directory+'\native')
+        $all=@($trial.Cases.Cases);$passed=@($all | Where-Object {$_.Passed}).Count
+        $baseline=@($all | Where-Object {$_.Case -notlike 'focus-*'})
+        $row=[ordered]@{Order=$trial.Order;Role=$trial.Role;Directory=$trial.Directory;Outcome=$trial.Outcome;
+            CollectionStatus=$trial.CollectionStatus;TimedOut=$trial.TimedOut;PassedCases=$passed;TotalCases=$all.Count;
+            BaselinePassed=@($baseline | Where-Object {$_.Passed}).Count;BaselineCases=$baseline.Count;
+            OwnedLifetimesCleaned=$trial.Observation.OwnedLifetimesCleaned;NeighborPassed=$trial.Neighbor.Passed;
+            AllCaseCleanupPassed=(@($all | Where-Object {-not $_.OwnedProcessesCleaned -or -not $_.HostExited -or -not $_.HookRemoved}).Count -eq 0)}
+        if($null -ne $review) {
+            $row.Version=$review.Version;$row.CoverageGaps=$review.CoverageGaps;$row.OperationalIssues=$review.OperationalIssues
+            $row.CoreCoverageGaps=$review.Core.CoverageGaps;$row.HostMessages=$review.HostMessages;$row.AgentEvents=$review.AgentEvents
+            $row.KeyOperations=$review.Core.KeyOperations;$row.NestedEntries=$review.Core.NestedEntries;$row.NestedReturns=$review.Core.NestedReturns
+            $row.NeighborHost=Trace-Stats (Join-Path $native 'neighbor') 'neighbor' $false
+            $row.NeighborAgent=Trace-Stats (Join-Path $native 'neighbor') 'agent' $true
+            if($trial.Role -eq 'Experiment') {
+                $c=$review.Coordination
+                foreach($key in @('OwnedScopes','BorrowedScopes','ExpiryRefusals','ReceiptOnlyScopes','AgentExitResolvedScopes','NeighborCollector')) {$row[$key]=$c.$key}
+                $row.Expiry=Read-Json (Join-Path $native 'suite\coordination-expiry\coordination-expiry.json')
+            }
+            foreach($phase in $review.Conditions) {
+                $phaseRow=[ordered]@{Machine=$machine;RunId=$report.RunId;Trial=$trial.Directory;Role=$trial.Role}
+                foreach($p in $phase.PSObject.Properties) {$phaseRow[$p.Name]=$p.Value}
+                $phases.Add([pscustomobject]$phaseRow)
+            }
+        }
+        $trialRows.Add([pscustomobject]$row)
+        foreach($case in $all | Where-Object {-not $_.Passed}) {
+            $caseDir=Join-Path $native ('suite\'+$case.Case)
+            $failure=[ordered]@{Machine=$machine;RunId=$report.RunId;Trial=$trial.Directory;Role=$trial.Role;Case=$case.Case;Error=$case.Error;
+                DeliberateSelectionChallenge=($case.Case -in @('focus-completed-selected','focus-pending-selected','focus-selection-bracket'))}
+            $observations=New-Object 'Collections.Generic.List[object]'
+            foreach($file in Get-ChildItem -LiteralPath $caseDir -File | Where-Object {$_.Name -match '^(focus-(condition|deadline|late|recovery|next)|host-key-record|shell|event-observation|cancel-\d+-(read|late|recovery|next)|no-read|ambiguous-(read|recovery|next))\.json$'}) {
+                $observations.Add([pscustomobject]@{File=$file.Name;Data=(Read-Json $file.FullName)})
+            }
+            $failure.Observations=$observations.ToArray();$failures.Add([pscustomobject]$failure)
+            if($failure.DeliberateSelectionChallenge -or $trial.Role -eq 'Control') {continue}
+            $hostEvents=New-Object 'Collections.Generic.List[object]'
+            $agentEvents=New-Object 'Collections.Generic.List[object]'
+            $requests=@(Get-ChildItem -LiteralPath $caseDir -File -Filter 'host-*-request.json' | Sort-Object {Request-Index $_.Name})
+            foreach($file in $requests) { $q=Read-Json $file.FullName;foreach($e in $q.Response.WindowTrace.Events) {$hostEvents.Add($e)} }
+            foreach($file in Get-ChildItem -LiteralPath $caseDir -File -Filter 'agent-*-request.json' | Sort-Object {Request-Index $_.Name}) {
+                $q=Read-Json $file.FullName;foreach($e in $q.Response.Trace.Events) {$agentEvents.Add($e)}
+            }
+            foreach($file in $requests) {
+                $q=Read-Json $file.FullName
+                if($q.RequestOperation -notin @(5,7,8)) {continue}
+                $key=@($q.Response.Trace.Events | Where-Object {$_.Stage -eq 4})
+                if($key.Count -ne 1) {continue}
+                $time=[decimal]$key[0].Qpc
+                $dispatches.Add([pscustomobject][ordered]@{Machine=$machine;Trial=$trial.Directory;Case=$case.Case;Record=$file.Name;
+                    RequestOperation=$q.RequestOperation;RequestSequence=$q.RequestSequence;Frequency=$q.Response.Trace.Frequency;
+                    EntryQpc=$key[0].Qpc;ReturnQpc=@($q.Response.Trace.Events | Where-Object {$_.Stage -eq 5} | Select-Object -ExpandProperty Qpc);
+                    SelectionBefore=$q.FixtureBefore.Trace.SelectionFlags;ControlBefore=$q.FixtureBefore.ControlCount;
+                    ControlAfter=$q.FixtureAfter.ControlCount;KeyboardRestored=$q.Response.Keyboard.Restored;KeyboardEqual=$q.Response.Keyboard.Equal;
+                    PreviousSelectReturn=@($hostEvents.ToArray() | Where-Object {$_.Message -eq 274 -and $_.Phase -eq 2 -and [decimal]$_.Qpc -le $time} | Select-Object -Last 1);
+                    NextEscapeEntry=@($hostEvents.ToArray() | Where-Object {$_.Message -eq 258 -and $_.Phase -eq 1 -and [decimal]$_.Qpc -ge $time} | Select-Object -First 1);
+                    HostBefore=@($hostEvents.ToArray() | Where-Object {[decimal]$_.Qpc -le $time} | Select-Object -Last 4);
+                    HostAfter=@($hostEvents.ToArray() | Where-Object {[decimal]$_.Qpc -ge $time} | Select-Object -First 5);
+                    AgentBefore=@($agentEvents.ToArray() | Where-Object {[decimal]$_.Qpc -le $time} | Select-Object -Last 4);
+                    AgentAfter=@($agentEvents.ToArray() | Where-Object {[decimal]$_.Qpc -ge $time} | Select-Object -First 6)})
+            }
+        }
+    }
+    $runs.Add([pscustomobject][ordered]@{Machine=$machine;Tier=$report.Tier;RunId=$report.RunId;OS=$report.OS;
+        PowerShellVersion=$report.PowerShellVersion;CLRVersion=$report.CLRVersion;KB3191566Reported=(@($report.Updates | Where-Object {$_.Id -eq 'KB3191566'}).Count -ne 0);
+        VerifiedEvidenceFiles=$audit.VerifiedEvidenceFiles;PreflightErrors=$report.PreflightErrors;Trials=$trialRows.ToArray()})
+}
+$result=[ordered]@{SchemaVersion=1;Kind='H3CoordinationWindows7Comparison';Date='2026-11-13';Runs=$runs.ToArray();
+    Phases=$phases.ToArray();Failures=$failures.ToArray();AdditionalTracedDispatches=$dispatches.ToArray();MilestoneAccepted=$false;ProductionCancellationImplemented=$false}
+[IO.File]::WriteAllText($OutputPath,($result | ConvertTo-Json -Depth 30),[Text.UTF8Encoding]::new($false))
+foreach($run in $runs) {
+    [pscustomobject]@{Machine=$run.Machine;Trials=$run.Trials.Count;Cases=($run.Trials | Measure-Object TotalCases -Sum).Sum;
+        Passed=($run.Trials | Measure-Object PassedCases -Sum).Sum;VerifiedFiles=$run.VerifiedEvidenceFiles;
+        ExperimentBaseline=(@($run.Trials | Where-Object {$_.Role -eq 'Experiment'}) | Measure-Object BaselinePassed -Sum).Sum}
+}

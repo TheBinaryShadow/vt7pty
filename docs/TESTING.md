@@ -148,6 +148,12 @@ research agent and retains both earlier packages unchanged. Its nine trials
 separate collection completeness from cancellation outcomes. Deliberately
 selected failures do not become passes when a later observation succeeds.
 
+The [coordinated prototype review](validation/2026-11-13-step-1.2-host-coordination-rc1-windows7.md)
+records 126/126 baseline/expiry cases and 54/54 protected focused phases passing
+on all three Windows 7 tiers, with no prototype recorder loss. The original
+controls and unprotected contrasts retain failures. Remaining H3 guard tests
+and runtime integration are separate work.
+
 Each research package has its own instructions and evidence. I keep the
 released 0.5.0 regression suite and full Windows 7 soak as separate requirements.
 [Console-SSH testing](SSH_BASELINE.md) is optional later work.

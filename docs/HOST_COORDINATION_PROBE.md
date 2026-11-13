@@ -1,9 +1,11 @@
 # Coordinated cancellation research
 
-I'm extending the [verified scraper coordination](validation/2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md)
-to the H3 research prototype's native and shell cancellation paths. This candidate
-also drains the neighboring session's recorders periodically. H3 remains open;
-the production runtime DLL and public API are unchanged.
+I've extended the [verified scraper coordination](validation/2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md)
+to the H3 research prototype's native and shell cancellation paths. The
+[Windows 7 review](validation/2026-11-13-step-1.2-host-coordination-rc1-windows7.md)
+passes all 126 baseline/expiry cases and 54 protected focused phases with no
+prototype trace loss. Remaining race, access-denied, active-child and PowerShell 7
+guards keep H3 open. The production runtime DLL and public API are unchanged.
 
 ## Run on the three Windows 7 machines
 

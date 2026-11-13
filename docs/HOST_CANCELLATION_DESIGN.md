@@ -1,6 +1,6 @@
 # Console-host cancellation design
 
-Status: H1 and H2 accepted on Windows 7; H3 rc1 has intermittent target failures and is not accepted.
+Status: H1 and H2 accepted on Windows 7; coordinated H3 baseline verified, with wider guards still pending.
 Updated: 2026-11-13.
 
 I'm following the [cancellation investigation](INPUT_CANCELLATION.md) with
@@ -46,8 +46,11 @@ with stale frozen state and a later Escape observed directly. The next research
 prototype needs coordination across its baseline paths and periodic neighbor
 trace collection. The [coordinated research candidate](HOST_COORDINATION_PROBE.md)
 implements those changes with an explicit keyboard-scope completion marker and
-an expiry refusal control. It awaits Windows 7 qualification. Remaining failures
-and wider guards keep H3 open.
+an expiry refusal control. The [coordinated Windows 7 review](validation/2026-11-13-step-1.2-host-coordination-rc1-windows7.md)
+passes all 126 baseline/expiry cases and 54 protected focused phases with no
+prototype trace loss. Unprotected contrasts and earlier controls retain their
+failures. True completion/close races, actual access denial, active-child and
+PowerShell 7 qualification keep H3 open.
 
 ## H1 implementation
 

@@ -1,0 +1,73 @@
+[CmdletBinding()]
+param(
+    [string]$StageRoot='D:\Git\vt7pty\artifacts\fidelity\returned-host-coordination-rc1-2026-11-13',
+    [string]$ShareRoot='\\10.0.0.3\KRMe\VT7_work\results',
+    [string]$Target='D:\Git\vt7pty\docs\validation\results\step-1.2\host-coordination-rc1\windows7'
+)
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$artifact=Join-Path $repo 'artifacts\fidelity'
+$Target=[IO.Path]::GetFullPath($Target).TrimEnd('\')
+if(-not $Target.StartsWith($repo+'\docs\validation\results\',[StringComparison]::OrdinalIgnoreCase)) {throw 'Unexpected preservation target.'}
+if(Test-Path -LiteralPath $Target) {throw 'Preservation target already exists.'}
+$sha=[Security.Cryptography.SHA256]::Create()
+function File-Hash([string]$Path) {
+    $stream=[IO.File]::OpenRead($Path)
+    try {return ([BitConverter]::ToString($sha.ComputeHash($stream))).Replace('-','').ToLowerInvariant()} finally {$stream.Dispose()}
+}
+function Require([bool]$Condition,[string]$Message) {if(-not $Condition) {throw $Message}}
+function List-Files([string]$Directory) {
+    $root=[IO.Path]::GetFullPath($Directory).TrimEnd('\')
+    @(Get-ChildItem -LiteralPath $root -File -Recurse | ForEach-Object {[pscustomobject]@{Path=$_.FullName.Substring($root.Length+1).Replace('\','/');Bytes=$_.Length}} | Sort-Object Path)
+}
+$checks=New-Object 'Collections.Generic.List[object]'
+$records=New-Object 'Collections.Generic.List[object]'
+function Copy-Exact([string]$Source,[string]$Relative) {
+    $destination=[IO.Path]::GetFullPath((Join-Path $Target $Relative))
+    Require ($destination.StartsWith($Target+'\',[StringComparison]::OrdinalIgnoreCase)) 'Preservation path leaves target.'
+    Require (-not (Test-Path -LiteralPath $destination)) 'Duplicate preservation file.'
+    [IO.Directory]::CreateDirectory((Split-Path -Parent $destination)) | Out-Null
+    $hash=File-Hash $Source;$bytes=(Get-Item -LiteralPath $Source).Length
+    [IO.File]::Copy($Source,$destination)
+    Require ((Get-Item -LiteralPath $destination).Length -eq $bytes -and (File-Hash $destination) -ceq $hash) 'Preserved bytes differ.'
+    $records.Add([pscustomobject]@{Path=$Relative.Replace('\','/');Bytes=$bytes;Sha256=$hash})
+}
+$runs=@(Get-ChildItem -LiteralPath $StageRoot -Directory | Sort-Object Name)
+$sourceNames=@(Get-ChildItem -LiteralPath $ShareRoot -Directory | Select-Object -ExpandProperty Name | Sort-Object)
+Require (($sourceNames -join '|') -ceq (($runs.Name | Sort-Object) -join '|')) 'Shared and staged run names differ.'
+foreach($run in $runs) {
+    $source=Join-Path $ShareRoot $run.Name
+    $sourceList=List-Files $source;$stagedList=List-Files $run.FullName
+    Require (($sourceList | ConvertTo-Json -Depth 3 -Compress) -ceq ($stagedList | ConvertTo-Json -Depth 3 -Compress)) 'Shared/staged inventories differ.'
+    $report=Get-Content -LiteralPath (Join-Path $run.FullName 'report.json') -Raw | ConvertFrom-Json
+    $wrappers=@('report.json','summary.txt')+@($report.Trials | ForEach-Object {$_.Directory+'\evidence-files.json'})
+    $wrapperChecks=New-Object 'Collections.Generic.List[object]'
+    foreach($relative in $wrappers) {
+        $sourceHash=File-Hash (Join-Path $source $relative);$stagedHash=File-Hash (Join-Path $run.FullName $relative)
+        Require ($sourceHash -ceq $stagedHash) 'Shared/staged report, summary or evidence inventory differs.'
+        $wrapperChecks.Add([pscustomobject]@{Path=$relative.Replace('\','/');Sha256=$sourceHash})
+    }
+    foreach($file in $stagedList) {Copy-Exact (Join-Path $run.FullName $file.Path) ($run.Name+'\'+$file.Path)}
+    $machine=$report.ComputerName.ToLowerInvariant()
+    $reviewPath=Join-Path $artifact ('h3-coordination-windows7-'+$machine+'-audit.json')
+    $review=Get-Content -LiteralPath $reviewPath -Raw | ConvertFrom-Json
+    Require ($review.RunId -ceq $run.Name -and $review.VerifiedEvidenceFiles+11 -eq $stagedList.Count) 'Audited evidence count differs.'
+    Copy-Exact $reviewPath ('audit\'+$machine+'.json')
+    Copy-Exact (Join-Path $artifact ('h3-coordination-windows7-'+$machine+'-audit.log')) ('audit\'+$machine+'-review.txt')
+    $checks.Add([pscustomobject]@{Machine=$report.ComputerName;RunId=$run.Name;ShareDirectory=$source;StagedDirectory=$run.FullName;
+        ReturnedFiles=$stagedList.Count;VerifiedEvidenceFiles=$review.VerifiedEvidenceFiles;FileListsAndLengthsMatch=$true;WrapperHashes=$wrapperChecks.ToArray()})
+}
+$integrity=[ordered]@{SchemaVersion=1;Kind='H3CoordinationCollectionIntegrity';Date='2026-11-13';ReviewSourceCommit=(& git rev-parse HEAD).Trim();
+    ArchiveSha256='c36e4aab77bfdd37804c0a79252ffc5a0c7adb63ec3177bd7872faff08f6ae6b';
+    ManifestSha256='9c29ebbfddaec3111c32f626b83d6fb14fd2cbff16f83afa7e1a4ab667e2fedc';Runs=$checks.ToArray()}
+$integrityPath=Join-Path $artifact 'h3-coordination-windows7-collection-integrity.json'
+[IO.File]::WriteAllText($integrityPath,($integrity | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+Copy-Exact $integrityPath 'audit\collection-integrity.json'
+Copy-Exact (Join-Path $artifact 'h3-coordination-windows7-comparison.json') 'comparison.json'
+foreach($script in @('Summarize-CoordinationWindows7.ps1','Preserve-CoordinationWindows7.ps1')) {Copy-Exact (Join-Path $artifact $script) ('scripts\'+$script+'.txt')}
+Copy-Exact (Join-Path $repo 'artifacts\h3-coordination-windows7-copy.log') 'logs\shared-copy.txt'
+$inventory=[ordered]@{SchemaVersion=1;Kind='H3CoordinationWindows7Preservation';Date='2026-11-13';Files=$records.ToArray()}
+[IO.File]::WriteAllText((Join-Path $Target 'preserved-files.json'),($inventory | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+$sha.Dispose()
+[pscustomobject]@{Runs=$runs.Count;Files=$records.Count;Bytes=($records.ToArray() | Measure-Object Bytes -Sum).Sum;Directory=$Target}

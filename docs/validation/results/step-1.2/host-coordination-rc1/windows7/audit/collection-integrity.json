@@ -1,0 +1,175 @@
+{
+    "SchemaVersion":  1,
+    "Kind":  "H3CoordinationCollectionIntegrity",
+    "Date":  "2026-11-13",
+    "ReviewSourceCommit":  "cebe936ca395d6db60b7b3c955845b646b97ae2d",
+    "ArchiveSha256":  "c36e4aab77bfdd37804c0a79252ffc5a0c7adb63ec3177bd7872faff08f6ae6b",
+    "ManifestSha256":  "9c29ebbfddaec3111c32f626b83d6fb14fd2cbff16f83afa7e1a4ab667e2fedc",
+    "Runs":  [
+                 {
+                     "Machine":  "TURTLE",
+                     "RunId":  "esu-coordination-20261113-193544-49dd7144",
+                     "ShareDirectory":  "\\\\10.0.0.3\\KRMe\\VT7_work\\results\\esu-coordination-20261113-193544-49dd7144",
+                     "StagedDirectory":  "D:\\Git\\vt7pty\\artifacts\\fidelity\\returned-host-coordination-rc1-2026-11-13\\esu-coordination-20261113-193544-49dd7144",
+                     "ReturnedFiles":  10348,
+                     "VerifiedEvidenceFiles":  10337,
+                     "FileListsAndLengthsMatch":  true,
+                     "WrapperHashes":  [
+                                           {
+                                               "Path":  "report.json",
+                                               "Sha256":  "bee618e0993027c90c407173c58acbc038715c5dae5b30ee482729ebb8c98753"
+                                           },
+                                           {
+                                               "Path":  "summary.txt",
+                                               "Sha256":  "fb67db705cf9781702a9494a5a0bbfa86bece7c08c70ddd1a619da5a074ebf7f"
+                                           },
+                                           {
+                                               "Path":  "01-control/evidence-files.json",
+                                               "Sha256":  "40830ccc3d865e46c17acd94813b07442dbbec2ef4385261dd301fa7197f0f17"
+                                           },
+                                           {
+                                               "Path":  "02-reference/evidence-files.json",
+                                               "Sha256":  "8428276902f68b738b7b420b60b648e8111189309ae8ebb35e666355ae4f21a7"
+                                           },
+                                           {
+                                               "Path":  "03-experiment/evidence-files.json",
+                                               "Sha256":  "0ff2ab2ccf8c8fb1b5fa01bce0d3d7f5f5f1fb45c3b70c87d369e5e51cbc6307"
+                                           },
+                                           {
+                                               "Path":  "04-control/evidence-files.json",
+                                               "Sha256":  "977598ea47896bc486c997b894d26e2367a0acd5014446181ce3fb7bc380ceee"
+                                           },
+                                           {
+                                               "Path":  "05-reference/evidence-files.json",
+                                               "Sha256":  "71d4516aa0acf793eb28e1fd97d01ca8120afa4c65f6e6860f2b2b7ed9f5259d"
+                                           },
+                                           {
+                                               "Path":  "06-experiment/evidence-files.json",
+                                               "Sha256":  "e24da8b8b03139848ba11c5f612970e982b29886f3435a88920b90086f5322ca"
+                                           },
+                                           {
+                                               "Path":  "07-control/evidence-files.json",
+                                               "Sha256":  "0c7ce63e55c00c1f908c4f4b3db6df3a8999c26519ebf099740d741ca03a585a"
+                                           },
+                                           {
+                                               "Path":  "08-reference/evidence-files.json",
+                                               "Sha256":  "061f6e1a66d8941fef841590478aa868c507a486ec0dba298619a0683f15a57f"
+                                           },
+                                           {
+                                               "Path":  "09-experiment/evidence-files.json",
+                                               "Sha256":  "76e24657b6a0dbf29d4e6921da3440dfdee06d46f2a6baabee96b095bab33078"
+                                           }
+                                       ]
+                 },
+                 {
+                     "Machine":  "LEOPARD",
+                     "RunId":  "legacy-coordination-20261113-193502-2ec0b1a4",
+                     "ShareDirectory":  "\\\\10.0.0.3\\KRMe\\VT7_work\\results\\legacy-coordination-20261113-193502-2ec0b1a4",
+                     "StagedDirectory":  "D:\\Git\\vt7pty\\artifacts\\fidelity\\returned-host-coordination-rc1-2026-11-13\\legacy-coordination-20261113-193502-2ec0b1a4",
+                     "ReturnedFiles":  11141,
+                     "VerifiedEvidenceFiles":  11130,
+                     "FileListsAndLengthsMatch":  true,
+                     "WrapperHashes":  [
+                                           {
+                                               "Path":  "report.json",
+                                               "Sha256":  "6d2c3c762e2a139e7e3bfd32074d391483b2ca99ffd304963788d38805efa08f"
+                                           },
+                                           {
+                                               "Path":  "summary.txt",
+                                               "Sha256":  "fb67db705cf9781702a9494a5a0bbfa86bece7c08c70ddd1a619da5a074ebf7f"
+                                           },
+                                           {
+                                               "Path":  "01-control/evidence-files.json",
+                                               "Sha256":  "8a484f0053af95d6448c28af7af5a3380fc6f4cb9dab4f495ee1d748200d1e9e"
+                                           },
+                                           {
+                                               "Path":  "02-reference/evidence-files.json",
+                                               "Sha256":  "a1833fbd696cf3e4d04a924896aa3342571b592e79e062d4ceb9a279e2f3b7c4"
+                                           },
+                                           {
+                                               "Path":  "03-experiment/evidence-files.json",
+                                               "Sha256":  "24617e6123f29ab8110d10978570b3dbc8e2c6712c1b17d8e0e62ee1472caebd"
+                                           },
+                                           {
+                                               "Path":  "04-control/evidence-files.json",
+                                               "Sha256":  "34ffbf4c2691c3b1d63de28b5db5aeb6c70fb36b929d75144f855d249fdbe42c"
+                                           },
+                                           {
+                                               "Path":  "05-reference/evidence-files.json",
+                                               "Sha256":  "b38b028fa09d6b2dfb7dfba5d9e372da603e972f80cd5ea67f2e72d9a9815803"
+                                           },
+                                           {
+                                               "Path":  "06-experiment/evidence-files.json",
+                                               "Sha256":  "997650189b62e5634bb8fd36ef9660fd4e934f1fba3ff4477919a8f201a839d5"
+                                           },
+                                           {
+                                               "Path":  "07-control/evidence-files.json",
+                                               "Sha256":  "d288d97bf13a4321a03998aece265dd6f6b17bf56b8f9fd5597a71d5be2fe967"
+                                           },
+                                           {
+                                               "Path":  "08-reference/evidence-files.json",
+                                               "Sha256":  "181096554c58e1508fed6f6f2bba9f0b33695e4ccb7116e812b8263c395070e5"
+                                           },
+                                           {
+                                               "Path":  "09-experiment/evidence-files.json",
+                                               "Sha256":  "17d95cfd88a09d8b676f1c66ba6e9ee1695938f4317ff0df3858324cb0ea6fb3"
+                                           }
+                                       ]
+                 },
+                 {
+                     "Machine":  "NESSY",
+                     "RunId":  "nonesu-coordination-20261113-195502-62e85696",
+                     "ShareDirectory":  "\\\\10.0.0.3\\KRMe\\VT7_work\\results\\nonesu-coordination-20261113-195502-62e85696",
+                     "StagedDirectory":  "D:\\Git\\vt7pty\\artifacts\\fidelity\\returned-host-coordination-rc1-2026-11-13\\nonesu-coordination-20261113-195502-62e85696",
+                     "ReturnedFiles":  11284,
+                     "VerifiedEvidenceFiles":  11273,
+                     "FileListsAndLengthsMatch":  true,
+                     "WrapperHashes":  [
+                                           {
+                                               "Path":  "report.json",
+                                               "Sha256":  "9abaeafd75c9fe5fd2fd9d0d91b034b14bf3617b829572dd4aa0f65dd3722dd7"
+                                           },
+                                           {
+                                               "Path":  "summary.txt",
+                                               "Sha256":  "fb67db705cf9781702a9494a5a0bbfa86bece7c08c70ddd1a619da5a074ebf7f"
+                                           },
+                                           {
+                                               "Path":  "01-control/evidence-files.json",
+                                               "Sha256":  "370ce7202d15cddd60bd0ae350823a43cefe40b3907ccbd69008fb29402ba1c0"
+                                           },
+                                           {
+                                               "Path":  "02-reference/evidence-files.json",
+                                               "Sha256":  "8476a4edb3e15e7d1fd5f3972cb3516a0f35853329ba391ee24578ae28f370fd"
+                                           },
+                                           {
+                                               "Path":  "03-experiment/evidence-files.json",
+                                               "Sha256":  "e7df62cf5684a6e57bd87491f82f645c0045074044f8fbeea2c93cfc898a3a7a"
+                                           },
+                                           {
+                                               "Path":  "04-control/evidence-files.json",
+                                               "Sha256":  "cd6b288f69cd53f45a46c67bfb0778865e494c1ceff0f6e32d08bd6b286cf709"
+                                           },
+                                           {
+                                               "Path":  "05-reference/evidence-files.json",
+                                               "Sha256":  "426ffad510ae7e2ddf9b52b65e00cf001f3c4357dbbaf359c1ade02ad0e74a90"
+                                           },
+                                           {
+                                               "Path":  "06-experiment/evidence-files.json",
+                                               "Sha256":  "07ad7f97ffc079b9fe99b0c9b43e62d17ab22179fd3c8c96262c1eaf1994b880"
+                                           },
+                                           {
+                                               "Path":  "07-control/evidence-files.json",
+                                               "Sha256":  "0ba97ddb8099c8c5541aba5ee80cb5e08a3c56a48f314b83359b27581778bc8b"
+                                           },
+                                           {
+                                               "Path":  "08-reference/evidence-files.json",
+                                               "Sha256":  "0b3c0732968ebcc0c03a411e403722202a37545084a0e94154e9e382858dd9bd"
+                                           },
+                                           {
+                                               "Path":  "09-experiment/evidence-files.json",
+                                               "Sha256":  "0846e318a534ea4e578aefff10ebba730d03d509e55b5dcd3116deac1c7365de"
+                                           }
+                                       ]
+                 }
+             ]
+}

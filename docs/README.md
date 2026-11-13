@@ -29,9 +29,11 @@ what I've learned from testing it.
 
 I'm working on input cancellation within Milestone 1. Host identity and dispatch
 are verified. Controlled Windows 7 experiments establish selection as a delivery
-blocker and support scrape/resize coordination. The coordinated research prototype
-now covers its baseline paths and collects neighbor traces periodically. Windows 7
-qualification remains before H3 acceptance and runtime integration.
+blocker and support scrape/resize coordination. The
+[coordinated Windows 7 review](validation/2026-11-13-step-1.2-host-coordination-rc1-windows7.md)
+passes all 126 prototype baseline/expiry cases and 54 protected focused phases,
+with no prototype trace loss. Remaining race, access-denied, active-child and
+PowerShell 7 guards precede H3 acceptance and runtime integration.
 
 | Guide | Purpose |
 | --- | --- |
