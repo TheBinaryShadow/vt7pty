@@ -1,0 +1,52 @@
+param([string]$Source='D:\Git\vt7pty\artifacts\fidelity\h3-freeze-final-debug\native', [string]$Output='D:\Git\vt7pty\artifacts\fidelity\h3-freeze-reviewer-controls')
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$reviewer='D:\Git\vt7pty\tools\research\Test-HostFreezeEvidence.ps1'
+if(Test-Path -LiteralPath $Output) { throw 'Use a fresh control directory.' }
+[IO.Directory]::CreateDirectory($Output) | Out-Null
+$records=@()
+foreach($name in @('wrong-host','hidden-deadline-failure','false-lease-claim','work-inside-lease')) {
+    $copy=Join-Path $Output $name
+    Copy-Item -LiteralPath $Source -Destination $copy -Recurse
+    $file=$null;$v=$null
+    switch($name) {
+        'wrong-host' {
+            $file=Get-ChildItem -LiteralPath (Join-Path $copy 'suite\focus-completed-quiet') -Filter 'host-*-request.json' | Where-Object {
+                $q=Get-Content -LiteralPath $_.FullName -Raw | ConvertFrom-Json
+                @($q.Response.WindowTrace.Events).Count -gt 0
+            } | Select-Object -First 1
+            $v=Get-Content -LiteralPath $file.FullName -Raw | ConvertFrom-Json
+            $v.Response.WindowTrace.Events[0].Pid=1
+        }
+        'hidden-deadline-failure' {
+            $file=Get-Item -LiteralPath (Join-Path $copy 'suite\focus-completed-selected\focus-condition.json')
+            $v=Get-Content -LiteralPath $file.FullName -Raw | ConvertFrom-Json
+            if($v.CancellationPassed) { throw 'Control requires the retained selection failure.' }
+            $v.CancellationPassed=$true
+        }
+        'false-lease-claim' {
+            $file=Get-Item -LiteralPath (Join-Path $copy 'suite\focus-completed-quiet\focus-condition.json')
+            $v=Get-Content -LiteralPath $file.FullName -Raw | ConvertFrom-Json
+            $v.LeaseActiveAtDeadline=$false
+        }
+        'work-inside-lease' {
+            $file=Get-ChildItem -LiteralPath (Join-Path $copy 'suite\focus-pending-coordinated') -Filter 'agent-*-request.json' | Where-Object {
+                $q=Get-Content -LiteralPath $_.FullName -Raw | ConvertFrom-Json
+                @($q.Response.Trace.Events | Where-Object {$_.Kind -eq 12 -and $_.Cols -eq 88 -and $_.Rows -eq 27}).Count -gt 0
+            } | Select-Object -First 1
+            $v=Get-Content -LiteralPath $file.FullName -Raw | ConvertFrom-Json
+            @($v.Response.Trace.Events | Where-Object {$_.Kind -eq 12 -and $_.Cols -eq 88 -and $_.Rows -eq 27})[0].Kind=5
+        }
+    }
+    $before=(Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+    [IO.File]::WriteAllText($file.FullName,($v | ConvertTo-Json -Depth 24),[Text.UTF8Encoding]::new($false))
+    $errorText='';$review=$null
+    try {$review=& $reviewer -Directory $copy} catch {$errorText=$_.Exception.Message}
+    $detected=if($name -eq 'work-inside-lease') {$errorText -eq '' -and @($review.OperationalIssues | Where-Object {$_ -like '*work/expiry inside held interval'}).Count -eq 1} else {$errorText -ne ''}
+    if(-not $detected) { throw ('Undetected reviewer control: '+$name) }
+    $records+=@([ordered]@{Name=$name;Detected=$detected;File=$file.FullName.Substring($copy.Length+1);BeforeSha256=$before;
+        AfterSha256=(Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant();Error=$errorText;
+        OperationalIssues=$(if($review) {@($review.OperationalIssues)} else {@()})})
+}
+[IO.File]::WriteAllText((Join-Path $Output 'controls.json'),($records | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+$records | Format-Table Name,Detected,Error

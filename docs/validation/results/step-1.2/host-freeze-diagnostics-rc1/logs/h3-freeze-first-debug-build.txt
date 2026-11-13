@@ -1,0 +1,90 @@
+Building VT7Pty native targets: Debug|x64
+
+  HostCancellationHook.cc
+  DebugClient.cc
+  Version.cc
+  DebugClient.cc
+  DebugClient.cc
+  HostCancellationHook.cc
+  HostCancellationHook.cc
+  Agent.cc
+  DebugClient.cc
+  EventLoop.cc
+  DebugServer.cc
+  NamedPipe.cc
+  Terminal.cc
+  Win32Console.cc
+  main.cc
+  DebugClient.cc
+  Version.cc
+  Agent.cc
+  ConsoleFont.cc
+  ConsoleInput.cc
+  ConsoleInputReencoding.cc
+  ConsoleLine.cc
+  DebugShowInput.cc
+  DefaultInputMap.cc
+  EventLoop.cc
+  InputMap.cc
+  LargeConsoleRead.cc
+  DebugClient.cc
+  main.cc
+  NamedPipe.cc
+  Scraper.cc
+  Terminal.cc
+  Win32Console.cc
+  Win32ConsoleBuffer.cc
+  Buffer.cc
+  DebugClient.cc
+  GenRandom.cc
+  OwnedHandle.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  WindowsVersion.cc
+  Assert.cc
+  Exception.cc
+  Version.cc
+  fixture-win32-echo1.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-win32-echo1.exe
+  fixture-write-console.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-write-console.exe
+  fixture-console-color-grid.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-console-color-grid.exe
+  fixture-utf16-echo.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-utf16-echo.exe
+  fixture-output-lines.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-output-lines.exe
+  fixture-show-console-input.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-show-console-input.exe
+  FidelityFixture.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\FidelityFixture.exe
+  tool-conout-mode.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\tool-conout-mode.exe
+  fixture-show-argv.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-show-argv.exe
+  tool-conin-mode.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\tool-conin-mode.exe
+  SessionFixture.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\SessionFixture.exe
+  HostDispatchHook.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostDispatchHook.dll
+  fixture-win32-echo2.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-win32-echo2.exe
+  fixture-win32-write1.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-win32-write1.exe
+  VtStateTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VtStateTest.exe
+  HostCancellationTraceHook.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationTraceHook.dll
+  VT7Pty.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty.dll
+  ProtocolTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\ProtocolTest.exe
+  HostCancellationHook.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationHook.dll
+  ProtocolTestAgent.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\ProtocolTestAgent.exe
+  ModernCppTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\ModernCppTest.exe
+  VT7Pty-DebugServer.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-DebugServer.exe
+  VT7Pty-Agent.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-Agent.exe
+  VT7Pty-FreezeAgent.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-FreezeAgent.exe
+  HostCancellationProbe.cc
+  HostCancellationProbe.cc
+  BackendSmokeTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\BackendSmokeTest.exe
+  HostDispatchProbe.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostDispatchProbe.exe
+  SessionContractTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\SessionContractTest.exe
+  HostIdentityProbe.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostIdentityProbe.exe
+  FidelityTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\FidelityTest.exe
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationFreezeHook.lib and object D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationFreezeHook.exp
+  HostCancellationFreezeHook.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationFreezeHook.dll
+  HostCancellationTraceProbe.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationTraceProbe.exe
+  HostCancellationProbe.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationProbe.exe
+  HostCancellationProbe.cc
+D:\Git\vt7pty\tests\fidelity\HostCancellationProbe.cc(202,15): error C2677: binary '+=': no global operator found which takes type 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' (or there is no acceptable conversion) [D:\Git\vt7pty\projects\HostCancellationFreezeProbe.vcxproj]
+MSBuild failed for Debug|x64 with exit code 1.
+At D:\Git\vt7pty\Build-VT7Pty.ps1:76 char:9
++         throw "MSBuild failed for $configurationName|x64 with exit co ...
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (MSBuild failed ...th exit code 1.:String) [], RuntimeException
+    + FullyQualifiedErrorId : MSBuild failed for Debug|x64 with exit code 1.
+ 

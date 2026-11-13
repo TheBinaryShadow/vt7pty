@@ -1,0 +1,56 @@
+{
+    "NativeExit":  1,
+    "NativeStatus":  "Fail",
+    "Cases":  22,
+    "FailedCases":  [
+                        {
+                            "Case":  "focus-completed-selected",
+                            "Passed":  false,
+                            "OwnedProcessesCleaned":  true,
+                            "HostExited":  true,
+                            "HookRemoved":  true,
+                            "Error":  "Case did not meet acceptance; inspect its raw records."
+                        },
+                        {
+                            "Case":  "focus-pending-selected",
+                            "Passed":  false,
+                            "OwnedProcessesCleaned":  true,
+                            "HostExited":  true,
+                            "HookRemoved":  true,
+                            "Error":  "Case did not meet acceptance; inspect its raw records."
+                        },
+                        {
+                            "Case":  "focus-selection-bracket",
+                            "Passed":  false,
+                            "OwnedProcessesCleaned":  true,
+                            "HostExited":  true,
+                            "HookRemoved":  true,
+                            "Error":  "Case did not meet acceptance; inspect its raw records."
+                        }
+                    ],
+    "Root":  {
+                 "SchemaVersion":  1,
+                 "Probe":  "HostCancellation",
+                 "Version":  3,
+                 "Status":  "Fail",
+                 "SuiteExit":  1,
+                 "NeighborExit":  0,
+                 "NeighborPolls":  27,
+                 "DesktopIsolationVerified":  true,
+                 "OwnedLifetimesCleaned":  true,
+                 "RootDesktop":  "Default",
+                 "SuiteDesktop":  "VT7Pty-H3-1b9c17457c5cb95ddacbdb7b4aca0ccc",
+                 "NeighborDesktop":  "VT7Pty-H3-9acee3af784c9a674bfbad3380c63368",
+                 "MilestoneAccepted":  false,
+                 "ProductionCancellationImplemented":  false,
+                 "Error":  "",
+                 "DiagnosticOnly":  true,
+                 "H3Accepted":  false,
+                 "OriginalDeadlineFailuresRetained":  true,
+                 "KeyOperation":  "Single synchronous WM_KEYDOWN C",
+                 "ResearchAgent":  true,
+                 "Rotation":  0,
+                 "AgentGateProtocol":  1,
+                 "CharacterizationConditions":  true
+             }
+}

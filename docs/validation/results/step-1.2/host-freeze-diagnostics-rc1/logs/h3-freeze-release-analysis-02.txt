@@ -1,0 +1,49 @@
+
+  AgentLocation.cc
+  vt7pty.cc
+  Agent.cc
+  ConsoleFont.cc
+  Buffer.cc
+  DebugClient.cc
+  GenRandom.cc
+  OwnedHandle.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  WindowsVersion.cc
+  Assert.cc
+  ConsoleInput.cc
+  Exception.cc
+  Version.cc
+  ConsoleInputReencoding.cc
+  ConsoleLine.cc
+  DebugShowInput.cc
+  DefaultInputMap.cc
+  EventLoop.cc
+  InputMap.cc
+  LargeConsoleRead.cc
+  HostCancellationHook.cc
+  main.cc
+  NamedPipe.cc
+  Scraper.cc
+  Terminal.cc
+  Win32Console.cc
+  Win32ConsoleBuffer.cc
+  Buffer.cc
+  DebugClient.cc
+  GenRandom.cc
+  OwnedHandle.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  WindowsVersion.cc
+  Assert.cc
+  Exception.cc
+  Version.cc
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty.lib and object D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty.exp
+  VT7Pty.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty.dll
+  VT7Pty-FreezeAgent.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty-FreezeAgent.exe
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Release\HostCancellationFreezeHook.lib and object D:\Git\vt7pty\artifacts\bin\x64\Release\HostCancellationFreezeHook.exp
+  HostCancellationFreezeHook.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\HostCancellationFreezeHook.dll
+  HostCancellationProbe.cc
+  HostCancellationFreezeProbe.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\HostCancellationFreezeProbe.exe
+D:\Git\vt7pty\tests\fidelity\HostFreezeWorker.h(19): error C6262: Function uses '27200' bytes of stack.  Consider moving some data to heap. [D:\Git\vt7pty\projects\HostCancellationFreezeProbe.vcxproj]
+D:\Git\vt7pty\tests\fidelity\HostCancellationWorker.h(426): error C6262: Function uses '17376' bytes of stack.  Consider moving some data to heap. [D:\Git\vt7pty\projects\HostCancellationFreezeProbe.vcxproj]

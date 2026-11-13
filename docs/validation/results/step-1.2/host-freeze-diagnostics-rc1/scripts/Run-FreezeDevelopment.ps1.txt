@@ -1,0 +1,27 @@
+param([string]$Configuration='Debug',[string]$Name='early-debug-01',[int]$Rotation=0)
+$ErrorActionPreference='Stop'
+$root='D:\Git\vt7pty'
+$out=Join-Path $root ('artifacts\fidelity\h3-freeze-'+$Name)
+if(Test-Path -LiteralPath $out){throw 'Development evidence directory exists'}
+$bin=Join-Path $out 'bin';$native=Join-Path $out 'native'
+[IO.Directory]::CreateDirectory($bin) | Out-Null
+[IO.Directory]::CreateDirectory($native) | Out-Null
+foreach($name in @('HostCancellationFreezeProbe.exe','HostCancellationFreezeProbe.pdb','HostCancellationFreezeHook.dll','HostCancellationFreezeHook.pdb')){Copy-Item -LiteralPath (Join-Path $root ('artifacts\bin\x64\'+$Configuration+'\'+$name)) -Destination (Join-Path $bin $name)}
+Copy-Item -LiteralPath (Join-Path $root ('artifacts\bin\x64\'+$Configuration+'\VT7Pty-FreezeAgent.exe')) -Destination (Join-Path $bin 'VT7Pty-Agent.exe')
+Copy-Item -LiteralPath (Join-Path $root ('artifacts\bin\x64\'+$Configuration+'\VT7Pty-FreezeAgent.pdb')) -Destination (Join-Path $bin 'VT7Pty-FreezeAgent.pdb')
+Copy-Item -LiteralPath (Join-Path $root 'artifacts\fidelity\inspection-host-cancellation-rc1\bin\VT7Pty.dll') -Destination (Join-Path $bin 'VT7Pty.dll')
+if((Get-FileHash -LiteralPath (Join-Path $bin 'VT7Pty.dll') -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167'){throw 'Runtime DLL changed'}
+$start=New-Object Diagnostics.ProcessStartInfo
+$start.FileName=Join-Path $bin 'HostCancellationFreezeProbe.exe'
+$start.Arguments='"'+$native+'"';$start.WorkingDirectory=$bin
+$start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
+$start.EnvironmentVariables['VT7PTY_H3_ORDER']=[string]$Rotation
+$process=[Diagnostics.Process]::Start($start)
+$stdout=$process.StandardOutput.ReadToEndAsync();$stderr=$process.StandardError.ReadToEndAsync()
+if(-not $process.WaitForExit(420000)){$process.Kill();$process.WaitForExit();throw 'Owned development controller deadline'}
+[IO.File]::WriteAllText((Join-Path $out 'stdout.txt'),$stdout.Result,[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText((Join-Path $out 'stderr.txt'),$stderr.Result,[Text.UTF8Encoding]::new($false))
+$code=$process.ExitCode;$process.Dispose()
+$probe=Get-Content -LiteralPath (Join-Path $native 'probe.json') -Raw | ConvertFrom-Json
+$cases=Get-Content -LiteralPath (Join-Path $native 'suite\cases.json') -Raw | ConvertFrom-Json
+[ordered]@{NativeExit=$code;NativeStatus=$probe.Status;Cases=@($cases.Cases).Count;FailedCases=@($cases.Cases | Where-Object {-not $_.Passed});Root=$probe} | ConvertTo-Json -Depth 8

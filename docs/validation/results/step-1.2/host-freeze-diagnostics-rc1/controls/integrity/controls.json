@@ -1,0 +1,26 @@
+[
+    {
+        "Role":  "control",
+        "ArchiveSha256":  "ed03734b8d6198710f0bfc8ef475b05f36f59949999a08748b9dc34e3aed2371",
+        "File":  "control/bin/HostCancellationProbe.exe",
+        "Offset":  499199,
+        "BeforeSha256":  "aebccd26377c35b57c372b838eaa9bc4d08baf514c41ee987db0d88bcf44aa19",
+        "AfterSha256":  "889197818ee06c37bb159e0a6440e338c2e3972b5b3f336c8270a9f473629f30",
+        "OuterManifestUpdated":  true,
+        "ExitCode":  1,
+        "RejectedBeforeResults":  true,
+        "ExpectedReason":  "Original rc1 control changed:"
+    },
+    {
+        "Role":  "reference",
+        "ArchiveSha256":  "ed03734b8d6198710f0bfc8ef475b05f36f59949999a08748b9dc34e3aed2371",
+        "File":  "reference/trace/bin/HostCancellationTraceProbe.exe",
+        "Offset":  556543,
+        "BeforeSha256":  "5b9748587d46ccb802dc0eda0aa228597127870a51045ebb50531fa1478c13e5",
+        "AfterSha256":  "218252ec392a379429fa7e1446ce7eed1d3e9e0189e155b546488ebcc8899d27",
+        "OuterManifestUpdated":  true,
+        "ExitCode":  1,
+        "RejectedBeforeResults":  true,
+        "ExpectedReason":  "Original trace reference changed:"
+    }
+]

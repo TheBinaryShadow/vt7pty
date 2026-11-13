@@ -1,0 +1,80 @@
+Building VT7Pty native targets: Debug|x64
+
+  AgentLocation.cc
+  vt7pty.cc
+  Buffer.cc
+  DebugClient.cc
+  GenRandom.cc
+  OwnedHandle.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  WindowsVersion.cc
+  Assert.cc
+  Exception.cc
+  Version.cc
+  HostCancellationHook.cc
+  VT7Pty-DebugServer.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-DebugServer.exe
+  VT7Pty-Agent.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-Agent.exe
+  fixture-win32-echo1.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-win32-echo1.exe
+  Agent.cc
+  ConsoleFont.cc
+  ConsoleInput.cc
+  ConsoleInputReencoding.cc
+  ConsoleLine.cc
+  DebugShowInput.cc
+  DefaultInputMap.cc
+  EventLoop.cc
+  InputMap.cc
+  LargeConsoleRead.cc
+  main.cc
+  fixture-utf16-echo.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-utf16-echo.exe
+  NamedPipe.cc
+  SessionFixture.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\SessionFixture.exe
+  Scraper.cc
+  Terminal.cc
+  Win32Console.cc
+  Win32ConsoleBuffer.cc
+  Buffer.cc
+  DebugClient.cc
+  GenRandom.cc
+  OwnedHandle.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  fixture-show-console-input.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-show-console-input.exe
+  WindowsVersion.cc
+  Assert.cc
+  Exception.cc
+  Version.cc
+  fixture-output-lines.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-output-lines.exe
+  FidelityFixture.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\FidelityFixture.exe
+  fixture-show-argv.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-show-argv.exe
+  ModernCppTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\ModernCppTest.exe
+  VtStateTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VtStateTest.exe
+  tool-conin-mode.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\tool-conin-mode.exe
+  fixture-win32-write1.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-win32-write1.exe
+  fixture-write-console.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-write-console.exe
+  HostDispatchHook.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostDispatchHook.dll
+  ProtocolTestAgent.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\ProtocolTestAgent.exe
+  HostCancellationHook.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationHook.dll
+  HostCancellationTraceHook.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationTraceHook.dll
+  ProtocolTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\ProtocolTest.exe
+  fixture-win32-echo2.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-win32-echo2.exe
+  tool-conout-mode.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\tool-conout-mode.exe
+  fixture-console-color-grid.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\fixture-console-color-grid.exe
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty.lib and object D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty.exp
+  VT7Pty.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty.dll
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationFreezeHook.lib and object D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationFreezeHook.exp
+  HostCancellationFreezeHook.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationFreezeHook.dll
+  VT7Pty-FreezeAgent.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-FreezeAgent.exe
+  HostCancellationProbe.cc
+  HostCancellationProbe.cc
+  HostDispatchProbe.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostDispatchProbe.exe
+  SessionContractTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\SessionContractTest.exe
+  HostIdentityProbe.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostIdentityProbe.exe
+  FidelityTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\FidelityTest.exe
+  BackendSmokeTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\BackendSmokeTest.exe
+  HostCancellationProbe.cc
+  HostCancellationProbe.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationProbe.exe
+  HostCancellationTraceProbe.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationTraceProbe.exe
+  HostCancellationFreezeProbe.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\HostCancellationFreezeProbe.exe
+Debug verification passed: D:\Git\vt7pty\artifacts\verification\x64\Debug

@@ -1,0 +1,9 @@
+Structured diagnostic transport exited with 1.
+diagnostic records lack required structured identity
+At D:\Git\vt7pty\Verify-VT7Pty.ps1:203 char:9
++         throw "$($Result.Name) exited with $($Result.ExitCode).`n$($R ...
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Structured diag...ctured identity:String) [], RuntimeException
+    + FullyQualifiedErrorId : Structured diagnostic transport exited with 1.
+diagnostic records lack required structured identity
+ 

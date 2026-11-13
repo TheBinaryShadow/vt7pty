@@ -1,0 +1,33 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$execution=Get-Content -LiteralPath (Join-Path $repo 'artifacts\fidelity\h3-freeze-exact-package-execution.json') -Raw | ConvertFrom-Json
+$reviewPath=Join-Path $repo 'artifacts\fidelity\h3-freeze-exact-package-review.json'
+if(-not (Test-Path -LiteralPath $reviewPath)) {
+    $null=& (Join-Path $repo 'tools\research\Test-HostFreezeEvidence.ps1') -Directory $execution.Results -PackageRoot $execution.Extraction -OutputPath $reviewPath
+}
+$review=Get-Content -LiteralPath $reviewPath -Raw | ConvertFrom-Json
+$report=Get-Content -LiteralPath (Join-Path $execution.Results 'report.json') -Raw | ConvertFrom-Json
+$conditions=@($review.Trials | Where-Object {$_.Role -eq 'Experiment'} | ForEach-Object {$_.Review.Conditions})
+$metrics=[ordered]@{RunId=$report.RunId;Collected=$report.Completed;Trials=$report.Trials.Count;Cases=0;PassedCases=0;
+    VerifiedEvidenceFiles=$review.VerifiedEvidenceFiles;TrialSummary=@();ConditionPhases=$conditions.Count;
+    DeadlinePassed=@($conditions | Where-Object {$_.OriginalDeadlineMet}).Count;DeadlineFailed=@($conditions | Where-Object {-not $_.OriginalDeadlineMet}).Count;
+    ConditionNotObserved=@($conditions | Where-Object {-not $_.ConditionObserved}).Count;LeaseNotActive=@($conditions | Where-Object {-not $_.LeaseActiveAtDeadline}).Count;
+    DelayMinimumMs=($conditions | Measure-Object ComparableDelayActualMs -Minimum).Minimum;DelayMaximumMs=($conditions | Measure-Object ComparableDelayActualMs -Maximum).Maximum;
+    HostMessages=0;AgentEvents=0;CoverageGaps=@();OperationalIssues=@();Selected=@();DelayControls=@()}
+foreach($trial in $report.Trials) {
+    $passed=@($trial.Cases.Cases | Where-Object {$_.Passed}).Count
+    $metrics.Cases+=$trial.Cases.Cases.Count;$metrics.PassedCases+=$passed
+    $metrics.TrialSummary+=@([ordered]@{Order=$trial.Order;Role=$trial.Role;Outcome=$trial.Outcome;Rotation=$trial.Rotation;CollectionStatus=$trial.CollectionStatus;
+        CasesPassed=$passed;Cases=$trial.Cases.Cases.Count;DurationMilliseconds=$trial.DurationMilliseconds;OwnedLifetimesCleaned=$trial.Observation.OwnedLifetimesCleaned;
+        DesktopIsolationVerified=$trial.Observation.DesktopIsolationVerified;FailedCases=@($trial.Cases.Cases | Where-Object {-not $_.Passed} | ForEach-Object {$_.Case})})
+}
+foreach($trial in $review.Trials | Where-Object {$_.Role -eq 'Experiment'}) {
+    $r=$trial.Review;$metrics.HostMessages+=$r.HostMessages;$metrics.AgentEvents+=$r.AgentEvents
+    $metrics.CoverageGaps+=@($r.Core.CoverageGaps)+@($r.CoverageGaps);$metrics.OperationalIssues+=@($r.OperationalIssues)
+    $metrics.Selected+=@($r.Conditions | Where-Object {$_.Condition -eq 'selected'})
+    $metrics.DelayControls+=@($r.Conditions | Where-Object {$_.Condition -eq 'delay-control'})
+}
+if($metrics.Collected -ne 9 -or $metrics.Cases -ne 141 -or $metrics.ConditionPhases -ne 33 -or $metrics.CoverageGaps.Count -or $metrics.OperationalIssues.Count) {throw 'Inspect incomplete or invalid experimental collection.'}
+[IO.File]::WriteAllText((Join-Path $repo 'artifacts\fidelity\h3-freeze-exact-package-metrics.json'),($metrics | ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
+[pscustomobject]@{RunId=$metrics.RunId;Collected=$metrics.Collected;Cases=$metrics.Cases;PassedCases=$metrics.PassedCases;VerifiedEvidenceFiles=$metrics.VerifiedEvidenceFiles;ConditionPhases=$metrics.ConditionPhases;CoverageGaps=$metrics.CoverageGaps.Count;OperationalIssues=$metrics.OperationalIssues.Count}

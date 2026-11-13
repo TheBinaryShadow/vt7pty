@@ -1,0 +1,70 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$target=Join-Path $repo 'docs\validation\results\step-1.2\host-freeze-diagnostics-rc1'
+$records=New-Object 'Collections.Generic.List[object]'
+$execution=Get-Content -LiteralPath (Join-Path $repo 'artifacts\fidelity\h3-freeze-exact-package-execution.json') -Raw | ConvertFrom-Json
+$package=Join-Path $repo 'artifacts\fidelity\packages\VT7Pty-host-freeze-diagnostics-0.5.0-rc1'
+$manifest=Get-Content -LiteralPath (Join-Path $package 'manifest.json') -Raw | ConvertFrom-Json
+function Copy-ExactFile([string]$Source,[string]$Relative) {
+    $sourcePath=[IO.Path]::GetFullPath($Source)
+    $destination=[IO.Path]::GetFullPath((Join-Path $target $Relative))
+    if(-not $destination.StartsWith($target+'\',[StringComparison]::OrdinalIgnoreCase)) {throw 'Evidence path leaves its directory.'}
+    [IO.Directory]::CreateDirectory((Split-Path -Parent $destination)) | Out-Null
+    $hash=(Get-FileHash -LiteralPath $sourcePath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if(Test-Path -LiteralPath $destination) {
+        if((Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hash) {throw ('Refusing to replace different evidence: '+$Relative)}
+    } else {[IO.File]::Copy($sourcePath,$destination)}
+    if((Get-Item -LiteralPath $destination).Length -ne (Get-Item -LiteralPath $sourcePath).Length -or
+        (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hash) {throw ('Evidence copy mismatch: '+$Relative)}
+    $records.Add([ordered]@{Path=$Relative.Replace('\','/');Bytes=(Get-Item -LiteralPath $destination).Length;Sha256=$hash})
+}
+function Copy-ExactTree([string]$Source,[string]$Relative,[bool]$SkipBinaries=$false) {
+    $sourcePath=[IO.Path]::GetFullPath($Source).TrimEnd('\')
+    foreach($file in @(Get-ChildItem -LiteralPath $sourcePath -File -Recurse)) {
+        if($SkipBinaries -and $file.Extension -in @('.exe','.dll','.pdb','.lib','.exp','.obj')) {continue}
+        Copy-ExactFile $file.FullName (Join-Path $Relative $file.FullName.Substring($sourcePath.Length+1))
+    }
+}
+Copy-ExactTree $execution.Results ('development\'+(Split-Path $execution.Results -Leaf))
+Copy-ExactTree (Join-Path $repo 'artifacts\fidelity\h3-freeze-early-debug-01\native') 'preliminary\early-debug\native'
+Copy-ExactTree (Join-Path $repo 'artifacts\fidelity\h3-freeze-final-debug\native') 'prepackage\debug\native'
+foreach($name in @('stdout.txt','stderr.txt')) {
+    Copy-ExactFile (Join-Path $repo ('artifacts\fidelity\h3-freeze-early-debug-01\'+$name)) ('preliminary\early-debug\'+$name)
+    Copy-ExactFile (Join-Path $repo ('artifacts\fidelity\h3-freeze-final-debug\'+$name)) ('prepackage\debug\'+$name)
+}
+Copy-ExactFile (Join-Path $repo 'artifacts\fidelity\h3-freeze-final-debug\audit-strengthened.json') 'prepackage\debug\audit.json'
+foreach($configuration in @('Debug','Release')) {Copy-ExactTree (Join-Path $repo ('artifacts\verification\x64\'+$configuration)) ('verification\'+$configuration.ToLowerInvariant()) $true}
+Copy-ExactTree (Join-Path $repo 'artifacts\fidelity\h3-freeze-debug-stale-source-check') 'preliminary\stale-debug-identity'
+Copy-ExactTree (Join-Path $repo 'artifacts\fidelity\h3-freeze-preliminary-release-verification') 'preliminary\release-verification-00d15e6' $true
+Copy-ExactFile (Join-Path $repo 'artifacts\fidelity\h3-freeze-exact-package-review.json') 'audit\evidence-review.json'
+Copy-ExactFile (Join-Path $repo 'artifacts\fidelity\h3-freeze-exact-package-metrics.json') 'audit\metrics.json'
+Copy-ExactFile (Join-Path $repo 'artifacts\fidelity\h3-freeze-exact-package-execution.json') 'audit\execution.json'
+Copy-ExactFile (Join-Path $package 'manifest.json') 'package\manifest.json'
+Copy-ExactFile (Join-Path $package 'control\manifest.json') 'package\control-manifest.json'
+Copy-ExactFile (Join-Path $package 'reference\manifest.json') 'package\reference-manifest.json'
+Copy-ExactFile ($execution.Archive+'.sha256') 'package\VT7Pty-host-freeze-diagnostics-0.5.0-rc1.zip.sha256'
+$pilot=Join-Path $repo 'artifacts\fidelity\preliminary-freeze-package-00d15e6'
+Copy-ExactFile (Join-Path $pilot 'VT7Pty-host-freeze-diagnostics-0.5.0-rc1\manifest.json') 'preliminary\unissued-package-00d15e6\manifest.json'
+Copy-ExactFile (Join-Path $pilot 'VT7Pty-host-freeze-diagnostics-0.5.0-rc1.zip.sha256') 'preliminary\unissued-package-00d15e6\archive.sha256'
+$integrity=Join-Path $repo 'artifacts\fidelity\h3-freeze-integrity-controls'
+foreach($name in @('controls.json','control-stdout.txt','control-stderr.txt','reference-stdout.txt','reference-stderr.txt','control-altered-manifest.json','reference-altered-manifest.json')) {Copy-ExactFile (Join-Path $integrity $name) ('controls\integrity\'+$name)}
+$reviewerControls=Join-Path $repo 'artifacts\fidelity\h3-freeze-reviewer-controls'
+Copy-ExactFile (Join-Path $reviewerControls 'controls.json') 'controls\reviewer\controls.json'
+$reviewerControlRecords=Get-Content -LiteralPath (Join-Path $reviewerControls 'controls.json') -Raw | ConvertFrom-Json
+foreach($control in $reviewerControlRecords) {
+    Copy-ExactFile (Join-Path (Join-Path $reviewerControls $control.Name) $control.File) ('controls\reviewer\'+$control.Name+'\'+$control.File)
+}
+foreach($script in @('Run-FreezeDevelopment.ps1','Run-FreezeIssuedCandidate.ps1','Review-FreezeIssuedCandidate.ps1','Test-FreezePackageIntegrity.ps1','Test-FreezeReviewerControls.ps1','Preserve-FreezeCandidate.ps1')) {
+    Copy-ExactFile (Join-Path $repo ('artifacts\fidelity\'+$script)) ('scripts\'+$script+'.txt')
+}
+foreach($name in @('h3-freeze-first-debug-build','h3-freeze-debug-probe-build','h3-freeze-debug-verification','h3-freeze-release-analysis','h3-freeze-release-analysis-02','h3-freeze-release-analysis-03','h3-freeze-final-debug-build','h3-freeze-final-debug-live','h3-freeze-final-debug-audit','h3-freeze-final-debug-verification','h3-freeze-reviewer-controls','h3-freeze-clean-release-package','h3-freeze-final-release-package','h3-freeze-inspected-debug-verification','h3-freeze-clean-debug-verification','h3-freeze-integrity-controls','h3-freeze-exact-package-run','h3-freeze-exact-package-execution')) {
+    $path=Join-Path $repo ('artifacts\'+$name+'.log')
+    if(Test-Path -LiteralPath $path) {Copy-ExactFile $path ('logs\'+$name+'.txt')}
+}
+[IO.Directory]::CreateDirectory($target) | Out-Null
+$inventory=[ordered]@{SchemaVersion=1;SourceCommit=$manifest.Experiment.SourceCommit;ArchiveSha256=$execution.ArchiveSha256;Files=$records.ToArray()}
+[IO.File]::WriteAllText((Join-Path $target 'preserved-files.json'),($inventory | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+$byteCount=0L
+foreach($record in $records) {$byteCount+=[long]$record.Bytes}
+[pscustomobject]@{Files=$records.Count;Bytes=$byteCount;Directory=$target}

@@ -1,0 +1,44 @@
+[
+    {
+        "Name":  "wrong-host",
+        "Detected":  true,
+        "File":  "suite\\focus-completed-quiet\\host-4-request.json",
+        "BeforeSha256":  "2df8e6a74b69c3749f16377c23a84eb089a48a15551efa20179a400d09fcd199",
+        "AfterSha256":  "a1f983b348b71c101048e63c897e22d2a464e88ff12f2e99c1a7c63db00add41",
+        "Error":  "H3 diagnostic evidence: host message sequence/context",
+        "OperationalIssues":  {
+
+                              }
+    },
+    {
+        "Name":  "hidden-deadline-failure",
+        "Detected":  true,
+        "File":  "suite\\focus-completed-selected\\focus-condition.json",
+        "BeforeSha256":  "e4c1820dced6f2678bf9edc930cf468bebf01b3f8397143095d0b238ee4c4bb7",
+        "AfterSha256":  "cfb93287a79375ef671b67440e6d218ae6a2c52c75f60655223292b9e45c2fb5",
+        "Error":  "H3 diagnostic evidence: condition outcome cannot hide a failed predicate",
+        "OperationalIssues":  {
+
+                              }
+    },
+    {
+        "Name":  "false-lease-claim",
+        "Detected":  true,
+        "File":  "suite\\focus-completed-quiet\\focus-condition.json",
+        "BeforeSha256":  "4ab60d70af3dc40c0a3ac231dc56a0b3b911654520698fbc872fb9506c515bc9",
+        "AfterSha256":  "793fb2d5fb10ee455cc66d0ab13fd45140c83e2d07e63b877694974e0c506219",
+        "Error":  "H3 diagnostic evidence: deadline lease claim matches agent observation",
+        "OperationalIssues":  {
+
+                              }
+    },
+    {
+        "Name":  "work-inside-lease",
+        "Detected":  true,
+        "File":  "suite\\focus-pending-coordinated\\agent-11-request.json",
+        "BeforeSha256":  "1981abdd1fa9a2bbb24a934ec9a0fb5d298e786db5e5bc7c2f519c839d8791a0",
+        "AfterSha256":  "743b012d38fe5fd1176bae63ea1b706a16fbaab6697662a01701dcb1498ef12b",
+        "Error":  "",
+        "OperationalIssues":  "suite\\focus-pending-coordinated/focus: work/expiry inside held interval"
+    }
+]
