@@ -1,0 +1,43 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$taskRoot='D:\Git\vt7pty'
+$taskDestination=Join-Path $taskRoot 'docs\validation\results\step-1.2\host-cancellation-diagnostics-rc1'
+if(Test-Path -LiteralPath $taskDestination){throw 'Evidence destination already exists'}
+[IO.Directory]::CreateDirectory($taskDestination) | Out-Null
+$taskCopied=New-Object 'Collections.Generic.List[object]'
+function Copy-EvidenceFile([string]$Source,[string]$Relative){
+    $target=Join-Path $taskDestination $Relative
+    [IO.Directory]::CreateDirectory((Split-Path $target)) | Out-Null
+    Copy-Item -LiteralPath $Source -Destination $target
+    $sourceHash=(Get-FileHash -LiteralPath $Source -Algorithm SHA256).Hash.ToLowerInvariant()
+    if((Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash.ToLowerInvariant() -cne $sourceHash){throw ('Copy changed: '+$Relative)}
+    $taskCopied.Add([ordered]@{Path=$Relative.Replace('\','/');Bytes=(Get-Item -LiteralPath $target).Length;Sha256=$sourceHash})
+}
+function Copy-EvidenceTree([string]$Source,[string]$Relative){
+    foreach($file in Get-ChildItem -LiteralPath $Source -Recurse -File){
+        $local=$file.FullName.Substring($Source.Length+1)
+        if($local -match '(^|\\)bin(\\|$)' -or $file.Extension -in @('.exe','.dll','.pdb','.lib','.obj')){continue}
+        Copy-EvidenceFile $file.FullName ($Relative+'\'+$local)
+    }
+}
+$taskExtract=Join-Path $taskRoot 'artifacts\fidelity\inspection-host-cancellation-diagnostics-rc1'
+$taskSummary=Get-Content -LiteralPath (Join-Path $taskRoot 'artifacts\fidelity\h3-diagnostic-exact-rc1\summary.json') -Raw | ConvertFrom-Json
+Copy-EvidenceFile (Join-Path $taskExtract 'manifest.json') 'package\manifest.json'
+Copy-EvidenceFile (Join-Path $taskExtract 'control\manifest.json') 'package\control-manifest.json'
+Copy-EvidenceFile (Join-Path $taskRoot 'artifacts\fidelity\packages\VT7Pty-host-cancellation-diagnostics-0.5.0-rc1.zip.sha256') 'package\VT7Pty-host-cancellation-diagnostics-0.5.0-rc1.zip.sha256'
+Copy-EvidenceTree (Join-Path $taskExtract ('results\'+$taskSummary.RunId)) ('development\'+$taskSummary.RunId)
+Copy-EvidenceTree (Join-Path $taskRoot 'artifacts\fidelity\h3-diagnostic-exact-rc1') 'audit'
+Copy-EvidenceTree (Join-Path $taskRoot 'artifacts\fidelity\h3-diagnostic-final-native') 'prepackage\final-native'
+Copy-EvidenceTree (Join-Path $taskRoot 'artifacts\fidelity\h3-diagnostic-review-controls') 'controls\reviewer'
+Copy-EvidenceTree (Join-Path $taskRoot 'artifacts\fidelity\h3-trace-early-debug-01\run') 'preliminary\debug-01'
+Copy-EvidenceTree (Join-Path $taskRoot 'artifacts\fidelity\h3-trace-early-debug-02\run') 'preliminary\debug-02'
+foreach($config in @('Debug','Release')){Copy-EvidenceTree (Join-Path $taskRoot ('artifacts\verification\x64\'+$config)) ('verification\'+$config.ToLowerInvariant())}
+foreach($name in @('h3-diagnostic-final-verification.log','h3-diagnostic-rc1-package.log','h3-diagnostic-rc1-exact.log')){
+    Copy-EvidenceFile (Join-Path $taskRoot ('artifacts\'+$name)) ('logs\'+$name+'.txt')
+}
+foreach($name in @('Check-CancellationDiagnosticPackage.ps1','Preserve-CancellationDiagnostics.ps1','Run-FinalCancellationTrace.ps1')){
+    Copy-EvidenceFile (Join-Path $taskRoot ('artifacts\fidelity\'+$name)) ('scripts\'+$name+'.txt')
+}
+$taskInventory=[ordered]@{SchemaVersion=1;SourceCommit=$taskSummary.SourceCommit;ArchiveSha256=$taskSummary.Sha256;Files=@($taskCopied | Sort-Object {$_.Path});Count=$taskCopied.Count}
+[IO.File]::WriteAllText((Join-Path $taskDestination 'preserved-files.json'),($taskInventory | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+Write-Host ('Preserved '+$taskCopied.Count+' files with byte-for-byte SHA-256 checks.')

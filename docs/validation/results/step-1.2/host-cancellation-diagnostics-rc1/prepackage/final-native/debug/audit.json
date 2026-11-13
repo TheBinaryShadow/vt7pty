@@ -1,0 +1,1439 @@
+{
+    "SchemaVersion":  1,
+    "Kind":  "H3TraceEvidenceReview",
+    "NativeStatus":  "Pass",
+    "PassedCases":  13,
+    "FailedCases":  [
+
+                    ],
+    "Sessions":  14,
+    "Requests":  43,
+    "KeyOperations":  13,
+    "NestedEntries":  12,
+    "NestedReturns":  12,
+    "LastSnapshotPublishedFixtureEvents":  73,
+    "ExtendedObservations":  0,
+    "CoverageGaps":  [
+
+                     ],
+    "KeyFindings":  [
+                        {
+                            "Case":  "suite\\cooked-repeated",
+                            "Request":  "host-2-request.json",
+                            "Sequence":  2,
+                            "Sent":  0,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           8,
+                                           7
+                                       ],
+                            "EntryCount":  0,
+                            "ReturnCount":  0,
+                            "EntryCtrl":  [
+
+                                          ],
+                            "EntryLeftCtrl":  [
+
+                                              ],
+                            "EntryKeysMatchApplied":  [
+
+                                                      ],
+                            "EntryWindowOwners":  [
+
+                                                  ],
+                            "EntryWindowThreads":  [
+
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        },
+                        {
+                            "Case":  "suite\\cooked-repeated",
+                            "Request":  "host-5-request.json",
+                            "Sequence":  3,
+                            "Sent":  1,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           3,
+                                           4,
+                                           5,
+                                           6,
+                                           7
+                                       ],
+                            "EntryCount":  1,
+                            "ReturnCount":  1,
+                            "EntryCtrl":  [
+                                              true
+                                          ],
+                            "EntryLeftCtrl":  [
+                                                  true
+                                              ],
+                            "EntryKeysMatchApplied":  [
+                                                          true
+                                                      ],
+                            "EntryWindowOwners":  [
+                                                      42072
+                                                  ],
+                            "EntryWindowThreads":  [
+                                                       14592
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        },
+                        {
+                            "Case":  "suite\\cooked-repeated",
+                            "Request":  "host-7-request.json",
+                            "Sequence":  4,
+                            "Sent":  1,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           3,
+                                           4,
+                                           5,
+                                           6,
+                                           7
+                                       ],
+                            "EntryCount":  1,
+                            "ReturnCount":  1,
+                            "EntryCtrl":  [
+                                              true
+                                          ],
+                            "EntryLeftCtrl":  [
+                                                  true
+                                              ],
+                            "EntryKeysMatchApplied":  [
+                                                          true
+                                                      ],
+                            "EntryWindowOwners":  [
+                                                      42072
+                                                  ],
+                            "EntryWindowThreads":  [
+                                                       14592
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        },
+                        {
+                            "Case":  "suite\\cooked-repeated",
+                            "Request":  "host-9-request.json",
+                            "Sequence":  5,
+                            "Sent":  1,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           3,
+                                           4,
+                                           5,
+                                           6,
+                                           7
+                                       ],
+                            "EntryCount":  1,
+                            "ReturnCount":  1,
+                            "EntryCtrl":  [
+                                              true
+                                          ],
+                            "EntryLeftCtrl":  [
+                                                  true
+                                              ],
+                            "EntryKeysMatchApplied":  [
+                                                          true
+                                                      ],
+                            "EntryWindowOwners":  [
+                                                      42072
+                                                  ],
+                            "EntryWindowThreads":  [
+                                                       14592
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        },
+                        {
+                            "Case":  "suite\\no-pending-read",
+                            "Request":  "host-2-request.json",
+                            "Sequence":  2,
+                            "Sent":  1,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           3,
+                                           4,
+                                           5,
+                                           6,
+                                           7
+                                       ],
+                            "EntryCount":  1,
+                            "ReturnCount":  1,
+                            "EntryCtrl":  [
+                                              true
+                                          ],
+                            "EntryLeftCtrl":  [
+                                                  true
+                                              ],
+                            "EntryKeysMatchApplied":  [
+                                                          true
+                                                      ],
+                            "EntryWindowOwners":  [
+                                                      51828
+                                                  ],
+                            "EntryWindowThreads":  [
+                                                       20340
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        },
+                        {
+                            "Case":  "suite\\completed-before-cancel",
+                            "Request":  "host-2-request.json",
+                            "Sequence":  2,
+                            "Sent":  1,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           3,
+                                           4,
+                                           5,
+                                           6,
+                                           7
+                                       ],
+                            "EntryCount":  1,
+                            "ReturnCount":  1,
+                            "EntryCtrl":  [
+                                              true
+                                          ],
+                            "EntryLeftCtrl":  [
+                                                  true
+                                              ],
+                            "EntryKeysMatchApplied":  [
+                                                          true
+                                                      ],
+                            "EntryWindowOwners":  [
+                                                      30424
+                                                  ],
+                            "EntryWindowThreads":  [
+                                                       45080
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        },
+                        {
+                            "Case":  "suite\\close-in-request",
+                            "Request":  "host-2-request.json",
+                            "Sequence":  2,
+                            "Sent":  1,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           3,
+                                           4,
+                                           5,
+                                           6,
+                                           7
+                                       ],
+                            "EntryCount":  1,
+                            "ReturnCount":  1,
+                            "EntryCtrl":  [
+                                              true
+                                          ],
+                            "EntryLeftCtrl":  [
+                                                  true
+                                              ],
+                            "EntryKeysMatchApplied":  [
+                                                          true
+                                                      ],
+                            "EntryWindowOwners":  [
+                                                      28904
+                                                  ],
+                            "EntryWindowThreads":  [
+                                                       23680
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        },
+                        {
+                            "Case":  "suite\\default-handler",
+                            "Request":  "host-2-request.json",
+                            "Sequence":  2,
+                            "Sent":  1,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           3,
+                                           4,
+                                           5,
+                                           6,
+                                           7
+                                       ],
+                            "EntryCount":  1,
+                            "ReturnCount":  1,
+                            "EntryCtrl":  [
+                                              true
+                                          ],
+                            "EntryLeftCtrl":  [
+                                                  true
+                                              ],
+                            "EntryKeysMatchApplied":  [
+                                                          true
+                                                      ],
+                            "EntryWindowOwners":  [
+                                                      36872
+                                                  ],
+                            "EntryWindowThreads":  [
+                                                       2940
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        },
+                        {
+                            "Case":  "suite\\cmd-empty",
+                            "Request":  "host-2-request.json",
+                            "Sequence":  2,
+                            "Sent":  1,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           3,
+                                           4,
+                                           5,
+                                           6,
+                                           7
+                                       ],
+                            "EntryCount":  1,
+                            "ReturnCount":  1,
+                            "EntryCtrl":  [
+                                              true
+                                          ],
+                            "EntryLeftCtrl":  [
+                                                  true
+                                              ],
+                            "EntryKeysMatchApplied":  [
+                                                          true
+                                                      ],
+                            "EntryWindowOwners":  [
+                                                      39068
+                                                  ],
+                            "EntryWindowThreads":  [
+                                                       44228
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        },
+                        {
+                            "Case":  "suite\\cmd-partial",
+                            "Request":  "host-2-request.json",
+                            "Sequence":  2,
+                            "Sent":  1,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           3,
+                                           4,
+                                           5,
+                                           6,
+                                           7
+                                       ],
+                            "EntryCount":  1,
+                            "ReturnCount":  1,
+                            "EntryCtrl":  [
+                                              true
+                                          ],
+                            "EntryLeftCtrl":  [
+                                                  true
+                                              ],
+                            "EntryKeysMatchApplied":  [
+                                                          true
+                                                      ],
+                            "EntryWindowOwners":  [
+                                                      45528
+                                                  ],
+                            "EntryWindowThreads":  [
+                                                       45252
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        },
+                        {
+                            "Case":  "suite\\powershell-empty",
+                            "Request":  "host-2-request.json",
+                            "Sequence":  2,
+                            "Sent":  1,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           3,
+                                           4,
+                                           5,
+                                           6,
+                                           7
+                                       ],
+                            "EntryCount":  1,
+                            "ReturnCount":  1,
+                            "EntryCtrl":  [
+                                              true
+                                          ],
+                            "EntryLeftCtrl":  [
+                                                  true
+                                              ],
+                            "EntryKeysMatchApplied":  [
+                                                          true
+                                                      ],
+                            "EntryWindowOwners":  [
+                                                      47692
+                                                  ],
+                            "EntryWindowThreads":  [
+                                                       3604
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        },
+                        {
+                            "Case":  "suite\\powershell-partial",
+                            "Request":  "host-2-request.json",
+                            "Sequence":  2,
+                            "Sent":  1,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           3,
+                                           4,
+                                           5,
+                                           6,
+                                           7
+                                       ],
+                            "EntryCount":  1,
+                            "ReturnCount":  1,
+                            "EntryCtrl":  [
+                                              true
+                                          ],
+                            "EntryLeftCtrl":  [
+                                                  true
+                                              ],
+                            "EntryKeysMatchApplied":  [
+                                                          true
+                                                      ],
+                            "EntryWindowOwners":  [
+                                                      49120
+                                                  ],
+                            "EntryWindowThreads":  [
+                                                       46368
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        },
+                        {
+                            "Case":  "suite\\host-key-record",
+                            "Request":  "host-2-request.json",
+                            "Sequence":  2,
+                            "Sent":  1,
+                            "KeyboardError":  0,
+                            "Stages":  [
+                                           1,
+                                           2,
+                                           3,
+                                           4,
+                                           5,
+                                           6,
+                                           7
+                                       ],
+                            "EntryCount":  1,
+                            "ReturnCount":  1,
+                            "EntryCtrl":  [
+                                              true
+                                          ],
+                            "EntryLeftCtrl":  [
+                                                  true
+                                              ],
+                            "EntryKeysMatchApplied":  [
+                                                          true
+                                                      ],
+                            "EntryWindowOwners":  [
+                                                      10084
+                                                  ],
+                            "EntryWindowThreads":  [
+                                                       51320
+                                                   ],
+                            "ReturnedStateRestored":  true
+                        }
+                    ],
+    "MilestoneAccepted":  false,
+    "ProductionCancellationImplemented":  false,
+    "Files":  [
+                  {
+                      "Path":  "neighbor/fixture-last.json",
+                      "Bytes":  1122,
+                      "Sha256":  "378c2d030699dd9549c9c2134fa5d0b16a9f9856e133f63b68367ccbdfaf19c0"
+                  },
+                  {
+                      "Path":  "neighbor/lifetime-1.json",
+                      "Bytes":  407,
+                      "Sha256":  "77b09dac8abf82067d082bce457456a534310d16525cce73c0efe4beef69ffbe"
+                  },
+                  {
+                      "Path":  "neighbor/neighbor.json",
+                      "Bytes":  58,
+                      "Sha256":  "666ad21c03d7987bc5eb32043fe91127a767e9b4c12ac6e389341cf8704c9824"
+                  },
+                  {
+                      "Path":  "neighbor/neighbor-1-request.json",
+                      "Bytes":  2818,
+                      "Sha256":  "68afef3ca8d7ff39f33dee8d094fd48e459ac960e4fcb6f2149afb881c170e11"
+                  },
+                  {
+                      "Path":  "neighbor/neighbor-2-request.json",
+                      "Bytes":  2821,
+                      "Sha256":  "1f29b5b5a97cff4f8c509e9c3cdd55f79035afc4568c6cb28635a0fe26cceb62"
+                  },
+                  {
+                      "Path":  "neighbor/neighbor-discovery.json",
+                      "Bytes":  296,
+                      "Sha256":  "777dba69bdbaabc5724f79b6d8d61dd39ba6c9f86f1bbb922ab01d1c98e7034e"
+                  },
+                  {
+                      "Path":  "neighbor/neighbor-hello.json",
+                      "Bytes":  2499,
+                      "Sha256":  "9e09345dde7a0a8100f4dd7dd025fbbf835532fd0c9a81db5044846c0ea8a87a"
+                  },
+                  {
+                      "Path":  "neighbor/neighbor-identity.json",
+                      "Bytes":  1746,
+                      "Sha256":  "1a281b7dabca6826a47ffe682d101b4f232d8355cdfcd0554da775617f5b3a06"
+                  },
+                  {
+                      "Path":  "neighbor/neighbor-read.json",
+                      "Bytes":  1122,
+                      "Sha256":  "b4b0f48c8fd5bb6f88c22c4d2fa75b4c2f1fa519dce42eaf2140436cebe95cc5"
+                  },
+                  {
+                      "Path":  "neighbor/output-trace.json",
+                      "Bytes":  526,
+                      "Sha256":  "0a07ac6a9988a8dab9b8b695b277e21117247d15d692502435303c054b9ef665"
+                  },
+                  {
+                      "Path":  "neighbor/stream.bin",
+                      "Bytes":  109,
+                      "Sha256":  "68dbcf91eec7996c212395a3b00496335088c6bb430bd9106b65cd8416b44580"
+                  },
+                  {
+                      "Path":  "probe.json",
+                      "Bytes":  541,
+                      "Sha256":  "9f8ecd813697d058d40cf73a59256666847a585915e17506e8d2c1be5eed52f1"
+                  },
+                  {
+                      "Path":  "suite/cases.json",
+                      "Bytes":  1585,
+                      "Sha256":  "718e550d3d3f8ae000e964b108381c8f65dc673bd0be7d82d6066aa0aadaa9ae"
+                  },
+                  {
+                      "Path":  "suite/close-in-request/closed-next.json",
+                      "Bytes":  1608,
+                      "Sha256":  "7dd812c1bf154bc1f26cc5424fe3b9bf44371bc512546a57e46740114d450422"
+                  },
+                  {
+                      "Path":  "suite/close-in-request/closed-read.json",
+                      "Bytes":  1341,
+                      "Sha256":  "f3b8504ab959ac514aa83a55b8d20ca4e52d19e82059281042e404f40338f3fd"
+                  },
+                  {
+                      "Path":  "suite/close-in-request/fixture-last.json",
+                      "Bytes":  1608,
+                      "Sha256":  "1df026bc23fe8f8beb1d2318b44b96c00c6fbe48bdea9229cbeeab8e8ccdf465"
+                  },
+                  {
+                      "Path":  "suite/close-in-request/host-1-request.json",
+                      "Bytes":  2820,
+                      "Sha256":  "cfc6c3b86ba4eeae445b60ee62975f2da449150b51df942932d7320807cd6e5f"
+                  },
+                  {
+                      "Path":  "suite/close-in-request/host-2-request.json",
+                      "Bytes":  10985,
+                      "Sha256":  "c18743dbd15932a8fe178af1221ccd39d546003daff3111c35af05c68ac2f202"
+                  },
+                  {
+                      "Path":  "suite/close-in-request/host-discovery.json",
+                      "Bytes":  298,
+                      "Sha256":  "47d39cc06dea495be840266bff00f699152dff71f13156d15252b5f42f63942d"
+                  },
+                  {
+                      "Path":  "suite/close-in-request/host-hello.json",
+                      "Bytes":  2501,
+                      "Sha256":  "77d3673f39020e8277915448678f7cedeeb03aad158a966fe0717ff81c7bfc04"
+                  },
+                  {
+                      "Path":  "suite/close-in-request/host-identity.json",
+                      "Bytes":  1747,
+                      "Sha256":  "b07a1fe5bd2e2b272d02c687cec9aa95a5644d7405dad58b90da684745bece3d"
+                  },
+                  {
+                      "Path":  "suite/close-in-request/output-trace.json",
+                      "Bytes":  876,
+                      "Sha256":  "af9f8f90335d05be3ab6c46a882334dc54cd10223e9947598526176c61765cf4"
+                  },
+                  {
+                      "Path":  "suite/close-in-request/stream.bin",
+                      "Bytes":  163,
+                      "Sha256":  "0dd3dfe00da460a708bef23c94958fa555008952a1ed4e428d019dcb32bd460c"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/continued-command.txt",
+                      "Bytes":  10,
+                      "Sha256":  "403f063c059fefed791601c8c692bfee58e31030c59cbcd48ccd9910d7a0ea10"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/event-observation.json",
+                      "Bytes":  1230,
+                      "Sha256":  "288abaa452c76779edf7821cedddb31d09d9ec6fbff99106ddce34bd1e078f97"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/fixture-last.json",
+                      "Bytes":  1222,
+                      "Sha256":  "6118b6d1ee530cf05d07e3a4a4d5cdf3ea2689981b24798495026d00bbdcc499"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/host-1-request.json",
+                      "Bytes":  2820,
+                      "Sha256":  "8b0114f40a4c4f1d6a78dd37d97d11b1fbb2c818877b2a65bb5064c715e5163a"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/host-2-request.json",
+                      "Bytes":  10885,
+                      "Sha256":  "6bd47503e48a8a9b5e27896d935f6632917c311889690f2cea8f37c009c2e193"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/host-3-request.json",
+                      "Bytes":  2823,
+                      "Sha256":  "bf53b0325596a4595fdc54edb177c897b312f918f408335342589b08eff3b4dd"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/host-discovery.json",
+                      "Bytes":  298,
+                      "Sha256":  "d50da865aa55ea76626bbd1f2aee19d714275154f8587d187d468abe93316a8c"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/host-hello.json",
+                      "Bytes":  2501,
+                      "Sha256":  "85fe33a13916b3d1154b38b4174248a255710fd321dc329bb1d0c4dbfb6fa7f1"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/host-identity.json",
+                      "Bytes":  1747,
+                      "Sha256":  "c727228cbd5ef666814beffd79ecdfd85b0c082c860dcdbedd3e2182d56e6a68"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/output-trace.json",
+                      "Bytes":  892,
+                      "Sha256":  "360fe4774acb51a6196f019fd921838a7a61eb4353360555cec30281f7f7385f"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/prompt-generations.json",
+                      "Bytes":  221,
+                      "Sha256":  "d4eb366d9c75a4ac47c42db721d5512a443c45c388768edde53ff7167e71ccf8"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/shell.json",
+                      "Bytes":  169,
+                      "Sha256":  "6e43175b403419f9a41c3bbc2d8e9b4b917a5ed954a90a05c9d405cd0b2255b7"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/shell-ready.json",
+                      "Bytes":  1051,
+                      "Sha256":  "d47193aabc509bc19c3519389eefab14bf3cb3aac196d291c4165cca241d033e"
+                  },
+                  {
+                      "Path":  "suite/cmd-empty/stream.bin",
+                      "Bytes":  291,
+                      "Sha256":  "d81295100e7a608574036a1d15e55f1d971bfcccf5c5c7b68b37d1925ac82e2b"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/continued-command.txt",
+                      "Bytes":  10,
+                      "Sha256":  "403f063c059fefed791601c8c692bfee58e31030c59cbcd48ccd9910d7a0ea10"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/event-observation.json",
+                      "Bytes":  1230,
+                      "Sha256":  "4563923d0de7ff412d462b0e0814ea4da7f1e73df7f3a586e254964cd2a4c1aa"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/fixture-last.json",
+                      "Bytes":  1222,
+                      "Sha256":  "bbf478d7fa7a92bb4c8eea24fe5df3bcb33ca1d2fe88ceec6be774ae8fa08351"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/host-1-request.json",
+                      "Bytes":  2818,
+                      "Sha256":  "5cba2ef4d82d8e40a587f2e697949ab092a29362b50f9c4ec24c4eab8fe03fdd"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/host-2-request.json",
+                      "Bytes":  10883,
+                      "Sha256":  "a78506b06dd29bc6a02c0f51b3ace252cdfd1f3d582fa8acb85b496c5fb7ed44"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/host-3-request.json",
+                      "Bytes":  2821,
+                      "Sha256":  "56d98ff319e52ba14cd034d4a1aa9568d4e585db73ba0d0b1a45147ab751557e"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/host-discovery.json",
+                      "Bytes":  298,
+                      "Sha256":  "61c4c0c3f07e00be690f1f46778e650318cc279d8d8795ac7366589d4350bb32"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/host-hello.json",
+                      "Bytes":  2500,
+                      "Sha256":  "62410fd304d4ff3dba293dbb7bf4ebe8121f7c7326124d3fa40b8a1a9848e151"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/host-identity.json",
+                      "Bytes":  1746,
+                      "Sha256":  "6f48558fec5e159243b693bb873d5a3dd018fc38cd68c8d7e5adf6f4edc1e365"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/output-trace.json",
+                      "Bytes":  1067,
+                      "Sha256":  "3f5471c8da4b7e76cf7cf42299e9b7f8c91d78e10c30e7ea5d8984c331f621ad"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/prompt-generations.json",
+                      "Bytes":  221,
+                      "Sha256":  "f11a3bb18352e7419e6b01c4594dec132da1b8bdfc13f9936ad292ef957260a7"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/shell.json",
+                      "Bytes":  169,
+                      "Sha256":  "6e43175b403419f9a41c3bbc2d8e9b4b917a5ed954a90a05c9d405cd0b2255b7"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/shell-ready.json",
+                      "Bytes":  1051,
+                      "Sha256":  "f485ab6e0faa1659012cbfe6057cca2cbe55b6e7cff813263a169e4bdc6c6768"
+                  },
+                  {
+                      "Path":  "suite/cmd-partial/stream.bin",
+                      "Bytes":  435,
+                      "Sha256":  "6920c4237335937f5f259a5632bc44d07b3c3bcb14750f8329146aab119c5b25"
+                  },
+                  {
+                      "Path":  "suite/completed-before-cancel/after.json",
+                      "Bytes":  1359,
+                      "Sha256":  "2eb57b18738b6e4f8d9df82f419368c8b36f26997f48109a3f6bab470f13686f"
+                  },
+                  {
+                      "Path":  "suite/completed-before-cancel/before.json",
+                      "Bytes":  1122,
+                      "Sha256":  "f45b70e54d759ed22133d88e08390a6ed24305fe72ccc6f05878d8d8b1cabac9"
+                  },
+                  {
+                      "Path":  "suite/completed-before-cancel/completed-next.json",
+                      "Bytes":  1607,
+                      "Sha256":  "cd8508e86dc974c26db8c445df4b679fb3cb2b3a0adbc56f7ffcad2381974a36"
+                  },
+                  {
+                      "Path":  "suite/completed-before-cancel/fixture-last.json",
+                      "Bytes":  1607,
+                      "Sha256":  "c08f99126f84a693eec94df865b74299289d3e5b37badeb8ae7fbe2fdddea3e9"
+                  },
+                  {
+                      "Path":  "suite/completed-before-cancel/host-1-request.json",
+                      "Bytes":  2816,
+                      "Sha256":  "898ad7bfc7b8742147aff99f4fe4769be986b8ed7962378cbe6738eb914cb50c"
+                  },
+                  {
+                      "Path":  "suite/completed-before-cancel/host-2-request.json",
+                      "Bytes":  11144,
+                      "Sha256":  "39bb0a6106f321b9e81c299c6bdcfc26e53adb042dc223b06fc4019daee3b61a"
+                  },
+                  {
+                      "Path":  "suite/completed-before-cancel/host-3-request.json",
+                      "Bytes":  2819,
+                      "Sha256":  "76fa108898382427f519773de6108b248c3fd80e6561cc8d52e1d4e9c38ad4b4"
+                  },
+                  {
+                      "Path":  "suite/completed-before-cancel/host-discovery.json",
+                      "Bytes":  298,
+                      "Sha256":  "bb4f53ba5d20ed51baa79f0735b8f6bc2fefd399cc4192b99d7931960279f94b"
+                  },
+                  {
+                      "Path":  "suite/completed-before-cancel/host-hello.json",
+                      "Bytes":  2499,
+                      "Sha256":  "f567fbbd9308b451071c43e96bc11a8d855aa2530ca2bba64994562a0177bd16"
+                  },
+                  {
+                      "Path":  "suite/completed-before-cancel/host-identity.json",
+                      "Bytes":  1747,
+                      "Sha256":  "92dcd56d8be5cbe3a648840d7a43e57bf560740a00daf0b0a50c849f370183e4"
+                  },
+                  {
+                      "Path":  "suite/completed-before-cancel/output-trace.json",
+                      "Bytes":  836,
+                      "Sha256":  "64e9485344c2d5a90e23b44e49845d5b9eaa4b29a4b2e439fbd3ac8ebbae8aa9"
+                  },
+                  {
+                      "Path":  "suite/completed-before-cancel/stream.bin",
+                      "Bytes":  173,
+                      "Sha256":  "19c4b9e6bfc002d416a8f3d992ea641fcd5b2fecea3096b7a40a0a273f97a465"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/cancel-1-next.json",
+                      "Bytes":  1608,
+                      "Sha256":  "66c50bd429ed50875bc4a69bc9a4cc1453e14968127609c969441afa26357380"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/cancel-1-pending.json",
+                      "Bytes":  977,
+                      "Sha256":  "154e8641a9838c0bd706eab321e4995b7e5d407ce1e572807e0c27460d2be9d8"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/cancel-1-read.json",
+                      "Bytes":  1341,
+                      "Sha256":  "150865a4663b94dd135ca6cfab1f9292b311b00a1d06514dde53db848f5d8057"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/cancel-2-next.json",
+                      "Bytes":  2353,
+                      "Sha256":  "8178b09cba2d143ee22cea9aae961177b7a5148ecd7a16a5cd4fd02f2241ccbe"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/cancel-2-pending.json",
+                      "Bytes":  1709,
+                      "Sha256":  "5ebd88b6d0edc97e1dc45bc1b3bf582dcc214d49f7c260e495c093434f7866df"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/cancel-2-read.json",
+                      "Bytes":  2084,
+                      "Sha256":  "25a48512c6ffe028ef43a60c47f2a5ac07ad2c5c761100ad0b9b49a459764c84"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/cancel-3-next.json",
+                      "Bytes":  3100,
+                      "Sha256":  "3bbd37854cf1a27a694d7110af76a741ffb2a7738b771797bbfe1ae5024092ef"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/cancel-3-pending.json",
+                      "Bytes":  2455,
+                      "Sha256":  "437bf92b97f673194f36939232f1a503d7dd7ef64d095a050e8d2422573e564e"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/cancel-3-read.json",
+                      "Bytes":  2831,
+                      "Sha256":  "b163c385e2d792c923a83f7f3c95e0875c7fca2c35450416376d18930aa356b8"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/fixture-last.json",
+                      "Bytes":  3100,
+                      "Sha256":  "725a321553f9c11e2dd836727d48b56774ab44e331ab3a964bdaba8f60cfdbad"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-10-request.json",
+                      "Bytes":  2834,
+                      "Sha256":  "f0137d56c636f9c4c0aa68a28adb5f49871c4b12c1a9a6c1b70c329cc496abd8"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-11-request.json",
+                      "Bytes":  2823,
+                      "Sha256":  "4ff3086e9c502bb7908846b2d3c11412b4429f93d21cc1d72b6de83146f046eb"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-1-request.json",
+                      "Bytes":  2820,
+                      "Sha256":  "1aa2170fb02e0b498c559bd83cded718ef320e0bf7aaed5012e0f43a618b5d1f"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-2-request.json",
+                      "Bytes":  8100,
+                      "Sha256":  "d58c0e8028c5b5d5835cf8b5c5917d11f08dff64e6b8ea0809f476214c9586b4"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-3-request.json",
+                      "Bytes":  2842,
+                      "Sha256":  "3ef59074d0526db41bb96b0e9404a64b544ebcbee4c06041530bcdce3b42b920"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-4-request.json",
+                      "Bytes":  2832,
+                      "Sha256":  "4d212285ba94ab82d0fd0c2440cc2875845cd72570a239779246a9d9966c2621"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-5-request.json",
+                      "Bytes":  10979,
+                      "Sha256":  "ff174463eee3dc9803b8c4dfc21e5fa6555d232803a1b08d9e6fad9ec68637fb"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-6-request.json",
+                      "Bytes":  2834,
+                      "Sha256":  "683d9503c4e84233d91bd4ef0681eadf5b4c121ef4781ccdd8e7c5959c17f976"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-7-request.json",
+                      "Bytes":  12454,
+                      "Sha256":  "99edc87575c5a495851f15884e340423d3efff58330f1cba0eede308d562f263"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-8-request.json",
+                      "Bytes":  2834,
+                      "Sha256":  "703a8e30c374cc82281d4e283ff57a4aae059c2f88ca13b5d834d468f5771df4"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-9-request.json",
+                      "Bytes":  13947,
+                      "Sha256":  "063e13a2dd539e58048d12a68efc7a61a26aba9522a02fb5527b8e3e6d6de355"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-discovery.json",
+                      "Bytes":  298,
+                      "Sha256":  "6232b2adad0a2b8f4261e774fbdfe54a185f6e86be82f0641364846101840d5e"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-hello.json",
+                      "Bytes":  2501,
+                      "Sha256":  "4077e01eb0d2e1434fa970336f9adc7a58eb25f134a5bad0462d1d7f5830791f"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/host-identity.json",
+                      "Bytes":  1747,
+                      "Sha256":  "856aadda8d53a038254f6747bb550c7bdf6b69a9c255951c976a161ef6abbcde"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/output-trace.json",
+                      "Bytes":  1199,
+                      "Sha256":  "b4a96ee9c0277d645cc65ea56af8ba247a9d891ab201c817bcc57f534e0feac9"
+                  },
+                  {
+                      "Path":  "suite/cooked-repeated/stream.bin",
+                      "Bytes":  286,
+                      "Sha256":  "78e8dd644cbeb1df227a95d612201d68ec233b386e33339900e410ce6179f8e0"
+                  },
+                  {
+                      "Path":  "suite/default-handler/default.json",
+                      "Bytes":  47,
+                      "Sha256":  "cf6d315873b8b1aaa3ec270faecca0fee53fedbbc94d54d2cb6a8caa619a3d74"
+                  },
+                  {
+                      "Path":  "suite/default-handler/fixture-last.json",
+                      "Bytes":  854,
+                      "Sha256":  "98ee3d0c68d77ac7f8ce9efbb8f97a7646d68f4e880322389998f3d228c1d309"
+                  },
+                  {
+                      "Path":  "suite/default-handler/host-1-request.json",
+                      "Bytes":  2817,
+                      "Sha256":  "4a174cfe08a1cb731c9b01a775169f72c62d2e9a3f0b84628d044ec571ce192d"
+                  },
+                  {
+                      "Path":  "suite/default-handler/host-2-request.json",
+                      "Bytes":  9504,
+                      "Sha256":  "0b6c6551b505e8ac89a64780f54e4d3ec76f1b17200f41e0fa6c619a0dd4a8f8"
+                  },
+                  {
+                      "Path":  "suite/default-handler/host-discovery.json",
+                      "Bytes":  294,
+                      "Sha256":  "8a589de437673de0dc71e305944c9873deedea4a7a517084f8a75215df02fa5b"
+                  },
+                  {
+                      "Path":  "suite/default-handler/host-hello.json",
+                      "Bytes":  2498,
+                      "Sha256":  "24a4b4eacfafcdd9fba83788fb7b3a287347dbd7a78255436694967de069a414"
+                  },
+                  {
+                      "Path":  "suite/default-handler/host-identity.json",
+                      "Bytes":  1744,
+                      "Sha256":  "ca524d1cbac9bcf43ab9c43e1b4d9c023a3352ac5fdf6f19e6e7513824d74256"
+                  },
+                  {
+                      "Path":  "suite/default-handler/output-trace.json",
+                      "Bytes":  306,
+                      "Sha256":  "6461d3932c74db11e9b18f35b446eb85f83ba58a25cc2fba6bb05f3aa43cfe7f"
+                  },
+                  {
+                      "Path":  "suite/default-handler/stream.bin",
+                      "Bytes":  84,
+                      "Sha256":  "12ef5d54e51784fd25b49f691a7d97f02cbc43a69cea2a17bf61c5d9e3e5ec5f"
+                  },
+                  {
+                      "Path":  "suite/host-key-record/fixture-last.json",
+                      "Bytes":  1159,
+                      "Sha256":  "ac59b9c9a918efd501470e842be967f784db31d5eb7caab419f9d26a2d9ef67b"
+                  },
+                  {
+                      "Path":  "suite/host-key-record/host-1-request.json",
+                      "Bytes":  2818,
+                      "Sha256":  "8a95f7772b7f2a3a156318096001a1099f4378d0946caedc44a5ea852decbe85"
+                  },
+                  {
+                      "Path":  "suite/host-key-record/host-2-request.json",
+                      "Bytes":  10800,
+                      "Sha256":  "6f283cd4336303e9ff027bc231edac0cd5a3458c886860ba50e4fcbd5ec9ba36"
+                  },
+                  {
+                      "Path":  "suite/host-key-record/host-3-request.json",
+                      "Bytes":  2819,
+                      "Sha256":  "8bd07abf24e58ab59ece7a4375786597fbbfbee936f54caac0ee403176130cf6"
+                  },
+                  {
+                      "Path":  "suite/host-key-record/host-discovery.json",
+                      "Bytes":  298,
+                      "Sha256":  "e2a12e989a4e590f1b76dba5f278b031486ca5dbae943479a0f3187f80d53f0b"
+                  },
+                  {
+                      "Path":  "suite/host-key-record/host-hello.json",
+                      "Bytes":  2500,
+                      "Sha256":  "c226d959212bb36d4138504ea1c35451f8e73bdee67f6e87b5ffd36a440f51dc"
+                  },
+                  {
+                      "Path":  "suite/host-key-record/host-identity.json",
+                      "Bytes":  1747,
+                      "Sha256":  "2df68f188687f6c65b27d6fd4726e5b0c291b416c1bb53aafa98a4a19dbe551b"
+                  },
+                  {
+                      "Path":  "suite/host-key-record/host-key-record.json",
+                      "Bytes":  1159,
+                      "Sha256":  "ebe437e37db73589f38f19bd682a8bc8d6128a4614a9fd1979376662543fb5dd"
+                  },
+                  {
+                      "Path":  "suite/host-key-record/output-trace.json",
+                      "Bytes":  515,
+                      "Sha256":  "3a7ace48ec6fe636a35aa75fcb6231b9408d600adb5dd932ffc48a1ecdc98add"
+                  },
+                  {
+                      "Path":  "suite/host-key-record/stream.bin",
+                      "Bytes":  99,
+                      "Sha256":  "691012577ce49c65d37c3c0c0ab0f6fc756ec239eb0c385a335e893eec089289"
+                  },
+                  {
+                      "Path":  "suite/lifetime-1.json",
+                      "Bytes":  408,
+                      "Sha256":  "9936c98ff6b2cf4263819a6168e97cb277ce750b29d1730e4cf833654709315f"
+                  },
+                  {
+                      "Path":  "suite/lifetime-10.json",
+                      "Bytes":  408,
+                      "Sha256":  "4f60a8d88c01990c911eae9e4d44814b1924b148dd69ad0d406f8b53f35af724"
+                  },
+                  {
+                      "Path":  "suite/lifetime-11.json",
+                      "Bytes":  429,
+                      "Sha256":  "c85282981a1a96e20b61dc1de3021b32482ac659ca3a993c4e7e64e773957e10"
+                  },
+                  {
+                      "Path":  "suite/lifetime-12.json",
+                      "Bytes":  408,
+                      "Sha256":  "2482107a97c2b67ab51d4e2374b32382bd78a185ff93cea906c876ebf1fcc824"
+                  },
+                  {
+                      "Path":  "suite/lifetime-13.json",
+                      "Bytes":  429,
+                      "Sha256":  "71b98f225065e8ab8ae0ec4e75bc2cfabd0a9295183abd7b086314c5ed943868"
+                  },
+                  {
+                      "Path":  "suite/lifetime-14.json",
+                      "Bytes":  407,
+                      "Sha256":  "cffd14651ec0c3913edac18cf591d45e6e6db35d929a8a690b5ffddb4e51ab83"
+                  },
+                  {
+                      "Path":  "suite/lifetime-15.json",
+                      "Bytes":  428,
+                      "Sha256":  "30ba6eeae95e20efec03f78d0a1d2ab1dbbe03d51c84cf82fffac5f8ab714c9a"
+                  },
+                  {
+                      "Path":  "suite/lifetime-16.json",
+                      "Bytes":  408,
+                      "Sha256":  "e919a5fb90f7c26693a9f04c56003974a22a59e8369651ef301bde92a7c9fa21"
+                  },
+                  {
+                      "Path":  "suite/lifetime-17.json",
+                      "Bytes":  429,
+                      "Sha256":  "0fc14e91ab2831e8ab91fbdc2145eb97362716e0cc0c3d43ddbbf63819452df5"
+                  },
+                  {
+                      "Path":  "suite/lifetime-18.json",
+                      "Bytes":  408,
+                      "Sha256":  "1f94dc133ac2af417c408e9b71d93944d73f1cc9ab426dd8d8d1bc8826252194"
+                  },
+                  {
+                      "Path":  "suite/lifetime-2.json",
+                      "Bytes":  408,
+                      "Sha256":  "876e62352e2cf2a3960fd3b1f234c1a873a33ae85db6b69fe28eb990ab7101a9"
+                  },
+                  {
+                      "Path":  "suite/lifetime-3.json",
+                      "Bytes":  408,
+                      "Sha256":  "143e2796e0bab80ac6c9513ae47d417550cb1a4d3e5464c2bda39f9f54a5c683"
+                  },
+                  {
+                      "Path":  "suite/lifetime-4.json",
+                      "Bytes":  408,
+                      "Sha256":  "1a4e1d40e1753b89aaee77d64c3a9f30882dc3c2d5348464304f0f8f277804dc"
+                  },
+                  {
+                      "Path":  "suite/lifetime-5.json",
+                      "Bytes":  408,
+                      "Sha256":  "030073c751c271c6df74a38ab7c910c31af14c33804ecd5f00b2f73104a94421"
+                  },
+                  {
+                      "Path":  "suite/lifetime-6.json",
+                      "Bytes":  407,
+                      "Sha256":  "7c1baf4c6c190d2c370df9338d0017063fb596bd46dc39c7c9d610e3a47aa924"
+                  },
+                  {
+                      "Path":  "suite/lifetime-7.json",
+                      "Bytes":  408,
+                      "Sha256":  "cfeca1a7ce22bf616ec20083f86c987b99b0ab15952884c21d9ce96ea3f4c2a1"
+                  },
+                  {
+                      "Path":  "suite/lifetime-8.json",
+                      "Bytes":  408,
+                      "Sha256":  "a1b747bb97d013360ee8bf3f794fcd594ea0533c2f8f3b088b244cee4625fd40"
+                  },
+                  {
+                      "Path":  "suite/lifetime-9.json",
+                      "Bytes":  429,
+                      "Sha256":  "78a4ab170ffe3ec0f6abb91d37314c7798810cec64c5ddc251f981be0492118d"
+                  },
+                  {
+                      "Path":  "suite/no-pending-read/fixture-last.json",
+                      "Bytes":  1360,
+                      "Sha256":  "870ef990c2accb83ab8cac6392e1cb2df9d641a0e0108a77b13b9ed65c8a004f"
+                  },
+                  {
+                      "Path":  "suite/no-pending-read/host-1-request.json",
+                      "Bytes":  2820,
+                      "Sha256":  "d0870a53079a40fff736397dd7bb22a79c8579d75b8a9d19c5cad86c676aeb98"
+                  },
+                  {
+                      "Path":  "suite/no-pending-read/host-2-request.json",
+                      "Bytes":  10607,
+                      "Sha256":  "0e711ed6c57de80215396675e3c2623ba36cc4bda69bb807de006f00f718082a"
+                  },
+                  {
+                      "Path":  "suite/no-pending-read/host-3-request.json",
+                      "Bytes":  2821,
+                      "Sha256":  "7a85186e05237c3ab35b3c751cff4e9392c2b763219bbd7c941a46652cf9651f"
+                  },
+                  {
+                      "Path":  "suite/no-pending-read/host-discovery.json",
+                      "Bytes":  298,
+                      "Sha256":  "5477d2320d1c5397aca0cc101f743baebcaf17b7a96273ebf620683740f1b3ae"
+                  },
+                  {
+                      "Path":  "suite/no-pending-read/host-hello.json",
+                      "Bytes":  2501,
+                      "Sha256":  "a15662c7016b14f1aa3d6752c2fff477de35d4276327354382af83def6220a62"
+                  },
+                  {
+                      "Path":  "suite/no-pending-read/host-identity.json",
+                      "Bytes":  1746,
+                      "Sha256":  "e6596fc879c0f9a36fb3ad3b197835e2c29b4d41adfae865de79bd22eb3d48cb"
+                  },
+                  {
+                      "Path":  "suite/no-pending-read/no-read.json",
+                      "Bytes":  1091,
+                      "Sha256":  "2b9ce1b7f0c540cd8dfa26b98805621156ccf70523a0c9d4336734d285bd3b87"
+                  },
+                  {
+                      "Path":  "suite/no-pending-read/no-read-next.json",
+                      "Bytes":  1360,
+                      "Sha256":  "de2ea17401e5d8a660cf18051d02a39b895b4e93d0fe71a19bcba87075245235"
+                  },
+                  {
+                      "Path":  "suite/no-pending-read/output-trace.json",
+                      "Bytes":  406,
+                      "Sha256":  "20221419ef9075c136ef53a976d50bd990dec48c8877d39a8108e936fb429fc2"
+                  },
+                  {
+                      "Path":  "suite/no-pending-read/stream.bin",
+                      "Bytes":  127,
+                      "Sha256":  "ca0334b04a29a9a51deedfaba0e552aa3ab7c74f758522edec7947f39b2b92fa"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/continued-command.txt",
+                      "Bytes":  8,
+                      "Sha256":  "628db0c7598820b101769164f5228a5096e4f531ee71ee7e5e31d734dd38fe64"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/event-observation.json",
+                      "Bytes":  1230,
+                      "Sha256":  "52d1a98383d77d7da3b6579b59ac0d9f16f7198844012de3fca7074bcf7b6fc5"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/fixture-last.json",
+                      "Bytes":  1222,
+                      "Sha256":  "2a200fba2011c38d004363a3a90b720d1a30483ac668f50eb8ca7e798e1e4710"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/host-1-request.json",
+                      "Bytes":  2819,
+                      "Sha256":  "02a7878d847cceead9c76a9133f9df82b13995279a5d3ae93a83859f99ff276c"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/host-2-request.json",
+                      "Bytes":  10870,
+                      "Sha256":  "f1839a26c02daf674b06bcf751b104f62b7a9789eb297bf50fb902aa21fc4197"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/host-3-request.json",
+                      "Bytes":  2822,
+                      "Sha256":  "c6c574e73baa77f48ad3e4b9cc4e34b64f14eccb9b02a05834e2f9c7519fd28a"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/host-discovery.json",
+                      "Bytes":  294,
+                      "Sha256":  "8828a50dad97f19764b2f5098dc21704c46e660d812dd9afb49d4e016e784ff8"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/host-hello.json",
+                      "Bytes":  2499,
+                      "Sha256":  "8502c37feed4e5d497b728c21031035645954d51ccde4866190b896828bb2311"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/host-identity.json",
+                      "Bytes":  1746,
+                      "Sha256":  "0821986c517c29b820022d9e4aec85cbf3dea5203f67a9189a8e73baa40f11c9"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/output-trace.json",
+                      "Bytes":  1052,
+                      "Sha256":  "5d2d407ff8cade2ad423029be10c661190c3d9b97ac8402cf03ba89cd31ec4f8"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/prompt-generations.json",
+                      "Bytes":  195,
+                      "Sha256":  "d8ea9d2599feaad2848e794e7cc68d1e797b33898a7d3786a1bd812a8ea48880"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/shell.json",
+                      "Bytes":  181,
+                      "Sha256":  "6f5edb693cfdcbd130352610909117ff0a900b9faa95a4d12a3b54145b56a072"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/shell-identity.txt",
+                      "Bytes":  28,
+                      "Sha256":  "947d183c385d32af52e9fa3412c8ca54c36800349fc4896b038e4f0c2ed52dab"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/shell-ready.json",
+                      "Bytes":  1051,
+                      "Sha256":  "707754b002ba7c03a23e188f62903819bae5c6c2db86ef63557b48427f21c113"
+                  },
+                  {
+                      "Path":  "suite/powershell-empty/stream.bin",
+                      "Bytes":  671,
+                      "Sha256":  "31f5eb04e52c4f7a01d628f9750c93de35fb7addef3ec17a4d0dbcf7b778b1d4"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/continued-command.txt",
+                      "Bytes":  8,
+                      "Sha256":  "628db0c7598820b101769164f5228a5096e4f531ee71ee7e5e31d734dd38fe64"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/event-observation.json",
+                      "Bytes":  1230,
+                      "Sha256":  "e18aaee2112753ca1c5e1285dbd04541e79f24816a42ede72503dd9396a1cda4"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/fixture-last.json",
+                      "Bytes":  1222,
+                      "Sha256":  "15368fbca8b9f1b85cc30b82ea31cd97c1b30d4a6d65288ce374a87c6e7478aa"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/host-1-request.json",
+                      "Bytes":  2818,
+                      "Sha256":  "8da4e9aa531095ea92c66fc3cb34ac395fb7a1f06bb2f0deac77cc7bba350329"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/host-2-request.json",
+                      "Bytes":  10883,
+                      "Sha256":  "b7cfbaf21141adb7659094e270c119ccc994c691df1e2c4d753598cd9d7f9a02"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/host-3-request.json",
+                      "Bytes":  2821,
+                      "Sha256":  "bbd4b9154c82419cb228b6f1edb9d25581e07c81b0b2b6847d756bd3aa26e14c"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/host-discovery.json",
+                      "Bytes":  298,
+                      "Sha256":  "21ccac0014587cdfa93498482417bb36f3fdd947e57631468eaa5edf688817c9"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/host-hello.json",
+                      "Bytes":  2500,
+                      "Sha256":  "bac0d9c80bb856bc80d4a4722d19a536c060a40a34ec11441bb0c7689253cc74"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/host-identity.json",
+                      "Bytes":  1746,
+                      "Sha256":  "48a38bb05ab9c6b273627e94ff5a67c1ff881bcbe60fc35e3cc1d614f538ef5d"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/output-trace.json",
+                      "Bytes":  1132,
+                      "Sha256":  "53aab11e16dcbd6dff9c2204d350be1e2d5b9cc821eb9687ef89395c2f93817d"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/prompt-generations.json",
+                      "Bytes":  195,
+                      "Sha256":  "01ff7f0fbeb419a5560a9b0867bf04693d2850bab56a193ea3403731fc6f2558"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/shell.json",
+                      "Bytes":  181,
+                      "Sha256":  "6f5edb693cfdcbd130352610909117ff0a900b9faa95a4d12a3b54145b56a072"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/shell-identity.txt",
+                      "Bytes":  28,
+                      "Sha256":  "947d183c385d32af52e9fa3412c8ca54c36800349fc4896b038e4f0c2ed52dab"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/shell-ready.json",
+                      "Bytes":  1051,
+                      "Sha256":  "0ac91accb1c4277cd0f615ff4847ea5755944441fcec65ed9792e538c997826d"
+                  },
+                  {
+                      "Path":  "suite/powershell-partial/stream.bin",
+                      "Bytes":  826,
+                      "Sha256":  "bcccf0102cddde3e5646a5c641df7ecaca9935add9f8bc19e5f5b1271ca299e1"
+                  },
+                  {
+                      "Path":  "suite/raw-input-guard/fixture-last.json",
+                      "Bytes":  1280,
+                      "Sha256":  "7fbab172e6f9ae0a817ed7f1805e09fc91b2d923e42162042145eb3f6ed7149c"
+                  },
+                  {
+                      "Path":  "suite/raw-input-guard/host-1-request.json",
+                      "Bytes":  2820,
+                      "Sha256":  "d7793d1d89dd57302f5e8507b67a4c35d008da60c2b27a9954922302af59d23a"
+                  },
+                  {
+                      "Path":  "suite/raw-input-guard/host-2-request.json",
+                      "Bytes":  2821,
+                      "Sha256":  "d28d9bed573e9423087225d7370fa7a127d08f9289f72b8593729fb44275a946"
+                  },
+                  {
+                      "Path":  "suite/raw-input-guard/host-discovery.json",
+                      "Bytes":  298,
+                      "Sha256":  "05a50243a9fbd95af9e5d61b1ad3de02f5314b05ea5fc258b8dd6f13d6de25c4"
+                  },
+                  {
+                      "Path":  "suite/raw-input-guard/host-hello.json",
+                      "Bytes":  2501,
+                      "Sha256":  "4caa73130ccd7cefcc1f28df1a4c75d0a18ac67eca9e8182427e8bfb5d328f94"
+                  },
+                  {
+                      "Path":  "suite/raw-input-guard/host-identity.json",
+                      "Bytes":  1747,
+                      "Sha256":  "24962653e6d2d4c52842ac19ba42e64dc7e84d9c2cf9afff9617647151a4f9c9"
+                  },
+                  {
+                      "Path":  "suite/raw-input-guard/output-trace.json",
+                      "Bytes":  417,
+                      "Sha256":  "505b77397eb5b7a0dba6721442b286772d22f8e61abc1dcc3418730a6eb8ae2c"
+                  },
+                  {
+                      "Path":  "suite/raw-input-guard/raw.json",
+                      "Bytes":  1280,
+                      "Sha256":  "85d4448103c0a5152e52cbb12ce11911a70e9d345805a84c789e5894899b5a09"
+                  },
+                  {
+                      "Path":  "suite/raw-input-guard/stream.bin",
+                      "Bytes":  99,
+                      "Sha256":  "9b618351e013058c10863045b28366064aaf2ab08a25de8fe353b54400493c53"
+                  },
+                  {
+                      "Path":  "suite/receipt-without-ack/ambiguous-next.json",
+                      "Bytes":  1607,
+                      "Sha256":  "7c4be87da9b6b5c868b453e1c80599f4cba181b1cdb4619ea9d2752f015a34fe"
+                  },
+                  {
+                      "Path":  "suite/receipt-without-ack/ambiguous-read.json",
+                      "Bytes":  1340,
+                      "Sha256":  "8c0b496461160450bf20b9c8a95b76db9e13b3f29450470e3a7c06d5f583bae3"
+                  },
+                  {
+                      "Path":  "suite/receipt-without-ack/fixture-last.json",
+                      "Bytes":  1607,
+                      "Sha256":  "cbe3833121774137b7ebe0fc9f28ed21d2cc3a8c8c3494393cf3624e5c3d10b9"
+                  },
+                  {
+                      "Path":  "suite/receipt-without-ack/host-1-request.json",
+                      "Bytes":  2818,
+                      "Sha256":  "77c2d923e3089fa5ebae6f35a89cd47d608fca2538b862f245858b10f5f48763"
+                  },
+                  {
+                      "Path":  "suite/receipt-without-ack/host-2-request.json",
+                      "Bytes":  5149,
+                      "Sha256":  "0e5216028a11404806830524e62cfdb1b9311e7fcb62ba00228e4879362ef003"
+                  },
+                  {
+                      "Path":  "suite/receipt-without-ack/host-ambiguity.json",
+                      "Bytes":  120,
+                      "Sha256":  "d6424cb2cf7e674f54889e1217d34213eedf0e368d3851ac2808e588966873d3"
+                  },
+                  {
+                      "Path":  "suite/receipt-without-ack/host-discovery.json",
+                      "Bytes":  298,
+                      "Sha256":  "1f92575c9350e086e50212287b579e5f7ce2e85a43d6eeff9dbb0e35b7614f68"
+                  },
+                  {
+                      "Path":  "suite/receipt-without-ack/host-hello.json",
+                      "Bytes":  2500,
+                      "Sha256":  "3702ad750736be7790675e9084af9c06f95ca6ac26f17ccbb940841300802fee"
+                  },
+                  {
+                      "Path":  "suite/receipt-without-ack/host-identity.json",
+                      "Bytes":  1746,
+                      "Sha256":  "a9887b13b290f2485ebcbe5e93e28f94a2a0a6a1d60419ed325c557ad78b215d"
+                  },
+                  {
+                      "Path":  "suite/receipt-without-ack/output-trace.json",
+                      "Bytes":  638,
+                      "Sha256":  "9e077c3adb8f2cba03e2f242a89b23d3b66ea4fac36b19854fd4f1308f810662"
+                  },
+                  {
+                      "Path":  "suite/receipt-without-ack/stream.bin",
+                      "Bytes":  155,
+                      "Sha256":  "e5b9c8ed3e3d17841cbd1627697731d5aed877f02eabc5a053f483a83cf93089"
+                  },
+                  {
+                      "Path":  "suite/shell-owner-exit/fixture-last.json",
+                      "Bytes":  993,
+                      "Sha256":  "3f851aed338d69d109777aac8c39f6bad0a2809ae1d43e5a2875407bc82276a4"
+                  },
+                  {
+                      "Path":  "suite/shell-owner-exit/host-1-request.json",
+                      "Bytes":  2814,
+                      "Sha256":  "51b1a217261583546f965bd7b6cd80bc574d9f855272c371b927a37ae5ce60d0"
+                  },
+                  {
+                      "Path":  "suite/shell-owner-exit/host-discovery.json",
+                      "Bytes":  298,
+                      "Sha256":  "f59f8c05e564ee1a3725fe56540d271c62c828f06a15d58f93acca95abea8843"
+                  },
+                  {
+                      "Path":  "suite/shell-owner-exit/host-hello.json",
+                      "Bytes":  2498,
+                      "Sha256":  "3329fcb88f687383f82fac7d4412788fb4fa57d533925741e3031f9088c063ad"
+                  },
+                  {
+                      "Path":  "suite/shell-owner-exit/host-identity.json",
+                      "Bytes":  1747,
+                      "Sha256":  "e10f6d2448de850163cee4a5752e186ab192f9596379d694dd017dbf1a0ab525"
+                  },
+                  {
+                      "Path":  "suite/shell-owner-exit/output-trace.json",
+                      "Bytes":  511,
+                      "Sha256":  "252ddc8e37f7dd2d4e003fa34db8063480c40e9a35ea99cdcd14a65a62351f25"
+                  },
+                  {
+                      "Path":  "suite/shell-owner-exit/owner-exit.json",
+                      "Bytes":  105,
+                      "Sha256":  "3a0f404c7ad3fcce6d97842d1e89b6ba6d0be21e1ae6d0d671c711d112a68213"
+                  },
+                  {
+                      "Path":  "suite/shell-owner-exit/stream.bin",
+                      "Bytes":  109,
+                      "Sha256":  "0534fcc973069ef23750fa9599042d585ed43290f8a70062350decabcc388bec"
+                  }
+              ]
+}

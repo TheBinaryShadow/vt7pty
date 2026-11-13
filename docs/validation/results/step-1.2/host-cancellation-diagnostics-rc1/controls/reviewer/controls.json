@@ -1,0 +1,14 @@
+[
+  {
+    "Control": "wrong-host-pid",
+    "Rejected": true,
+    "OriginalNativeStatusStillPass": true,
+    "Reason": "H3 diagnostic evidence: nested trace context/clock"
+  },
+  {
+    "Control": "false-late-pass",
+    "Rejected": true,
+    "OriginalNativeStatusStillPass": true,
+    "Reason": "H3 diagnostic evidence: late observation cannot upgrade original failure"
+  }
+]

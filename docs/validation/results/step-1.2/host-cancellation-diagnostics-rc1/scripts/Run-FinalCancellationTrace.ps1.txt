@@ -1,0 +1,26 @@
+$ErrorActionPreference='Stop'
+$taskRoot='D:\Git\vt7pty'
+$taskBase=Join-Path $taskRoot 'artifacts\fidelity\h3-diagnostic-final-native'
+if(Test-Path -LiteralPath $taskBase) { throw 'Final native evidence already exists' }
+[IO.Directory]::CreateDirectory($taskBase) | Out-Null
+foreach($taskConfig in @('Debug','Release')) {
+    $taskCase=Join-Path $taskBase $taskConfig.ToLowerInvariant()
+    [IO.Directory]::CreateDirectory((Join-Path $taskCase 'bin')) | Out-Null
+    [IO.Directory]::CreateDirectory((Join-Path $taskCase 'native')) | Out-Null
+    foreach($taskName in @('HostCancellationTraceProbe.exe','HostCancellationTraceHook.dll')) { Copy-Item -LiteralPath (Join-Path $taskRoot ('artifacts\bin\x64\'+$taskConfig+'\'+$taskName)) -Destination (Join-Path $taskCase ('bin\'+$taskName)) }
+    foreach($taskName in @('VT7Pty.dll','VT7Pty-Agent.exe')) { Copy-Item -LiteralPath (Join-Path $taskRoot ('artifacts\fidelity\inspection-host-cancellation-rc1\bin\'+$taskName)) -Destination (Join-Path $taskCase ('bin\'+$taskName)) }
+    $taskStart=New-Object Diagnostics.ProcessStartInfo
+    $taskStart.FileName=Join-Path $taskCase 'bin\HostCancellationTraceProbe.exe'
+    $taskStart.WorkingDirectory=Join-Path $taskCase 'bin';$taskStart.Arguments='"'+(Join-Path $taskCase 'native')+'"'
+    $taskStart.UseShellExecute=$false;$taskStart.CreateNoWindow=$true;$taskStart.RedirectStandardOutput=$true;$taskStart.RedirectStandardError=$true
+    $taskProcess=New-Object Diagnostics.Process;$taskProcess.StartInfo=$taskStart
+    [void]$taskProcess.Start()
+    if(-not $taskProcess.WaitForExit(300000)) { $taskProcess.Kill();throw 'Final native trace deadline' }
+    $taskStdout=$taskProcess.StandardOutput.ReadToEnd();$taskStderr=$taskProcess.StandardError.ReadToEnd();$taskExit=$taskProcess.ExitCode;$taskProcess.Dispose()
+    [IO.File]::WriteAllText((Join-Path $taskCase 'stdout.txt'),$taskStdout)
+    [IO.File]::WriteAllText((Join-Path $taskCase 'stderr.txt'),$taskStderr)
+    if($taskExit -ne 0 -or $taskStderr -ne '') { throw ($taskConfig+' native trace failed: '+$taskStderr) }
+    $null=& (Join-Path $taskRoot 'tools\research\Test-HostCancellationDiagnosticEvidence.ps1') -Directory (Join-Path $taskCase 'native') -OutputPath (Join-Path $taskCase 'audit.json')
+    $taskAudit=Get-Content -LiteralPath (Join-Path $taskCase 'audit.json') -Raw | ConvertFrom-Json
+    Write-Output ($taskConfig+': '+$taskAudit.PassedCases+' cases passed, '+$taskAudit.NestedEntries+' nested entries, '+$taskAudit.NestedReturns+' returns; '+$taskAudit.CoverageGaps.Count+' coverage gaps')
+}

@@ -13,6 +13,7 @@ read left pending. H3 is not accepted; the runtime cancellation defect remains o
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
+| H3 paired diagnostics | [rc1 candidate and retained local failure](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md) | Pending on NESSY, TURTLE and LEOPARD |
 | Host cancellation (H3) | [rc1 prototype and local results](2026-10-13-step-1.2-host-cancellation-rc1-candidate.md) | [Not accepted: five failing repetitions](2026-11-13-step-1.2-host-cancellation-rc1-windows7.md) |
 | Host dispatch (H2) | [rc1 candidate](2026-10-13-step-1.2-host-dispatch-rc1-candidate.md) | [Accepted](2026-10-13-step-1.2-host-dispatch-rc1-windows7.md) |
 | Host identity (H1) | [rc1 candidate](2026-10-13-step-1.2-host-identity-rc1-candidate.md) | [Accepted](2026-10-13-step-1.2-host-identity-rc1-windows7.md) |

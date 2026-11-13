@@ -1,0 +1,69 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$taskRoot='D:\Git\vt7pty'
+$taskZip=Join-Path $taskRoot 'artifacts\fidelity\packages\VT7Pty-host-cancellation-diagnostics-0.5.0-rc1.zip'
+$taskExtract=Join-Path $taskRoot 'artifacts\fidelity\inspection-host-cancellation-diagnostics-rc1'
+$taskReview=Join-Path $taskRoot 'artifacts\fidelity\h3-diagnostic-exact-rc1'
+$taskNegative=Join-Path $taskRoot 'artifacts\fidelity\h3-diagnostic-integrity-control'
+$taskShell='C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+foreach($p in @($taskExtract,$taskReview,$taskNegative)){if(Test-Path -LiteralPath $p){throw ('Output already exists: '+$p)}}
+[IO.Directory]::CreateDirectory($taskReview) | Out-Null
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[IO.Compression.ZipFile]::ExtractToDirectory($taskZip,$taskExtract)
+$taskManifest=Get-Content -LiteralPath (Join-Path $taskExtract 'manifest.json') -Raw | ConvertFrom-Json
+foreach($file in $taskManifest.Files){
+    $p=Join-Path $taskExtract $file.Path
+    if((Get-Item -LiteralPath $p).Length -ne $file.Bytes -or (Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant() -ne $file.Sha256){throw ('Extracted file changed: '+$file.Path)}
+}
+$taskOriginal=Get-Content -LiteralPath (Join-Path $taskExtract 'control\manifest.json') -Raw | ConvertFrom-Json
+if(@(Get-ChildItem -LiteralPath (Join-Path $taskExtract 'control') -Recurse -File).Count -ne 18){throw 'Original control count'}
+foreach($file in $taskOriginal.Files){if((Get-FileHash -LiteralPath (Join-Path $taskExtract ('control\'+$file.Path)) -Algorithm SHA256).Hash.ToLowerInvariant() -ne $file.Sha256){throw 'Original control changed'}}
+Write-Host 'All 18 original control files and all outer package files match.'
+& $taskShell -NoLogo -NoProfile -ExecutionPolicy Bypass -File (Join-Path $taskExtract 'tools\research\Invoke-HostCancellationDiagnostics.ps1') -Tier DevelopmentHost > (Join-Path $taskReview 'runner-stdout.txt') 2> (Join-Path $taskReview 'runner-stderr.txt')
+$taskRunnerExit=$LASTEXITCODE
+$taskRuns=@(Get-ChildItem -LiteralPath (Join-Path $taskExtract 'results') -Directory)
+if($taskRuns.Count -ne 1){throw 'Expected one exact-package run'}
+$taskRun=$taskRuns[0].FullName
+$taskReport=Get-Content -LiteralPath (Join-Path $taskRun 'report.json') -Raw | ConvertFrom-Json
+$taskAudit=& (Join-Path $taskRoot 'tools\research\Test-HostCancellationDiagnosticEvidence.ps1') -Directory $taskRun -PackageRoot $taskExtract -OutputPath (Join-Path $taskReview 'evidence-review.json')
+Write-Host ('Exact-package run: '+$taskReport.RunId+'; runner exit '+$taskRunnerExit+'; collection '+$taskReport.Completed+'/6')
+[IO.Compression.ZipFile]::ExtractToDirectory($taskZip,$taskNegative)
+$taskChanged=Join-Path $taskNegative 'control\bin\HostCancellationProbe.exe'
+$taskBytes=[IO.File]::ReadAllBytes($taskChanged)
+$taskBytes[$taskBytes.Length-1]=$taskBytes[$taskBytes.Length-1] -bxor 1
+[IO.File]::WriteAllBytes($taskChanged,$taskBytes)
+$taskChangedHash=(Get-FileHash -LiteralPath $taskChanged -Algorithm SHA256).Hash.ToLowerInvariant()
+$taskChangedManifest=Get-Content -LiteralPath (Join-Path $taskNegative 'manifest.json') -Raw | ConvertFrom-Json
+$taskEntry=@($taskChangedManifest.Files | Where-Object {$_.Path -eq 'control/bin/HostCancellationProbe.exe'})
+if($taskEntry.Count -ne 1){throw 'Copied control inventory entry missing'}
+$taskEntry[0].Sha256=$taskChangedHash
+[IO.File]::WriteAllText((Join-Path $taskNegative 'manifest.json'),($taskChangedManifest | ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
+$taskNegativeStart=New-Object Diagnostics.ProcessStartInfo
+$taskNegativeStart.FileName=$taskShell
+$taskNegativeStart.Arguments='-NoLogo -NoProfile -ExecutionPolicy Bypass -File "'+(Join-Path $taskNegative 'tools\research\Invoke-HostCancellationDiagnostics.ps1')+'" -Tier DevelopmentHost'
+$taskNegativeStart.UseShellExecute=$false
+$taskNegativeStart.CreateNoWindow=$true
+$taskNegativeStart.RedirectStandardOutput=$true
+$taskNegativeStart.RedirectStandardError=$true
+$taskNegativeProcess=[Diagnostics.Process]::Start($taskNegativeStart)
+$taskNegativeOut=$taskNegativeProcess.StandardOutput.ReadToEnd()
+$taskNegativeError=$taskNegativeProcess.StandardError.ReadToEnd()
+$taskNegativeProcess.WaitForExit()
+$taskNegativeExit=$taskNegativeProcess.ExitCode
+$taskNegativeProcess.Dispose()
+$taskRefused=$taskNegativeExit -ne 0 -and $taskNegativeError.Contains('Original rc1 control changed:') -and -not (Test-Path -LiteralPath (Join-Path $taskNegative 'results'))
+if(-not $taskRefused){throw ('Integrity control did not refuse before launch: '+$taskNegativeError)}
+[IO.File]::WriteAllText((Join-Path $taskReview 'integrity-stderr.txt'),$taskNegativeError,[Text.UTF8Encoding]::new($false))
+$taskIntegrity=[ordered]@{ChangedFile='control/bin/HostCancellationProbe.exe';OuterHashUpdated=$true;OriginalManifestUnchanged=$true;ChangedFileSha256=$taskChangedHash;ExitCode=$taskNegativeExit;RejectedBeforeResultsAndLaunch=$taskRefused;Reason='Original rc1 control changed'}
+[IO.File]::WriteAllText((Join-Path $taskReview 'integrity-control.json'),($taskIntegrity | ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+$taskSummary=[ordered]@{
+    Archive=[IO.Path]::GetFileName($taskZip);Bytes=(Get-Item -LiteralPath $taskZip).Length;Sha256=(Get-FileHash -LiteralPath $taskZip -Algorithm SHA256).Hash.ToLowerInvariant()
+    ManifestSha256=(Get-FileHash -LiteralPath (Join-Path $taskExtract 'manifest.json') -Algorithm SHA256).Hash.ToLowerInvariant()
+    SourceCommit=$taskManifest.Trace.SourceCommit;SourceTreeClean=$taskManifest.Trace.SourceTreeClean;OriginalControlFiles=18
+    VerificationSha256=$taskManifest.Trace.VerificationSha256;RunId=$taskReport.RunId;RunnerExit=$taskRunnerExit
+    Completed=$taskReport.Completed;ControlPass=$taskReport.ControlPass;ControlFail=$taskReport.ControlFail;TracePass=$taskReport.TracePass;TraceFail=$taskReport.TraceFail
+    Cases=@($taskReport.Trials | ForEach-Object {$_.Cases.Cases}).Count;VerifiedEvidenceFiles=$taskAudit.VerifiedEvidenceFiles
+    IntegrityControlRejected=$taskRefused;MilestoneAccepted=$false;ProductionCancellationImplemented=$false
+}
+[IO.File]::WriteAllText((Join-Path $taskReview 'summary.json'),($taskSummary | ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+$taskSummary | Format-List

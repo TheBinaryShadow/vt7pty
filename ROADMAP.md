@@ -97,7 +97,9 @@ public-API experiments failed. I'm now following the
   record four passing and five failing repetitions. Failures and remaining
   H3 guards must be resolved before acceptance. The
   [follow-up investigation](docs/validation/2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
-  narrows the observation gaps. The [diagnostic package](docs/HOST_CANCELLATION_DIAGNOSTICS.md)
+  narrows the observation gaps. The [diagnostic candidate](docs/validation/2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md)
+  is ready for three-machine tracing; one local control failure is preserved.
+  The [run guide](docs/HOST_CANCELLATION_DIAGNOSTICS.md)
   pairs unchanged rc1 controls with bounded tracing; target results are pending.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,

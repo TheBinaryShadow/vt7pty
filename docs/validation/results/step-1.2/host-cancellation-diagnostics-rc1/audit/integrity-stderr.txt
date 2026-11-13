@@ -1,0 +1,8 @@
+Original rc1 control changed: bin/HostCancellationProbe.exe
+At D:\Git\vt7pty\artifacts\fidelity\h3-diagnostic-integrity-control\tools\research\Invoke-HostCancellationDiagnostics.p
+s1:30 char:59
++ ... e.Sha256) { throw ('Original rc1 control changed: '+$taskFile.Path) } ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Original rc1 co...lationProbe.exe:String) [], RuntimeException
+    + FullyQualifiedErrorId : Original rc1 control changed: bin/HostCancellationProbe.exe
+ 
