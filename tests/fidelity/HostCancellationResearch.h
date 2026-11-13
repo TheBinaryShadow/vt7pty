@@ -73,9 +73,20 @@ inline std::wstring imagePath(HANDLE process) {
     check(QueryFullProcessImageNameW(process,0,buffer.data(),&length),"process image");
     return {buffer.data(),length};
 }
+#ifdef VT7PTY_H3_GUARDS
+struct GuardInputRecord {
+    uint32_t type=0,down=0,character=0,virtualKey=0,scan=0,modifiers=0,repeat=0;
+};
+inline std::wstring guardEnvironment(const wchar_t *name) {
+    std::vector<wchar_t> value(32768); const DWORD count=GetEnvironmentVariableW(name,value.data(),32768);
+    check(count>0 && count<32768,"guard environment"); return {value.data(),count};
+}
+#endif
 struct IdentityPacket {
     uint32_t magic=0x33494856,
-#if defined(VT7PTY_H3_COORDINATED)
+#if defined(VT7PTY_H3_GUARDS)
+        schema=5,
+#elif defined(VT7PTY_H3_COORDINATED)
         schema=4,
 #elif defined(VT7PTY_H3_FREEZE)
         schema=3,
@@ -91,6 +102,10 @@ struct IdentityPacket {
     uint32_t shellId=0,shellAlive=0,shellExit=0,inputMode=0,keyCount=0;
     Key keys[16]={};
     wchar_t text[128]={};
+#ifdef VT7PTY_H3_GUARDS
+    uint32_t guardInputCount=0;
+    GuardInputRecord guardInput[32]={};
+#endif
 #ifdef VT7PTY_H3_DIAGNOSTIC
     h3trace::Observation trace;
 #endif
@@ -130,6 +145,11 @@ struct Activity {
 #endif
 struct Read {
     bool raw=false; DWORD keyCount=0; Key keys[16]={};
+#ifdef VT7PTY_H3_GUARDS
+    bool guardFence=false;
+    uint32_t guardInputCount=0;
+    GuardInputRecord guardInput[32]={};
+#endif
 #ifdef VT7PTY_H3_DIAGNOSTIC
     bool oneKey=false;
     uint32_t index=0,scanCodes[16]={};
@@ -145,6 +165,25 @@ inline DWORD WINAPI readLine(void *data) {
 #ifdef VT7PTY_H3_DIAGNOSTIC
     h3trace::fixtureTimeline.append(h3trace::ReadEntry,r.index,r.raw ? 1u : 0u);
     InterlockedExchange(&r.entered,1);
+#endif
+#ifdef VT7PTY_H3_GUARDS
+    if(r.guardFence) {
+        bool marker=false;
+        while(r.guardInputCount<32) {
+            INPUT_RECORD item={}; DWORD count=0;
+            if(!ReadConsoleInputW(GetStdHandle(STD_INPUT_HANDLE),&item,1,&count) || count!=1) { r.error=GetLastError(); break; }
+            auto &record=r.guardInput[r.guardInputCount++]; record.type=item.EventType;
+            if(item.EventType!=KEY_EVENT) continue;
+            const auto &key=item.Event.KeyEvent;
+            record.down=key.bKeyDown ? 1u : 0u; record.character=key.uChar.UnicodeChar; record.virtualKey=key.wVirtualKeyCode;
+            record.scan=key.wVirtualScanCode; record.modifiers=key.dwControlKeyState; record.repeat=key.wRepeatCount;
+            if(key.bKeyDown && key.uChar.UnicodeChar==L'z' && key.wVirtualKeyCode=='Z') marker=true;
+            if(marker && !key.bKeyDown && key.wVirtualKeyCode=='Z') { r.succeeded=TRUE; break; }
+        }
+        if(!r.succeeded && !r.error) r.error=ERROR_INSUFFICIENT_BUFFER;
+        h3trace::fixtureTimeline.append(h3trace::ReadReturn,r.index,r.succeeded ? 1u : 0u,r.guardInputCount,r.error);
+        InterlockedExchange(&r.returned,1); return 0;
+    }
 #endif
     if(r.raw) {
         unsigned int characters=0;
@@ -201,6 +240,9 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
     ULONG server=0; check(GetNamedPipeServerProcessId(pipe.value,&server) && server==expectedServer,"fixture server");
     check(SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),ENABLE_EXTENDED_FLAGS|ENABLE_PROCESSED_INPUT|ENABLE_LINE_INPUT|ENABLE_ECHO_INPUT),"fixture mode");
     check(FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE)),"fixture input barrier");
+    #ifdef VT7PTY_H3_GUARDS
+    check(SetConsoleCtrlHandler(nullptr,FALSE),"fixture explicitly opts into Ctrl+C");
+#endif
     check(SetConsoleCtrlHandler(controlHandler,TRUE),"fixture control handler");
 #ifdef VT7PTY_H3_DIAGNOSTIC
     bool handlerRegistered=true;
@@ -210,18 +252,32 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
 #ifdef VT7PTY_H3_FREEZE
     Activity activity;
 #endif
+#ifdef VT7PTY_H3_GUARDS
+    bool guardEventArmed=false;
+#endif
     // Preserve reader storage until completion, or exit this owned fixture.
     try {
         const ULONGLONG deadline=GetTickCount64()+
-#ifdef VT7PTY_H3_FREEZE
+#if defined(VT7PTY_H3_GUARDS)
+            720000;
+#elif defined(VT7PTY_H3_FREEZE)
             480000;
 #else
             240000;
 #endif
         while(GetTickCount64()<deadline) {
+            char command=0;
+#ifdef VT7PTY_H3_GUARDS
+            const bool guardFinal=guardEventArmed && InterlockedCompareExchange(&controls,0,0)!=0;
+            if(guardFinal)command='I';else {
+#endif
             DWORD available=0; check(PeekNamedPipe(pipe.value,nullptr,0,nullptr,&available,nullptr),"fixture command peek");
             if(!available) { Sleep(2); continue; }
-            char command=0; transfer(pipe.value,&command,1,false);
+            transfer(pipe.value,&command,1,false);
+#ifdef VT7PTY_H3_GUARDS
+            }
+            if(command=='J'){check(thread.value==INVALID_HANDLE_VALUE && shell.value==INVALID_HANDLE_VALUE,"idle event-only child");guardEventArmed=true;command='I';}
+#endif
             if(command=='Q') {
 #ifdef VT7PTY_H3_FREEZE
                 activity.finish();
@@ -233,6 +289,9 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
             if(command=='R' || command=='U'
 #ifdef VT7PTY_H3_DIAGNOSTIC
                 || command=='K'
+#ifdef VT7PTY_H3_GUARDS
+                || command=='F'
+#endif
 #endif
                 ) {
                 if(thread.value!=INVALID_HANDLE_VALUE) {
@@ -243,7 +302,13 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
                 read.raw=command=='U';
 #ifdef VT7PTY_H3_DIAGNOSTIC
                 read.raw=read.raw || command=='K'; read.oneKey=command=='K'; read.index=readIndex;
+#ifdef VT7PTY_H3_GUARDS
+                read.guardFence=command=='F';
+#endif
                 InterlockedExchange(&h3trace::fixtureReadIndex,static_cast<LONG>(readIndex));
+#endif
+#ifdef VT7PTY_H3_GUARDS
+                if(!read.guardFence) // ReadConsoleInput observes the existing queue without changing modes or flushing.
 #endif
                 check(SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),read.raw ? ENABLE_EXTENDED_FLAGS : ENABLE_EXTENDED_FLAGS|ENABLE_PROCESSED_INPUT|ENABLE_LINE_INPUT|ENABLE_ECHO_INPUT),"read mode");
                 constexpr wchar_t marker[]=L"HOST_INPUT>"; DWORD count=0;
@@ -254,14 +319,34 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
 #ifdef VT7PTY_H3_DIAGNOSTIC
                 handlerRegistered=false;
 #endif
-            } else if(command=='M' || command=='W') {
+            } else if(command=='M' || command=='W'
+#ifdef VT7PTY_H3_GUARDS
+                || command=='P' || command=='L'
+#endif
+                ) {
                 check(shell.value==INVALID_HANDLE_VALUE && thread.value==INVALID_HANDLE_VALUE,"idle shell fixture");
                 wchar_t system[MAX_PATH]={}; check(GetSystemDirectoryW(system,MAX_PATH)>0,"system path");
-                const std::wstring exe=std::wstring(system)+(command=='M' ? L"\\cmd.exe" : L"\\WindowsPowerShell\\v1.0\\powershell.exe");
+                std::wstring exe=std::wstring(system)+(command=='M' ? L"\\cmd.exe" : L"\\WindowsPowerShell\\v1.0\\powershell.exe");
                 auto line=quote(exe)+(command=='M' ? L" /D /Q /K \"prompt H3_CMD$G\"" :
                     L" -NoLogo -NoProfile -NoExit -Command \"Remove-Module PSReadLine -ErrorAction SilentlyContinue; function global:prompt { 'H3_PS>' }\"");
 #ifdef VT7PTY_H3_DIAGNOSTIC
                 if(command=='W') line=quote(exe)+L" -NoLogo -NoProfile -NoExit -Command \"Remove-Module PSReadLine -ErrorAction SilentlyContinue; $global:VT7PtyH3Generation=0; function global:prompt { $global:VT7PtyH3Generation++; 'H3_PS['+$global:VT7PtyH3Generation.ToString()+']>' }\"";
+#endif
+#ifdef VT7PTY_H3_GUARDS
+                if(command=='P' || command=='L') {
+                    exe=guardEnvironment(L"VT7PTY_H3_PWSH");
+                    const auto literal=[](const std::wstring &s) { std::wstring q=L"'"; for(wchar_t ch:s) {q+=ch;if(ch==L'\'')q+=ch;} return q+L"'"; };
+                    std::wstring boot=L"Remove-Module PSReadLine -ErrorAction SilentlyContinue; ";
+                    if(command=='L') {
+                        const auto module=exe.substr(0,exe.find_last_of(L'\\'))+L"\\Modules\\PSReadLine\\PSReadLine.psd1";
+                        check(GetFileAttributesW(module.c_str())!=INVALID_FILE_ATTRIBUTES,"bundled PSReadLine");
+                        const auto history=guardEnvironment(L"VT7PTY_H3_GUARD_OUTPUT")+L"\\psreadline-"+std::to_wstring(GetCurrentProcessId())+L".txt";
+                        boot=L"Import-Module "+literal(module)+L" -ErrorAction Stop; Set-PSReadLineOption -HistorySaveStyle SaveNothing -HistorySavePath "+
+                            literal(history)+L" -PredictionSource None -EditMode Windows; ";
+                    }
+                    boot+=L"$global:VT7PtyH3Generation=0; function global:prompt { $global:VT7PtyH3Generation++; 'H3_PS['+$global:VT7PtyH3Generation.ToString()+']>' }";
+                    line=quote(exe)+L" -NoLogo -NoProfile -NoExit -Command "+quote(boot);
+                }
 #endif
                 std::vector<wchar_t> mutableLine(line.begin(),line.end()); mutableLine.push_back(0);
                 STARTUPINFOW startup={}; startup.cb=sizeof(startup); PROCESS_INFORMATION process={};
@@ -305,6 +390,9 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
             p.readIndex=readIndex;
             DWORD inputMode=0; check(GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),&inputMode),"observed input mode"); p.inputMode=inputMode;
             if(p.readReturned) { p.keyCount=read.keyCount; std::copy_n(read.keys,read.keyCount,p.keys); }
+#ifdef VT7PTY_H3_GUARDS
+            if(p.readReturned) {p.guardInputCount=read.guardInputCount;std::copy_n(read.guardInput,read.guardInputCount,p.guardInput);}
+#endif
             if(shell.value!=INVALID_HANDLE_VALUE) {
                 p.shellId=GetProcessId(shell.value); p.shellAlive=WaitForSingleObject(shell.value,0)==WAIT_TIMEOUT ? 1u : 0u;
                 DWORD shellExit=0; check(GetExitCodeProcess(shell.value,&shellExit),"owned shell exit"); p.shellExit=shellExit;
@@ -330,6 +418,13 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
             p.trace.qpc=h3trace::qpc();
 #endif
             transfer(pipe.value,&p,sizeof(p),true);
+#ifdef VT7PTY_H3_GUARDS
+            if(guardFinal) {
+                constexpr wchar_t final[]=L"GUARD_CHILD_FINAL\r\n";DWORD written=0;
+                check(WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE),final,static_cast<DWORD>(std::size(final)-1),&written,nullptr),"child final output");
+                ExitProcess(37); // The event-only application exits in response to its recorded Ctrl+C.
+            }
+#endif
         }
         throw std::runtime_error("fixture deadline");
     } catch(...) {
@@ -345,6 +440,9 @@ class Session {
     bool closed_=false;
 public:
     Handle agent,child,host,descendant;
+#ifdef VT7PTY_H3_GUARDS
+    Handle guardChild;
+#endif
     VtState state{80,25};
     std::string raw;
     uint64_t lineFeeds=0;
@@ -409,18 +507,27 @@ public:
         transfer(pipe_.value,&command,1,true);
         IdentityPacket p; transfer(pipe_.value,&p,sizeof(p),false);
         check(p.magic==0x33494856 && p.schema==
-#if defined(VT7PTY_H3_COORDINATED)
+#if defined(VT7PTY_H3_GUARDS)
+            5
+#elif defined(VT7PTY_H3_COORDINATED)
             4
 #elif defined(VT7PTY_H3_FREEZE)
             3
 #else
             1
 #endif
+            #ifdef VT7PTY_H3_GUARDS
+            && p.guardInputCount<=32
+#endif
             && p.processId==GetProcessId(child.value) &&
             p.parentId==GetProcessId(agent.value) && p.window!=0 && p.windowThread!=0 &&
             p.consoleCount>0 && p.consoleCount<=16 && p.readReturned<=1 && p.readSucceeded<=1 && p.textCount<=127 && p.keyCount<=16 && p.controlCount<=128,"identity packet");
         const auto contains=[&](DWORD id) { return std::find(p.consoleProcesses,p.consoleProcesses+p.consoleCount,id)!=p.consoleProcesses+p.consoleCount; };
-        check(contains(p.processId) && contains(p.parentId) && (p.consoleCount==2 || (p.consoleCount==3 && p.shellId && contains(p.shellId))),"owned console members");
+        check(contains(p.processId) && contains(p.parentId) && (p.consoleCount==2 || (p.consoleCount==3 && p.shellId && contains(p.shellId))
+#ifdef VT7PTY_H3_GUARDS
+            || (p.consoleCount==4 && p.shellId && contains(p.shellId) && guardChild.value && guardChild.value!=INVALID_HANDLE_VALUE && contains(GetProcessId(guardChild.value)))
+#endif
+            ),"owned console members");
 #ifdef VT7PTY_H3_DIAGNOSTIC
         lastObservation=p; haveObservation=true;
 #endif
@@ -483,6 +590,11 @@ public:
                 cleanupOkay=false; TerminateProcess(process,125); WaitForSingleObject(process,5000);
             }
         }
+        #ifdef VT7PTY_H3_GUARDS
+        if(guardChild.value && guardChild.value!=INVALID_HANDLE_VALUE && WaitForSingleObject(guardChild.value,5000)!=WAIT_OBJECT_0) {
+            cleanupOkay=false; TerminateProcess(guardChild.value,125); WaitForSingleObject(guardChild.value,5000);
+        }
+#endif
         output_.reset(); return cleanupOkay;
     }
 };
@@ -545,6 +657,15 @@ inline std::string packetJson(const IdentityPacket &p) {
 #endif
 #else
     const std::string diagnostic;
+#endif
+#ifdef VT7PTY_H3_GUARDS
+    diagnostic+=",\"CtrlIgnoreExplicitlyReset\":true,\"GuardInput\":[";
+    for(uint32_t n=0;n<p.guardInputCount;++n) {
+        if(n) diagnostic+=','; const auto &r=p.guardInput[n];
+        diagnostic+="{\"Type\":"+std::to_string(r.type)+",\"Down\":"+std::to_string(r.down)+",\"Character\":"+std::to_string(r.character)+
+            ",\"VirtualKey\":"+std::to_string(r.virtualKey)+",\"Scan\":"+std::to_string(r.scan)+",\"Modifiers\":"+std::to_string(r.modifiers)+",\"Repeat\":"+std::to_string(r.repeat)+"}";
+    }
+    diagnostic+="]";
 #endif
     std::string keys="[";
     for(uint32_t i=0;i<p.keyCount;++i) {

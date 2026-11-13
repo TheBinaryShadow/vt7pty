@@ -11,7 +11,10 @@
 #endif
 #endif
 namespace hostcancel {
-#if defined(VT7PTY_H3_COORDINATED)
+#if defined(VT7PTY_H3_GUARDS)
+constexpr uint32_t magic=0x47434856,version=5;
+constexpr wchar_t probeName[]=L"HostCancellationGuardProbe.exe",hookName[]=L"HostCancellationGuardHook.dll";
+#elif defined(VT7PTY_H3_COORDINATED)
 constexpr uint32_t magic=0x43434856,version=4;
 constexpr wchar_t probeName[]=L"HostCancellationCoordinatedProbe.exe",hookName[]=L"HostCancellationCoordinatedHook.dll";
 #elif defined(VT7PTY_H3_FREEZE)

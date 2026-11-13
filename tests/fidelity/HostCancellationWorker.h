@@ -8,12 +8,18 @@ namespace {
 #ifdef VT7PTY_H3_FREEZE
 void freezeOracle();
 #endif
+#ifdef VT7PTY_H3_GUARDS
+void guardOracle();
+#endif
 
 struct Registration {
     uint32_t kind=1,sequence=0;
     Identity identity;
     uint32_t shell=0,ready=0;
     uint64_t shellCreated=0;
+#ifdef VT7PTY_H3_GUARDS
+    uint32_t guardChild=0;uint64_t guardChildCreated=0;
+#endif
 };
 HANDLE parentPipe=INVALID_HANDLE_VALUE;
 uint32_t registrationSequence=0;
@@ -22,6 +28,9 @@ void registerSession(Session &s,Channel &c) {
     if(s.descendant.value && s.descendant.value!=INVALID_HANDLE_VALUE) {
         r.shell=GetProcessId(s.descendant.value); r.shellCreated=creation(s.descendant.value);
     }
+    #ifdef VT7PTY_H3_GUARDS
+    if(s.guardChild.value && s.guardChild.value!=INVALID_HANDLE_VALUE) {r.guardChild=GetProcessId(s.guardChild.value);r.guardChildCreated=creation(s.guardChild.value);}
+#endif
     transfer(parentPipe,&r,sizeof(r),true);
     char ack=0; transfer(parentPipe,&ack,1,false); check(ack=='A',"parent lifetime registration");
 }
@@ -92,6 +101,9 @@ void cancellationOracle() {
     puts("Host cancellation trace oracle: 6 checks passed");
 #ifdef VT7PTY_H3_FREEZE
     freezeOracle();
+#ifdef VT7PTY_H3_GUARDS
+    guardOracle();
+#endif
 #endif
 #endif
 }
@@ -157,6 +169,9 @@ CaseResult caseRun(const std::wstring &output,const std::string &name,unsigned i
     const std::wstring path=output+L"\\"+std::wstring(name.begin(),name.end());
     check(CreateDirectoryW(path.c_str(),nullptr),"new case directory");
     CaseResult result; result.name=name;
+#ifdef VT7PTY_H3_GUARDS
+    h3guards::shell=h3guards::Shell::Native;
+#endif
     std::unique_ptr<Session> session; std::unique_ptr<Channel> channel;
     try {
         session=std::make_unique<Session>(index,path);
@@ -184,11 +199,18 @@ CaseResult caseRun(const std::wstring &output,const std::string &name,unsigned i
     return result;
 }
 void startOwnedShell(Session &s,Channel &c,bool cmd) {
-    auto p=s.observe(cmd ? 'M' : 'W');
+    auto command=cmd ? 'M' : 'W';
+#ifdef VT7PTY_H3_GUARDS
+    if(!cmd && h3guards::shell!=h3guards::Shell::Native) command=h3guards::shell==h3guards::Shell::ReadLine7 ? 'L' : 'P';
+#endif
+    auto p=s.observe(command);
     Handle shellCandidate(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION|SYNCHRONIZE|PROCESS_TERMINATE,FALSE,p.shellId));
     check(shellCandidate.value && parentProcessId(p.shellId)==GetProcessId(s.child.value),"owned shell descendant");
     wchar_t system[MAX_PATH]={}; check(GetSystemDirectoryW(system,MAX_PATH)>0,"system directory");
-    const auto expected=std::wstring(system)+(cmd ? L"\\cmd.exe" : L"\\WindowsPowerShell\\v1.0\\powershell.exe");
+    auto expected=std::wstring(system)+(cmd ? L"\\cmd.exe" : L"\\WindowsPowerShell\\v1.0\\powershell.exe");
+#ifdef VT7PTY_H3_GUARDS
+    if(!cmd && h3guards::shell!=h3guards::Shell::Native) expected=guardEnvironment(L"VT7PTY_H3_PWSH");
+#endif
     check(_wcsicmp(imagePath(shellCandidate.value).c_str(),expected.c_str())==0,"exact system shell");
     s.descendant.reset(shellCandidate.value); shellCandidate.value=INVALID_HANDLE_VALUE;
     registerSession(s,c);
@@ -224,6 +246,9 @@ bool shellCase(Session &s,Channel &c,const std::wstring &out,bool cmd,bool parti
 #endif
             ; },10000),"native shell identity");
         metadata=fileText(identity); check(metadata.ends_with("|0|ConsoleHost"),"native ConsoleHost editor");
+#ifdef VT7PTY_H3_GUARDS
+        if(h3guards::shell==h3guards::Shell::PowerShell7)check(metadata.starts_with("7.2.24|"),"pinned native PowerShell 7");
+#endif
     }
 #ifdef VT7PTY_H3_DIAGNOSTIC
     if(cmd) {
@@ -320,6 +345,9 @@ bool shellCase(Session &s,Channel &c,const std::wstring &out,bool cmd,bool parti
     s.quit();
     return restored && fresh && discarded && content && alive && p.controlCount==1 && p.controlType==CTRL_C_EVENT;
 }
+#ifdef VT7PTY_H3_GUARDS
+#include "HostGuardWorker.h"
+#endif
 int suite(const std::wstring &output) {
     std::vector<CaseResult> results;
     unsigned int index=0;
@@ -448,6 +476,7 @@ int suite(const std::wstring &output) {
         c.close(); s.quit(); return passed;
     });
 #ifdef VT7PTY_H3_FREEZE
+#ifndef VT7PTY_H3_GUARDS
     const h3freeze::Command conditions[]={h3freeze::Command::Quiet,h3freeze::Command::Selected,h3freeze::Command::Coordinated,h3freeze::Command::Sham};
     for(bool pending:{false,true}) for(unsigned int j=0;j<4;++j) {
         const auto mode=conditions[(j+freezeRotation())%4];
@@ -455,9 +484,15 @@ int suite(const std::wstring &output) {
             [=](Session &s,Channel &c,const std::wstring &out) { return freezeCase(s,c,out,mode,pending); });
     }
     add("focus-selection-bracket",freezeBracket);
+#endif
 #ifdef VT7PTY_H3_COORDINATED
     add("coordination-expiry",coordinationExpiry);
+#ifdef VT7PTY_H3_GUARDS
+    addGuardCases(add,output);
+    bool passed=results.size()==(h3guards::powerShell7Required() ? 34u : 26u);
+#else
     bool passed=results.size()==23;
+#endif
 #else
     bool passed=results.size()==22;
 #endif

@@ -74,6 +74,12 @@ Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostCancellationCoordinated
 EndProject
 Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "VT7Pty-CoordinatedAgent", "projects\VT7Pty-CoordinatedAgent.vcxproj", "{82F721CA-38F1-4EDC-921E-AD8E998AB313}"
 EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostCancellationGuardProbe", "projects\HostCancellationGuardProbe.vcxproj", "{82F721CA-38F1-4EDC-921E-AD8E998AB321}"
+EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "HostCancellationGuardHook", "projects\HostCancellationGuardHook.vcxproj", "{82F721CA-38F1-4EDC-921E-AD8E998AB322}"
+EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "VT7Pty-GuardAgent", "projects\VT7Pty-GuardAgent.vcxproj", "{82F721CA-38F1-4EDC-921E-AD8E998AB323}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -224,6 +230,18 @@ Global
 		{82F721CA-38F1-4EDC-921E-AD8E998AB202}.Debug|x64.Build.0 = Debug|x64
 		{82F721CA-38F1-4EDC-921E-AD8E998AB202}.Release|x64.ActiveCfg = Release|x64
 		{82F721CA-38F1-4EDC-921E-AD8E998AB202}.Release|x64.Build.0 = Release|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB321}.Debug|x64.ActiveCfg = Debug|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB321}.Debug|x64.Build.0 = Debug|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB321}.Release|x64.ActiveCfg = Release|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB321}.Release|x64.Build.0 = Release|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB322}.Debug|x64.ActiveCfg = Debug|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB322}.Debug|x64.Build.0 = Debug|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB322}.Release|x64.ActiveCfg = Release|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB322}.Release|x64.Build.0 = Release|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB323}.Debug|x64.ActiveCfg = Debug|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB323}.Debug|x64.Build.0 = Debug|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB323}.Release|x64.ActiveCfg = Release|x64
+		{82F721CA-38F1-4EDC-921E-AD8E998AB323}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

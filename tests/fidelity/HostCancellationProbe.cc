@@ -30,6 +30,9 @@ struct Desktop {
 struct Lifetime {
     Identity identity;
     Handle agent,fixture,host,shell;
+#ifdef VT7PTY_H3_GUARDS
+    Handle guardChild;
+#endif
     DWORD shellPid=0;
 };
 struct Worker {
@@ -96,8 +99,20 @@ struct Worker {
                 agrees(hostQuery(life->shell.value),hostQuery(life->fixture.value)),"registered owned shell");
             life->shellPid=r.shell;
         }
+        #ifdef VT7PTY_H3_GUARDS
+        if(r.guardChild) {
+            life->guardChild.reset(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION|SYNCHRONIZE|PROCESS_TERMINATE,FALSE,r.guardChild));
+            check(r.shell && life->guardChild.value && creation(life->guardChild.value)==r.guardChildCreated && parentProcessId(r.guardChild)==r.shell &&
+                _wcsicmp(imagePath(life->guardChild.value).c_str(),imagePath(process.value).c_str())==0 &&
+                agrees(hostQuery(life->guardChild.value),hostQuery(life->fixture.value)),"registered native grandchild");
+        }
+        const std::string guardLifetime=",\"GuardChild\":"+std::to_string(r.guardChild)+",\"GuardChildCreated\":"+h3trace::u64(r.guardChildCreated)+
+            ",\"ShellImage\":"+json(r.shell ? utf8(imagePath(life->shell.value)) : "")+",\"GuardChildImage\":"+json(r.guardChild ? utf8(imagePath(life->guardChild.value)) : "");
+#else
+        const std::string guardLifetime;
+#endif
         writeFile(output+L"\\lifetime-"+std::to_wstring(r.sequence)+L".json","{\"Identity\":"+identityJson(i)+
-            ",\"Desktop\":"+json(utf8(desktop.name))+",\"ConsoleWindowEnumeratedOnDesktop\":true,\"Shell\":"+std::to_string(r.shell)+",\"ShellCreated\":"+json(std::to_string(r.shellCreated))+"}");
+            ",\"Desktop\":"+json(utf8(desktop.name))+",\"ConsoleWindowEnumeratedOnDesktop\":true,\"Shell\":"+std::to_string(r.shell)+",\"ShellCreated\":"+json(std::to_string(r.shellCreated))+guardLifetime+"}");
         lifetimes.push_back(std::move(life)); lastRegistration=r.sequence;
         char ack='A'; transfer(pipe.value,&ack,1,true);
     }
@@ -112,7 +127,11 @@ struct Worker {
         for(const auto &life:lifetimes) {
             // Retained and independently verified descendants only. Never request
             // PROCESS_TERMINATE for conhost or terminate it on any cleanup path.
-            for(HANDLE client:{life->shell.value,life->fixture.value,life->agent.value}) if(client && client!=INVALID_HANDLE_VALUE) {
+            for(HANDLE client:{
+#ifdef VT7PTY_H3_GUARDS
+                life->guardChild.value,
+#endif
+                life->shell.value,life->fixture.value,life->agent.value}) if(client && client!=INVALID_HANDLE_VALUE) {
                 if(WaitForSingleObject(client,5000)!=WAIT_OBJECT_0) {
                     cleanupOkay=false; TerminateProcess(client,125); WaitForSingleObject(client,5000);
                 }
@@ -154,6 +173,12 @@ int worker(const std::wstring &pipeName,DWORD parent,const std::wstring &output,
 }
 int run(const std::wstring &output) {
     cancellationOracle();
+#ifdef VT7PTY_H3_GUARDS
+    const auto tier=guardEnvironment(L"VT7PTY_H3_GUARD_TIER");
+    check(tier==L"NonESU" || tier==L"ESU" || tier==L"Legacy" || tier==L"Development","declared guard tier");
+    if(h3guards::powerShell7Required())check(GetFileAttributesW(guardEnvironment(L"VT7PTY_H3_PWSH").c_str())!=INVALID_FILE_ATTRIBUTES,"required pinned PowerShell 7");
+    check(SetEnvironmentVariableW(L"VT7PTY_H3_GUARD_OUTPUT",output.c_str()),"guard output environment");
+#endif
     const auto originalDesktop=desktopName(GetCurrentThreadId());
     check(originalDesktop==L"Default","root on normal test desktop");
     const TokenIdentity token(GetCurrentProcess()); check(token.integrity==SECURITY_MANDATORY_MEDIUM_RID,"ordinary test user");
@@ -171,7 +196,9 @@ int run(const std::wstring &output) {
         check(a->desktop.name!=b->desktop.name && a->desktop.name!=originalDesktop && b->desktop.name!=originalDesktop,"separate desktops");
         uint32_t observed=0;
         deadline=GetTickCount64()+
-#ifdef VT7PTY_H3_FREEZE
+#if defined(VT7PTY_H3_GUARDS)
+            600000;
+#elif defined(VT7PTY_H3_FREEZE)
             360000;
 #else
             150000;
@@ -203,10 +230,20 @@ int run(const std::wstring &output) {
     const std::string diagnostic;
 #endif
 #ifdef VT7PTY_H3_FREEZE
-    diagnostic+=",\"ResearchAgent\":true,\"Rotation\":"+std::to_string(freezeRotation())+",\"AgentGateProtocol\":1,\"CharacterizationConditions\":true";
+    diagnostic+=",\"ResearchAgent\":true,\"Rotation\":"+std::to_string(freezeRotation())+",\"AgentGateProtocol\":1,\"CharacterizationConditions\":"+std::string(
+#ifdef VT7PTY_H3_GUARDS
+        "false"
+#else
+        "true"
+#endif
+        );
 #endif
 #ifdef VT7PTY_H3_COORDINATED
     diagnostic+=",\"BaselineCoordinated\":true,\"NeighborPeriodicDrain\":true,\"NeighborSoakMs\":"+std::to_string(neighborSoakMs());
+#endif
+    #ifdef VT7PTY_H3_GUARDS
+    diagnostic+=",\"GuardQualification\":true,\"GuardTier\":"+json(utf8(tier))+",\"PowerShell7Required\":"+h3guards::boolean(h3guards::powerShell7Required())+
+        ",\"PowerShell7Path\":"+json(h3guards::powerShell7Required() ? utf8(guardEnvironment(L"VT7PTY_H3_PWSH")) : "");
 #endif
     writeFile(output+L"\\probe.json","{\"SchemaVersion\":1,\"Probe\":\"HostCancellation\",\"Version\":"+std::to_string(version)+",\"Status\":"+json(passed ? "Pass" : "Fail")+
         ",\"SuiteExit\":"+std::to_string(aExit)+",\"NeighborExit\":"+std::to_string(bExit)+",\"NeighborPolls\":"+std::to_string(polls)+
@@ -225,5 +262,12 @@ int wmain(int argc,wchar_t **argv) {
         if(argc==2 && std::wstring_view(argv[1])==L"--self-test") { cancellationOracle(); return 0; }
         if(argc==2) return run(argv[1]);
         return 2;
-    } catch(const std::exception &e) { fprintf(stderr,"Host cancellation harness error: %s\n",e.what()); return 2; }
+    } catch(const std::exception &e) {
+#ifdef VT7PTY_H3_GUARDS
+        if(argc==6 && std::wstring_view(argv[1])==L"--worker") {
+            try {writeFile(std::wstring(argv[4])+L"\\worker-error.json","{\"Error\":"+json(e.what())+",\"Role\":"+json(utf8(argv[5]))+"}");} catch(...) {}
+        }
+#endif
+        fprintf(stderr,"Host cancellation harness error: %s\n",e.what());return 2;
+    }
 }

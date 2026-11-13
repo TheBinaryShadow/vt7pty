@@ -9,12 +9,15 @@ Windows 7 machines. The coordinated H3 prototype completes all 27 collections,
 passing 126/126 baseline/expiry cases and 54/54 protected focused phases with no
 prototype trace loss. Unprotected contrasts and unchanged controls retain their
 failures. Remaining race, access-denied, active-child and PowerShell 7 guards
-keep H3 and the runtime cancellation fix open.
+keep H3 and the runtime cancellation fix open. The
+[guard candidate](../HOST_GUARDS.md) implements that qualification matrix;
+its Windows 7 results are pending.
 
 ## Current fidelity work
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
+| H3 guard qualification | [Implementation and runner guide](../HOST_GUARDS.md) | Pending on NESSY, TURTLE and LEOPARD |
 | Coordinated H3 prototype | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-coordination-rc1-candidate.md) | [Reviewed: baseline and recording verified; H3 guards remain](2026-11-13-step-1.2-host-coordination-rc1-windows7.md) |
 | H3 scraper coordination | [rc1 candidate, controlled contrasts and retained failures](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-candidate.md) | [Reviewed: coordination supported; H3 open](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md) |
 | H3 paired diagnostics | [rc1 candidate and retained local failure](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md) | [Reviewed: selection-state correlation; H3 open](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md) |

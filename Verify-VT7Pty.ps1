@@ -323,7 +323,10 @@ $expectedImports = [ordered]@{
     'HostCancellationFreezeHook.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
     'HostCancellationCoordinatedProbe.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll', 'VT7Pty.dll')
     'HostCancellationCoordinatedHook.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
+    'HostCancellationGuardProbe.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll', 'VT7Pty.dll')
+    'HostCancellationGuardHook.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
     'VT7Pty-CoordinatedAgent.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'SHELL32.dll', 'USER32.dll')
+    'VT7Pty-GuardAgent.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'SHELL32.dll', 'USER32.dll')
     'VT7Pty-FreezeAgent.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'SHELL32.dll', 'USER32.dll')
     'HostDispatchProbe.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll', 'VT7Pty.dll')
     'HostDispatchHook.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
@@ -400,7 +403,10 @@ foreach ($configurationName in $configurations) {
         'VT7Pty-FreezeAgent.exe', 'VT7Pty-FreezeAgent.pdb',
         'HostCancellationCoordinatedProbe.exe', 'HostCancellationCoordinatedProbe.pdb',
         'HostCancellationCoordinatedHook.dll', 'HostCancellationCoordinatedHook.pdb',
+        'HostCancellationGuardProbe.exe', 'HostCancellationGuardProbe.pdb',
+        'HostCancellationGuardHook.dll', 'HostCancellationGuardHook.pdb',
         'VT7Pty-CoordinatedAgent.exe', 'VT7Pty-CoordinatedAgent.pdb',
+        'VT7Pty-GuardAgent.exe', 'VT7Pty-GuardAgent.pdb',
         'HostCancellationTraceProbe.exe', 'HostCancellationTraceProbe.pdb',
         'HostCancellationTraceHook.dll', 'HostCancellationTraceHook.pdb',
         'HostDispatchProbe.exe', 'HostDispatchProbe.pdb',
@@ -430,6 +436,7 @@ foreach ($configurationName in $configurations) {
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostCancellationProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostCancellationFreezeProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostCancellationCoordinatedProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostCancellationGuardProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostCancellationTraceProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostDispatchProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostIdentityProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
@@ -501,6 +508,8 @@ foreach ($configurationName in $configurations) {
     if($freezeOracle.Count -ne 1 -or $freezeOracle[0].StandardOutput -ne ($traceExpected+[Environment]::NewLine+'Host freeze oracle: 3 checks passed')) { throw 'Host freeze oracle did not complete.' }
     $coordinatedOracle = @($tests | Where-Object { $_.Name -eq 'HostCancellationCoordinatedProbe.exe' })
     if($coordinatedOracle.Count -ne 1 -or $coordinatedOracle[0].StandardOutput -ne ($traceExpected+[Environment]::NewLine+'Host freeze oracle: 3 checks passed')) { throw 'Coordinated host oracle did not complete.' }
+    $guardOracle = @($tests | Where-Object { $_.Name -eq 'HostCancellationGuardProbe.exe' })
+    if($guardOracle.Count -ne 1 -or $guardOracle[0].StandardOutput -ne ($traceExpected+[Environment]::NewLine+'Host freeze oracle: 3 checks passed'+[Environment]::NewLine+'Host guard oracle: 13 checks passed')) { throw 'Host guard oracle did not complete.' }
     $dispatchOracle = @($tests | Where-Object { $_.Name -eq 'HostDispatchProbe.exe' })
     if ($dispatchOracle.Count -ne 1 -or $dispatchOracle[0].StandardOutput -ne 'Host dispatch oracle: 13 checks passed') { throw 'Host dispatch oracle did not complete.' }
     $hostOracle = @($tests | Where-Object { $_.Name -eq 'HostIdentityProbe.exe' })

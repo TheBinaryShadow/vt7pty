@@ -20,14 +20,13 @@ system. The exact release passed all 30 acceptance cases and a two-hour soak
 on each of my three Windows 7 test machines, including a PowerShell 2.0
 installation without KB3191566. See the [release review](docs/validation/2026-10-02-0.5.0-release-acceptance.md).
 
-I'm now working on console fidelity. Ctrl+C at CMD and native Windows PowerShell
-prompts still leaves typed input behind. I've verified host identification and
-a test-only dispatch channel on all three machines. The first
-[cancellation prototype](docs/HOST_CANCELLATION_PROBE.md) passes its core local
-workflows, but [Windows 7 rc1 runs](docs/validation/2026-11-13-step-1.2-host-cancellation-rc1-windows7.md)
-show intermittent cancellation and control-event failures. Resolving those
-failures and the remaining H3 guards comes before runtime integration.
-
+I'm now working on console fidelity. The released runtime still leaves typed
+input behind when Ctrl+C is used at CMD and native Windows PowerShell prompts.
+I've verified host identity, dispatch and the coordinated research baseline on
+all three Windows 7 machines. The [H3 guard candidate](docs/HOST_GUARDS.md) adds
+completion/close races, actual access denial, native children and PowerShell 7
+checks. Its Windows 7 qualification comes before H3 acceptance and runtime
+integration.
 VT7 integration comes after the backend and its API are ready. VT7Pty does not
 yet replace ConPTY for unmodified applications. I am not planning a kernel driver.
 

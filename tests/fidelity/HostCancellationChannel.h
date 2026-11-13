@@ -3,6 +3,9 @@
 #pragma once
 #include "HostCancellationResearch.h"
 #include "HostCancellationProtocol.h"
+#ifdef VT7PTY_H3_GUARDS
+#include "HostGuardSupport.h"
+#endif
 #ifdef VT7PTY_H3_COORDINATED
 #include "HostCoordinationGuard.h"
 #endif
@@ -181,11 +184,24 @@ class Channel {
     }
 public:
     Request binding;
+#ifdef VT7PTY_H3_GUARDS
+    std::atomic<bool> closingRequested=false,inFlight=false;
+    void requestClose() noexcept {closingRequested.store(true);} // In-flight work retains its resources until completion.
+    h3guards::InputRace *inputRace=nullptr;
+    h3guards::CloseRace *closeRace=nullptr;
+#endif
     unsigned int accepted=0,rejected=0;
     bool actualDispatch=false,unhooked=false;
-    Channel(Session &s,const std::wstring &dir,const wchar_t *name):session(s),output(dir),label(name) {
+    Channel(Session &s,const std::wstring &dir,const wchar_t *name
+#ifdef VT7PTY_H3_GUARDS
+        ,bool deniedOpen=false
+#endif
+        ):session(s),output(dir),label(name) {
         try {
             const DWORD tid=discover(s,output,label);
+#ifdef VT7PTY_H3_GUARDS
+            if(deniedOpen) h3guards::deniedThread(tid,GetProcessId(s.host.value),output+L"\\kernel-access-denied.json");
+#endif
             thread.reset(OpenThread(THREAD_QUERY_LIMITED_INFORMATION|SYNCHRONIZE,FALSE,tid));
             check(thread.value && GetProcessIdOfThread(thread.value)==GetProcessId(s.host.value),"retained discovery thread");
             wchar_t desktop[256]={},station[256]={}; DWORD size=0;
@@ -243,11 +259,18 @@ public:
         auto request=binding; request.operation=op; request.sequence=sequence; request.deadline=GetTickCount64()+4000; return request;
     }
     Response exchange(Request request,Result expected,const char *caseName) {
+#ifdef VT7PTY_H3_GUARDS
+        std::unique_ptr<h3guards::Flight> flight;
+#endif
 #ifdef VT7PTY_H3_COORDINATED
         std::unique_ptr<h3coord::Guard> coordination;
 #endif
         try {
-            check(!disabled && !closed,"no dispatch on retired channel");
+            check(!disabled && !closed
+#ifdef VT7PTY_H3_GUARDS
+                && !closingRequested.load()
+#endif
+                ,"no dispatch on retired channel");
             verifyLive();
 #ifdef VT7PTY_H3_FREEZE
             if(expected==Result::Accepted && (request.operation==Op::Cancel || request.operation==Op::RestoreControl || request.operation==Op::CancelClose || request.operation==Op::CancelSuppressAck)) snapshot();
@@ -280,12 +303,26 @@ public:
             #ifdef VT7PTY_H3_COORDINATED
             if(coordination) { check(ResetEvent(completion.value),"reset callback boundary"); coordination->beforeWrite(); }
 #endif
+#ifdef VT7PTY_H3_GUARDS
+            if(mutation) flight=std::make_unique<h3guards::Flight>(inFlight,closingRequested,disabled);
+#endif
             transfer(server.value,&request,sizeof(request),true);
+#ifdef VT7PTY_H3_GUARDS
+            if(mutation && inputRace) {inputRace->publish();inputRace->signalBegin=h3trace::qpc();}
+            if(mutation && closeRace) closeRace->published();
+#endif
             signal();
+#ifdef VT7PTY_H3_GUARDS
+            if(mutation && inputRace) inputRace->signalEnd=h3trace::qpc();
+            if(mutation && closeRace) closeRace->completed(completion.value);
+#endif
 #ifdef VT7PTY_H3_COORDINATED
             if(coordination) coordination->signalReturned();
 #endif
             const auto response=receive();
+#ifdef VT7PTY_H3_GUARDS
+            if(mutation && closeRace) closeRace->ackQpc=h3trace::qpc();
+#endif
 #ifdef VT7PTY_H3_FREEZE
             check(response.windowTrace.count<=h3freeze::chunkCapacity && response.windowTrace.next>=windowCursor,"window trace cursor");
             windowCursor=response.windowTrace.next; windowTotal=response.windowTrace.total;
@@ -321,6 +358,9 @@ public:
             #ifdef VT7PTY_H3_COORDINATED
             if(coordination) { coordination->observeCompletion(completion.value); coordination->complete(expected); }
 #endif
+            #ifdef VT7PTY_H3_GUARDS
+            if(mutation && closeRace) closeRace->endQpc=h3trace::qpc();
+#endif
             return response;
         } catch(const std::exception &error) {
 #ifdef VT7PTY_H3_COORDINATED
@@ -331,8 +371,8 @@ public:
             disabled=true; throw;
         }
     }
-    void ambiguityControl(bool cancel=false) {
-        exchange(next(cancel ? Op::CancelSuppressAck : Op::SuppressAck),Result::Received,"receipt-without-final-ack");
+    void ambiguityControl(bool cancel=false,bool alreadyReceived=false) {
+        if(!alreadyReceived) exchange(next(cancel ? Op::CancelSuppressAck : Op::SuppressAck),Result::Received,"receipt-without-final-ack");
         bool timedOut=false;
         try { receive(150); } catch(const std::runtime_error &e) { timedOut=std::string(e.what())=="OutcomeUnknown: acknowledgment deadline"; }
         check(timedOut && blocked(),"unknown outcome disables dispatch");
@@ -379,6 +419,10 @@ public:
         // User32 owns the remote module's hook lifetime. This only frees our local reference.
         if(module) { FreeLibrary(module); module=nullptr; }
     }
-    bool blocked() const { return disabled || closed; }
+    bool blocked() const { return disabled || closed
+#ifdef VT7PTY_H3_GUARDS
+        || closingRequested.load()
+#endif
+        ; }
 };
 } // namespace

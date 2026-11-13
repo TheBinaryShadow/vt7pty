@@ -1,6 +1,6 @@
-# Developer-side version-4 checks, loaded by Test-HostFreezeEvidence.ps1.
+# Developer-side version-4/5 checks, loaded by Test-HostFreezeEvidence.ps1.
 function Review-CoordinationNative([string]$Native,$Root,$Locations) {
-    Require-Trace ($Root.Version -eq 4 -and $Root.BaselineCoordinated -and $Root.NeighborPeriodicDrain -and $Root.NeighborSoakMs -ge 0 -and $Root.NeighborSoakMs -le 90000) 'coordinated research boundary'
+    Require-Trace ($Root.Version -in @(4,5) -and $Root.BaselineCoordinated -and $Root.NeighborPeriodicDrain -and $Root.NeighborSoakMs -ge 0 -and $Root.NeighborSoakMs -le 90000) 'coordinated research boundary'
     $rows=@();$owned=0;$borrowed=0;$refusals=0;$receipts=0;$exits=0
     foreach($location in $Locations) {
         $dir=Join-Path $Native $location.Path
@@ -30,7 +30,7 @@ function Review-CoordinationNative([string]$Native,$Root,$Locations) {
             Require-Trace (Test-Path -LiteralPath $path) 'coordinated operation has host evidence'
             $q=Read-TraceJson $path;$bound[$p.HostRecord]=$true
             Require-Trace ($q.Case -ceq $p.Case -and $q.RequestSequence -ceq $p.RequestSequence -and $q.RequestOperation -eq $p.Operation -and
-                $q.RequestSchema -eq 4 -and $q.RequestIdentity.Agent -eq $hello.Identity.Agent -and $q.RequestIdentity.Host -eq $hello.Identity.Host -and
+                $q.RequestSchema -eq $root.Version -and $q.RequestIdentity.Agent -eq $hello.Identity.Agent -and $q.RequestIdentity.Host -eq $hello.Identity.Host -and
                 $p.HostWriteStarted -and $p.VerifiedBeforeWrite -and [decimal]$p.ReadyQpc -ge [decimal]$p.BeginQpc -and
                 [decimal]$p.WriteBeginQpc -ge [decimal]$p.ReadyQpc -and [decimal]$p.CompletionQpc -ge [decimal]$p.WriteBeginQpc -and
                 [decimal]$p.AckQpc -ge [decimal]$p.CompletionQpc -and [decimal]$p.EndQpc -ge [decimal]$p.AckQpc) 'permit binding and completion boundary'

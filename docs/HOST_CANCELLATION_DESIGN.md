@@ -1,6 +1,6 @@
 # Console-host cancellation design
 
-Status: H1 and H2 accepted on Windows 7; coordinated H3 baseline verified, with wider guards still pending.
+Status: H1 and H2 accepted on Windows 7; coordinated baseline verified; guard candidate implemented and awaiting Windows 7 qualification.
 Updated: 2026-11-13.
 
 I'm following the [cancellation investigation](INPUT_CANCELLATION.md) with
@@ -51,6 +51,13 @@ passes all 126 baseline/expiry cases and 54 protected focused phases with no
 prototype trace loss. Unprotected contrasts and earlier controls retain their
 failures. True completion/close races, actual access denial, active-child and
 PowerShell 7 qualification keep H3 open.
+
+The [guard candidate](HOST_GUARDS.md) now implements concurrent completion and
+channel-close checks, a restricted-token kernel access-denied path, controlled
+native children, and both pinned PowerShell 7 editor configurations. The public
+child route retains the event/exit contract; the host route also requires cooked
+read cancellation and a subsequent read. Its exact runtime controls remain
+unchanged. H3 acceptance awaits Windows 7 results.
 
 ## H1 implementation
 

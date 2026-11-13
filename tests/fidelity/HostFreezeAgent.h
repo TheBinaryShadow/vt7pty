@@ -46,7 +46,9 @@ public:
         if(!owner_.value) throw std::runtime_error("research controller handle");
         std::vector<wchar_t> image(32768); DWORD length=static_cast<DWORD>(image.size());
         fidelity::check(QueryFullProcessImageNameW(owner_.value,0,image.data(),&length),"research controller image");
-        #ifdef VT7PTY_H3_COORDINATED
+        #if defined(VT7PTY_H3_GUARDS)
+        const auto expected=fidelity::directory()+L"\\HostCancellationGuardProbe.exe";
+#elif defined(VT7PTY_H3_COORDINATED)
         const auto expected=fidelity::directory()+L"\\HostCancellationCoordinatedProbe.exe";
 #else
         const auto expected=fidelity::directory()+L"\\HostCancellationFreezeProbe.exe";

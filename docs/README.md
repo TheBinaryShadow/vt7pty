@@ -33,7 +33,9 @@ blocker and support scrape/resize coordination. The
 [coordinated Windows 7 review](validation/2026-11-13-step-1.2-host-coordination-rc1-windows7.md)
 passes all 126 prototype baseline/expiry cases and 54 protected focused phases,
 with no prototype trace loss. Remaining race, access-denied, active-child and
-PowerShell 7 guards precede H3 acceptance and runtime integration.
+PowerShell 7 guards precede H3 acceptance and runtime integration. The
+[new guard candidate](HOST_GUARDS.md) implements that matrix and awaits runs
+on all three Windows 7 tiers.
 
 | Guide | Purpose |
 | --- | --- |
@@ -46,6 +48,7 @@ PowerShell 7 guards precede H3 acceptance and runtime integration.
 | [Host cancellation probe](HOST_CANCELLATION_PROBE.md) | Run the first H3 prototype and see its remaining limits |
 | [Cancellation diagnostics](HOST_CANCELLATION_DIAGNOSTICS.md) | Collect interleaved rc1 control and traced trials |
 | [Scraper coordination experiment](HOST_FREEZE_DIAGNOSTICS.md) | Compare held selection, quiet intervals, activity and delay controls |
+| [H3 guard qualification](HOST_GUARDS.md) | Run completion/close races, actual denial, native children and pinned PowerShell 7 checks |
 | [Coordinated cancellation prototype](HOST_COORDINATION_PROBE.md) | Qualify baseline coordination, callback completion, expiry and neighbor collection |
 | [Optional SSH testing](SSH_BASELINE.md) | Deferred remote-test prerequisites |
 
