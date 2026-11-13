@@ -102,6 +102,8 @@ public-API experiments failed. I'm now following the
   completes all 18 trials, with 6/9 controls and 7/9 traced trials passing.
   Selection is active before both traced native delivery failures. I'll test
   coordination with the scraper and tighten shell observations before a fix decision.
+  The [historical reassessment](docs/validation/2026-11-13-step-1.2-cancellation-reassessment.md)
+  adds controlled selected/unselected contrasts and full freeze/Escape tracing.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.

@@ -1,0 +1,83 @@
+{
+  "SchemaVersion": 1,
+  "ReviewedDate": "2026-11-13",
+  "ReviewSource": "05cef71",
+  "NativeTestsRerun": false,
+  "InventoryReferencesChecked": 7229,
+  "UniqueFilesClaimed": false,
+  "AllMatched": true,
+  "Sets": [
+    {
+      "Base": "docs/validation/results/step-1.1",
+      "Inventory": "windows7-evidence-review.json",
+      "Property": "Files",
+      "Checked": 214,
+      "Missing": 0,
+      "LengthMismatches": 0,
+      "HashMismatches": 0
+    },
+    {
+      "Base": "docs/validation/results/step-1.1/rc3",
+      "Inventory": "windows7-evidence-review.json",
+      "Property": "Files",
+      "Checked": 445,
+      "Missing": 0,
+      "LengthMismatches": 0,
+      "HashMismatches": 0
+    },
+    {
+      "Base": "docs/validation/results/step-1.2/mechanism-rc1",
+      "Inventory": "windows7-evidence-review.json",
+      "Property": "PreservedFiles",
+      "Checked": 481,
+      "Missing": 0,
+      "LengthMismatches": 0,
+      "HashMismatches": 0
+    },
+    {
+      "Base": "docs/validation/results/step-1.2/host-identity-rc1",
+      "Inventory": "windows7-evidence-review.json",
+      "Property": "Files",
+      "Checked": 132,
+      "Missing": 0,
+      "LengthMismatches": 0,
+      "HashMismatches": 0
+    },
+    {
+      "Base": "docs/validation/results/step-1.2/host-dispatch-rc1",
+      "Inventory": "windows7-evidence-review.json",
+      "Property": "Files",
+      "Checked": 519,
+      "Missing": 0,
+      "LengthMismatches": 0,
+      "HashMismatches": 0
+    },
+    {
+      "Base": "docs/validation/results/step-1.2/host-cancellation-rc1/windows7",
+      "Inventory": "../windows7-preserved-files.json",
+      "Property": "Files",
+      "Checked": 1346,
+      "Missing": 0,
+      "LengthMismatches": 0,
+      "HashMismatches": 0
+    },
+    {
+      "Base": "docs/validation/results/step-1.2/host-cancellation-rc1/investigation",
+      "Inventory": "preserved-files.json",
+      "Property": "Files",
+      "Checked": 910,
+      "Missing": 0,
+      "LengthMismatches": 0,
+      "HashMismatches": 0
+    },
+    {
+      "Base": "docs/validation/results/step-1.2/host-cancellation-diagnostics-rc1/windows7",
+      "Inventory": "preserved-files.json",
+      "Property": "Files",
+      "Checked": 3182,
+      "Missing": 0,
+      "LengthMismatches": 0,
+      "HashMismatches": 0
+    }
+  ]
+}

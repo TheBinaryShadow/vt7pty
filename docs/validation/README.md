@@ -23,7 +23,9 @@ selection before the key request. H3 and the runtime cancellation fix remain ope
 
 The [H3 failure investigation](2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
 compares the original failures with passes. The [paired diagnostic review](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md)
-records the selection-state finding and the next controlled experiment.
+records the selection-state finding. The [historical reassessment](2026-11-13-step-1.2-cancellation-reassessment.md)
+rechecks the evidence chain and strengthens the next experiment with held-state
+controls, freeze/Escape tracing and separate shell measurements.
 
 These research bundles use the released 0.5.0 runtime. Passing a research stage
 does not resolve the recorded shell defects or accept Milestone 1.

@@ -1,0 +1,141 @@
+{
+  "SchemaVersion": 1,
+  "ReviewedDate": "2026-11-13",
+  "RepositoryRevision": "05cef71",
+  "Scope": "Historical primary-source research and limitations; no implementation copied or changed.",
+  "Sources": [
+    {
+      "id": "conemu590",
+      "url": "https://github.com/ConEmu/conemu-old-issues/issues/590",
+      "title": "Ctrl-C doesn't work in PowerShell and cmd",
+      "historicalDate": "2012-06-13",
+      "metadataDate": "2015-07-31 migration",
+      "supports": "Original report names Windows 7 Enterprise SP1 x64 and failure to abort CMD/PowerShell input.",
+      "limit": "Historical matching symptom, not evidence of the current selection race."
+    },
+    {
+      "id": "winptyFreeze",
+      "url": "https://github.com/rprichard/winpty/commit/2e661f15fd6efb09289c9c46401139a72a7e3336",
+      "title": "Freeze behavior on inactive console buffers",
+      "historicalDate": "2016-04-19",
+      "commit": "2e661f15fd6efb09289c9c46401139a72a7e3336",
+      "supports": "Maintainer reports Windows 7 selection blocks writes to inactive buffers, for both Mark and SelectAll.",
+      "limit": "Protective output synchronization must be retained; this test does not measure cancellation."
+    },
+    {
+      "id": "winptyMark",
+      "url": "https://github.com/rprichard/winpty/issues/53#issuecomment-224243883",
+      "title": "Mark alternative reverted",
+      "historicalDate": "2016",
+      "supports": "Maintainer reports cursor interference and screen corruption from the Mark alternative.",
+      "limit": "Do not substitute Mark as an assumed solution."
+    },
+    {
+      "id": "winptyGui",
+      "url": "https://github.com/rprichard/winpty/commit/c9ce3ad1e347d9535eef5c79927a82c9f8eb5f29",
+      "title": "GUI Ctrl+C implementation",
+      "historicalDate": "2017-05-17",
+      "commit": "c9ce3ad1e347d9535eef5c79927a82c9f8eb5f29",
+      "supports": "Upstream tried window messages for prompt cancellation.",
+      "limit": "Superseded by the later revert."
+    },
+    {
+      "id": "winptyRevert",
+      "url": "https://github.com/rprichard/winpty/commit/4978cf94b6ea48e38eea3146bd0d23210f87aa89",
+      "title": "Revert GUI processed Ctrl+C",
+      "historicalDate": "2017-05-19",
+      "commit": "4978cf94b6ea48e38eea3146bd0d23210f87aa89",
+      "supports": "Upstream returned to GenerateConsoleCtrlEvent.",
+      "limit": "Historical design decision does not establish impossibility of a verified in-host operation."
+    },
+    {
+      "id": "winpty116",
+      "url": "https://github.com/rprichard/winpty/issues/116#issuecomment-302646738",
+      "title": "Maintainer analysis of background keyboards, ordering and NUL",
+      "historicalDate": "2017-05-19",
+      "supports": "Explains modifier-state problems across background desktops, unsafe global input, queued-message reordering and NUL character records from synchronous sends.",
+      "limit": "Current nested modifier traces address one observed boundary; selection and raw-character fidelity remain separate."
+    },
+    {
+      "id": "winpty116raw",
+      "url": "https://github.com/rprichard/winpty/issues/116#issuecomment-302358416",
+      "title": "GUI unprocessed Ctrl+C produces NUL",
+      "historicalDate": "2017-05-18",
+      "supports": "Maintainer records NUL characters and a PowerShell failure on the unprocessed GUI path.",
+      "limit": "The diagnostic Character=0 contract is not equivalent to the accepted unprocessed transport's character 0x03."
+    },
+    {
+      "id": "winpty116win7",
+      "url": "https://github.com/rprichard/winpty/issues/116#issuecomment-302339101",
+      "title": "Initial Windows 7 GUI cancellation result",
+      "historicalDate": "2017-05-18",
+      "supports": "Maintainer reports prompt cancellation working for CMD and PowerShell on Windows 7 before the broader limitations were found.",
+      "limit": "Plausibility, not a qualification of the current implementation."
+    },
+    {
+      "id": "winpty117",
+      "url": "https://github.com/rprichard/winpty/issues/117",
+      "title": "Different types of input can be reordered",
+      "historicalDate": "2017-05-17",
+      "supports": "Input-record batching must be flushed before a separately issued event or window message.",
+      "limit": "Historical input-ordering hazard, not measured as the cause of the current two traced failures."
+    },
+    {
+      "id": "conemuQueue",
+      "url": "https://github.com/ConEmu/ConEmu/blob/694d71c27f83628e65d2fbbb54c4f2c94547933f/src/ConEmuCD/Queue.cpp#L48",
+      "title": "ConEmu processed Ctrl+C input path",
+      "historicalDate": "2017-04-03",
+      "commit": "694d71c27f83628e65d2fbbb54c4f2c94547933f",
+      "blob": "587e6d0b48c758b09af090bfb940a802bea53083",
+      "supports": "Uses a window key message for processed Ctrl+C, cites issue 590, warns about modifiers.",
+      "limit": "Its readiness checks do not prove a solution to this exact scrape-freeze race."
+    },
+    {
+      "id": "conemuPause",
+      "url": "https://github.com/ConEmu/ConEmu/blob/694d71c27f83628e65d2fbbb54c4f2c94547933f/src/common/WConsole.cpp#L746",
+      "title": "ConEmu output pause and selection",
+      "historicalDate": "2017-04-03",
+      "commit": "694d71c27f83628e65d2fbbb54c4f2c94547933f",
+      "blob": "dec8bdb7bbaed13c5aecac673b398687c7001ce3",
+      "supports": "Pauses through Mark, resumes with Escape, and treats selection as halted output.",
+      "limit": "Different product and implementation."
+    },
+    {
+      "id": "reactosSelection",
+      "url": "https://github.com/reactos/reactos/blob/447673979ce8a19188628cac6053a5d20c368237/win32ss/user/winsrv/consrv/frontends/gui/conwnd.c#L1157",
+      "title": "Compatibility implementation of selection key handling",
+      "commit": "447673979ce8a19188628cac6053a5d20c368237",
+      "supports": "Active-selection branch clears selection on Ctrl+C/Escape and returns before ordinary input; SelectAll sets mouse-style selection.",
+      "limit": "Independent compatibility implementation, not Windows 7 source. Its selection branch filters non-WM_KEYDOWN messages, so it does not establish WinPTY WM_CHAR Escape behavior. Behavioral reference only; no code copied."
+    },
+    {
+      "id": "ms2014",
+      "url": "https://blogs.windows.com/windowsdeveloper/2014/10/07/console-improvements-in-the-windows-10-technical-preview/",
+      "title": "Console improvements in Windows 10 Technical Preview",
+      "historicalDate": "2014-10-07",
+      "supports": "Microsoft presents the newer dual copy/cancel Ctrl+C keyboard behavior as a Windows 10 console change.",
+      "limit": "Do not infer that Windows 7 follows current copy-to-clipboard behavior."
+    },
+    {
+      "id": "msModes",
+      "url": "https://learn.microsoft.com/en-us/windows/console/setconsolemode",
+      "title": "SetConsoleMode",
+      "supports": "QuickEdit is bit 0x40 and can be disabled using extended flags; processed input is a separate flag.",
+      "limit": "Disabling QuickEdit does not prevent the agent from explicitly invoking SelectAll."
+    },
+    {
+      "id": "msSelection",
+      "url": "https://learn.microsoft.com/en-us/windows/console/console-selection-info-str",
+      "title": "CONSOLE_SELECTION_INFO",
+      "supports": "Flags 7 combine selection in progress, nonempty selection, and mouse-style selection.",
+      "limit": "The flags do not identify which process caused selection or establish atomic state at key entry."
+    },
+    {
+      "id": "msSend",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-sendmessage",
+      "title": "SendMessage",
+      "supports": "Synchronous cross-thread sending blocks and can process incoming nonqueued messages while waiting.",
+      "limit": "A coordination handshake inside the host callback can introduce circular waits."
+    }
+  ]
+}

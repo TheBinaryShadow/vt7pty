@@ -9,7 +9,8 @@ control or accept H3.
 The [Windows 7 review](validation/2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md)
 records all 18 completed trials, including the PowerShell 2.0 run. Both traced
 native delivery failures sampled an active selection before dispatch. H3 remains
-open for a controlled scraper/cancellation experiment.
+open for a controlled scraper/cancellation experiment. The [reassessment](validation/2026-11-13-step-1.2-cancellation-reassessment.md)
+records the historical sources and the refined selected/unselected test conditions.
 
 ## Run on Windows 7
 
