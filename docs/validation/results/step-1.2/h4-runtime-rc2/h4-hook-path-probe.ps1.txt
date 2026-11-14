@@ -1,0 +1,38 @@
+$ErrorActionPreference='Stop'
+$native=@"
+using System;
+using System.Text;
+using System.Runtime.InteropServices;
+public static class H4HookPathCheck {
+ [DllImport("kernel32.dll",CharSet=CharSet.Unicode,SetLastError=true)] public static extern IntPtr LoadLibraryExW(string p,IntPtr f,uint flags);
+ [DllImport("kernel32.dll",CharSet=CharSet.Ansi,SetLastError=true)] public static extern IntPtr GetProcAddress(IntPtr m,string n);
+ [DllImport("kernel32.dll",CharSet=CharSet.Unicode,SetLastError=true)] public static extern uint GetModuleFileNameW(IntPtr m,StringBuilder p,uint c);
+ [DllImport("kernel32.dll")] public static extern uint GetCurrentThreadId();
+ [DllImport("kernel32.dll")] public static extern bool FreeLibrary(IntPtr m);
+ [DllImport("kernel32.dll")] public static extern void SetLastError(uint e);
+ [DllImport("user32.dll",SetLastError=true)] public static extern IntPtr SetWindowsHookExW(int t,IntPtr c,IntPtr m,uint id);
+ [DllImport("user32.dll",SetLastError=true)] public static extern bool UnhookWindowsHookEx(IntPtr h);
+}
+"@
+Add-Type -TypeDefinition $native
+$results=@()
+foreach($dir in @('D:\Git\vt7pty\artifacts\bin\x64\Release','D:\Git\vt7pty\artifacts\fidelity\h4-exact-rc1\runtime\bin','D:\Git\vt7pty\artifacts\fidelity\h4-exact-rc2\runtime\bin','D:\Git\vt7pty\artifacts\fidelity\h4-fresh-hook-path')) {
+ $path=Join-Path $dir 'VT7Pty-Host.dll'
+ $module=[H4HookPathCheck]::LoadLibraryExW($path,[IntPtr]::Zero,8)
+ $loadError=[Runtime.InteropServices.Marshal]::GetLastWin32Error()
+ if($module -eq [IntPtr]::Zero){throw ('Own-process DLL load failed: '+$path)}
+ $address=[H4HookPathCheck]::GetProcAddress($module,'VT7PtyHostCallback')
+ if($address -eq [IntPtr]::Zero){throw 'Missing callback export'}
+ $name=New-Object Text.StringBuilder 32768
+ [void][H4HookPathCheck]::GetModuleFileNameW($module,$name,32768)
+ [H4HookPathCheck]::SetLastError(0)
+ $thread=[H4HookPathCheck]::GetCurrentThreadId()
+ $hook=[H4HookPathCheck]::SetWindowsHookExW(4,$address,$module,$thread)
+ $errorCode=[Runtime.InteropServices.Marshal]::GetLastWin32Error()
+ $results+=@(@{Path=$path;Sha256=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant();LoadedPath=$name.ToString();ModuleLoaded=$true;ExportFound=$true;OwnThread=$thread;HookInstalled=($hook -ne [IntPtr]::Zero);HookError=$errorCode;LoadError=$loadError})
+ if($hook -ne [IntPtr]::Zero){if(-not [H4HookPathCheck]::UnhookWindowsHookEx($hook)){throw 'Own hook removal failed'}}
+ if(-not [H4HookPathCheck]::FreeLibrary($module)){throw 'Own module release failed'}
+}
+$record=@{Kind='H4OwnThreadHookPathContrast';Date=[DateTime]::UtcNow.ToString('o');NoHostTargeted=$true;NoHookMessagesSent=$true;Results=$results}
+[IO.File]::WriteAllText('D:\Git\vt7pty\artifacts\fidelity\h4-hook-path-contrast.json',($record | ConvertTo-Json -Depth 6),(New-Object Text.UTF8Encoding($false)))
+$results | Select-Object Path,Sha256,HookInstalled,HookError

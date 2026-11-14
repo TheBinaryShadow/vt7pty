@@ -1,0 +1,481 @@
+Microsoft (R) COFF/PE Dumper Version 14.44.35228.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-Agent.exe
+
+PE signature found
+
+File Type: EXECUTABLE IMAGE
+
+FILE HEADER VALUES
+            8664 machine (x64)
+               B number of sections
+        6AF7C213 time date stamp
+               0 file pointer to symbol table
+               0 number of symbols
+              F0 size of optional header
+              22 characteristics
+                   Executable
+                   Application can handle large (>2GB) addresses
+
+OPTIONAL HEADER VALUES
+             20B magic # (PE32+)
+           14.44 linker version
+          288E00 size of code
+           E0400 size of initialized data
+               0 size of uninitialized data
+            6767 entry point (0000000140006767) @ILT+22370(mainCRTStartup)
+            1000 base of code
+       140000000 image base (0000000140000000 to 000000014036FFFF)
+            1000 section alignment
+             200 file alignment
+            6.01 operating system version
+            0.00 image version
+            6.01 subsystem version
+               0 Win32 version
+          370000 size of image
+             400 size of headers
+               0 checksum
+               3 subsystem (Windows CUI)
+            8160 DLL characteristics
+                   High Entropy Virtual Addresses
+                   Dynamic base
+                   NX compatible
+                   Terminal Server Aware
+          100000 size of stack reserve
+            1000 size of stack commit
+          100000 size of heap reserve
+            1000 size of heap commit
+               0 loader flags
+              10 number of directories
+               0 [       0] RVA [size] of Export Directory
+          361910 [      64] RVA [size] of Import Directory
+          36A000 [     A06] RVA [size] of Resource Directory
+          342000 [   1BE28] RVA [size] of Exception Directory
+               0 [       0] RVA [size] of Certificates Directory
+          36B000 [    1CB4] RVA [size] of Base Relocation Directory
+          313850 [      54] RVA [size] of Debug Directory
+               0 [       0] RVA [size] of Architecture Directory
+               0 [       0] RVA [size] of Global Pointer Directory
+          314EA0 [      28] RVA [size] of Thread Storage Directory
+          3136D0 [     140] RVA [size] of Load Configuration Directory
+               0 [       0] RVA [size] of Bound Import Directory
+          361000 [     910] RVA [size] of Import Address Table Directory
+               0 [       0] RVA [size] of Delay Import Directory
+               0 [       0] RVA [size] of COM Descriptor Directory
+               0 [       0] RVA [size] of Reserved Directory
+
+
+SECTION HEADER #1
+   .text name
+  288D23 virtual size
+    1000 virtual address (0000000140001000 to 0000000140289D22)
+  288E00 size of raw data
+     400 file pointer to raw data (00000400 to 002891FF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+60000020 flags
+         Code
+         Execute Read
+
+SECTION HEADER #2
+  .rdata name
+   B16EA virtual size
+  28A000 virtual address (000000014028A000 to 000000014033B6E9)
+   B1800 size of raw data
+  289200 file pointer to raw data (00289200 to 0033A9FF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+40000040 flags
+         Initialized Data
+         Read Only
+
+  Debug Directories
+
+        Time Type        Size      RVA  Pointer
+    -------- ------- -------- -------- --------
+    D39FCC81 cv            4F 00319620   318820    Format: RSDS, {1DE27AC7-B255-53BF-3BDD-0BBB42D62595}, 67, D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-Agent.pdb
+    D39FCC81 feat          14 00319670   318870    Counts: Pre-VC++ 11.00=0, C/C++=321, /GS=321, /sdl=27, guardN=294
+    D39FCC81 repro         24 00319684   318884    C7 7A E2 1D 55 B2 BF 53 3B DD 0B BB 42 D6 25 95 69 E0 74 A1 83 E7 D5 C6 16 A6 AC 04 81 CC 9F D3
+
+SECTION HEADER #3
+   .data name
+    5B94 virtual size
+  33C000 virtual address (000000014033C000 to 0000000140341B93)
+    3400 size of raw data
+  33AA00 file pointer to raw data (0033AA00 to 0033DDFF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+C0000040 flags
+         Initialized Data
+         Read Write
+
+SECTION HEADER #4
+  .pdata name
+   1EBE8 virtual size
+  342000 virtual address (0000000140342000 to 0000000140360BE7)
+   1EC00 size of raw data
+  33DE00 file pointer to raw data (0033DE00 to 0035C9FF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+40000040 flags
+         Initialized Data
+         Read Only
+
+SECTION HEADER #5
+  .idata name
+    25B9 virtual size
+  361000 virtual address (0000000140361000 to 00000001403635B8)
+    2600 size of raw data
+  35CA00 file pointer to raw data (0035CA00 to 0035EFFF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+40000040 flags
+         Initialized Data
+         Read Only
+
+  Section contains the following imports:
+
+    ADVAPI32.dll
+             140361000 Import Address Table
+             140361978 Import Name Table
+                     0 time date stamp
+                     0 Index of first forwarder reference
+
+                         211 OpenProcessToken
+                         216 OpenThreadToken
+                         105 EqualSid
+                         157 GetSidSubAuthority
+                         158 GetSidSubAuthorityCount
+                         15B GetTokenInformation
+                         189 IsValidSid
+                          C2 CryptAcquireContextW
+                          DC CryptReleaseContext
+                          D2 CryptGenRandom
+                          20 AllocateAndInitializeSid
+                         11F FreeSid
+                         17A InitializeSecurityDescriptor
+                         2E4 SetSecurityDescriptorDacl
+                         2D4 SetEntriesInAclW
+                         14E GetSecurityInfo
+                          7B ConvertSidToStringSidW
+                          83 ConvertStringSidToSidW
+                          81 ConvertStringSecurityDescriptorToSecurityDescriptorW
+                          79 ConvertSecurityDescriptorToStringSecurityDescriptorW
+
+    SHELL32.dll
+             1403617B0 Import Address Table
+             140362128 Import Name Table
+                     0 time date stamp
+                     0 Index of first forwarder reference
+
+                           9 CommandLineToArgvW
+
+    USER32.dll
+             140361810 Import Address Table
+             140362188 Import Name Table
+                     0 time date stamp
+                     0 Index of first forwarder reference
+
+                         3FC VkKeyScanW
+                         15A GetDoubleClickTime
+                         32D SendMessageW
+                         3D5 UnhookWinEvent
+                         38B SetWinEventHook
+                         3D7 UnhookWindowsHookEx
+                         3A2 SetWindowsHookExW
+                         28B MapVirtualKeyW
+                         2B8 PeekMessageW
+                          C1 DispatchMessageW
+                         3D2 TranslateMessage
+                         1E6 GetUserObjectInformationW
+                         1BC GetProcessWindowStation
+                         1DA GetThreadDesktop
+                          51 CloseDesktop
+                         2AE OpenInputDesktop
+                         2BC PostMessageW
+                         32C SendMessageTimeoutW
+
+    KERNEL32.dll
+             140361118 Import Address Table
+             140361A90 Import Name Table
+                     0 time date stamp
+                     0 Index of first forwarder reference
+
+                         4A6 ReadConsoleW
+                         593 SetStdHandle
+                         55A SetEnvironmentVariableW
+                         1D3 FreeEnvironmentStringsW
+                         262 GetEnvironmentStringsW
+                         2C6 GetOEMCP
+                         1DB GetACP
+                         3BE IsValidCodePage
+                         1B4 FindNextFileW
+                         1A3 FindFirstFileExW
+                         19D FindClose
+                         343 GetTimeZoneInformation
+                         569 SetFilePointerEx
+                         278 GetFileSizeEx
+                         1C8 FlushFileBuffers
+                         17B EnumSystemLocalesW
+                         349 GetUserDefaultLCID
+                         3C0 IsValidLocale
+                         291 GetLocaleInfoW
+                         3E4 LCMapStringW
+                          B3 CompareStringW
+                         303 GetStdHandle
+                          9D CloseHandle
+                         14F DuplicateHandle
+                         28D GetLastError
+                         625 WaitForSingleObject
+                         241 GetCurrentProcess
+                         102 CreateProcessW
+                         52F SetConsoleCtrlHandler
+                         28C GetLargestConsoleWindowSize
+                         659 WriteConsoleInputW
+                         22A GetConsoleProcessList
+                         4A9 ReadFile
+                         660 WriteFile
+                         578 SetLastError
+                         454 PeekNamedPipe
+                          F8 CreateNamedPipeW
+                         500 ResetEvent
+                          D9 CreateEventW
+                         5C8 Sleep
+                         2EE GetProcessTimes
+                         242 GetCurrentProcessId
+                         245 GetCurrentThread
+                         246 GetCurrentThreadId
+                         446 OpenThread
+                         2E6 GetProcessId
+                         2E7 GetProcessIdOfThread
+                         43F OpenProcess
+                         33D GetTickCount64
+                         311 GetSystemDirectoryW
+                         3C4 IsWow64Process
+                         1D4 FreeLibrary
+                         2A1 GetModuleFileNameW
+                         2A5 GetModuleHandleW
+                         2DD GetProcAddress
+                         3F6 LoadLibraryExW
+                         366 GlobalDeleteAtom
+                         47A QueryFullProcessImageNameW
+                         363 GlobalAddAtomW
+                         2AB GetNamedPipeClientProcessId
+                         22F GetConsoleTitleW
+                         54A SetConsoleTitleW
+                         22D GetConsoleSelectionInfo
+                         118 CreateToolhelp32Snapshot
+                         45F Process32FirstW
+                         461 Process32NextW
+                         213 GetConsoleCP
+                         229 GetConsoleOutputCP
+                         238 GetCurrentConsoleFontEx
+                         54D SetCurrentConsoleFontEx
+                         225 GetConsoleMode
+                         53F SetConsoleMode
+                         1DA GenerateConsoleCtrlEvent
+                         4A0 ReadConsoleInputW
+                         623 WaitForMultipleObjects
+                         200 GetCommandLineW
+                          E6 CreateFileW
+                          B4 ConnectNamedPipe
+                         2C7 GetOverlappedResult
+                          88 CancelIo
+                         219 GetConsoleCursorInfo
+                         230 GetConsoleWindow
+                         195 FillConsoleOutputCharacterW
+                         193 FillConsoleOutputAttribute
+                          CC CreateConsoleScreenBuffer
+                         22B GetConsoleScreenBufferInfo
+                         547 SetConsoleScreenBufferSize
+                         533 SetConsoleCursorPosition
+                         548 SetConsoleTextAttribute
+                         54B SetConsoleWindowInfo
+                         65E WriteConsoleOutputW
+                         4A5 ReadConsoleOutputW
+                         263 GetEnvironmentVariableA
+                         44A OutputDebugStringA
+                         581 SetNamedPipeHandleState
+                         5F0 TransactNamedPipe
+                         62C WaitNamedPipeW
+                         318 GetSystemTime
+                         2A0 GetModuleFileNameA
+                         31A GetSystemTimeAsFileTime
+                         3F7 LoadLibraryW
+                         64C WideCharToMultiByte
+                         3FD LocalAlloc
+                         402 LocalFree
+                         341 GetTimeFormatW
+                         423 MultiByteToWideChar
+                         1CF FormatMessageA
+                         157 EnterCriticalSection
+                         3F0 LeaveCriticalSection
+                         397 InitializeCriticalSectionEx
+                         12F DeleteCriticalSection
+                         153 EncodePointer
+                         128 DecodePointer
+                         3E3 LCMapStringEx
+                         290 GetLocaleInfoEx
+                         308 GetStringTypeW
+                          B1 CompareStringEx
+                         1EA GetCPInfo
+                         4EA ReleaseSRWLockExclusive
+                           0 AcquireSRWLockExclusive
+                         62D WakeAllConditionVariable
+                         5CA SleepConditionVariableSRW
+                         509 RtlCaptureContext
+                         511 RtlLookupFunctionEntry
+                         518 RtlVirtualUnwind
+                         5FB UnhandledExceptionFilter
+                         5B8 SetUnhandledExceptionFilter
+                         5D8 TerminateProcess
+                         3B8 IsProcessorFeaturePresent
+                         3B0 IsDebuggerPresent
+                         498 RaiseException
+                         301 GetStartupInfoW
+                         481 QueryPerformanceCounter
+                         39A InitializeSListHead
+                         37C HeapAlloc
+                         380 HeapFree
+                         2E4 GetProcessHeap
+                         61C VirtualQuery
+                         513 RtlPcToFileHeader
+                         517 RtlUnwindEx
+                         3A0 InterlockedPushEntrySList
+                         39E InterlockedFlushSList
+                         396 InitializeCriticalSectionAndSpinCount
+                         5EA TlsAlloc
+                         5EC TlsGetValue
+                         5EE TlsSetValue
+                         5EB TlsFree
+                         385 HeapSize
+                         388 HeapValidate
+                         314 GetSystemInfo
+                         2A4 GetModuleHandleExW
+                         186 ExitProcess
+                         1FF GetCommandLineA
+                         383 HeapReAlloc
+                         382 HeapQueryInformation
+                         27A GetFileType
+                         44B OutputDebugStringW
+                         65F WriteConsoleW
+                         329 GetTempPathW
+                         1C2 FlsAlloc
+                         1C4 FlsGetValue
+                         1C6 FlsSetValue
+                         1C3 FlsFree
+                         3BA IsThreadAFiber
+                         61A VirtualProtect
+                         24C GetDateFormatW
+                         516 RtlUnwind
+
+SECTION HEADER #6
+.msvcjmc name
+    234A virtual size
+  364000 virtual address (0000000140364000 to 0000000140366349)
+    2400 size of raw data
+  35F000 file pointer to raw data (0035F000 to 003613FF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+C0000040 flags
+         Initialized Data
+         Read Write
+
+SECTION HEADER #7
+    .tls name
+     31B virtual size
+  367000 virtual address (0000000140367000 to 000000014036731A)
+     400 size of raw data
+  361400 file pointer to raw data (00361400 to 003617FF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+C0000040 flags
+         Initialized Data
+         Read Write
+
+SECTION HEADER #8
+  .00cfg name
+     175 virtual size
+  368000 virtual address (0000000140368000 to 0000000140368174)
+     200 size of raw data
+  361800 file pointer to raw data (00361800 to 003619FF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+40000040 flags
+         Initialized Data
+         Read Only
+
+SECTION HEADER #9
+.fptable name
+     233 virtual size
+  369000 virtual address (0000000140369000 to 0000000140369232)
+     400 size of raw data
+  361A00 file pointer to raw data (00361A00 to 00361DFF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+C0000040 flags
+         Initialized Data
+         Read Write
+
+SECTION HEADER #A
+   .rsrc name
+     A06 virtual size
+  36A000 virtual address (000000014036A000 to 000000014036AA05)
+     C00 size of raw data
+  361E00 file pointer to raw data (00361E00 to 003629FF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+40000040 flags
+         Initialized Data
+         Read Only
+
+SECTION HEADER #B
+  .reloc name
+    42AC virtual size
+  36B000 virtual address (000000014036B000 to 000000014036F2AB)
+    4400 size of raw data
+  362A00 file pointer to raw data (00362A00 to 00366DFF)
+       0 file pointer to relocation table
+       0 file pointer to line numbers
+       0 number of relocations
+       0 number of line numbers
+42000040 flags
+         Initialized Data
+         Discardable
+         Read Only
+
+  Summary
+
+        1000 .00cfg
+        6000 .data
+        1000 .fptable
+        3000 .idata
+        3000 .msvcjmc
+       1F000 .pdata
+       B2000 .rdata
+        5000 .reloc
+        1000 .rsrc
+      289000 .text
+        1000 .tls

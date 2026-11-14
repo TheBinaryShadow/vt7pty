@@ -102,7 +102,8 @@ public-API experiments failed. I'm now following the
   The [H4 candidate](docs/H4_RUNTIME.md) uses approved opt-in backing-desktop
   isolation and API 1.1 two-phase close. Local checks cover 41 runtime cases and
   25 protocol/keyboard oracles. Windows 7, keyboard and sustained opt-in workload
-  qualification remain open.
+  qualification remain open. The [rc2 review](docs/validation/2026-11-14-step-1.2-h4-runtime-rc2-candidate.md)
+  holds archive issuance pending a fresh-session hook-registration check on WOLF.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.
 - [ ] Add focused regressions and verify US/Croatian keyboard behavior where

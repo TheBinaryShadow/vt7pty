@@ -1,0 +1,42 @@
+Runtime cancellation oracle: 25 checks passed
+FAIL: desktop-boundary runtime startup: lost connection to agent
+FAIL: cooked-empty runtime startup: lost connection to agent
+FAIL: cooked-partial runtime startup: lost connection to agent
+FAIL: cooked-repeated runtime startup: lost connection to agent
+FAIL: raw-input runtime startup: lost connection to agent
+FAIL: input-burst runtime startup: lost connection to agent
+FAIL: no-pending-read runtime startup: lost connection to agent
+FAIL: completed-before-cancel runtime startup: lost connection to agent
+FAIL: default-handler runtime startup: lost connection to agent
+FAIL: mode-transitions runtime startup: lost connection to agent
+FAIL: race-enter-biased runtime startup: lost connection to agent
+FAIL: race-concurrent runtime startup: lost connection to agent
+FAIL: race-cancel-biased runtime startup: lost connection to agent
+FAIL: race-outcomes both completion outcomes (Win32 0)
+FAIL: close-rpc runtime startup: lost connection to agent
+FAIL: close-input runtime startup: lost connection to agent
+FAIL: agent-death runtime startup: lost connection to agent
+FAIL: caller-death test-channel transfer (Win32 109)
+FAIL: caller-and-agent-death test-channel transfer (Win32 109)
+FAIL: enclosing-job test-channel transfer (Win32 109)
+FAIL: neighbor-isolation runtime startup: lost connection to agent
+FAIL: recreate-resources runtime startup: lost connection to agent
+PASS: impersonation-denied 
+PASS: helper-missing 
+PASS: helper-wrong 
+FAIL: cmd-empty runtime startup: lost connection to agent
+FAIL: cmd-partial runtime startup: lost connection to agent
+FAIL: child-cmd-event runtime startup: lost connection to agent
+FAIL: child-cmd-cooked runtime startup: lost connection to agent
+FAIL: powershell-empty runtime startup: lost connection to agent
+FAIL: powershell-partial runtime startup: lost connection to agent
+FAIL: child-powershell-event runtime startup: lost connection to agent
+FAIL: child-powershell-cooked runtime startup: lost connection to agent
+FAIL: pwsh-native-empty runtime startup: lost connection to agent
+FAIL: pwsh-native-partial runtime startup: lost connection to agent
+FAIL: child-pwsh-native-event runtime startup: lost connection to agent
+FAIL: child-pwsh-native-cooked runtime startup: lost connection to agent
+FAIL: pwsh-readline-empty runtime startup: lost connection to agent
+FAIL: pwsh-readline-partial runtime startup: lost connection to agent
+FAIL: child-pwsh-readline-event runtime startup: lost connection to agent
+FAIL: child-pwsh-readline-cooked runtime startup: lost connection to agent

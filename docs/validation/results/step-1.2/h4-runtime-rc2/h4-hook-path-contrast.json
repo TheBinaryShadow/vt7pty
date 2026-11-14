@@ -1,0 +1,52 @@
+{
+  "Results": [
+    {
+      "HookError": 0,
+      "Sha256": "824b09c3974cef9451fcef8ade2a6d8c9297f158ec5348b87e00855c5dfcf3b4",
+      "LoadError": 0,
+      "LoadedPath": "D:\\Git\\vt7pty\\artifacts\\bin\\x64\\Release\\VT7Pty-Host.dll",
+      "OwnThread": 57968,
+      "ExportFound": true,
+      "HookInstalled": true,
+      "Path": "D:\\Git\\vt7pty\\artifacts\\bin\\x64\\Release\\VT7Pty-Host.dll",
+      "ModuleLoaded": true
+    },
+    {
+      "HookError": 0,
+      "Sha256": "5fb87590d64e0ce10db75d8869711045b1c23beb06a51fbb3af1ceae460917cf",
+      "LoadError": 0,
+      "LoadedPath": "D:\\Git\\vt7pty\\artifacts\\fidelity\\h4-exact-rc1\\runtime\\bin\\VT7Pty-Host.dll",
+      "OwnThread": 57968,
+      "ExportFound": true,
+      "HookInstalled": true,
+      "Path": "D:\\Git\\vt7pty\\artifacts\\fidelity\\h4-exact-rc1\\runtime\\bin\\VT7Pty-Host.dll",
+      "ModuleLoaded": true
+    },
+    {
+      "HookError": 126,
+      "Sha256": "824b09c3974cef9451fcef8ade2a6d8c9297f158ec5348b87e00855c5dfcf3b4",
+      "LoadError": 0,
+      "LoadedPath": "D:\\Git\\vt7pty\\artifacts\\fidelity\\h4-exact-rc2\\runtime\\bin\\VT7Pty-Host.dll",
+      "OwnThread": 57968,
+      "ExportFound": true,
+      "HookInstalled": false,
+      "Path": "D:\\Git\\vt7pty\\artifacts\\fidelity\\h4-exact-rc2\\runtime\\bin\\VT7Pty-Host.dll",
+      "ModuleLoaded": true
+    },
+    {
+      "HookError": 126,
+      "Sha256": "824b09c3974cef9451fcef8ade2a6d8c9297f158ec5348b87e00855c5dfcf3b4",
+      "LoadError": 0,
+      "LoadedPath": "D:\\Git\\vt7pty\\artifacts\\fidelity\\h4-fresh-hook-path\\VT7Pty-Host.dll",
+      "OwnThread": 57968,
+      "ExportFound": true,
+      "HookInstalled": false,
+      "Path": "D:\\Git\\vt7pty\\artifacts\\fidelity\\h4-fresh-hook-path\\VT7Pty-Host.dll",
+      "ModuleLoaded": true
+    }
+  ],
+  "Date": "2026-11-14T02:31:55.0239098Z",
+  "Kind": "H4OwnThreadHookPathContrast",
+  "NoHookMessagesSent": true,
+  "NoHostTargeted": true
+}

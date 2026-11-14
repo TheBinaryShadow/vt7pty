@@ -1,0 +1,16 @@
+[0m[0K]0;VT7Pty dispatch research 116733812]0;VT7Pty dispatch research 116734328H3_PS[1]>[0K$m=Get-Module PSReadLine; $v='none'; $cfg='native'; if($m){$v=$m.Versi[0Ko[?25l
+n.ToString();$o=Get-PSReadLineOption;$cfg=$m.Path+'|'+$o.EditMode.ToString()+'|[0K'
++$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAllText('D:\Git\vt7pty\artifa[0Kc
+ts\fidelity\h4-rc2-registered-reference\suite\child-powershell-etx\guard-shell-[0Ki
+dentity.txt',$PSVersionTable.PSVersion.ToString()+'|'+$v+'|'+$Host.Name+'|'+$cf[0Kg
+)[0K
+H3_PS[2]>[0K[?25h& "D:\Git\vt7pty\artifacts\fidelity\inspection-host-guards-rc1\experim[0Ke[?25l
+nt\bin\HostCancellationGuardProbe.exe" --fixture "\\.\pipe\VT7Pty-H3-child-4749[0K2
+-1167353290480" 47492[0K
+[0K[?25hGUARD_CHILD_FINAL[0K[?25l
+H3_PS[3]>[0K[?25h[IO.File]::WriteAllText('D:\Git\vt7pty\artifacts\fidelity\h4-rc2-regis[0Kt[?25l
+ered-reference\suite\child-powershell-etx\parent-child-exit.txt',$LASTEXITCODE.[0KT
+oString()); [IO.File]::WriteAllText('D:\Git\vt7pty\artifacts\fidelity\h4-rc2-re[0Kg
+istered-reference\suite\child-powershell-etx\parent-continued.txt','CONTINUE')[0K
+H3_PS[4]>[0K[?25hexit 0[0K[?25l
+[0K[?25h

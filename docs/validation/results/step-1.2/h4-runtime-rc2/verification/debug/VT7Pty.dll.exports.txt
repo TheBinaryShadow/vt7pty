@@ -1,0 +1,53 @@
+Microsoft (R) COFF/PE Dumper Version 14.44.35228.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty.dll
+
+File Type: DLL
+
+  Section contains the following exports for VT7Pty.dll
+
+    00000000 characteristics
+    4D2CD418 time date stamp
+        0.00 version
+           1 ordinal base
+          20 number of functions
+          20 number of names
+
+    ordinal hint RVA      name
+
+          1    0 00004458 vt7pty_agent_process = @ILT+13395(vt7pty_agent_process)
+          2    1 0000552E vt7pty_close = @ILT+17705(vt7pty_close)
+          3    2 00005FC4 vt7pty_conerr_name = @ILT+20415(vt7pty_conerr_name)
+          4    3 000067BC vt7pty_config_free = @ILT+22455(vt7pty_config_free)
+          5    4 0000820B vt7pty_config_new = @ILT+29190(vt7pty_config_new)
+          6    5 00007DA6 vt7pty_config_set_agent_timeout = @ILT+28065(vt7pty_config_set_agent_timeout)
+          7    6 00007ED7 vt7pty_config_set_initial_size = @ILT+28370(vt7pty_config_set_initial_size)
+          8    7 00008995 vt7pty_config_set_mouse_mode = @ILT+31120(vt7pty_config_set_mouse_mode)
+          9    8 000047E1 vt7pty_conin_name = @ILT+14300(vt7pty_conin_name)
+         10    9 00008AAD vt7pty_conout_name = @ILT+31400(vt7pty_conout_name)
+         11    A 00006762 vt7pty_error_code = @ILT+22365(vt7pty_error_code)
+         12    B 00007D5B vt7pty_error_free = @ILT+27990(vt7pty_error_free)
+         13    C 0000162C vt7pty_error_msg = @ILT+1575(vt7pty_error_msg)
+         14    D 00006A00 vt7pty_free = @ILT+23035(vt7pty_free)
+         15    E 00005AC4 vt7pty_get_console_process_list = @ILT+19135(vt7pty_get_console_process_list)
+         16    F 000021B2 vt7pty_open = @ILT+4525(vt7pty_open)
+         17   10 000063F2 vt7pty_set_size = @ILT+21485(vt7pty_set_size)
+         18   11 00002216 vt7pty_spawn = @ILT+4625(vt7pty_spawn)
+         19   12 000066E0 vt7pty_spawn_config_free = @ILT+22235(vt7pty_spawn_config_free)
+         20   13 000086A2 vt7pty_spawn_config_new = @ILT+30365(vt7pty_spawn_config_new)
+
+  Summary
+
+        1000 .00cfg
+        6000 .data
+        1000 .fptable
+        3000 .idata
+        1000 .msvcjmc
+       1C000 .pdata
+       9C000 .rdata
+        4000 .reloc
+        1000 .rsrc
+      255000 .text
+        1000 .tls

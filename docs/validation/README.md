@@ -17,7 +17,7 @@ qualification, Milestone 1 and VT7 integration remain open.
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| H4 runtime integration | [rc1 development and candidate review](2026-11-14-step-1.2-h4-runtime-rc1-candidate.md) | Pending; H4 remains open |
+| H4 runtime integration | [rc2 payload results and archive-placement investigation](2026-11-14-step-1.2-h4-runtime-rc2-candidate.md) | Pending; local archive gate remains open |
 | H3 guard qualification | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-guards-rc1-candidate.md) | [Accepted: 282/282 guard cases; H4 remains](2026-11-14-step-1.2-host-guards-rc1-windows7.md) |
 | Coordinated H3 prototype | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-coordination-rc1-candidate.md) | [Reviewed: baseline and recording verified; H3 guards remain](2026-11-13-step-1.2-host-coordination-rc1-windows7.md) |
 | H3 scraper coordination | [rc1 candidate, controlled contrasts and retained failures](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-candidate.md) | [Reviewed: coordination supported; H3 open](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md) |
