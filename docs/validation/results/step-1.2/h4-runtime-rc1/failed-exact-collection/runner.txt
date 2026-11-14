@@ -1,0 +1,22 @@
+H4 uses an opt-in runtime. Original rc1 failures are retained separately.
+The Windows 7 regression phase includes the full 120-minute baseline soak.
+Trial 1/9: Control
+Control: Fail; collection Partial
+Trial 2/9: Reference
+Reference: Fail; collection Partial
+Trial 3/9: Runtime
+Runtime: Fail; collection Partial
+Trial 4/9: Control
+Control: Fail; collection Partial
+Trial 5/9: Reference
+Reference: Fail; collection Partial
+Trial 6/9: Runtime
+Runtime: Fail; collection Partial
+Trial 7/9: Control
+Control: Fail; collection Partial
+Trial 8/9: Reference
+Reference: Fail; collection Partial
+Trial 9/9: Runtime
+Runtime: Fail; collection Partial
+H4 collection: 0/9 trials completed. Runtime/reference failures or incomplete trials: 9. Regression: NotApplicable. Original control failures remain failures. H4 acceptance is pending independent review, keyboard and sustained opt-in workload qualification.
+Results: D:\Git\vt7pty\artifacts\fidelity\h4-exact-rc1\results\developmenthost-h4-20261114-015716-35498f25

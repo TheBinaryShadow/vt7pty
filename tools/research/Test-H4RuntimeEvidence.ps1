@@ -190,6 +190,8 @@ if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')) {
         Assert-H4 (@(Get-ChildItem -LiteralPath $trialDir -File -Recurse).Count -eq $inventory.Files.Count+1) 'complete returned file inventory'
         $hashes+=$inventory.Files.Count
         $native=Join-Path $trialDir 'native'
+        $producer=Read-H4 (Join-Path $native 'probe.json')
+        Assert-H4 ($trial.NativeOutcome -ceq $producer.Status) 'producer outcome retained'
         if($role -eq 'Runtime') {
             $review=Review-H4Native $native ($report.Tier -ne 'Legacy')
             $root=Read-H4 (Join-Path $native 'probe.json')

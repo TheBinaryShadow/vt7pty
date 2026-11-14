@@ -1,0 +1,18 @@
+[0m[0KH3_PS[1]>[0K$m=Get-Module PSReadLine; $v='none'; $cfg='native'; if($m){$v=$m.Versi[0Ko[?25l
+n.ToString();$o=Get-PSReadLineOption;$cfg=$m.Path+'|'+$o.EditMode.ToString()+'|[0K'
++$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAllText('D:\Git\vt7pty\artifa[0Kc
+ts\fidelity\h4-exact-rc1\results\developmenthost-h4-20261114-015716-35498f25\03[0K-
+runtime\native\child-powershell-cooked\shell-identity.txt',$PSVersionTable.PSVe[0Kr
+sion.ToString()+'|'+$v+'|'+$Host.Name+'|'+$cfg)[0K
+H3_PS[2]>[0K[?25h& "D:\Git\vt7pty\artifacts\fidelity\h4-exact-rc1\runtime\bin\RuntimeCa[0Kn[?25l
+cellationTest.exe" --fixture "\\.\pipe\VT7Pty-H4-child-61104-1137782796661" 611[0K0
+4[0K
+[0K[?25hHOST_INPUT>childpending[0KHOST_INPUT>[0KCHILD_NEXT[0K[?25l
+[0K[?25hH3_PS[3]>[0K[IO.File]::WriteAllText('D:\Git\vt7pty\artifacts\fidelity\h4-exact-rc1[0K\[?25l
+results\developmenthost-h4-20261114-015716-35498f25\03-runtime\native\child-pow[0Ke
+rshell-cooked\child-exit.txt',$LASTEXITCODE.ToString()); [IO.File]::WriteAllTex[0Kt
+('D:\Git\vt7pty\artifacts\fidelity\h4-exact-rc1\results\developmenthost-h4-2026[0K1
+114-015716-35498f25\03-runtime\native\child-powershell-cooked\continued.txt','C[0KO
+NTINUE')[0K
+H3_PS[4]>[0K[?25hexit 0[0K[?25l
+[0K[?25h

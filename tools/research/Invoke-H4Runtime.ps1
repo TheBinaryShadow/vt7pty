@@ -107,7 +107,10 @@ function Invoke-H4Process([string]$Executable,[string]$Arguments,[string]$Workin
     $taskStart=New-Object Diagnostics.ProcessStartInfo
     $taskStart.FileName=$Executable;$taskStart.Arguments=$Arguments;$taskStart.WorkingDirectory=$WorkingDirectory
     $taskStart.UseShellExecute=$false;$taskStart.CreateNoWindow=$true;$taskStart.RedirectStandardOutput=$true;$taskStart.RedirectStandardError=$true
-    foreach($taskKey in $Environment.Keys){$taskStart.EnvironmentVariables[$taskKey]=[string]$Environment[$taskKey]}
+    foreach($taskKey in $Environment.Keys){
+        if([string]$Environment[$taskKey] -eq ''){$taskStart.EnvironmentVariables.Remove($taskKey)}
+        else {$taskStart.EnvironmentVariables[$taskKey]=[string]$Environment[$taskKey]}
+    }
     $taskProcess=New-Object Diagnostics.Process;$taskProcess.StartInfo=$taskStart
     $taskClock=[Diagnostics.Stopwatch]::StartNew()
     try {
@@ -137,7 +140,7 @@ foreach($taskOrder in 1..9) {
     $taskTrial=Join-Path $taskOutput $taskName
     [IO.Directory]::CreateDirectory($taskTrial) | Out-Null
     $taskNative=Join-Path $taskTrial 'native'
-    $taskRecord=@{Order=$taskOrder;Group=$taskGroup;Role=$taskRole;Directory=$taskName;Outcome='NotRun';CollectionStatus='NotRun';Error='';TimedOut=$false;ExitCode=$null;DurationMilliseconds=0;StandardOutput='';StandardError=''}
+    $taskRecord=@{Order=$taskOrder;Group=$taskGroup;Role=$taskRole;Directory=$taskName;Outcome='NotRun';NativeOutcome='NotRun';CollectionStatus='NotRun';Error='';TimedOut=$false;ExitCode=$null;DurationMilliseconds=0;StandardOutput='';StandardError=''}
     if(-not $taskPreflight.Count) {
         try {
             Write-Host ('Trial '+$taskOrder+'/9: '+$taskRole)
@@ -147,10 +150,12 @@ foreach($taskOrder in 1..9) {
             if($taskRole -eq 'Runtime'){$taskBin=Join-Path $PackageRoot 'runtime\bin';$taskExe='RuntimeCancellationTest.exe';$taskArgs='--run "'+$taskNative+'"'}
             elseif($taskRole -eq 'Reference'){$taskBin=Join-Path $PackageRoot 'reference\experiment\bin';$taskExe='HostCancellationGuardProbe.exe';$taskArgs='"'+$taskNative+'"'}
             else {$taskBin=Join-Path $PackageRoot 'reference\control\bin';$taskExe='HostCancellationProbe.exe';$taskArgs='"'+$taskNative+'"'}
+            if($taskRole -ne 'Runtime'){[IO.Directory]::CreateDirectory($taskNative) | Out-Null}
             $taskNativeRun=Invoke-H4Process (Join-Path $taskBin $taskExe) $taskArgs $taskBin 900000 $taskEnv
             foreach($taskField in $taskNativeRun.Keys){$taskRecord[$taskField]=$taskNativeRun[$taskField]}
             if($taskRecord.TimedOut){throw 'Controller deadline; keep all partial evidence.'}
             $taskProbe=Read-VT7Json (Join-Path $taskNative 'probe.json')
+            $taskRecord.NativeOutcome=$taskProbe.Status
             $taskRecord.Outcome=$taskProbe.Status
             if($taskRole -eq 'Runtime') {
                 $taskCases=(Read-VT7Json (Join-Path $taskNative 'cases.json')).Cases

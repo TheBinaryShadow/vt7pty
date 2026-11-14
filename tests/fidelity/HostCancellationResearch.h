@@ -776,6 +776,9 @@ inline void startRead(Session &s,const std::string &text) {
     check(!s.observe('R').readReturned,"read starts pending"); s.input(text);
     std::u32string expected=U"HOST_INPUT>"; for(unsigned char c:text) expected+=c;
     check(s.until([&] { return s.state.contains(expected); }),"pending input echo");
+#ifdef VT7PTY_H4_RUNTIME
+    check(s.until([&] { const auto ready=s.observe(); return ready.trace.readEntered==1 && !ready.readReturned; }),"runtime reader entered before cancellation");
+#endif
     check(!s.observe().readReturned,"echoed read still pending");
 }
 inline void finishRead(Session &s,const std::wstring &text,const std::wstring &output,const wchar_t *label) {

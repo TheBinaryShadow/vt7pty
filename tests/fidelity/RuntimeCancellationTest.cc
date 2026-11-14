@@ -444,7 +444,9 @@ int run(const std::wstring &out, const std::string &filter = "")
         {"impersonation-denied", impersonationDenied},
         {"helper-missing", [](Context &c) { helperFailure(c, false); }},
         {"helper-wrong", [](Context &c) { helperFailure(c, true); }}};
-    const bool ps7 = GetEnvironmentVariableW(L"VT7PTY_H4_LEGACY", nullptr, 0) == 0;
+    wchar_t legacy[2] = {};
+    const bool ps7 =
+        !(GetEnvironmentVariableW(L"VT7PTY_H4_LEGACY", legacy, 2) == 1 && legacy[0] == L'1');
     for (char kind : {'M', 'W', 'P', 'L'})
     {
         if (!ps7 && (kind == 'P' || kind == 'L'))
