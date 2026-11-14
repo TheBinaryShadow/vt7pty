@@ -14,6 +14,7 @@ claim.
 | Outside scope | XP, Vista and x86 |
 | Development evidence | x64 Debug/Release builds and source debugging on Windows 10 build 19044 |
 | Release baseline | 0.5.0, public API 1.0, client-agent protocol 1 |
+| H4 development | 0.5.1-dev, API 1.1/protocol 2; opt-in host module, Windows 7 qualification pending |
 | Runtime dependencies | Static MSVC runtime; no compiler or SDK needed on the target |
 | VT7 integration | Planned |
 | ConPTY compatibility | Not implemented |
@@ -25,6 +26,12 @@ behavior. Static CRT selection and successful linking do not prove that path wor
 
 Historical WinPTY support statements describe upstream releases. They do not
 qualify a VT7Pty build.
+
+The [H4 opt-in path](H4_RUNTIME.md) currently requires an unimpersonated,
+medium-integrity interactive caller on the current input desktop. Applications
+stay on the ordinary desktop, but backing-console HWND queries can differ.
+Elevated, service, cross-integrity, lock/session-transition and broader desktop
+resource behavior are unqualified.
 
 ## My Windows 7 test machines
 

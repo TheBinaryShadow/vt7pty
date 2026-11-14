@@ -23,7 +23,7 @@
 
 #ifdef VT7PTY_AGENT_ASSERT
 
-void agentShutdown();
+void agentShutdown(bool consoleCloseAlreadyQueued=false);
 void agentAssertFail(const char *file, int line, const char *cond);
 
 // Calling the standard assert() function does not work in the agent because

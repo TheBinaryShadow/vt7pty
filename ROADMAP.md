@@ -3,8 +3,7 @@
 Updated: 2026-11-14.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
-behavior in Milestone 1. **Next: define the H4 runtime contract and integrate
-the qualified cancellation mechanism.** The [H3 Windows 7 review](docs/validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
+behavior in Milestone 1. **Next: qualify the opt-in H4 runtime on Windows 7.** The [H3 Windows 7 review](docs/validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
 accepts all 282 guard cases on NESSY, TURTLE and LEOPARD. H3 is complete within
 the controlled research boundary; production qualification and VT7 integration remain open.
 
@@ -100,6 +99,10 @@ public-API experiments failed. I'm now following the
   [validation history](docs/validation/README.md). H3 accepts the controlled
   private-desktop prototype; ordinary-desktop and production lifetime work belong to H4.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
+  The [H4 candidate](docs/H4_RUNTIME.md) uses approved opt-in backing-desktop
+  isolation and API 1.1 two-phase close. Local checks cover 41 runtime cases and
+  25 protocol/keyboard oracles. Windows 7, keyboard and sustained opt-in workload
+  qualification remain open.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.
 - [ ] Add focused regressions and verify US/Croatian keyboard behavior where

@@ -297,7 +297,7 @@ $manifestToolPath = Find-ManifestTool
 $manifestToolVersion = (Get-Item -LiteralPath $manifestToolPath).VersionInfo.FileVersion
 $configurations = if ($Configuration -eq 'All') { @('Debug', 'Release') } else { @($Configuration) }
 $expectedExports = @(
-    'vt7pty_agent_process', 'vt7pty_conerr_name', 'vt7pty_config_free',
+    'vt7pty_agent_process', 'vt7pty_close', 'vt7pty_conerr_name', 'vt7pty_config_free',
     'vt7pty_config_new', 'vt7pty_config_set_agent_timeout',
     'vt7pty_config_set_initial_size', 'vt7pty_config_set_mouse_mode',
     'vt7pty_conin_name', 'vt7pty_conout_name', 'vt7pty_error_code',
@@ -306,7 +306,9 @@ $expectedExports = @(
     'vt7pty_spawn', 'vt7pty_spawn_config_free', 'vt7pty_spawn_config_new'
 )
 $expectedImports = [ordered]@{
-    'VT7Pty.dll' = @('ADVAPI32.dll', 'KERNEL32.dll')
+    'VT7Pty.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
+    'RuntimeCancellationTest.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll', 'VT7Pty.dll')
+    'VT7Pty-Host.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
     'VT7Pty-Agent.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'SHELL32.dll', 'USER32.dll')
     'VT7Pty-DebugServer.exe' = @('ADVAPI32.dll', 'KERNEL32.dll')
     'BackendSmokeTest.exe' = @('KERNEL32.dll', 'VT7Pty.dll')
@@ -387,6 +389,8 @@ foreach ($configurationName in $configurations) {
     $requiredArtifacts = @(
         'VT7Pty.dll', 'VT7Pty.lib', 'VT7Pty.pdb',
         'VT7Pty-Agent.exe', 'VT7Pty-Agent.pdb',
+        'VT7Pty-Host.dll', 'VT7Pty-Host.pdb',
+        'RuntimeCancellationTest.exe', 'RuntimeCancellationTest.pdb',
         'VT7Pty-DebugServer.exe', 'VT7Pty-DebugServer.pdb',
         'ModernCppTest.exe', 'ModernCppTest.pdb',
         'BackendSmokeTest.exe', 'BackendSmokeTest.pdb',
@@ -433,6 +437,7 @@ foreach ($configurationName in $configurations) {
     }
 
     $tests = @(
+        Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'RuntimeCancellationTest.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostCancellationProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostCancellationFreezeProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
         Invoke-NativeTest -Executable (Join-Path $binaryDirectory 'HostCancellationCoordinatedProbe.exe') -WorkingDirectory $binaryDirectory -Arguments @('--self-test')
@@ -499,6 +504,8 @@ foreach ($configurationName in $configurations) {
     foreach ($test in $tests) {
         Assert-NativeTestPassed -Result $test
     }
+    $runtimeOracle = @($tests | Where-Object { $_.Name -eq 'RuntimeCancellationTest.exe' })
+    if ($runtimeOracle.Count -ne 1 -or $runtimeOracle[0].StandardOutput -ne 'Runtime cancellation oracle: 25 checks passed') { throw 'Runtime cancellation oracle did not complete.' }
     $cancellationOracle = @($tests | Where-Object { $_.Name -eq 'HostCancellationProbe.exe' })
     if ($cancellationOracle.Count -ne 1 -or $cancellationOracle[0].StandardOutput -ne 'Host cancellation oracle: 33 checks passed') { throw 'Host cancellation oracle did not complete.' }
     $traceOracle = @($tests | Where-Object { $_.Name -eq 'HostCancellationTraceProbe.exe' })

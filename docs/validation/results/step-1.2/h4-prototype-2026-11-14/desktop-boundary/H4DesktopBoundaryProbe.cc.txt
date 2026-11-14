@@ -1,0 +1,80 @@
+// Copyright (c) 2026 VT7Pty contributors
+// SPDX-License-Identifier: MIT
+#include "D:/Git/vt7pty/tests/fidelity/WinTest.h"
+#include <array>
+#include <cstring>
+#include <limits>
+using namespace fidelity;
+namespace {
+std::wstring objectName(HANDLE h) {
+ wchar_t name[256]={};DWORD bytes=0;
+ check(GetUserObjectInformationW(h,UOI_NAME,name,sizeof(name),&bytes),"object name");return name;
+}
+std::wstring self() {std::vector<wchar_t> p(32768);const DWORD n=GetModuleFileNameW(nullptr,p.data(),32768);check(n>0&&n<32768,"self image");return {p.data(),n};}
+std::wstring random() {
+ HCRYPTPROV provider=0;check(CryptAcquireContextW(&provider,nullptr,nullptr,PROV_RSA_FULL,CRYPT_VERIFYCONTEXT|CRYPT_SILENT),"nonce provider");
+ std::array<BYTE,16> bytes{};const BOOL ok=CryptGenRandom(provider,static_cast<DWORD>(bytes.size()),bytes.data());CryptReleaseContext(provider,0);check(ok!=FALSE,"nonce");
+ std::wstring text;for(BYTE b:bytes){text+=L"0123456789abcdef"[b>>4];text+=L"0123456789abcdef"[b&15];}return text;
+}
+uint64_t host() {
+ using Query=LONG(NTAPI*)(HANDLE,ULONG,void*,ULONG,ULONG*);
+ const auto address=GetProcAddress(GetModuleHandleW(L"ntdll.dll"),"NtQueryInformationProcess");Query q=nullptr;static_assert(sizeof(q)==sizeof(address));memcpy(&q,&address,sizeof(q));
+ ULONG_PTR raw=0;ULONG size=0;check(q&&q(GetCurrentProcess(),49,&raw,sizeof(raw),&size)>=0&&size==sizeof(raw)&&raw>3&&raw<=MAXDWORD,"console host query");return raw&~ULONG_PTR{3};
+}
+struct Report {DWORD pid=0,parent=0;uint64_t host=0,console=0,gui=0;wchar_t desktop[256]={};DWORD read=0;wchar_t text[32]={};};
+Report report(HWND gui=nullptr) {Report r;r.pid=GetCurrentProcessId();r.parent=parentProcessId(r.pid);r.host=host();r.console=reinterpret_cast<uintptr_t>(GetConsoleWindow());r.gui=reinterpret_cast<uintptr_t>(gui);wcscpy_s(r.desktop,objectName(GetThreadDesktop(GetCurrentThreadId())).c_str());return r;}
+void send(HANDLE p,const Report &r){auto copy=r;transfer(p,&copy,sizeof(copy),true);}
+Report receive(HANDLE p){Report r;transfer(p,&r,sizeof(r),false);return r;}
+void barrier(HANDLE p){char value=0;transfer(p,&value,1,false);check(value=='A',"root barrier");}
+void ack(HANDLE p){char a='A';transfer(p,&a,1,true);}
+void spawn(const std::wstring &args,const std::wstring &desktop,DWORD flags,Handle &process,Handle &thread) {
+ std::wstring command=quote(self())+L" "+args;std::vector<wchar_t> line(command.begin(),command.end());line.push_back(0);
+ std::wstring desk=desktop;STARTUPINFOW si={};si.cb=sizeof(si);si.dwFlags=STARTF_USESHOWWINDOW;si.wShowWindow=SW_HIDE;si.lpDesktop=desk.empty()?nullptr:desk.data();PROCESS_INFORMATION pi={};
+ check(CreateProcessW(self().c_str(),line.data(),nullptr,nullptr,FALSE,flags,nullptr,nullptr,&si,&pi),"owned child launch");process.reset(pi.hProcess);thread.reset(pi.hThread);
+}
+Handle *unused=nullptr;
+void join(HANDLE process,DWORD expected){check(WaitForSingleObject(process,10000)==WAIT_OBJECT_0,"owned process exit");DWORD code=0;check(GetExitCodeProcess(process,&code)&&code==expected,"owned process status");}
+HANDLE client(const std::wstring &name){HANDLE p=CreateFileW(name.c_str(),GENERIC_READ|GENERIC_WRITE,0,nullptr,OPEN_EXISTING,FILE_FLAG_OVERLAPPED,nullptr);check(p!=INVALID_HANDLE_VALUE,"control client");return p;}
+int child(const std::wstring &pipeName,bool grand) {
+ Handle pipe(client(pipeName));const HWND window=CreateWindowExW(0,L"STATIC",L"VT7Pty H4 desktop proof",WS_POPUP,0,0,1,1,nullptr,nullptr,GetModuleHandleW(nullptr),nullptr);check(window!=nullptr,"owned hidden GUI window");
+ auto r=report(window);send(pipe.value,r);barrier(pipe.value);
+ if(grand){DestroyWindow(window);return 37;}
+ wchar_t text[32]={};DWORD count=0;check(ReadConsoleW(GetStdHandle(STD_INPUT_HANDLE),text,31,&count,nullptr),"cross-desktop cooked read");
+ r.read=(count==6&&std::wstring(text,count)==L"TEST\r\n")?1u:0u;wcscpy_s(r.text,text);send(pipe.value,r);check(r.read==1,"inherited console input");
+ const auto name=L"\\\\.\\pipe\\VT7Pty-H4-grand-"+random();Handle server(privateServer(name));Handle process,thread;spawn(L"--grand "+quote(name),L"",0,process,thread);connect(server.value);
+ auto g=receive(server.value);send(pipe.value,g);barrier(pipe.value);ack(server.value);join(process.value,37);
+ DestroyWindow(window);return 0;
+}
+int stage(const std::wstring &pipeName,const std::wstring &applicationDesktop) {
+ Handle pipe(client(pipeName));send(pipe.value,report());barrier(pipe.value);
+ const auto name=L"\\\\.\\pipe\\VT7Pty-H4-app-"+random();Handle server(privateServer(name)),process,thread;
+ spawn(L"--app "+quote(name),applicationDesktop,0,process,thread);connect(server.value);send(pipe.value,receive(server.value));barrier(pipe.value);ack(server.value);
+ std::vector<INPUT_RECORD> records;for(wchar_t ch:std::wstring(L"TEST\r")){INPUT_RECORD key={};key.EventType=KEY_EVENT;key.Event.KeyEvent.bKeyDown=TRUE;key.Event.KeyEvent.wRepeatCount=1;key.Event.KeyEvent.uChar.UnicodeChar=ch;key.Event.KeyEvent.wVirtualKeyCode=ch=='\r'?VK_RETURN:static_cast<WORD>(ch);records.push_back(key);key.Event.KeyEvent.bKeyDown=FALSE;records.push_back(key);}
+ DWORD written=0;check(WriteConsoleInputW(GetStdHandle(STD_INPUT_HANDLE),records.data(),static_cast<DWORD>(records.size()),&written)&&written==records.size(),"owned console input");
+ send(pipe.value,receive(server.value));send(pipe.value,receive(server.value));barrier(pipe.value);ack(server.value);join(process.value,0);return 0;
+}
+bool contains(HDESK desktop,HWND expected) {
+ struct State{HWND expected;bool found=false;} state{expected};
+ check(EnumDesktopWindows(desktop,[](HWND w,LPARAM p)->BOOL{auto &s=*reinterpret_cast<State*>(p);if(w==s.expected)s.found=true;return TRUE;},reinterpret_cast<LPARAM>(&state)),"enumerate owned desktop");return state.found;
+}
+int root(const std::wstring &output) {
+ const auto current=objectName(GetThreadDesktop(GetCurrentThreadId()));check(_wcsicmp(objectName(GetProcessWindowStation()).c_str(),L"WinSta0")==0,"interactive window station");
+ const auto desktopName=L"VT7Pty-H4-proof-"+random();
+ Handle token;check(OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&token.value),"desktop token");DWORD bytes=0;GetTokenInformation(token.value,TokenUser,nullptr,0,&bytes);std::vector<BYTE> user(bytes);check(GetTokenInformation(token.value,TokenUser,user.data(),bytes,&bytes),"desktop user");
+ LocalAllocation<wchar_t> sid;check(ConvertSidToStringSidW(reinterpret_cast<TOKEN_USER*>(user.data())->User.Sid,&sid.value),"desktop SID");
+ LocalAllocation<void> descriptor;const auto sddl=L"D:P(A;;GA;;;SY)(A;;GA;;;"+std::wstring(sid.value)+L")";check(ConvertStringSecurityDescriptorToSecurityDescriptorW(sddl.c_str(),SDDL_REVISION_1,&descriptor.value,nullptr),"desktop descriptor");
+ SECURITY_ATTRIBUTES sa={sizeof(sa),descriptor.value,FALSE};HDESK desktop=CreateDesktopW(desktopName.c_str(),nullptr,nullptr,0,DESKTOP_CREATEWINDOW|DESKTOP_CREATEMENU|DESKTOP_ENUMERATE|DESKTOP_HOOKCONTROL|DESKTOP_READOBJECTS|DESKTOP_WRITEOBJECTS,&sa);check(desktop!=nullptr,"private backing desktop");
+ struct Close{HDESK h;~Close(){if(h)CloseDesktop(h);}} closer{desktop};
+ const auto name=L"\\\\.\\pipe\\VT7Pty-H4-root-"+random();Handle server(privateServer(name)),process,thread;
+ spawn(L"--stage "+quote(name)+L" "+quote(L"WinSta0\\"+current),L"WinSta0\\"+desktopName,CREATE_NEW_CONSOLE,process,thread);connect(server.value);
+ auto agent=receive(server.value);check(agent.pid==GetProcessId(process.value)&&std::wstring(agent.desktop)==desktopName,"agent private desktop");Handle hostProcess(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION|SYNCHRONIZE,FALSE,static_cast<DWORD>(agent.host)));check(hostProcess.value!=nullptr,"retained console host");check(contains(desktop,reinterpret_cast<HWND>(agent.console)),"console window private");ack(server.value);
+ auto app=receive(server.value);check(app.parent==agent.pid&&std::wstring(app.desktop)==current&&app.host==agent.host&&app.console==agent.console,"ordinary application shares private console");check(contains(GetThreadDesktop(GetCurrentThreadId()),reinterpret_cast<HWND>(app.gui)),"application GUI on ordinary desktop");ack(server.value);
+ auto read=receive(server.value);check(read.read==1&&std::wstring(read.text)==L"TEST\r\n","cross-desktop read result");
+ auto grand=receive(server.value);check(grand.parent==app.pid&&std::wstring(grand.desktop)==current&&grand.host==agent.host,"ordinary descendant inherits console and desktop");check(contains(GetThreadDesktop(GetCurrentThreadId()),reinterpret_cast<HWND>(grand.gui)),"descendant GUI on ordinary desktop");ack(server.value);join(process.value,0);
+ check(WaitForSingleObject(hostProcess.value,10000)==WAIT_OBJECT_0,"observed host exit");
+ const auto narrow=[](const std::wstring &s){std::string t;for(wchar_t c:s){check(c<128,"ASCII proof metadata");t+=static_cast<char>(c);}return t;};
+ writeFile(output,"{\"Kind\":\"H4DesktopBoundaryProof\",\"PrivateDesktop\":"+json(narrow(desktopName))+",\"ApplicationDesktop\":"+json(narrow(current))+",\"Agent\":"+std::to_string(agent.pid)+",\"Application\":"+std::to_string(app.pid)+",\"Descendant\":"+std::to_string(grand.pid)+",\"Host\":"+std::to_string(agent.host)+",\"AgentAndHostPrivate\":true,\"ApplicationAndDescendantOrdinary\":true,\"GuiWindowsOrdinary\":true,\"SharedConsoleRead\":true,\"OwnedProcessesExited\":true,\"ObservedHostExited\":true,\"DevelopmentOnly\":true}");
+ puts("Desktop boundary proof: passed");return 0;
+}
+}
+int wmain(int argc,wchar_t **argv){try{if(argc==3&&std::wstring(argv[1])==L"--app")return child(argv[2],false);if(argc==3&&std::wstring(argv[1])==L"--grand")return child(argv[2],true);if(argc==4&&std::wstring(argv[1])==L"--stage")return stage(argv[2],argv[3]);check(argc==2,"output argument");return root(argv[1]);}catch(const std::exception &e){fprintf(stderr,"Desktop boundary proof: %s\n",e.what());return 1;}}

@@ -49,6 +49,9 @@
 
 #include "ConsoleFont.h"
 #include "ConsoleInput.h"
+#include "HostCancellation.h"
+#include "../shared/HostIdentity.h"
+#include "../shared/Exception.h"
 #include "NamedPipe.h"
 #include "Scraper.h"
 #include "Terminal.h"
@@ -151,10 +154,12 @@ Agent::Agent(LPCWSTR controlPipeName,
              uint64_t agentFlags,
              int mouseMode,
              int initialCols,
-             int initialRows) :
+             int initialRows,
+             const std::wstring &applicationDesktop) :
     m_useConerr((agentFlags & VT7PTY_FLAG_CONERR) != 0),
     m_plainMode((agentFlags & VT7PTY_FLAG_PLAIN_OUTPUT) != 0),
-    m_mouseMode(mouseMode)
+    m_mouseMode(mouseMode),
+    m_applicationDesktop(applicationDesktop)
 {
     trace("Agent::Agent entered");
 
@@ -182,18 +187,6 @@ Agent::Agent(LPCWSTR controlPipeName,
         m_conerrPipe = &createDataServerPipe(true, L"conerr");
     }
 
-    // Send an initial response packet to VT7Pty.dll containing pipe names.
-    {
-        auto setupPacket = newPacket();
-        writeAgentHandshake(setupPacket);
-        setupPacket.putWString(m_coninPipe->name());
-        setupPacket.putWString(m_conoutPipe->name());
-        if (m_useConerr) {
-            setupPacket.putWString(m_conerrPipe->name());
-        }
-        writePacket(setupPacket);
-    }
-
     auto primaryTerminal = std::make_unique<Terminal>(
         *m_conoutPipe, m_plainMode, outputColor);
     m_primaryScraper = std::make_unique<Scraper>(
@@ -218,6 +211,21 @@ Agent::Agent(LPCWSTR controlPipeName,
     SetConsoleCtrlHandler(NULL, FALSE);
     SetConsoleCtrlHandler(consoleCtrlHandler, TRUE);
 
+    if (agentFlags & VT7PTY_FLAG_HOST_CANCELLATION) {
+        vt7pty::internal::host::require(!m_applicationDesktop.empty(), L"Application desktop required");
+        m_hostCancellation = std::make_unique<HostCancellation>(m_console);
+        m_consoleInput->setHostCancellation(m_hostCancellation.get());
+    }
+    // Protocol 2 reports the flags actually accepted before exposing data pipes.
+    {
+        auto setupPacket = newPacket();
+        writeAgentHandshake(setupPacket);
+        setupPacket.putInt64(static_cast<int64_t>(agentFlags));
+        setupPacket.putWString(m_coninPipe->name());
+        setupPacket.putWString(m_conoutPipe->name());
+        if (m_useConerr) setupPacket.putWString(m_conerrPipe->name());
+        writePacket(setupPacket);
+    }
     setPollInterval(25);
 #ifdef VT7PTY_H3_FREEZE
     m_freezeResearch=std::make_unique<h3freeze::AgentControl>(createNamedPipe(),m_console,
@@ -228,7 +236,9 @@ Agent::Agent(LPCWSTR controlPipeName,
 Agent::~Agent()
 {
     trace("Agent::~Agent entered");
-    agentShutdown();
+    m_consoleInput.reset();
+    if (m_hostCancellation) m_hostCancellation->close();
+    agentShutdown(m_hostCancellation && m_hostCancellation->consoleCloseQueued());
     if (m_childProcess != NULL) {
         CloseHandle(m_childProcess);
     }
@@ -402,6 +412,7 @@ void Agent::handleStartProcessPacket(ReadBuffer &packet)
     STARTUPINFOW sui = {};
     PROCESS_INFORMATION pi = {};
     sui.cb = sizeof(sui);
+    sui.lpDesktop = m_applicationDesktop.empty() ? nullptr : const_cast<LPWSTR>(m_applicationDesktop.c_str());
     BOOL inheritHandles = FALSE;
     if (m_useConerr) {
         inheritHandles = TRUE;

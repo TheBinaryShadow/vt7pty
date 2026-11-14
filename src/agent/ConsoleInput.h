@@ -34,6 +34,7 @@
 
 class Win32Console;
 class DsrSender;
+class HostCancellation;
 
 class ConsoleInput
 {
@@ -41,6 +42,7 @@ public:
     ConsoleInput(HANDLE conin, int mouseMode, DsrSender &dsrSender,
                  Win32Console &console);
     void writeInput(const std::string &input);
+    void setHostCancellation(HostCancellation *value) { m_hostCancellation = value; }
     void flushIncompleteEscapeCode();
     void setMouseWindowRect(SmallRect val) { m_mouseWindowRect = val; }
     void updateInputFlags(bool forceTrace=false);
@@ -86,6 +88,7 @@ private:
 private:
     Win32Console &m_console;
     HANDLE m_conin = nullptr;
+    HostCancellation *m_hostCancellation = nullptr;
     int m_mouseMode = 0;
     DsrSender &m_dsrSender;
     bool m_dsrSent = false;

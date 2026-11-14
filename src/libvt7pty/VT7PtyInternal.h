@@ -28,6 +28,7 @@
 #include "../include/vt7pty.h"
 
 #include "../shared/OwnedHandle.h"
+#include "../shared/BackingDesktop.h"
 
 // The structures in this header are not intended to be accessed directly by
 // client programs.
@@ -48,6 +49,7 @@ struct vt7pty_config_s {
 
 struct vt7pty_s {
     std::mutex mutex;
+    std::unique_ptr<vt7pty::internal::BackingDesktop> backingDesktop;
     OwnedHandle agentProcess;
     OwnedHandle controlPipe;
     DWORD agentTimeoutMs = 0;

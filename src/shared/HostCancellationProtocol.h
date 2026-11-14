@@ -1,0 +1,85 @@
+// Copyright (c) 2026 VT7Pty contributors
+// SPDX-License-Identifier: MIT
+#pragma once
+#include <cstdint>
+#include <cstring>
+#include <initializer_list>
+namespace vt7pty::internal::cancel
+{
+constexpr uint32_t magic = 0x31435056, version = 1;
+enum class Operation : uint32_t
+{
+    Bind = 1,
+    Cancel = 2,
+    Close = 3
+};
+enum class Result : uint32_t
+{
+    Hello = 0,
+    Accepted = 1,
+    Rejected = 2,
+    Failure = 3
+};
+struct Identity
+{
+    uint32_t agent = 0, agentThread = 0, host = 0, hostThread = 0, caller = 0, reserved = 0;
+    uint64_t agentCreated = 0, hostCreated = 0, callerCreated = 0, window = 0;
+};
+struct Request
+{
+    uint32_t signature = magic, schema = version, bytes = sizeof(Request);
+    Operation operation = Operation::Bind;
+    uint64_t nonce[2] = {}, sequence = 0, deadline = 0;
+    Identity identity;
+};
+struct Keyboard
+{
+    uint32_t captured = 0, applied = 0, sent = 0, restored = 0, equal = 0, error = 0;
+    uint8_t before[256] = {}, during[256] = {}, after[256] = {};
+};
+struct Response
+{
+    uint32_t signature = magic, schema = version, bytes = sizeof(Response);
+    Result result = Result::Rejected;
+    uint64_t nonce[2] = {}, sequence = 0, acceptedSequence = 0;
+    Identity identity;
+    Keyboard keyboard;
+};
+inline bool same(const Identity &a, const Identity &b)
+{
+    return a.agent == b.agent && a.agentThread == b.agentThread && a.host == b.host &&
+           a.hostThread == b.hostThread && a.agentCreated == b.agentCreated &&
+           a.hostCreated == b.hostCreated && a.caller == b.caller &&
+           a.callerCreated == b.callerCreated && a.reserved == 0 && b.reserved == 0 &&
+           a.window == b.window;
+}
+inline bool frame(const Request &r, uint64_t now)
+{
+    return r.signature == magic && r.schema == version && r.bytes == sizeof(r) &&
+           r.identity.reserved == 0 && r.sequence != 0 && r.deadline > now &&
+           r.deadline - now <= 5000 &&
+           (r.operation == Operation::Bind || r.operation == Operation::Cancel ||
+            r.operation == Operation::Close);
+}
+inline bool next(const Request &r, const Request &binding, uint64_t previous, uint64_t now)
+{
+    return frame(r, now) && previous != UINT64_MAX && r.sequence == previous + 1 &&
+           r.operation != Operation::Bind && same(r.identity, binding.identity) &&
+           r.nonce[0] == binding.nonce[0] && r.nonce[1] == binding.nonce[1];
+}
+inline bool restoredKeyboard(const Keyboard &k)
+{
+    if (k.captured != 1 || k.applied != 1 || k.sent != 1 || k.restored != 1 || k.equal != 1 ||
+        k.error || memcmp(k.before, k.after, 256) != 0)
+        return false;
+    uint8_t expected[256];
+    memcpy(expected, k.before, 256);
+    for (unsigned int vk :
+         {0x10u, 0xa0u, 0xa1u, 0x11u, 0xa2u, 0xa3u, 0x12u, 0xa4u, 0xa5u, 0x5bu, 0x5cu})
+        expected[vk] &= 1;
+    expected[0x11] |= 0x80;
+    expected[0xa2] |= 0x80;
+    return memcmp(expected, k.during, 256) == 0;
+}
+static_assert(sizeof(Identity) == 56 && sizeof(Request) == 104 && sizeof(Response) == 896);
+} // namespace vt7pty::internal::cancel

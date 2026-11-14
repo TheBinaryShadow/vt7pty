@@ -8,6 +8,18 @@ until implemented.
 
 ## Unreleased
 
+### H4 runtime candidate (0.5.1-dev)
+
+- Added opt-in backing-console isolation and verified host-thread cancellation
+  for processed cooked ETX while applications remain on the ordinary desktop.
+- Added the matched VT7Pty-Host.dll, session-bound host channel and an owned-host
+  lifetime monitor for normal close, caller death and agent death.
+- Advanced the development API to 1.1 with two-phase vt7pty_close, and the
+  client-agent protocol to 2 with accepted session flags in setup.
+- Added 41 integrated runtime cases, 25 protocol/keyboard oracles and a portable
+  three-machine candidate retaining the original H3 controls and guard reference.
+  Windows 7 and remaining H4 qualification are pending.
+
 ### Documentation
 
 - Rewritten project decisions and test reviews in first person.

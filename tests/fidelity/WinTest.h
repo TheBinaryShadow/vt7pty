@@ -13,7 +13,7 @@
 #include <memory>
 
 namespace fidelity {
-inline void check(bool okay, const char *operation) {
+_Post_satisfies_(okay) inline void check(bool okay, const char *operation) {
     if (!okay) throw std::runtime_error(std::string(operation) + " (Win32 " + std::to_string(GetLastError()) + ")");
 }
 struct Handle {

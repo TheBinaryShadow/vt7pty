@@ -32,10 +32,10 @@ void assertTrace(const char *file, int line, const char *cond) {
 
 #ifdef VT7PTY_AGENT_ASSERT
 
-void agentShutdown() {
+void agentShutdown(bool consoleCloseAlreadyQueued) {
     HWND hwnd = GetConsoleWindow();
     if (hwnd != NULL) {
-        PostMessage(hwnd, WM_CLOSE, 0, 0);
+        if (!consoleCloseAlreadyQueued) PostMessage(hwnd, WM_CLOSE, 0, 0);
         Sleep(30000);
         trace("Agent shutdown: WM_CLOSE did not end agent process");
     } else {

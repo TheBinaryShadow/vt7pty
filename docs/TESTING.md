@@ -1,4 +1,9 @@
-# Testing VT7Pty
+# Testing
+
+The [H4 runner](H4_RUNTIME.md) tests the opt-in development runtime on all three
+Windows 7 tiers. It retains frozen H3 controls/reference, runs the integrated
+runtime cases, then the existing regression suite and 120-minute baseline soak.
+H4 keyboard and sustained opt-in workload qualification remain separate gates. VT7Pty
 
 I use local native tests, portable Windows 7 packages and focused research
 probes. They answer different questions, so a passing research probe does not

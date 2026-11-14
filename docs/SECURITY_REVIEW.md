@@ -109,3 +109,25 @@ name-capability authentication for public data pipes, and the narrow CONERR
 handle-inheritance requirement. Each follows an existing public behavior and
 has a documented trust boundary. Future work that changes process launch,
 pipe consumers, or inheritable handles must update this review and its tests.
+
+
+## H4 development boundary
+
+The opt-in [H4 runtime](H4_RUNTIME.md) adds an in-host callback module, a private
+desktop and a lifetime monitor. I bind the local channel to retained agent,
+caller and host identities, matching tokens, exact colocated controller image,
+OS-reported pipe peers, a random nonce, sequence and bounded deadline. The
+callback verifies its actual host thread/window. The desktop and IPC ACLs allow
+the current user and SYSTEM.
+
+This is not a security boundary against malicious code running as the same user.
+The path currently rejects impersonation and requires a medium-integrity
+interactive caller. Other access policies remain unqualified. Keyboard state
+is scoped to the isolated host thread, checked byte-for-byte after restoration,
+and never retried on an ambiguous cancellation. Host-local code and monitor
+handles remain valid until the owned host exits.
+
+Missing/wrong modules, real impersonation denial, agent/caller death, concurrent
+close, neighbor sessions and enclosing-job inheritance have focused development
+tests. Windows 7 execution, forced callback timeout/rundown, larger resource
+budgets and broader job policy remain qualification work. H4 is not accepted.

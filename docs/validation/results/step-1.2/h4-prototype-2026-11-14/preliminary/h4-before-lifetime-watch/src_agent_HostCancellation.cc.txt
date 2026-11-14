@@ -1,0 +1,106 @@
+// Copyright (c) 2026 VT7Pty contributors
+// SPDX-License-Identifier: MIT
+#include "HostCancellation.h"
+#include "Win32Console.h"
+#include "../shared/HostIdentity.h"
+#include "../shared/GenRandom.h"
+#include "../shared/DebugClient.h"
+#include "../shared/StringUtil.h"
+#include <array>
+#include <cstring>
+using namespace vt7pty::internal;
+namespace {
+struct Watch {HWND window=nullptr;DWORD host=0,selected=0,count=0;bool bad=false;};
+thread_local Watch *activeWatch=nullptr;
+void CALLBACK event(HWINEVENTHOOK,DWORD,HWND window,LONG object,LONG child,DWORD tid,DWORD){
+ if(!activeWatch||window!=activeWatch->window||object!=OBJID_WINDOW||child!=CHILDID_SELF)return;
+ if(++activeWatch->count>256){activeWatch->bad=true;return;}
+ OwnedHandle thread(OpenThread(THREAD_QUERY_LIMITED_INFORMATION,FALSE,tid));
+ if(thread&&GetProcessIdOfThread(thread.get())==activeWatch->host){if(activeWatch->selected&&activeWatch->selected!=tid)activeWatch->bad=true;activeWatch->selected=tid;}
+}
+DWORD discover(HWND window,DWORD pid){
+ Watch watch;watch.window=window;watch.host=pid;activeWatch=&watch;
+ struct Reset{~Reset(){activeWatch=nullptr;}} reset;
+ HWINEVENTHOOK hook=SetWinEventHook(EVENT_OBJECT_NAMECHANGE,EVENT_OBJECT_NAMECHANGE,nullptr,event,pid,0,WINEVENT_OUTOFCONTEXT);
+ host::require(hook!=nullptr,L"Host dispatch discovery");
+ struct Unhook{HWINEVENTHOOK value;~Unhook(){UnhookWinEvent(value);}} unhook{hook};
+ wchar_t title[2048]={};GetConsoleTitleW(title,2048);std::array<DWORD,2> ids{};
+ for(size_t pass=0;pass<2;++pass){
+  watch.selected=0;const auto name=L"VT7Pty host initialization "+std::to_wstring(GetTickCount64())+L" "+std::to_wstring(pass);
+  host::require(SetConsoleTitleW(name.c_str())!=FALSE,L"Host title discovery");const auto end=GetTickCount64()+250;
+  while(GetTickCount64()<end){MSG m;while(PeekMessageW(&m,nullptr,0,0,PM_REMOVE)){TranslateMessage(&m);DispatchMessageW(&m);}Sleep(1);}
+  ids[pass]=watch.selected;
+ }
+ SetConsoleTitleW(title);host::require(!watch.bad&&ids[0]!=0&&ids[0]==ids[1],L"Repeatable owned host dispatch thread");return ids[0];
+}
+std::string hex(const BYTE *bytes){std::string s;s.reserve(512);for(size_t i=0;i<256;++i){s+="0123456789abcdef"[bytes[i]>>4];s+="0123456789abcdef"[bytes[i]&15];}return s;}
+}
+HostCancellation::HostCancellation(Win32Console &console):console_(console){
+ try{
+  host::noImpersonation();host::require(host::privateDesktop(),L"Isolated backing desktop required");
+  const DWORD pid=host::consoleHost(GetCurrentProcess());host_.reset(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION|SYNCHRONIZE,FALSE,pid));host::require(static_cast<bool>(host_),L"Open retained console host");
+  wchar_t system[MAX_PATH]={};const UINT length=GetSystemDirectoryW(system,MAX_PATH);host::require(length>0&&length<MAX_PATH,L"System directory");
+  host::require(_wcsicmp(host::image(host_.get()).c_str(),(std::wstring(system)+L"\\conhost.exe").c_str())==0,L"System console host image");
+  const host::Token ours(GetCurrentProcess()),theirs(host_.get());BOOL wow=TRUE;
+  host::require(ours.same(theirs)&&ours.integrity==SECURITY_MANDATORY_MEDIUM_RID&&IsWow64Process(host_.get(),&wow)&&!wow,L"Console host token and native architecture");
+  const DWORD tid=discover(console_.hwnd(),pid);thread_.reset(OpenThread(THREAD_QUERY_LIMITED_INFORMATION|SYNCHRONIZE,FALSE,tid));host::require(thread_&&GetProcessIdOfThread(thread_.get())==pid,L"Retained discovered host thread");
+  binding_.identity={GetCurrentProcessId(),GetCurrentThreadId(),pid,tid,host::creation(GetCurrentProcess()),host::creation(host_.get()),reinterpret_cast<uintptr_t>(console_.hwnd())};
+  GenRandom random;host::require(random.fillBuffer(binding_.nonce,sizeof(binding_.nonce)),L"Host channel nonce");
+  wchar_t nonce[33]={};swprintf_s(nonce,L"%016llx%016llx",binding_.nonce[0],binding_.nonce[1]);
+  const auto name=L"VT7Pty-H4-"+std::to_wstring(GetCurrentProcessId())+L"-"+nonce;
+  const auto sd=host::privateDescriptor();SECURITY_ATTRIBUTES sa={sizeof(sa),sd.get(),FALSE};
+  pipe_.reset(CreateNamedPipeW((L"\\\\.\\pipe\\"+name).c_str(),PIPE_ACCESS_DUPLEX|FILE_FLAG_FIRST_PIPE_INSTANCE,PIPE_TYPE_BYTE|PIPE_READMODE_BYTE|PIPE_NOWAIT|PIPE_REJECT_REMOTE_CLIENTS,1,8192,8192,0,&sa));
+  host::require(static_cast<bool>(pipe_),L"Private host channel");SetLastError(ERROR_SUCCESS);
+  completion_.reset(CreateEventW(&sa,TRUE,FALSE,(L"Local\\"+name+L"-completion").c_str()));host::require(completion_&&GetLastError()!=ERROR_ALREADY_EXISTS,L"Private host completion event");
+  atom_=GlobalAddAtomW(name.c_str());host::require(atom_!=0,L"Host channel atom");
+  module_=LoadLibraryExW((host::directory()+L"\\VT7Pty-Host.dll").c_str(),nullptr,LOAD_WITH_ALTERED_SEARCH_PATH);host::require(module_!=nullptr,L"Load colocated VT7Pty-Host.dll");
+  const auto address=GetProcAddress(module_,"VT7PtyHostCallback");HOOKPROC callback=nullptr;static_assert(sizeof(callback)==sizeof(address));memcpy(&callback,&address,sizeof(callback));host::require(callback!=nullptr,L"Host callback export");
+  hook_=SetWindowsHookExW(WH_CALLWNDPROC,callback,module_,tid);host::require(hook_!=nullptr,L"Install owned-thread host callback");
+  notify();auto hello=receive(1000);ULONG peer=0;host::require(GetNamedPipeClientProcessId(pipe_.get(),&peer)&&peer==pid&&hello.result==cancel::Result::Hello,L"Actual host pipe peer");
+  const auto bound=request(cancel::Operation::Bind);host::require(bound.result==cancel::Result::Accepted,L"Host channel bind");ready_=true;
+  TRACE_EVENT(TraceSeverity::Info,TraceSubsystem::Console,"host-cancel ready host=%u thread=%u desktop=%s",pid,tid,utf8FromWide(host::objectName(GetThreadDesktop(GetCurrentThreadId()))).c_str());
+ }catch(...){cleanup();throw;}
+}
+void HostCancellation::notify(){
+ host::live(host_.get(),binding_.identity.host,binding_.identity.hostCreated);
+ host::require(WaitForSingleObject(thread_.get(),0)==WAIT_TIMEOUT&&host::consoleHost(GetCurrentProcess())==binding_.identity.host,L"Live console dispatch association");
+ DWORD_PTR value=0;SetLastError(ERROR_SUCCESS);
+ host::require(SendMessageTimeoutW(console_.hwnd(),WM_NULL,atom_,binding_.identity.agent,SMTO_ABORTIFHUNG|SMTO_BLOCK|SMTO_ERRORONEXIT,1000,&value)!=0,L"OutcomeUnknown: host notification");
+}
+cancel::Response HostCancellation::receive(DWORD timeout){
+ const auto end=GetTickCount64()+timeout;DWORD bytes=0;
+ do{host::require(PeekNamedPipe(pipe_.get(),nullptr,0,nullptr,&bytes,nullptr)!=FALSE,L"Host response channel");if(bytes>=sizeof(cancel::Response))break;Sleep(1);}while(GetTickCount64()<end);
+ host::require(bytes==sizeof(cancel::Response),L"OutcomeUnknown: host response deadline or framing");cancel::Response r;DWORD read=0;
+ host::require(ReadFile(pipe_.get(),&r,sizeof(r),&read,nullptr)&&read==sizeof(r),L"Host response read");
+ host::require(r.signature==cancel::magic&&r.schema==cancel::version&&r.bytes==sizeof(r)&&r.nonce[0]==binding_.nonce[0]&&r.nonce[1]==binding_.nonce[1]&&
+  r.identity.host==binding_.identity.host&&r.identity.hostThread==binding_.identity.hostThread&&r.identity.hostCreated==binding_.identity.hostCreated&&r.identity.window==binding_.identity.window,L"Actual host callback identity");
+ return r;
+}
+cancel::Response HostCancellation::request(cancel::Operation op){
+ host::require(!disabled_&&sequence_!=UINT64_MAX,L"Host dispatch disabled");auto q=binding_;q.sequence=++sequence_;q.deadline=GetTickCount64()+3000;q.operation=op;DWORD written=0;
+ host::require(WriteFile(pipe_.get(),&q,sizeof(q),&written,nullptr)&&written==sizeof(q),L"Host request publication");notify();auto r=receive(1000);
+ host::require(r.sequence==q.sequence&&r.acceptedSequence==q.sequence&&cancel::same(r.identity,q.identity),L"Host response session and sequence");return r;
+}
+void HostCancellation::cancel(){
+ host::require(ready_&&!disabled_,L"Host cancellation unavailable");
+ CONSOLE_SELECTION_INFO selection={};
+ host::require(!console_.frozen()&&GetConsoleSelectionInfo(&selection)&&selection.dwFlags==0,L"Cancellation refused while console selected");
+ host::require(ResetEvent(completion_.get())!=FALSE,L"Reset host keyboard boundary"); // All scraping and resize run on this same agent thread.
+ try{
+  const auto r=request(cancel::Operation::Cancel);
+  host::require(WaitForSingleObject(completion_.get(),1000)==WAIT_OBJECT_0,L"OutcomeUnknown: keyboard completion boundary");
+  const auto &k=r.keyboard;
+  TRACE_EVENT(TraceSeverity::Info,TraceSubsystem::Console,"host-cancel result sequence=%llu result=%u host=%u thread=%u captured=%u applied=%u sent=%u restored=%u equal=%u error=%u",
+   sequence_,static_cast<unsigned>(r.result),r.identity.host,r.identity.hostThread,k.captured,k.applied,k.sent,k.restored,k.equal,k.error);
+  TRACE_EVENT(TraceSeverity::Info,TraceSubsystem::Console,"host-cancel before sequence=%llu keys=%s",sequence_,hex(k.before).c_str());
+  TRACE_EVENT(TraceSeverity::Info,TraceSubsystem::Console,"host-cancel during sequence=%llu keys=%s",sequence_,hex(k.during).c_str());
+  TRACE_EVENT(TraceSeverity::Info,TraceSubsystem::Console,"host-cancel after sequence=%llu keys=%s",sequence_,hex(k.after).c_str());
+  host::require(r.result==cancel::Result::Accepted&&k.captured&&k.applied&&k.sent&&k.restored&&k.equal&&!k.error,L"Host cancellation or keyboard restoration failed");
+ }catch(...){disabled_=true;ready_=false;TRACE_EVENT(TraceSeverity::Error,TraceSubsystem::Console,"host-cancel unavailable sequence=%llu outcome=unknown retry=disabled",sequence_);throw;}
+}
+void HostCancellation::cleanup() noexcept{
+ if(hook_){UnhookWindowsHookEx(hook_);hook_=nullptr;}if(module_){FreeLibrary(module_);module_=nullptr;}if(atom_){GlobalDeleteAtom(atom_);atom_=0;}
+ pipe_.reset();completion_.reset();thread_.reset();host_.reset();ready_=false;
+}
+void HostCancellation::close() noexcept{if(ready_&&!disabled_)try{const auto r=request(cancel::Operation::Close);(void)r;}catch(...){disabled_=true;}ready_=false;cleanup();}
+HostCancellation::~HostCancellation(){close();}

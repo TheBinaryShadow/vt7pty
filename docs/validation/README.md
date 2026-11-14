@@ -9,13 +9,15 @@ accepted on all three Windows 7 machines. The
 [H3 guard review](2026-11-14-step-1.2-host-guards-rc1-windows7.md)
 verifies 282/282 guard cases, with no prototype coverage gaps or neighbor trace
 loss. Original controls and unprotected contrasts retain their failures.
-My next step is H4 runtime integration and production qualification. The runtime
-cancellation fix, Milestone 1 and VT7 integration remain open.
+The opt-in [H4 runtime candidate](../H4_RUNTIME.md) now implements the approved
+desktop and two-phase close contract. Its Windows 7 and remaining production
+qualification, Milestone 1 and VT7 integration remain open.
 
 ## Current fidelity work
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
+| H4 runtime integration | [rc1 development and candidate review](2026-11-14-step-1.2-h4-runtime-rc1-candidate.md) | Pending; H4 remains open |
 | H3 guard qualification | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-guards-rc1-candidate.md) | [Accepted: 282/282 guard cases; H4 remains](2026-11-14-step-1.2-host-guards-rc1-windows7.md) |
 | Coordinated H3 prototype | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-coordination-rc1-candidate.md) | [Reviewed: baseline and recording verified; H3 guards remain](2026-11-13-step-1.2-host-coordination-rc1-windows7.md) |
 | H3 scraper coordination | [rc1 candidate, controlled contrasts and retained failures](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-candidate.md) | [Reviewed: coordination supported; H3 open](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md) |
@@ -35,7 +37,7 @@ controls, freeze/Escape tracing and separate shell measurements. The
 [controlled Windows 7 review](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md)
 records the resulting contrasts, stale frozen state and neighbor trace limit.
 
-These research bundles use the released 0.5.0 runtime. Passing a research stage
+The H1-H3 research bundles use the released 0.5.0 runtime. Passing a research stage
 does not resolve the recorded shell defects or accept Milestone 1.
 
 ## Published baseline

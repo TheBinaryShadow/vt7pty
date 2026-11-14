@@ -31,12 +31,13 @@ I'm working on input cancellation within Milestone 1. H1, H2 and the controlled
 H3 prototype are accepted on all three Windows 7 tiers. The
 [guard review](validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
 verifies 282/282 cases, including races, actual access denial, native children
-and the applicable PowerShell 7 matrix. H4 now needs runtime integration,
-ordinary-desktop behavior, lifetime policy and regression qualification.
+and the applicable PowerShell 7 matrix. The opt-in H4 runtime candidate now
+implements the approved desktop and close contract; target qualification remains.
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |
 | --- | --- |
+| [H4 runtime qualification](H4_RUNTIME.md) | Opt-in runtime contract, three-machine runner and remaining gates |
 | [Fidelity plan](FIDELITY.md) | Required applications, measurements and remaining coverage |
 | [Fidelity test bundle](FIDELITY_BASELINE.md) | Run and interpret the shell and fixture tests |
 | [Cancellation investigation](INPUT_CANCELLATION.md) | Failed approaches and what they established |

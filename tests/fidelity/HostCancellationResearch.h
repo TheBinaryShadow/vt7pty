@@ -19,6 +19,9 @@
 // H3-specific fixture/session protocol. H1 and H2 stay unchanged during research.
 using namespace fidelity;
 namespace cancelresearch {
+#ifdef VT7PTY_H4_RUNTIME
+inline HWND runtimeFixtureGui=nullptr;
+#endif
 struct Query {
     LONG status=static_cast<LONG>(0xc0000002u);
     ULONG length=0;
@@ -83,8 +86,14 @@ inline std::wstring guardEnvironment(const wchar_t *name) {
 }
 #endif
 struct IdentityPacket {
+#ifdef VT7PTY_H4_RUNTIME
+    wchar_t fixtureDesktop[256]={};
+    uint64_t fixtureGui=0;
+#endif
     uint32_t magic=0x33494856,
-#if defined(VT7PTY_H3_GUARDS)
+#if defined(VT7PTY_H4_RUNTIME)
+        schema=6,
+#elif defined(VT7PTY_H3_GUARDS)
         schema=5,
 #elif defined(VT7PTY_H3_COORDINATED)
         schema=4,
@@ -190,6 +199,11 @@ inline DWORD WINAPI readLine(void *data) {
         while(characters<2) {
             INPUT_RECORD item={}; DWORD count=0;
             if(!ReadConsoleInputW(GetStdHandle(STD_INPUT_HANDLE),&item,1,&count) || count!=1) { r.error=GetLastError(); InterlockedExchange(&r.returned,1); return 0; }
+            #ifdef VT7PTY_H4_RUNTIME
+            if(r.guardInputCount==32){r.error=ERROR_INSUFFICIENT_BUFFER;InterlockedExchange(&r.returned,1);return 0;}
+            auto &observed=r.guardInput[r.guardInputCount++];observed.type=item.EventType;
+            if(item.EventType==KEY_EVENT){const auto &k=item.Event.KeyEvent;observed.down=k.bKeyDown?1u:0u;observed.character=k.uChar.UnicodeChar;observed.virtualKey=k.wVirtualKeyCode;observed.scan=k.wVirtualScanCode;observed.modifiers=k.dwControlKeyState;observed.repeat=k.wRepeatCount;}
+            #endif
             if(item.EventType==KEY_EVENT && item.Event.KeyEvent.bKeyDown) {
                 const auto &key=item.Event.KeyEvent;
                 if(r.keyCount==16) { r.error=ERROR_INSUFFICIENT_BUFFER; InterlockedExchange(&r.returned,1); return 0; }
@@ -375,6 +389,11 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
             p.trace.beginQpc=h3trace::qpc();
 #endif
             p.processId=GetCurrentProcessId(); p.parentId=parentProcessId(p.processId);
+#ifdef VT7PTY_H4_RUNTIME
+            DWORD desktopBytes=0;
+            check(GetUserObjectInformationW(GetThreadDesktop(GetCurrentThreadId()),UOI_NAME,p.fixtureDesktop,sizeof(p.fixtureDesktop),&desktopBytes),"runtime fixture desktop");
+            p.fixtureGui=reinterpret_cast<uintptr_t>(runtimeFixtureGui);
+#endif
             p.query=hostQuery(GetCurrentProcess());
             const HWND window=GetConsoleWindow(); p.window=reinterpret_cast<uintptr_t>(window);
             DWORD windowProcess=0; p.windowThread=GetWindowThreadProcessId(window,&windowProcess); p.windowProcess=windowProcess;
@@ -468,21 +487,31 @@ public:
         return result+"]}";
     }
 #endif
-    explicit Session(unsigned int index,const std::wstring &researchOutput=L"") {
+    explicit Session(unsigned int index,const std::wstring &researchOutput=L"",uint64_t sessionFlags=0) {
 #ifndef VT7PTY_H3_FREEZE
         (void)researchOutput;
 #endif
         try {
-            auto *config=vt7pty_config_new(0,nullptr); check(config!=nullptr,"config");
+            auto *config=vt7pty_config_new(sessionFlags,nullptr); check(config!=nullptr,"config");
             vt7pty_config_set_initial_size(config,80,25); vt7pty_config_set_agent_timeout(config,5000);
 #ifdef VT7PTY_H3_FREEZE
             std::wstring nonce;
             { h3freeze::LaunchEnvironment environment; nonce=environment.nonce; pty_=vt7pty_open(config,nullptr); }
 #else
+#ifdef VT7PTY_H4_RUNTIME
+            vt7pty_error_ptr_t startupError=nullptr;
+            pty_=vt7pty_open(config,&startupError);
+            if(startupError){const auto message=utf8(vt7pty_error_msg(startupError));vt7pty_error_free(startupError);vt7pty_config_free(config);throw std::runtime_error("runtime startup: "+message);}
+#else
             pty_=vt7pty_open(config,nullptr);
+#endif
 #endif
             vt7pty_config_free(config); check(pty_!=nullptr,"open session");
             check(DuplicateHandle(GetCurrentProcess(),vt7pty_agent_process(pty_),GetCurrentProcess(),&agent.value,0,FALSE,DUPLICATE_SAME_ACCESS),"agent handle");
+#ifdef VT7PTY_H4_RUNTIME
+            const auto association=hostQuery(agent.value);check(valid(association),"runtime agent host association");
+            host.reset(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION|SYNCHRONIZE,FALSE,static_cast<DWORD>(association.raw&~ULONG_PTR{3})));check(host.value!=nullptr,"retained runtime host");
+#endif
             input_.reset(CreateFileW(vt7pty_conin_name(pty_),GENERIC_WRITE,0,nullptr,OPEN_EXISTING,FILE_FLAG_OVERLAPPED,nullptr));
             output_.reset(CreateFileW(vt7pty_conout_name(pty_),GENERIC_READ,0,nullptr,OPEN_EXISTING,FILE_FLAG_OVERLAPPED,nullptr));
             check(input_.value!=INVALID_HANDLE_VALUE && output_.value!=INVALID_HANDLE_VALUE,"session pipes");
@@ -503,11 +532,16 @@ public:
         } catch(...) { cleanup(); throw; }
     }
     ~Session() { cleanup(); }
+#ifdef VT7PTY_H4_RUNTIME
+    vt7pty_t *runtimeHandle() const { return pty_; }
+#endif
     IdentityPacket observe(char command='I') {
         transfer(pipe_.value,&command,1,true);
         IdentityPacket p; transfer(pipe_.value,&p,sizeof(p),false);
         check(p.magic==0x33494856 && p.schema==
-#if defined(VT7PTY_H3_GUARDS)
+#if defined(VT7PTY_H4_RUNTIME)
+            6
+#elif defined(VT7PTY_H3_GUARDS)
             5
 #elif defined(VT7PTY_H3_COORDINATED)
             4
@@ -520,8 +554,11 @@ public:
             && p.guardInputCount<=32
 #endif
             && p.processId==GetProcessId(child.value) &&
-            p.parentId==GetProcessId(agent.value) && p.window!=0 && p.windowThread!=0 &&
-            p.consoleCount>0 && p.consoleCount<=16 && p.readReturned<=1 && p.readSucceeded<=1 && p.textCount<=127 && p.keyCount<=16 && p.controlCount<=128,"identity packet");
+            p.parentId==GetProcessId(agent.value) && p.window!=0 &&
+#ifndef VT7PTY_H4_RUNTIME
+            p.windowThread!=0 &&
+#endif
+            p.consoleCount>0 && p.consoleCount<=16 && p.readReturned<=1 && p.readSucceeded<=1 && p.textCount<=127 && p.keyCount<=16 && p.controlCount<=128,("identity packet: schema="+std::to_string(p.schema)+" pid="+std::to_string(p.processId)+" expected="+std::to_string(GetProcessId(child.value))+" parent="+std::to_string(p.parentId)+" agent="+std::to_string(GetProcessId(agent.value))+" hwnd="+std::to_string(p.window)+" windowThread="+std::to_string(p.windowThread)+" members="+std::to_string(p.consoleCount)).c_str());
         const auto contains=[&](DWORD id) { return std::find(p.consoleProcesses,p.consoleProcesses+p.consoleCount,id)!=p.consoleProcesses+p.consoleCount; };
         check(contains(p.processId) && contains(p.parentId) && (p.consoleCount==2 || (p.consoleCount==3 && p.shellId && contains(p.shellId))
 #ifdef VT7PTY_H3_GUARDS
@@ -668,6 +705,9 @@ inline std::string packetJson(const IdentityPacket &p) {
     diagnostic+="]";
 #endif
     std::string keys="[";
+#ifdef VT7PTY_H4_RUNTIME
+    diagnostic+=",\"FixtureDesktop\":"+json(utf8(p.fixtureDesktop))+",\"FixtureGuiWindow\":"+std::to_string(p.fixtureGui);
+#endif
     for(uint32_t i=0;i<p.keyCount;++i) {
         if(i) keys+=',';
         const auto &k=p.keys[i];

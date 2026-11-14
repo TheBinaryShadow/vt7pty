@@ -19,6 +19,7 @@
 // IN THE SOFTWARE.
 
 #include "ConsoleInput.h"
+#include "HostCancellation.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -398,6 +399,10 @@ int ConsoleInput::scanInput(std::vector<INPUT_RECORD> &records,
     if (input[0] == '\x03' && (inputConsoleMode() & ENABLE_PROCESSED_INPUT)) {
         flushInputRecords(records);
         trace("Ctrl-C");
+        if (m_hostCancellation && (inputConsoleMode() & ENABLE_LINE_INPUT)) {
+            m_hostCancellation->cancel();
+            return 1;
+        }
         const BOOL ret = GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0);
         trace("GenerateConsoleCtrlEvent: %d", ret);
         return 1;

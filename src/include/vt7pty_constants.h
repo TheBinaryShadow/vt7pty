@@ -64,10 +64,17 @@
  * them. */
 #define VT7PTY_FLAG_COLOR_ESCAPES       0x4ull
 
+/* H4 candidate: isolate the backing host and cancel processed cooked reads
+ * through its verified dispatch thread. Applications retain the caller's
+ * ordinary desktop. Requires the matched VT7Pty-Host.dll and a medium-integrity
+ * interactive caller. Raw input retains its public input-record route. */
+#define VT7PTY_FLAG_HOST_CANCELLATION   0x8ull
+
 #define VT7PTY_FLAG_MASK (0ull \
     | VT7PTY_FLAG_CONERR \
     | VT7PTY_FLAG_PLAIN_OUTPUT \
     | VT7PTY_FLAG_COLOR_ESCAPES \
+    | VT7PTY_FLAG_HOST_CANCELLATION \
 )
 
 /* QuickEdit mode is initially disabled, and the agent does not send mouse

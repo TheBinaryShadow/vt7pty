@@ -1,0 +1,87 @@
+{
+  "SchemaVersion": 1,
+  "Kind": "H4LocalPrototypeReview",
+  "ReviewedDate": "2026-11-14",
+  "SourceCommit": "5a225364efd61ff19926389b23c50691ae14e403",
+  "SourceTreeClean": false,
+  "DevelopmentHost": "WOLF",
+  "OSBuild": "10.0.19044.0",
+  "PassingCases": 8,
+  "TotalCases": 8,
+  "Run": {
+    "Kind": "H4RuntimeProbe",
+    "SchemaVersion": 1,
+    "Status": "Pass",
+    "Passed": 8,
+    "Total": 8,
+    "PackageVersion": "0.5.1-dev",
+    "SourceCommit": "5a225364efd61ff19926389b23c50691ae14e403",
+    "ApplicationDesktop": "Default",
+    "RuntimeIntegrated": true,
+    "H4Accepted": false
+  },
+  "Binaries": [
+    {
+      "Name": "VT7Pty.dll",
+      "Bytes": 3228160,
+      "Sha256": "fdfaa546c20851de12f29285f2516272bd26038dac1756260704daa240e0bee5",
+      "ProductVersion": "0.5.1-dev"
+    },
+    {
+      "Name": "VT7Pty-Agent.exe",
+      "Bytes": 3565568,
+      "Sha256": "4890107c33e12b991f4fb42a6b1cf526fef40119ffcea045bfbcb9b1e8b74086",
+      "ProductVersion": "0.5.1-dev"
+    },
+    {
+      "Name": "VT7Pty-Host.dll",
+      "Bytes": 3088384,
+      "Sha256": "c38022bbb997186171d8a21ed2858518cbba938904fced371e9c6acb0fd723f6",
+      "ProductVersion": "0.5.1-dev"
+    },
+    {
+      "Name": "RuntimeCancellationTest.exe",
+      "Bytes": 2194944,
+      "Sha256": "68a67db63599e76ef6b44e840971b0207bd59197c88efa228b3f9196d10bdc83",
+      "ProductVersion": "0.5.1-dev"
+    }
+  ],
+  "SourceSnapshots": [
+    "projects/RuntimeCancellationTest.vcxproj",
+    "projects/VT7Pty-Agent.vcxproj",
+    "projects/VT7Pty-CoordinatedAgent.vcxproj",
+    "projects/VT7Pty-FreezeAgent.vcxproj",
+    "projects/VT7Pty-GuardAgent.vcxproj",
+    "projects/VT7Pty-Host.vcxproj",
+    "src/agent/Agent.cc",
+    "src/agent/Agent.h",
+    "src/agent/ConsoleInput.cc",
+    "src/agent/ConsoleInput.h",
+    "src/agent/HostCancellation.cc",
+    "src/agent/HostCancellation.h",
+    "src/agent/main.cc",
+    "src/host/HostCancellation.cc",
+    "src/include/vt7pty_constants.h",
+    "src/include/vt7pty_version.h",
+    "src/include/vt7pty.h",
+    "src/libvt7pty/vt7pty.cc",
+    "src/libvt7pty/VT7PtyInternal.h",
+    "src/shared/Assert.cc",
+    "src/shared/Assert.h",
+    "src/shared/BackingDesktop.h",
+    "src/shared/HostCancellationProtocol.h",
+    "src/shared/HostIdentity.h",
+    "src/shared/Protocol.h",
+    "tests/fidelity/HostCancellationResearch.h",
+    "tests/fidelity/RuntimeCancellationTest.cc",
+    "tests/unit/ProtocolTest.cc",
+    "Verify-VT7Pty.ps1",
+    "VERSION.txt",
+    "VT7Pty.sln"
+  ],
+  "H4Accepted": false,
+  "Windows7Qualified": false,
+  "NativeStaticAnalysisCompleted": false,
+  "FullRegressionCompleted": false,
+  "ContractDecisionsPending": true
+}

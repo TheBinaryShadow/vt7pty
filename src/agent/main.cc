@@ -27,6 +27,10 @@
 #include "../shared/WindowsVersion.h"
 #include "../shared/Assert.h"
 #include "../shared/Version.h"
+#include "../shared/Exception.h"
+#include "../shared/DebugClient.h"
+#include "../include/vt7pty_constants.h"
+#include <exception>
 
 #include "Agent.h"
 #include "DebugShowInput.h"
@@ -89,17 +93,33 @@ int main() {
         return 0;
     }
 
-    if (argc != 6) {
+    if (argc != 6 && argc != 7) {
         fprintf(stderr, USAGE, argv[0], argv[0]);
         return 1;
     }
 
-    Agent agent(argv[1],
-                vt7pty_atoi64(utf8FromWide(argv[2]).c_str()),
-                atoi(utf8FromWide(argv[3]).c_str()),
-                atoi(utf8FromWide(argv[4]).c_str()),
-                atoi(utf8FromWide(argv[5]).c_str()));
-    agent.run();
+    const uint64_t flags = vt7pty_atoi64(utf8FromWide(argv[2]).c_str());
+    if ((flags & VT7PTY_FLAG_MASK) != flags ||
+            ((flags & VT7PTY_FLAG_HOST_CANCELLATION) != 0) != (argc == 7)) {
+        fprintf(stderr, "Invalid agent flags or application desktop.\n");
+        return 1;
+    }
+    try {
+        Agent agent(argv[1], flags,
+                    atoi(utf8FromWide(argv[3]).c_str()),
+                    atoi(utf8FromWide(argv[4]).c_str()),
+                    atoi(utf8FromWide(argv[5]).c_str()),
+                    argc == 7 ? argv[6] : L"");
+        agent.run();
+    } catch (const Exception &error) {
+        trace("Agent failure: %s", utf8FromWide(error.what()).c_str());
+        fprintf(stderr, "Agent failure: %ls\n", error.what());
+        return 1;
+    } catch (const std::exception &error) {
+        trace("Agent failure: %s", error.what());
+        fprintf(stderr, "Agent failure: %s\n", error.what());
+        return 1;
+    }
 
     // The Agent destructor shouldn't return, but if it does, exit
     // unsuccessfully.

@@ -1,0 +1,79 @@
+// Copyright (c) 2026 VT7Pty contributors
+// SPDX-License-Identifier: MIT
+#include "../shared/HostCancellationProtocol.h"
+#include "../shared/HostIdentity.h"
+namespace {
+using namespace vt7pty::internal;
+HMODULE module=nullptr;HANDLE pipe=INVALID_HANDLE_VALUE,owner=nullptr,boundary=nullptr;
+cancel::Request binding;uint64_t sequence=0;ATOM atom=0;HWND target=nullptr;bool bound=false,retired=false;volatile LONG entered=0;
+void retire() noexcept {for(HANDLE h:{pipe,owner,boundary})if(h&&h!=INVALID_HANDLE_VALUE)CloseHandle(h);pipe=INVALID_HANDLE_VALUE;owner=boundary=nullptr;retired=true;}
+void reply(cancel::Result result,const cancel::Request *q=nullptr,const cancel::Keyboard *keys=nullptr){
+ cancel::Response r;r.result=result;r.nonce[0]=binding.nonce[0];r.nonce[1]=binding.nonce[1];r.acceptedSequence=sequence;
+ r.identity=binding.identity;r.identity.host=GetCurrentProcessId();r.identity.hostThread=GetCurrentThreadId();r.identity.hostCreated=host::creation(GetCurrentProcess());r.identity.window=reinterpret_cast<uintptr_t>(target);
+ if(q)r.sequence=q->sequence;if(keys)r.keyboard=*keys;DWORD written=0;
+ if(!WriteFile(pipe,&r,sizeof(r),&written,nullptr)||written!=sizeof(r))retire();
+}
+void open(const CWPSTRUCT &m){
+ if(m.wParam<0xc000||m.wParam>0xffff||m.lParam<=0||static_cast<uint64_t>(m.lParam)>MAXDWORD)return;
+ wchar_t name[256]={};if(!GlobalGetAtomNameW(static_cast<ATOM>(m.wParam),name,256))return;
+ const DWORD pid=static_cast<DWORD>(m.lParam);const auto prefix=L"VT7Pty-H4-"+std::to_wstring(pid)+L"-";const std::wstring value(name);
+ if(value.size()!=prefix.size()+32||value.compare(0,prefix.size(),prefix)!=0||value.find_first_not_of(L"0123456789abcdef",prefix.size())!=std::wstring::npos)return;
+ OwnedHandle candidate(CreateFileW((L"\\\\.\\pipe\\"+value).c_str(),GENERIC_READ|GENERIC_WRITE,0,nullptr,OPEN_EXISTING,0,nullptr));if(!candidate)return;
+ DWORD mode=PIPE_READMODE_BYTE|PIPE_NOWAIT;host::require(SetNamedPipeHandleState(candidate.get(),&mode,nullptr,nullptr)!=FALSE,L"Nonblocking host channel");
+ ULONG server=0;host::require(GetNamedPipeServerProcessId(candidate.get(),&server)&&server==pid,L"Host channel owner");
+ OwnedHandle process(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION|SYNCHRONIZE,FALSE,pid));host::require(static_cast<bool>(process),L"Host controller open");
+ host::require(_wcsicmp(host::image(process.get()).c_str(),(host::directory(module)+L"\\VT7Pty-Agent.exe").c_str())==0,L"Exact colocated host controller");
+ const host::Token ours(GetCurrentProcess()),theirs(process.get());host::require(ours.same(theirs)&&ours.integrity==SECURITY_MANDATORY_MEDIUM_RID&&host::privateDesktop(),L"Host controller token and isolated desktop");
+ OwnedHandle completion(OpenEventW(EVENT_MODIFY_STATE,FALSE,(L"Local\\"+value+L"-completion").c_str()));host::require(static_cast<bool>(completion),L"Host completion event");
+ binding.nonce[0]=_wcstoui64(value.substr(prefix.size(),16).c_str(),nullptr,16);binding.nonce[1]=_wcstoui64(value.substr(prefix.size()+16,16).c_str(),nullptr,16);
+ binding.identity.agent=pid;binding.identity.agentCreated=host::creation(process.get());
+ pipe=candidate.release();owner=process.release();boundary=completion.release();target=m.hwnd;atom=static_cast<ATOM>(m.wParam);reply(cancel::Result::Hello);
+}
+bool bind(const cancel::Request &q){
+ if(!cancel::frame(q,GetTickCount64())||q.operation!=cancel::Operation::Bind||q.sequence!=1||q.nonce[0]!=binding.nonce[0]||q.nonce[1]!=binding.nonce[1]||
+ q.identity.agent!=binding.identity.agent||q.identity.agentCreated!=binding.identity.agentCreated||q.identity.host!=GetCurrentProcessId()||q.identity.hostThread!=GetCurrentThreadId()||
+ q.identity.hostCreated!=host::creation(GetCurrentProcess())||q.identity.window!=reinterpret_cast<uintptr_t>(target))return false;
+ host::live(owner,q.identity.agent,q.identity.agentCreated);host::require(host::consoleHost(owner)==GetCurrentProcessId(),L"Controller console association");
+ OwnedHandle thread(OpenThread(THREAD_QUERY_LIMITED_INFORMATION|SYNCHRONIZE,FALSE,q.identity.agentThread));host::require(thread&&GetProcessIdOfThread(thread.get())==q.identity.agent,L"Controller thread");
+ host::require(host::objectName(GetThreadDesktop(q.identity.agentThread))==host::objectName(GetThreadDesktop(GetCurrentThreadId())),L"Controller shares isolated backing desktop");
+ DWORD pid=0;const DWORD tid=GetWindowThreadProcessId(target,&pid);host::require(pid==GetCurrentProcessId()&&tid==GetCurrentThreadId(),L"Actual host window dispatch");
+ binding=q;sequence=1;bound=true;return true;
+}
+struct Keys {
+ cancel::Keyboard &e;
+ explicit Keys(cancel::Keyboard &value):e(value){e.captured=GetKeyboardState(e.before)!=FALSE;host::require(e.captured!=0,L"Host keyboard capture");}
+ ~Keys(){if(e.applied){e.restored=SetKeyboardState(e.before)!=FALSE;if(!e.restored)e.error=GetLastError();e.equal=GetKeyboardState(e.after)&&memcmp(e.before,e.after,256)==0;}}
+ void apply(){BYTE state[256];memcpy(state,e.before,256);for(unsigned int vk:{VK_SHIFT,VK_LSHIFT,VK_RSHIFT,VK_CONTROL,VK_LCONTROL,VK_RCONTROL,VK_MENU,VK_LMENU,VK_RMENU,VK_LWIN,VK_RWIN})state[vk]&=1;
+ state[VK_CONTROL]|=0x80;state[VK_LCONTROL]|=0x80;e.applied=SetKeyboardState(state)!=FALSE;host::require(e.applied!=0,L"Host temporary Ctrl state");
+ host::require(GetKeyboardState(e.during)&&memcmp(state,e.during,256)==0&&(GetKeyState(VK_CONTROL)&0x8000),L"Host Ctrl state verified");}
+};
+cancel::Keyboard cancelRead(){
+ cancel::Keyboard e;
+ try{Keys scope(e);scope.apply();const UINT scan=MapVirtualKeyW('C',MAPVK_VK_TO_VSC);host::require(scan>0&&scan<256,L"Host C scan code");
+ SendMessageW(target,WM_KEYDOWN,'C',static_cast<LPARAM>((scan<<16)|1u));e.sent=1;}catch(...){if(!e.error)e.error=GetLastError()?GetLastError():ERROR_GEN_FAILURE;}return e;
+}
+void dispatch(const CWPSTRUCT &m){
+ if(retired||!host::privateDesktop())return;if(pipe==INVALID_HANDLE_VALUE){open(m);return;}
+ if(m.hwnd!=target||m.wParam!=atom||m.lParam!=binding.identity.agent)return;
+ if(WaitForSingleObject(owner,0)!=WAIT_TIMEOUT){retire();return;}
+ DWORD available=0;if(!PeekNamedPipe(pipe,nullptr,0,nullptr,&available,nullptr)){retire();return;}if(!available)return;if(available!=sizeof(cancel::Request)){retire();return;}
+ cancel::Request q;DWORD read=0;if(!ReadFile(pipe,&q,sizeof(q),&read,nullptr)||read!=sizeof(q)){retire();return;}
+ bool accepted=false;
+ if(!bound)accepted=bind(q);
+ else if(cancel::next(q,binding,sequence,GetTickCount64())){
+  host::live(owner,binding.identity.agent,binding.identity.agentCreated);host::require(host::consoleHost(owner)==GetCurrentProcessId()&&GetCurrentThreadId()==binding.identity.hostThread,L"Live host binding");
+  sequence=q.sequence;accepted=true;
+ }
+ if(!accepted){reply(cancel::Result::Rejected,&q);return;}
+ if(q.operation==cancel::Operation::Cancel){const auto keys=cancelRead();if(!SetEvent(boundary)){retire();return;}
+  reply(keys.sent&&keys.restored&&keys.equal&&!keys.error?cancel::Result::Accepted:cancel::Result::Failure,&q,&keys);
+  if(!keys.restored||!keys.equal||keys.error)retire();
+ }else{reply(cancel::Result::Accepted,&q);if(q.operation==cancel::Operation::Close)retire();}
+}
+}
+extern "C" __declspec(dllexport) LRESULT CALLBACK VT7PtyHostCallback(int code,WPARAM wp,LPARAM lp){
+ if(code>=0&&lp){const auto &m=*reinterpret_cast<const CWPSTRUCT *>(lp);if(m.message==WM_NULL&&InterlockedCompareExchange(&entered,1,0)==0){
+  try{dispatch(m);}catch(...){retire();}InterlockedExchange(&entered,0);
+ }}return CallNextHookEx(nullptr,code,wp,lp);
+}
+BOOL WINAPI DllMain(HINSTANCE instance,DWORD reason,void *){if(reason==DLL_PROCESS_ATTACH)module=instance;return TRUE;}

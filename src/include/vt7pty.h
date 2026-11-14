@@ -224,6 +224,15 @@ VT7PTY_API int
 vt7pty_get_console_process_list(vt7pty_t *wp, int *processList, const int processCount,
                                 vt7pty_error_ptr_t *err /*OPTIONAL*/);
 
+/* Retires the session without freeing its allocation. This operation is
+ * idempotent and may run concurrently with other session calls. It serializes
+ * behind existing control RPCs; later RPCs return LOST_CONNECTION. Closing the
+ * control connection asks the agent to shut down its console. The caller's
+ * independently opened data-pipe handles remain the caller's responsibility.
+ * The borrowed agent handle and pipe-name strings remain valid until free.
+ * Stop and join all session users before calling vt7pty_free. */
+VT7PTY_API BOOL vt7pty_close(vt7pty_t *wp, vt7pty_error_ptr_t *err /*OPTIONAL*/);
+
 /* Frees the vt7pty_t object and the OS resources contained in it.  This
  * call breaks the connection with the agent, which should then close its
  * console, terminating the processes attached to it.

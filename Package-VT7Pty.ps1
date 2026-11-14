@@ -138,6 +138,7 @@ foreach ($kind in @('runtime', 'development', 'symbols', 'tests')) {
 
 $plans.runtime['bin\VT7Pty.dll'] = Join-Path $binaryDirectory 'VT7Pty.dll'
 $plans.runtime['bin\VT7Pty-Agent.exe'] = Join-Path $binaryDirectory 'VT7Pty-Agent.exe'
+$plans.runtime['bin\VT7Pty-Host.dll'] = Join-Path $binaryDirectory 'VT7Pty-Host.dll'
 $plans.runtime['docs\COMPATIBILITY.md'] = Join-Path $repositoryRoot 'docs\COMPATIBILITY.md'
 
 foreach ($header in @('vt7pty.h', 'vt7pty_constants.h', 'vt7pty_version.h')) {
@@ -147,7 +148,7 @@ $plans.development['lib\VT7Pty.lib'] = Join-Path $binaryDirectory 'VT7Pty.lib'
 $plans.development['docs\NAMING.md'] = Join-Path $repositoryRoot 'docs\NAMING.md'
 $plans.development['docs\VERSIONING.md'] = Join-Path $repositoryRoot 'docs\VERSIONING.md'
 
-foreach ($binary in @('VT7Pty', 'VT7Pty-Agent', 'VT7Pty-DebugServer')) {
+foreach ($binary in @('VT7Pty', 'VT7Pty-Agent', 'VT7Pty-Host', 'VT7Pty-DebugServer')) {
     $plans.symbols["symbols\$binary.pdb"] = Join-Path $binaryDirectory "$binary.pdb"
 }
 foreach ($testProgram in $testPrograms) {
@@ -155,7 +156,7 @@ foreach ($testProgram in $testPrograms) {
 }
 $plans.symbols['docs\DIAGNOSTICS.md'] = Join-Path $repositoryRoot 'docs\DIAGNOSTICS.md'
 
-foreach ($binary in @('VT7Pty.dll', 'VT7Pty-Agent.exe', 'VT7Pty-DebugServer.exe')) {
+foreach ($binary in @('VT7Pty.dll', 'VT7Pty-Agent.exe', 'VT7Pty-Host.dll', 'VT7Pty-DebugServer.exe')) {
     $plans.tests["bin\$binary"] = Join-Path $binaryDirectory $binary
 }
 foreach ($testProgram in $testPrograms) {

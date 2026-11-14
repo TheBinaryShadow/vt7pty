@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<ItemGroup Label="ProjectConfigurations"><ProjectConfiguration Include="Debug|x64"><Configuration>Debug</Configuration><Platform>x64</Platform></ProjectConfiguration><ProjectConfiguration Include="Release|x64"><Configuration>Release</Configuration><Platform>x64</Platform></ProjectConfiguration></ItemGroup>
+<PropertyGroup Label="Globals"><ProjectGuid>{D2C7D9A1-7E46-4D0F-AF80-356FECF36325}</ProjectGuid><Keyword>Win32Proj</Keyword><RootNamespace>RuntimeCancellationTest</RootNamespace><VT7PtyFileDescription>VT7Pty integrated cancellation qualification</VT7PtyFileDescription></PropertyGroup>
+<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/><PropertyGroup Label="Configuration"><ConfigurationType>Application</ConfigurationType></PropertyGroup><Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+<ItemDefinitionGroup><Link><SubSystem>Console</SubSystem><AdditionalDependencies>advapi32.lib;user32.lib;%(AdditionalDependencies)</AdditionalDependencies></Link></ItemDefinitionGroup>
+<ItemGroup><ClCompile Include="..\tests\fidelity\RuntimeCancellationTest.cc"/></ItemGroup>
+<ItemGroup><ProjectReference Include="VT7Pty.vcxproj"><Project>{FCD1D231-A00E-4A06-AE98-A495F9BF25D1}</Project></ProjectReference><ProjectReference Include="VT7Pty-Agent.vcxproj"><Project>{13EA7B4F-5CD5-4972-B95D-94488A850238}</Project><LinkLibraryDependencies>false</LinkLibraryDependencies></ProjectReference></ItemGroup>
+<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+</Project>

@@ -1,0 +1,204 @@
+// Copyright (c) 2026 VT7Pty contributors
+// SPDX-License-Identifier: MIT
+#pragma once
+#include "Exception.h"
+#include "OwnedHandle.h"
+#include "WindowsSecurity.h"
+#include <array>
+#include <cstdint>
+#include <cstring>
+#include <limits>
+#include <sddl.h>
+#include <string>
+#include <tlhelp32.h>
+#include <vector>
+#include <windows.h>
+namespace vt7pty::internal::host
+{
+inline std::wstring quote(const std::wstring &text)
+{
+    std::wstring out = L"\"";
+    size_t slashes = 0;
+    for (wchar_t c : text)
+    {
+        if (c == L'\\')
+        {
+            ++slashes;
+            continue;
+        }
+        out.append(slashes * (c == L'"' ? 2u : 1u), L'\\');
+        slashes = 0;
+        if (c == L'"')
+            out += L'\\';
+        out += c;
+    }
+    out.append(slashes * 2, L'\\');
+    return out + L'"';
+}
+_Post_satisfies_(value) inline void require(bool value, const wchar_t *message)
+{
+    if (!value)
+        throwWindowsError(message, GetLastError() ? GetLastError() : ERROR_INVALID_DATA);
+}
+inline uint64_t creation(HANDLE process)
+{
+    FILETIME c = {}, e = {}, k = {}, u = {};
+    require(GetProcessTimes(process, &c, &e, &k, &u) != FALSE, L"Host process creation");
+    return (uint64_t{c.dwHighDateTime} << 32) | c.dwLowDateTime;
+}
+inline DWORD consoleHost(HANDLE process)
+{
+    using Query = LONG(NTAPI *)(HANDLE, ULONG, void *, ULONG, ULONG *);
+    const HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+    if (!ntdll)
+        throwWindowsError(L"Loaded ntdll module");
+    const auto address = GetProcAddress(ntdll, "NtQueryInformationProcess");
+    Query query = nullptr;
+    static_assert(sizeof(query) == sizeof(address));
+    memcpy(&query, &address, sizeof(query));
+    ULONG_PTR raw = 0;
+    ULONG bytes = 0;
+    require(query && query(process, 49, &raw, sizeof(raw), &bytes) >= 0 && bytes == sizeof(raw) &&
+                raw > 3 && raw <= MAXDWORD,
+            L"Unrecognized console host association");
+    return static_cast<DWORD>(raw & ~ULONG_PTR{3});
+}
+inline std::wstring image(HANDLE process)
+{
+    std::vector<wchar_t> p(32768);
+    DWORD size = static_cast<DWORD>(p.size());
+    require(QueryFullProcessImageNameW(process, 0, p.data(), &size) != FALSE, L"Host image query");
+    return {p.data(), size};
+}
+inline std::wstring objectName(HANDLE object)
+{
+    wchar_t text[256] = {};
+    DWORD bytes = 0;
+    require(GetUserObjectInformationW(object, UOI_NAME, text, sizeof(text), &bytes) != FALSE,
+            L"Desktop object name");
+    return text;
+}
+inline std::wstring modulePath(HMODULE module = nullptr)
+{
+    std::vector<wchar_t> p(32768);
+    const DWORD size = GetModuleFileNameW(module, p.data(), 32768);
+    require(size > 0 && size < 32768, L"Host module path");
+    return {p.data(), size};
+}
+inline std::wstring directory(HMODULE module = nullptr)
+{
+    const auto p = modulePath(module);
+    return p.substr(0, p.find_last_of(L'\\'));
+}
+struct Token
+{
+    std::vector<BYTE> user;
+    TOKEN_STATISTICS statistics = {};
+    DWORD integrity = 0, session = 0;
+    explicit Token(HANDLE process)
+    {
+        HANDLE raw = nullptr;
+        require(OpenProcessToken(process, TOKEN_QUERY, &raw) != FALSE, L"Host token open");
+        OwnedHandle token(raw);
+        DWORD bytes = 0;
+        GetTokenInformation(token.get(), TokenUser, nullptr, 0, &bytes);
+        require(bytes > 0 && bytes < 65536, L"Host token size");
+        user.resize(bytes);
+        require(GetTokenInformation(token.get(), TokenUser, user.data(), bytes, &bytes) != FALSE,
+                L"Host token user");
+        require(GetTokenInformation(token.get(), TokenStatistics, &statistics, sizeof(statistics),
+                                    &bytes) != FALSE,
+                L"Host token logon");
+        require(GetTokenInformation(token.get(), TokenSessionId, &session, sizeof(session),
+                                    &bytes) != FALSE,
+                L"Host token session");
+        bytes = 0;
+        GetTokenInformation(token.get(), TokenIntegrityLevel, nullptr, 0, &bytes);
+        require(bytes > 0 && bytes < 65536, L"Host token integrity size");
+        std::vector<BYTE> buffer(bytes);
+        require(GetTokenInformation(token.get(), TokenIntegrityLevel, buffer.data(), bytes,
+                                    &bytes) != FALSE,
+                L"Host token integrity");
+        auto sid = reinterpret_cast<TOKEN_MANDATORY_LABEL *>(buffer.data())->Label.Sid;
+        require(IsValidSid(sid) && *GetSidSubAuthorityCount(sid) > 0, L"Host integrity SID");
+        integrity = *GetSidSubAuthority(sid, *GetSidSubAuthorityCount(sid) - 1);
+    }
+    PSID sid() const
+    {
+        return reinterpret_cast<const TOKEN_USER *>(user.data())->User.Sid;
+    }
+    bool same(const Token &other) const
+    {
+        return EqualSid(sid(), other.sid()) && integrity == other.integrity &&
+               session == other.session &&
+               statistics.AuthenticationId.LowPart == other.statistics.AuthenticationId.LowPart &&
+               statistics.AuthenticationId.HighPart == other.statistics.AuthenticationId.HighPart;
+    }
+};
+inline SecurityDescriptor privateDescriptor()
+{
+    const Token token(GetCurrentProcess());
+    return stringToSd(L"D:P(A;;GA;;;SY)(A;;GA;;;" + sidToString(token.sid()) + L")");
+}
+inline bool privateDesktop()
+{
+    try
+    {
+        if (_wcsicmp(objectName(GetProcessWindowStation()).c_str(), L"WinSta0") != 0)
+            return false;
+        const auto name = objectName(GetThreadDesktop(GetCurrentThreadId()));
+        if (name.compare(0, 15, L"VT7Pty-Console-") != 0)
+            return false;
+        HDESK input = OpenInputDesktop(0, FALSE, DESKTOP_READOBJECTS);
+        if (!input)
+            return false;
+        bool separate = false;
+        try
+        {
+            separate = _wcsicmp(objectName(input).c_str(), name.c_str()) != 0;
+        }
+        catch (...)
+        {
+            CloseDesktop(input);
+            throw;
+        }
+        CloseDesktop(input);
+        return separate;
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+inline DWORD parent(DWORD pid)
+{
+    OwnedHandle snapshot(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0));
+    require(static_cast<bool>(snapshot), L"Host parent snapshot");
+    PROCESSENTRY32W entry = {};
+    entry.dwSize = sizeof(entry);
+    require(Process32FirstW(snapshot.get(), &entry) != FALSE, L"Host parent enumeration");
+    do
+    {
+        if (entry.th32ProcessID == pid)
+            return entry.th32ParentProcessID;
+    } while (Process32NextW(snapshot.get(), &entry));
+    throwWindowsError(L"Host parent was not found", ERROR_NOT_FOUND);
+}
+inline void noImpersonation()
+{
+    HANDLE token = nullptr;
+    if (OpenThreadToken(GetCurrentThread(), TOKEN_QUERY, TRUE, &token))
+    {
+        CloseHandle(token);
+        throwWindowsError(L"Host cancellation requires an unimpersonated caller",
+                          ERROR_ACCESS_DENIED);
+    }
+    require(GetLastError() == ERROR_NO_TOKEN, L"Host caller token");
+}
+inline void live(HANDLE h, DWORD pid, uint64_t time)
+{
+    require(h && h != INVALID_HANDLE_VALUE && GetProcessId(h) == pid && creation(h) == time &&
+                WaitForSingleObject(h, 0) == WAIT_TIMEOUT,
+            L"Host retained process identity");
+}
+} // namespace vt7pty::internal::host

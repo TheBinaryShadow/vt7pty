@@ -1,7 +1,7 @@
 # VT7Pty Architecture
 
-Status: released 0.5.0 native architecture and planned boundaries. Updated:
-2026-10-13.
+Status: released 0.5.0 architecture with the opt-in H4 development path.
+Updated: 2026-11-14.
 
 I use this guide to explain the released native backend and its planned
 boundaries. The source code is authoritative if an implementation detail
@@ -18,7 +18,18 @@ console applications without displaying the backing console window. It must
 translate terminal input into console input records and reconstruct terminal
 output from the legacy console state.
 
-## Current components
+## H4 development path
+
+The [H4 candidate](H4_RUNTIME.md) adds VT7Pty-Host.dll for flagged sessions.
+The DLL creates a private backing desktop; the agent and host use it while the
+application and GUI descendants retain the ordinary desktop. Processed cooked
+ETX uses one verified host callback, serialized with agent work. Raw input keeps
+its existing record path. A pinned host-local monitor handles caller/agent death.
+The development API is 1.1 and its client-agent protocol is 2. Two-phase close
+retires a session before its allocation is freed. This path is opt-in and still
+needs target qualification; it is not part of the published 0.5.0 runtime.
+
+## Released components
 
 | Component | Current role | Disposition and next boundary |
 | --- | --- | --- |
@@ -38,7 +49,7 @@ by responsibility: product code under `src`, public headers under
 `src/include`, tests under `tests`, developer programs and scripts under
 `tools`, and design and validation records under `docs`.
 
-## Current session flow
+## Released session flow
 
 ```text
 Terminal host

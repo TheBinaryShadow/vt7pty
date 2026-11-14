@@ -1,0 +1,14 @@
+[0m[0KH3_PS[1]>[0K$m=Get-Module PSReadLine; $v='none'; $cfg='native'; if($m){$v=$m.Versi[0Ko[?25l
+n.ToString();$o=Get-PSReadLineOption;$cfg=$m.Path+'|'+$o.EditMode.ToString()+'|[0K'
++$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAllText('D:\Git\vt7pty\artifa[0Kc
+ts\fidelity\h4-traced-debug-1\child-powershell-event\shell-identity.txt',$PSVer[0Ks
+ionTable.PSVersion.ToString()+'|'+$v+'|'+$Host.Name+'|'+$cfg)[0K
+H3_PS[2]>[0K[?25h& "D:\Git\vt7pty\artifacts\bin\x64\Debug\RuntimeCancellationTest.exe" [0K-[?25l
+-fixture "\\.\pipe\VT7Pty-H4-child-19992-1116482995464" 19992[0K
+[0K[?25hGUARD_CHILD_FINAL[0K[?25l
+H3_PS[3]>[0K[?25h[IO.File]::WriteAllText('D:\Git\vt7pty\artifacts\fidelity\h4-traced-de[0Kb[?25l
+ug-1\child-powershell-event\child-exit.txt',$LASTEXITCODE.ToString()); [IO.File[0K]
+::WriteAllText('D:\Git\vt7pty\artifacts\fidelity\h4-traced-debug-1\child-powers[0Kh
+ell-event\continued.txt','CONTINUE')[0K
+H3_PS[4]>[0K[?25hexit 0[0K[?25l
+[0K[?25h

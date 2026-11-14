@@ -25,8 +25,9 @@ input behind when Ctrl+C is used at CMD and native Windows PowerShell prompts.
 I've qualified the [H3 cancellation prototype](docs/validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
 on all three Windows 7 machines, with 282/282 guard cases passing. Completion/close
 races, actual access denial, native children and the applicable PowerShell 7
-checks pass within the controlled research boundary. H4 is next: runtime
-integration, ordinary-desktop behavior, lifetime policy and regression qualification.
+checks pass within the controlled research boundary. The opt-in
+[H4 runtime candidate](docs/H4_RUNTIME.md) now integrates cancellation and two-phase
+close, with ordinary-desktop applications. Target qualification is pending.
 VT7 integration comes after the backend and its API are ready. VT7Pty does not
 yet replace ConPTY for unmodified applications. I am not planning a kernel driver.
 

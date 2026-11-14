@@ -28,7 +28,7 @@
 #include "Buffer.h"
 
 constexpr wchar_t VT7PTY_AGENT_IDENTITY[] = L"VT7Pty-Agent";
-constexpr int32_t VT7PTY_PROTOCOL_VERSION = 1;
+constexpr int32_t VT7PTY_PROTOCOL_VERSION = 2;
 // Includes the leading uint64_t length. This bounds malformed peer input.
 constexpr uint64_t VT7PTY_MAX_CONTROL_PACKET_BYTES = 1024 * 1024;
 

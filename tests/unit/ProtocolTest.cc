@@ -124,8 +124,8 @@ static void testStructuredDiagnosticRecord() {
 
 int main(int argc, char *argv[]) {
     static_assert(VT7PTY_API_VERSION_MAJOR == 1);
-    static_assert(VT7PTY_API_VERSION_MINOR == 0);
-    static_assert(VT7PTY_PROTOCOL_VERSION == 1);
+    static_assert(VT7PTY_API_VERSION_MINOR == 1);
+    static_assert(VT7PTY_PROTOCOL_VERSION == 2);
     static_assert(VT7PTY_MAX_CONTROL_PACKET_BYTES == 1024 * 1024);
 
     if (argc == 2 && std::strcmp(argv[1], "EMIT_DIAGNOSTICS") == 0) {

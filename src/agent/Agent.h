@@ -35,6 +35,7 @@
 namespace h3freeze { class AgentControl; }
 #endif
 class ConsoleInput;
+class HostCancellation;
 class NamedPipe;
 class ReadBuffer;
 class Scraper;
@@ -48,7 +49,8 @@ public:
           uint64_t agentFlags,
           int mouseMode,
           int initialCols,
-          int initialRows);
+          int initialRows,
+          const std::wstring &applicationDesktop = L"");
     virtual ~Agent();
     void sendDsr() override;
 
@@ -80,6 +82,8 @@ private:
     const bool m_useConerr;
     const bool m_plainMode;
     const int m_mouseMode;
+    const std::wstring m_applicationDesktop;
+    std::unique_ptr<HostCancellation> m_hostCancellation;
     Win32Console m_console;
     std::unique_ptr<Scraper> m_primaryScraper;
     std::unique_ptr<Scraper> m_errorScraper;

@@ -436,15 +436,22 @@ static OwnedHandle startAgentProcess(
         const std::wstring &controlPipeName,
         const std::wstring &params,
         DWORD creationFlags,
-        DWORD &agentPid) {
+        DWORD &agentPid,
+        const vt7pty::internal::BackingDesktop *backing) {
     const std::wstring exePath = findAgentProgram();
-    const auto cmdline = std::format(
+    auto cmdline = std::format(
         L"\"{}\" {} {}", exePath, controlPipeName, params);
+    std::wstring agentDesktop;
+    if (backing) {
+        agentDesktop = backing->name();
+        cmdline += L" " + vt7pty::internal::host::quote(backing->application());
+    }
 
     auto cmdlineV = vectorWithNulFromString(cmdline);
     // Start the agent.
     STARTUPINFOW sui = {};
     sui.cb = sizeof(sui);
+    sui.lpDesktop = backing ? agentDesktop.data() : nullptr;
 
     if (shouldSpecifyHideFlag()) {
         sui.dwFlags |= STARTF_USESHOWWINDOW;
@@ -504,9 +511,12 @@ createAgentSession(const vt7pty_config_t *cfg,
         L"\\\\.\\pipe\\vt7pty-control-v1-" + GenRandom().uniqueName();
     wp->controlPipe = createControlPipe(pipeName);
 
+    if (cfg->flags & VT7PTY_FLAG_HOST_CANCELLATION) {
+        wp->backingDesktop = std::make_unique<vt7pty::internal::BackingDesktop>();
+    }
     DWORD agentPid = 0;
     wp->agentProcess = startAgentProcess(
-        pipeName, params, creationFlags, agentPid);
+        pipeName, params, creationFlags, agentPid, wp->backingDesktop.get());
     connectControlPipe(*wp.get());
     verifyPipeClientPid(wp->controlPipe.get(), agentPid);
 
@@ -554,6 +564,10 @@ vt7pty_open(const vt7pty_config_t *cfg,
                 VT7PTY_ERROR_AGENT_INCOMPATIBLE, message.c_str());
         }
 
+        if (packet.getInt64() != static_cast<int64_t>(cfg->flags)) {
+            throw ClientException(VT7PTY_ERROR_AGENT_INCOMPATIBLE,
+                L"Agent session capabilities do not match the requested flags");
+        }
         // Get the CONIN/CONOUT pipe names.
         wp->coninPipeName = packet.getWString();
         wp->conoutPipeName = packet.getWString();
@@ -616,7 +630,8 @@ class RpcOperation {
 public:
     RpcOperation(vt7pty_t &wp) : m_wp(wp) {
         if (m_wp.controlPipe.get() == nullptr) {
-            throw Exception(L"Agent shutdown due to RPC failure");
+            throw ClientException(VT7PTY_ERROR_LOST_CONNECTION,
+                L"Session is closed or its agent connection failed");
         }
     }
     ~RpcOperation() {
@@ -825,6 +840,17 @@ vt7pty_get_console_process_list(vt7pty_t *wp, int *processList, const int proces
         rpc.success();
         return actualProcessCount;
     } API_CATCH(0)
+}
+
+VT7PTY_API BOOL vt7pty_close(vt7pty_t *wp, vt7pty_error_ptr_t *err) {
+    API_TRY {
+        ASSERT(wp != nullptr);
+        std::lock_guard<std::mutex> lock(wp->mutex);
+        // The allocation, borrowed process handle and immutable pipe names stay
+        // alive until free. Existing RPC work holds this same mutex.
+        wp->controlPipe.close();
+        return TRUE;
+    } API_CATCH(FALSE)
 }
 
 VT7PTY_API void vt7pty_free(vt7pty_t *wp) {

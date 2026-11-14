@@ -59,9 +59,9 @@ child route retains the event/exit contract; the host route also requires cooked
 read cancellation and a subsequent read. The
 [Windows 7 guard review](validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
 accepts 282/282 cases across all nine guard trials. I accept H3 for this controlled
-x64 private-desktop prototype. H4 must define runtime routing and ownership, then
-qualify ordinary-desktop queues, keyboard layouts, access policy, concurrent
-API/session destruction, cleanup and integrated runtime regressions.
+x64 private-desktop prototype. H4 now implements an approved [opt-in runtime contract](H4_RUNTIME.md).
+Ordinary-desktop queues, keyboard layouts, access policy, concurrent API/session
+retirement, cleanup and integrated runtime qualification remain its gates.
 
 ## H1 implementation
 
