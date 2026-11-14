@@ -1,0 +1,47 @@
+{
+  "SchemaVersion": 1,
+  "Kind": "H3GuardWindows7ReviewDecision",
+  "ReviewedDate": "2026-11-14",
+  "RecordedUtc": "2026-11-14T00:04:15.7962995Z",
+  "ReviewSource": "1b69c3f949347f99018615012b0c1bc23bb929d7",
+  "ArchiveSha256": "620cd3e489fdf53f08184207f947414bd50f89a1ff617507c76c7ac20a099ca7",
+  "ManifestSha256": "d7f4c97e6ca6952d837b2cca566dd3a5479a44829f2a3ef19f63a11df5b05892",
+  "ExperimentSourceCommit": "1054a9a75e25bd04eb08f100f442d05e03c5eaad",
+  "IndependentReviewerExitCodes": {
+    "NESSY": 0,
+    "TURTLE": 0,
+    "LEOPARD": 0
+  },
+  "Reviewers": [
+    {
+      "Path": "tools/research/Test-HostGuardEvidence.ps1",
+      "Sha256": "19e25aa045b9535e3cf774f510a95f85d24c4a91e69c986ddf332b17806380da"
+    },
+    {
+      "Path": "tools/research/Test-HostFreezeEvidence.ps1",
+      "Sha256": "e4ebdde5e7fa7743fc2ef4d05b68006a2c59565e6ac4e4d28f75ffaaf53eb6d2"
+    },
+    {
+      "Path": "tools/research/HostGuardEvidence.ps1",
+      "Sha256": "5a9ba2d1f420c2a9dfe2563c895bb01059dde4e492925ee3f7d5eae9472cb143"
+    },
+    {
+      "Path": "tools/research/HostCoordinationEvidence.ps1",
+      "Sha256": "34fc0931e4c1d324e801e6039513919f7fcf23688e2d3515d8279b7f831b97c6"
+    },
+    {
+      "Path": "tools/research/Test-HostCancellationDiagnosticEvidence.ps1",
+      "Sha256": "808fa2cb421f494ba6ba804fa210fdd1e89c526fd14b3c1cc4d94d750709b5b3"
+    },
+    {
+      "Path": "tools/research/Test-HostCancellationEvidence.ps1",
+      "Sha256": "a4c102762adb5fa85ee95258fd0661807b9f20e7a33921876e83147f891a399f"
+    }
+  ],
+  "H3ResearchAccepted": true,
+  "AcceptanceScope": "Controlled x64 private-desktop research prototype on the three agreed Windows 7 SP1 configurations",
+  "ProductionCancellationImplemented": false,
+  "MilestoneAccepted": false,
+  "VT7IntegrationAccepted": false,
+  "Next": "H4 runtime design, ordinary-desktop and keyboard-layout qualification, API lifetime, failure and cleanup, then full regression and target acceptance"
+}

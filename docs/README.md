@@ -27,15 +27,13 @@ what I've learned from testing it.
 
 ## Follow current development
 
-I'm working on input cancellation within Milestone 1. Host identity and dispatch
-are verified. Controlled Windows 7 experiments establish selection as a delivery
-blocker and support scrape/resize coordination. The
-[coordinated Windows 7 review](validation/2026-11-13-step-1.2-host-coordination-rc1-windows7.md)
-passes all 126 prototype baseline/expiry cases and 54 protected focused phases,
-with no prototype trace loss. Remaining race, access-denied, active-child and
-PowerShell 7 guards precede H3 acceptance and runtime integration. The
-[new guard candidate](HOST_GUARDS.md) implements that matrix and awaits runs
-on all three Windows 7 tiers.
+I'm working on input cancellation within Milestone 1. H1, H2 and the controlled
+H3 prototype are accepted on all three Windows 7 tiers. The
+[guard review](validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
+verifies 282/282 cases, including races, actual access denial, native children
+and the applicable PowerShell 7 matrix. H4 now needs runtime integration,
+ordinary-desktop behavior, lifetime policy and regression qualification.
+The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |
 | --- | --- |

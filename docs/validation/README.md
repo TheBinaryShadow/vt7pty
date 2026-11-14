@@ -4,20 +4,19 @@ I keep dated reviews here so I can trace a decision back to the exact source,
 package and test environment. The [roadmap](../../ROADMAP.md) describes current
 progress; each review describes the state at the time it was written.
 
-**Current result:** host identity and dispatch are accepted on all three
-Windows 7 machines. The coordinated H3 prototype completes all 27 collections,
-passing 126/126 baseline/expiry cases and 54/54 protected focused phases with no
-prototype trace loss. Unprotected contrasts and unchanged controls retain their
-failures. Remaining race, access-denied, active-child and PowerShell 7 guards
-keep H3 and the runtime cancellation fix open. The
-[guard candidate](../HOST_GUARDS.md) implements that qualification matrix;
-its Windows 7 results are pending.
+**Current result:** H1, H2 and the controlled H3 cancellation prototype are
+accepted on all three Windows 7 machines. The
+[H3 guard review](2026-11-14-step-1.2-host-guards-rc1-windows7.md)
+verifies 282/282 guard cases, with no prototype coverage gaps or neighbor trace
+loss. Original controls and unprotected contrasts retain their failures.
+My next step is H4 runtime integration and production qualification. The runtime
+cancellation fix, Milestone 1 and VT7 integration remain open.
 
 ## Current fidelity work
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| H3 guard qualification | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-guards-rc1-candidate.md) | Pending on NESSY, TURTLE and LEOPARD |
+| H3 guard qualification | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-guards-rc1-candidate.md) | [Accepted: 282/282 guard cases; H4 remains](2026-11-14-step-1.2-host-guards-rc1-windows7.md) |
 | Coordinated H3 prototype | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-coordination-rc1-candidate.md) | [Reviewed: baseline and recording verified; H3 guards remain](2026-11-13-step-1.2-host-coordination-rc1-windows7.md) |
 | H3 scraper coordination | [rc1 candidate, controlled contrasts and retained failures](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-candidate.md) | [Reviewed: coordination supported; H3 open](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md) |
 | H3 paired diagnostics | [rc1 candidate and retained local failure](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md) | [Reviewed: selection-state correlation; H3 open](2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md) |

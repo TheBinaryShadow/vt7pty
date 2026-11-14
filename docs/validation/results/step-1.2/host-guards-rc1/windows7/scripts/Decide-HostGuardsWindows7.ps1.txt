@@ -1,0 +1,53 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$audit=Join-Path $repo 'artifacts\fidelity\host-guards-rc1-windows7-review-2026-11-14'
+$c=Get-Content -LiteralPath (Join-Path $audit 'comparison.json') -Raw|ConvertFrom-Json
+$integrity=Get-Content -LiteralPath (Join-Path $audit 'collection-integrity.json') -Raw|ConvertFrom-Json
+$all=@(foreach($r in $c.Runs){foreach($t in $r.Trials){$t}})
+$guards=@($all|Where-Object {$_.Role -eq 'Experiment'})
+$controls=@($all|Where-Object {$_.Role -eq 'Control'})
+$references=@($all|Where-Object {$_.Role -eq 'Reference'})
+function Sum-Field($Rows,[string]$Name){return [long](($Rows|Measure-Object -Property $Name -Sum).Sum)}
+if($c.Runs.Count -ne 3 -or $all.Count -ne 27 -or $guards.Count -ne 9){throw 'Missing collections.'}
+foreach($r in $c.Runs){if(-not $r.SemanticReviewsCompleted -or $r.PreflightErrors.Count -ne 0){throw 'Incomplete independent review.'}}
+foreach($t in $all){if($t.CollectionStatus -ne 'Completed' -or $t.TimedOut -or -not $t.OwnedLifetimesCleaned -or -not $t.NeighborPassed -or -not $t.AllCaseCleanupPassed){throw 'Collection or lifetime failure.'}}
+foreach($t in $guards){if(-not $t.Guards.Qualified -or $t.CoverageGaps.Count -or $t.CoreCoverageGaps.Count -or $t.OperationalIssues.Count -or $t.Guards.CompletedContenders -lt 1 -or $t.Guards.CanceledContenders -lt 1 -or $t.NeighborHost.Lost -ne 0 -or $t.NeighborAgent.Lost -ne 0){throw 'Guard review does not qualify.'}}
+$verified=Sum-Field $c.Runs 'VerifiedEvidenceFiles'
+if($verified+$integrity.VerifiedMetadataHashes -ne $integrity.TotalFiles){throw 'Returned-file hash coverage mismatch.'}
+$phases=@($c.Phases|Group-Object Condition|ForEach-Object {[pscustomobject]@{Condition=$_.Name;Passing=@($_.Group|Where-Object {$_.CancellationPassed}).Count;Total=$_.Count}})
+$metrics=[pscustomobject]@{
+ SchemaVersion=1;Kind='H3GuardWindows7ReviewMetrics';ReviewedDate='2026-11-14'
+ Collections=$all.Count;PassingCases=(Sum-Field $all 'PassedCases');TotalCases=(Sum-Field $all 'TotalCases')
+ ControlPassing=(Sum-Field $controls 'PassedCases');ControlCases=(Sum-Field $controls 'TotalCases')
+ ReferencePassing=(Sum-Field $references 'PassedCases');ReferenceCases=(Sum-Field $references 'TotalCases')
+ GuardPassing=(Sum-Field $guards 'PassedCases');GuardCases=(Sum-Field $guards 'TotalCases')
+ GuardBaselinePassing=(Sum-Field $guards 'BaselinePassed');GuardBaselineCases=(Sum-Field $guards 'BaselineCases')
+ VerifiedEvidenceHashes=$verified;VerifiedMetadataHashes=$integrity.VerifiedMetadataHashes;ReturnedFiles=$integrity.TotalFiles;ReturnedBytes=$integrity.TotalBytes
+ GuardCompletedReads=[long](($guards.Guards|Measure-Object CompletedContenders -Sum).Sum)
+ GuardCanceledReads=[long](($guards.Guards|Measure-Object CanceledContenders -Sum).Sum)
+ OwnedScopes=(Sum-Field $guards 'OwnedScopes');BorrowedScopes=(Sum-Field $guards 'BorrowedScopes')
+ ExpiryRefusals=(Sum-Field $guards 'ExpiryRefusals');ReceiptOnlyScopes=(Sum-Field $guards 'ReceiptOnlyScopes')
+ NeighborHostEvents=[long](($guards.NeighborHost|Measure-Object Total -Sum).Sum)
+ NeighborAgentEvents=[long](($guards.NeighborAgent|Measure-Object Total -Sum).Sum)
+ NeighborHostLost=[long](($guards.NeighborHost|Measure-Object Lost -Sum).Sum)
+ NeighborAgentLost=[long](($guards.NeighborAgent|Measure-Object Lost -Sum).Sum)
+ MinDrains=($guards.NeighborCollector|Measure-Object Drains -Minimum).Minimum
+ MaxDrains=($guards.NeighborCollector|Measure-Object Drains -Maximum).Maximum
+ MaxDrainGapMs=($guards.NeighborCollector|Measure-Object MaxGapMs -Maximum).Maximum
+ MaxDrainDurationMs=($guards.NeighborCollector|Measure-Object MaxDrainDurationMs -Maximum).Maximum
+ ReferenceConditions=$phases;FailedCases=$c.Failures.Count
+ DeliberateSelectedFailures=@($c.Failures|Where-Object {$_.DeliberateSelectionChallenge}).Count
+ OtherControlFailures=@($c.Failures|Where-Object {$_.Role -eq 'Control'}).Count
+ OtherReferenceFailures=@($c.Failures|Where-Object {-not $_.DeliberateSelectionChallenge -and $_.Role -eq 'Reference'}).Count
+ H3ResearchAccepted=$true;MilestoneAccepted=$false;ProductionCancellationImplemented=$false
+}
+[IO.File]::WriteAllText((Join-Path $audit 'metrics.json'),($metrics|ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
+$zip=Join-Path $repo 'artifacts\fidelity\packages\VT7Pty-host-guards-0.5.0-rc1.zip'
+$zipHash=(Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+if($zipHash -cne '620cd3e489fdf53f08184207f947414bd50f89a1ff617507c76c7ac20a099ca7'){throw 'Issued archive hash differs.'}
+$reviewers=@('Test-HostGuardEvidence.ps1','Test-HostFreezeEvidence.ps1','HostGuardEvidence.ps1','HostCoordinationEvidence.ps1','Test-HostCancellationDiagnosticEvidence.ps1','Test-HostCancellationEvidence.ps1')
+$hashes=@(foreach($name in $reviewers){$p=Join-Path $repo ('tools\research\'+$name);[pscustomobject]@{Path=('tools/research/'+$name);Sha256=(Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant()}})
+$decision=[pscustomobject]@{SchemaVersion=1;Kind='H3GuardWindows7ReviewDecision';ReviewedDate='2026-11-14';RecordedUtc=[DateTime]::UtcNow.ToString('o');ReviewSource=(git rev-parse HEAD);ArchiveSha256=$zipHash;ManifestSha256='d7f4c97e6ca6952d837b2cca566dd3a5479a44829f2a3ef19f63a11df5b05892';ExperimentSourceCommit='1054a9a75e25bd04eb08f100f442d05e03c5eaad';IndependentReviewerExitCodes=[pscustomobject]@{NESSY=0;TURTLE=0;LEOPARD=0};Reviewers=$hashes;H3ResearchAccepted=$true;AcceptanceScope='Controlled x64 private-desktop research prototype on the three agreed Windows 7 SP1 configurations';ProductionCancellationImplemented=$false;MilestoneAccepted=$false;VT7IntegrationAccepted=$false;Next='H4 runtime design, ordinary-desktop and keyboard-layout qualification, API lifetime, failure and cleanup, then full regression and target acceptance'}
+[IO.File]::WriteAllText((Join-Path $audit 'review-decision.json'),($decision|ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
+$metrics|ConvertTo-Json -Depth 6

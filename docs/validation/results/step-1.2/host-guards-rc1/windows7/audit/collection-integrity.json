@@ -1,0 +1,210 @@
+{
+  "SchemaVersion": 1,
+  "Kind": "H3GuardReturnedCollectionIntegrity",
+  "ReviewedDate": "2026-11-14",
+  "RecordedUtc": "2026-11-14T00:01:33.5026630Z",
+  "TotalFiles": 42158,
+  "TotalBytes": 179104828,
+  "VerifiedMetadataHashes": 33,
+  "Collections": [
+    {
+      "RunId": "esu-guards-20261113-231016-362dc862",
+      "Machine": "TURTLE",
+      "Files": 13028,
+      "Bytes": 53175359,
+      "Source": "\\\\10.0.0.3\\KRMe\\VT7_work\\results\\esu-guards-20261113-231016-362dc862",
+      "Staged": "D:\\Git\\vt7pty\\artifacts\\fidelity\\host-guards-rc1-returned-2026-11-14\\esu-guards-20261113-231016-362dc862",
+      "FileNamesAndLengthsMatch": true,
+      "MetadataHashes": [
+        {
+          "Path": "report.json",
+          "Bytes": 45277,
+          "Sha256": "43a9be85855ee6fffb461395a22ee9d89b36e3c990e65bc1a0771dd3b08c1c4b"
+        },
+        {
+          "Path": "summary.txt",
+          "Bytes": 155,
+          "Sha256": "74de1bd7edaf1b19a19ab0531878a96cc3ab6d99b58774f56ed9ec319790b1af"
+        },
+        {
+          "Path": "01-control/evidence-files.json",
+          "Bytes": 21841,
+          "Sha256": "59718c4d9bd73fb631cb966c1d4de7eb603ff6156d42b190d18f1cf6de7ed172"
+        },
+        {
+          "Path": "02-reference/evidence-files.json",
+          "Bytes": 297897,
+          "Sha256": "26b620e24d41e920f569682dcfe88391ed1de59e9b9d6d7b3f05695815ec93d5"
+        },
+        {
+          "Path": "03-experiment/evidence-files.json",
+          "Bytes": 319865,
+          "Sha256": "81a6399541ec2b33eeb0cd1b2d46399469bd74f41a546413c2ef3e2504d6f0b1"
+        },
+        {
+          "Path": "04-control/evidence-files.json",
+          "Bytes": 21841,
+          "Sha256": "c2e3156ec77c0f789c1facf292b9d1db8cdd003319bc6133b2c15791028da122"
+        },
+        {
+          "Path": "05-reference/evidence-files.json",
+          "Bytes": 297129,
+          "Sha256": "674244223629007be329392f8cd2af8418e857e259864d335bfecd246426b2c6"
+        },
+        {
+          "Path": "06-experiment/evidence-files.json",
+          "Bytes": 319025,
+          "Sha256": "14ed88ebeeff6b9cc726cac786248917bb8ffe5d36519789ea61c0fae5483b34"
+        },
+        {
+          "Path": "07-control/evidence-files.json",
+          "Bytes": 21841,
+          "Sha256": "b5a6b201cfc5f41491575973534bfad8f551415729758ee030a4848cd28f4e11"
+        },
+        {
+          "Path": "08-reference/evidence-files.json",
+          "Bytes": 298313,
+          "Sha256": "8b1d262e67eca7a04d6d5c966805260cca95456657ae2961497a49c90ff5836e"
+        },
+        {
+          "Path": "09-experiment/evidence-files.json",
+          "Bytes": 319262,
+          "Sha256": "c9263ebb0a628fc026bd6445879a0fad0c70216706db4ca5f2cc2c7392f51b27"
+        }
+      ]
+    },
+    {
+      "RunId": "legacy-guards-20261113-230918-419d8013",
+      "Machine": "LEOPARD",
+      "Files": 12669,
+      "Bytes": 52658792,
+      "Source": "\\\\10.0.0.3\\KRMe\\VT7_work\\results\\legacy-guards-20261113-230918-419d8013",
+      "Staged": "D:\\Git\\vt7pty\\artifacts\\fidelity\\host-guards-rc1-returned-2026-11-14\\legacy-guards-20261113-230918-419d8013",
+      "FileNamesAndLengthsMatch": true,
+      "MetadataHashes": [
+        {
+          "Path": "report.json",
+          "Bytes": 45109,
+          "Sha256": "d0cefe1b9671af909834adec5e5dbee7d9a40c2ba8b0dd68e1f5abca5c9bc4c6"
+        },
+        {
+          "Path": "summary.txt",
+          "Bytes": 155,
+          "Sha256": "bbe8fe2ed25ce78444e7ec9f9517e5d8e613111bc2085ef1156f7d54de419d60"
+        },
+        {
+          "Path": "01-control/evidence-files.json",
+          "Bytes": 21840,
+          "Sha256": "c6ef1cf2824e4cb8d4e45435b929424516098c439a39de68e07c7013b51e146d"
+        },
+        {
+          "Path": "02-reference/evidence-files.json",
+          "Bytes": 325198,
+          "Sha256": "2795d9f3ec0e67e4a2760da730e791ba04fd600eb184f49b5bdb03ae2faa0903"
+        },
+        {
+          "Path": "03-experiment/evidence-files.json",
+          "Bytes": 273992,
+          "Sha256": "4e8d663e04af886d3011bf985f3680bd5143d95d99f65bbfcf96f0261beef91c"
+        },
+        {
+          "Path": "04-control/evidence-files.json",
+          "Bytes": 22146,
+          "Sha256": "67fcc1123a4031129e84f097a410129f24080039efbd3043f49602cdbf70002a"
+        },
+        {
+          "Path": "05-reference/evidence-files.json",
+          "Bytes": 323834,
+          "Sha256": "99ac0abf911b83d64551ec1cdccbe61c0a165e1a691eb940bdf1c8919ecc9b36"
+        },
+        {
+          "Path": "06-experiment/evidence-files.json",
+          "Bytes": 272877,
+          "Sha256": "9f240c50fefc8e2bf7ef709cd2486f5190fcc03e15dbd422a42ce664b2fa1052"
+        },
+        {
+          "Path": "07-control/evidence-files.json",
+          "Bytes": 21840,
+          "Sha256": "61c3eb55a2768155928162af22b50b128d1d53857b9cd2f4f3e9a4da62eadfac"
+        },
+        {
+          "Path": "08-reference/evidence-files.json",
+          "Bytes": 328391,
+          "Sha256": "0b6da4cef1bac92784a1bf5c888a014ada12b1b564d072bae44325f718070119"
+        },
+        {
+          "Path": "09-experiment/evidence-files.json",
+          "Bytes": 268864,
+          "Sha256": "580468c47f05e8b2a32e7ceb45f02307329551e8e5697977ac8ff21327cf3886"
+        }
+      ]
+    },
+    {
+      "RunId": "nonesu-guards-20261113-230934-af1af567",
+      "Machine": "NESSY",
+      "Files": 16461,
+      "Bytes": 73270677,
+      "Source": "\\\\10.0.0.3\\KRMe\\VT7_work\\results\\nonesu-guards-20261113-230934-af1af567",
+      "Staged": "D:\\Git\\vt7pty\\artifacts\\fidelity\\host-guards-rc1-returned-2026-11-14\\nonesu-guards-20261113-230934-af1af567",
+      "FileNamesAndLengthsMatch": true,
+      "MetadataHashes": [
+        {
+          "Path": "report.json",
+          "Bytes": 51423,
+          "Sha256": "0f4ec7fe517da13dda3e15a569afa32457950abbbfdf8ced7a2b97db3414c9d6"
+        },
+        {
+          "Path": "summary.txt",
+          "Bytes": 155,
+          "Sha256": "182d49418e04626b80055157ca492235af1ba855ffbb134deef88c1067ba33bf"
+        },
+        {
+          "Path": "01-control/evidence-files.json",
+          "Bytes": 21840,
+          "Sha256": "7f383c3ddedae29feb9f0c68af525eed215119d07704bbd0c8cc034933cad16f"
+        },
+        {
+          "Path": "02-reference/evidence-files.json",
+          "Bytes": 371188,
+          "Sha256": "422b1143151c779fa4c7851cf18fae3a30e85d196b0a47ee31ca91a64a25ee77"
+        },
+        {
+          "Path": "03-experiment/evidence-files.json",
+          "Bytes": 437366,
+          "Sha256": "bdb6bc525a7242314e1cd8f6a771aa0680bbe846b0ea6ea5b91666bca8706bd5"
+        },
+        {
+          "Path": "04-control/evidence-files.json",
+          "Bytes": 21840,
+          "Sha256": "bb52ccc4f650fd5677f7a834e44223f5e7216aae1fecf5bf6db2b82b1b6266cd"
+        },
+        {
+          "Path": "05-reference/evidence-files.json",
+          "Bytes": 372246,
+          "Sha256": "46a4259d59fcf83c3369bebdf4e6946e5af2f8e59a5ff16e049d5cef4c05ae5c"
+        },
+        {
+          "Path": "06-experiment/evidence-files.json",
+          "Bytes": 428134,
+          "Sha256": "4a6a4083dd79f9f7fadd66ffc3c62a5eb963f6b1877fc80cf574d292290390c9"
+        },
+        {
+          "Path": "07-control/evidence-files.json",
+          "Bytes": 21840,
+          "Sha256": "9630c1180f49845ddc3b1d830a6e4affac00ff1ad769af5712c7b0ef974b8ebb"
+        },
+        {
+          "Path": "08-reference/evidence-files.json",
+          "Bytes": 371567,
+          "Sha256": "2b1d2f8bdcb657e73e8d5d0d321a7f68ccd7bf3f265bf6cc42984c957e1e5e1f"
+        },
+        {
+          "Path": "09-experiment/evidence-files.json",
+          "Bytes": 371527,
+          "Sha256": "cde033134273f8c55ee551360c698897cdb764418ecacc53272716f474c0cadf"
+        }
+      ]
+    }
+  ],
+  "RawResultsModified": false
+}

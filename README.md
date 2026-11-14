@@ -22,11 +22,11 @@ installation without KB3191566. See the [release review](docs/validation/2026-10
 
 I'm now working on console fidelity. The released runtime still leaves typed
 input behind when Ctrl+C is used at CMD and native Windows PowerShell prompts.
-I've verified host identity, dispatch and the coordinated research baseline on
-all three Windows 7 machines. The [H3 guard candidate](docs/HOST_GUARDS.md) adds
-completion/close races, actual access denial, native children and PowerShell 7
-checks. Its Windows 7 qualification comes before H3 acceptance and runtime
-integration.
+I've qualified the [H3 cancellation prototype](docs/validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
+on all three Windows 7 machines, with 282/282 guard cases passing. Completion/close
+races, actual access denial, native children and the applicable PowerShell 7
+checks pass within the controlled research boundary. H4 is next: runtime
+integration, ordinary-desktop behavior, lifetime policy and regression qualification.
 VT7 integration comes after the backend and its API are ready. VT7Pty does not
 yet replace ConPTY for unmodified applications. I am not planning a kernel driver.
 

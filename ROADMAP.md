@@ -1,12 +1,12 @@
 # VT7Pty roadmap
 
-Updated: 2026-11-13.
+Updated: 2026-11-14.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
-behavior in Milestone 1. **Next: run the [H3 guard candidate](docs/HOST_GUARDS.md)
-on all three Windows 7 machines.** The coordinated baseline is verified on those
-machines. The new candidate adds completion/close races, actual access denial,
-active-child and PowerShell 7 guards. H3 and runtime integration remain open.
+behavior in Milestone 1. **Next: define the H4 runtime contract and integrate
+the qualified cancellation mechanism.** The [H3 Windows 7 review](docs/validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
+accepts all 282 guard cases on NESSY, TURTLE and LEOPARD. H3 is complete within
+the controlled research boundary; production qualification and VT7 integration remain open.
 
 I check an item only when its stated work and required tests are complete.
 Partial implementations stay unchecked. A local pass does not replace a required
@@ -88,42 +88,17 @@ public-API experiments failed. I'm now following the
 - [x] H2: Verify actual host dispatch and a session-bound request/acknowledgment
   channel, including stale requests, failures and isolation.
   [Results](docs/validation/2026-10-13-step-1.2-host-dispatch-rc1-windows7.md).
-- [ ] H3: Cancel a pending cooked read, discard the old line, deliver exactly
+- [x] H3: Cancel a pending cooked read, discard the old line, deliver exactly
   one control event, preserve the next read and recover real shell prompts.
-  The first [private-desktop prototype](docs/HOST_CANCELLATION_PROBE.md) is implemented;
-  [rc1 passes three local repetitions](docs/validation/2026-10-13-step-1.2-host-cancellation-rc1-candidate.md);
-  [Windows 7 rc1 results](docs/validation/2026-11-13-step-1.2-host-cancellation-rc1-windows7.md)
-  record four passing and five failing repetitions. Failures and remaining
-  H3 guards must be resolved before acceptance. The
-  [follow-up investigation](docs/validation/2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
-  narrows the observation gaps. The [diagnostic candidate](docs/validation/2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-candidate.md)
-  retains one local control failure. The [paired Windows 7 review](docs/validation/2026-11-13-step-1.2-host-cancellation-diagnostics-rc1-windows7.md)
-  completes all 18 trials, with 6/9 controls and 7/9 traced trials passing.
-  Selection is active before both traced native delivery failures. This led to
-  controlled scraper coordination and stronger shell observations.
-  The [historical reassessment](docs/validation/2026-11-13-step-1.2-cancellation-reassessment.md)
-  adds controlled selected/unselected contrasts and full freeze/Escape tracing.
-  The [new diagnostic package](docs/HOST_FREEZE_DIAGNOSTICS.md) implements those
-  contrasts with a separately identified research agent, delay controls and
-  stronger shell observations. Both earlier control packages remain unchanged.
-  The [rc1 candidate](docs/validation/2026-11-13-step-1.2-host-freeze-diagnostics-rc1-candidate.md)
-  completed all nine local collections and retains the deliberate selection failures.
-  The [Windows 7 review](docs/validation/2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md)
-  verifies all 27 collections: quiet/coordinated phases pass 54/54 and held-selection
-  delivery fails 27/27. Thirteen other case failures remain. The next prototype
-  must extend coordination to the baseline paths and fix neighbor recorder overflow.
-  The [version-4 research candidate](docs/HOST_COORDINATION_PROBE.md) now implements
-  that work with a callback completion marker, an expiry refusal control and
-  periodic neighbor draining. The [rc1 candidate](docs/validation/2026-11-13-step-1.2-host-coordination-rc1-candidate.md)
-  completes all nine local collections and passes all 42 prototype baseline/expiry
-  cases. The [Windows 7 review](docs/validation/2026-11-13-step-1.2-host-coordination-rc1-windows7.md)
-  verifies all 27 collections, with 126/126 prototype baseline/expiry cases and
-  54/54 protected focused phases passing and no prototype trace loss. The two
-  failed delay controls leave scraping active. Remaining race, access-denied,
-  active-child and PowerShell 7 guards keep H3 open. The
-  [guard candidate](docs/HOST_GUARDS.md) implements those checks with separate
-  protocol-5 probe, callback and agent identities. It retains the original
-  control and complete issued version-4 package. Target qualification is pending.
+  The [Windows 7 guard review](docs/validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
+  accepts nine guard trials and 282/282 cases, including completion/close races,
+  actual access denial, active children and the applicable PowerShell 7 matrix.
+  Earlier [controlled contrasts](docs/validation/2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md)
+  established selection as a delivery blocker; the
+  [coordinated baseline](docs/validation/2026-11-13-step-1.2-host-coordination-rc1-windows7.md)
+  qualified protected dispatch and recording. Original failures remain in the
+  [validation history](docs/validation/README.md). H3 accepts the controlled
+  private-desktop prototype; ordinary-desktop and production lifetime work belong to H4.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.
@@ -132,7 +107,7 @@ public-API experiments failed. I'm now following the
 
 I'll complete this step when the defined input workflows pass without duplicate
 or lost input, incorrect child interruption, or a broken shell after cancellation.
-H1 and H2 are research results; the released runtime still has the original defect.
+H1, H2 and H3 are research results; the released runtime still has the original defect.
 
 ### Step 1.3: Improve output and Unicode reconstruction
 

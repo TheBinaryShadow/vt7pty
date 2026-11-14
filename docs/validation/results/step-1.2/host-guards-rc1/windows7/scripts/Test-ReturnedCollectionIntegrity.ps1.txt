@@ -1,0 +1,37 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$share='\\10.0.0.3\KRMe\VT7_work\results'
+$stage='D:\Git\vt7pty\artifacts\fidelity\host-guards-rc1-returned-2026-11-14'
+$audit='D:\Git\vt7pty\artifacts\fidelity\host-guards-rc1-windows7-review-2026-11-14'
+$rows=New-Object 'Collections.Generic.List[object]'
+$totalFiles=0L;$totalBytes=0L;$rootHashes=0
+foreach($source in @(Get-ChildItem -LiteralPath $share -Directory | Sort-Object Name)){
+ $local=Join-Path $stage $source.Name
+ $remoteFiles=@(Get-ChildItem -LiteralPath $source.FullName -File -Recurse)
+ $localFiles=@(Get-ChildItem -LiteralPath $local -File -Recurse)
+ if($remoteFiles.Count -ne $localFiles.Count){throw ('File count differs: '+$source.Name)}
+ $index=@{}
+ foreach($file in $localFiles){$index.Add($file.FullName.Substring($local.Length+1),$file)}
+ foreach($file in $remoteFiles){
+  $relative=$file.FullName.Substring($source.FullName.Length+1)
+  if(-not $index.ContainsKey($relative) -or $index[$relative].Length -ne $file.Length){throw ('Source/staged file differs: '+$relative)}
+ }
+ $metadata=@('report.json','summary.txt')+@(Get-ChildItem -LiteralPath $local -Directory | ForEach-Object {$_.Name+'\evidence-files.json'})
+ if($metadata.Count -ne 11){throw 'Expected eleven collection-level files.'}
+ $hashes=New-Object 'Collections.Generic.List[object]'
+ foreach($relative in $metadata){
+  $remoteHash=(Get-FileHash -LiteralPath (Join-Path $source.FullName $relative) -Algorithm SHA256).Hash.ToLowerInvariant()
+  $localHash=(Get-FileHash -LiteralPath (Join-Path $local $relative) -Algorithm SHA256).Hash.ToLowerInvariant()
+  if($remoteHash -cne $localHash){throw ('Collection metadata differs: '+$relative)}
+  $hashes.Add([pscustomobject]@{Path=$relative.Replace('\','/');Bytes=(Get-Item -LiteralPath (Join-Path $local $relative)).Length;Sha256=$localHash});$rootHashes++
+ }
+ $report=Get-Content -LiteralPath (Join-Path $local 'report.json') -Raw|ConvertFrom-Json
+ $bytes=[long](($localFiles|Measure-Object Length -Sum).Sum)
+ $totalFiles+=$localFiles.Count;$totalBytes+=$bytes
+ $rows.Add([pscustomobject]@{RunId=$source.Name;Machine=$report.ComputerName;Files=$localFiles.Count;Bytes=$bytes;Source=$source.FullName;Staged=$local;FileNamesAndLengthsMatch=$true;MetadataHashes=$hashes.ToArray()})
+}
+if($rows.Count -ne 3){throw 'Expected all three returned collections.'}
+$result=[pscustomobject]@{SchemaVersion=1;Kind='H3GuardReturnedCollectionIntegrity';ReviewedDate='2026-11-14';RecordedUtc=[DateTime]::UtcNow.ToString('o');TotalFiles=$totalFiles;TotalBytes=$totalBytes;VerifiedMetadataHashes=$rootHashes;Collections=$rows.ToArray();RawResultsModified=$false}
+[IO.File]::WriteAllText((Join-Path $audit 'collection-integrity.json'),($result|ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
+$result|Select-Object TotalFiles,TotalBytes,VerifiedMetadataHashes|ConvertTo-Json -Compress
+$rows.ToArray()|Select-Object Machine,Files,Bytes|ConvertTo-Json -Compress

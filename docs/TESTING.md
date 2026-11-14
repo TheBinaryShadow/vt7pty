@@ -16,7 +16,7 @@ replace release acceptance. The [roadmap](../ROADMAP.md) records what is complet
 | Test the cancellation prototype | Private-desktop research package | [H3 probe](HOST_CANCELLATION_PROBE.md) |
 | Investigate cancellation failures | Interleaved unchanged controls and traced trials | [Diagnostic package](HOST_CANCELLATION_DIAGNOSTICS.md) |
 | Test scraper coordination | Unchanged controls, trace reference and controlled freeze conditions | [Freeze experiment](HOST_FREEZE_DIAGNOSTICS.md) |
-| Qualify the remaining H3 guards | Concurrent completion/close, kernel denial and application matrix | [Guard candidate](HOST_GUARDS.md) |
+| Reproduce the qualified H3 guards | Concurrent completion/close, kernel denial and application matrix | [Guard guide](HOST_GUARDS.md) |
 | Qualify coordinated cancellation | Original control, unchanged version 3 and coordinated version 4 | [Coordinated prototype](HOST_COORDINATION_PROBE.md) |
 | Collect failure details | Diagnostic tools | [Diagnostics](DIAGNOSTICS.md) |
 
@@ -143,7 +143,8 @@ Ctrl+C cancellation remains unresolved in CMD and native Windows PowerShell.
 The [investigation](INPUT_CANCELLATION.md) records failed public-API approaches.
 The [console-host design](HOST_CANCELLATION_DESIGN.md) separates identity (H1),
 dispatch (H2), cancellation (H3) and production integration (H4).
-H1 and H2 are accepted; neither cancels a read or reruns the wider fidelity corpus.
+H1, H2 and the controlled H3 prototype are accepted. H4 still needs the integrated
+runtime and its wider regression qualification.
 
 The [scraper coordination experiment](HOST_FREEZE_DIAGNOSTICS.md) uses a separate
 research agent and retains both earlier packages unchanged. Its nine trials
@@ -153,8 +154,11 @@ selected failures do not become passes when a later observation succeeds.
 The [coordinated prototype review](validation/2026-11-13-step-1.2-host-coordination-rc1-windows7.md)
 records 126/126 baseline/expiry cases and 54/54 protected focused phases passing
 on all three Windows 7 tiers, with no prototype recorder loss. The original
-controls and unprotected contrasts retain failures. Remaining H3 guard tests
-and runtime integration are separate work.
+controls and unprotected contrasts retain failures. The
+[H3 guard review](validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
+now accepts all 282 guard cases on the three Windows 7 machines, with no prototype
+coverage gaps or neighbor trace loss. Ordinary-desktop behavior, keyboard layouts,
+API lifetime, cleanup and runtime regression tests remain H4 requirements.
 
 Each research package has its own instructions and evidence. I keep the
 released 0.5.0 regression suite and full Windows 7 soak as separate requirements.

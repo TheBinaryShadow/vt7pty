@@ -1,0 +1,54 @@
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$stage=Join-Path $repo 'artifacts\fidelity\host-guards-rc1-returned-2026-11-14'
+$audit=Join-Path $repo 'artifacts\fidelity\host-guards-rc1-windows7-review-2026-11-14'
+$dest=Join-Path $repo 'docs\validation\results\step-1.2\host-guards-rc1\windows7'
+if(Test-Path -LiteralPath $dest){throw 'Preserved Windows 7 review already exists.'}
+$integrity=Get-Content -LiteralPath (Join-Path $audit 'collection-integrity.json') -Raw|ConvertFrom-Json
+$expected=@{}
+foreach($collection in $integrity.Collections){
+ $run=Join-Path $stage $collection.RunId
+ foreach($meta in $collection.MetadataHashes){
+  $expected.Add(('collections/'+$collection.RunId+'/'+$meta.Path),[pscustomobject]@{Bytes=[long]$meta.Bytes;Sha256=$meta.Sha256})
+ }
+ $report=Get-Content -LiteralPath (Join-Path $run 'report.json') -Raw|ConvertFrom-Json
+ foreach($trial in $report.Trials){
+  $list=Get-Content -LiteralPath (Join-Path $run ($trial.Directory+'\evidence-files.json')) -Raw|ConvertFrom-Json
+  foreach($file in $list.Files){
+   $relative='collections/'+$collection.RunId+'/'+$trial.Directory+'/'+$file.Path.Replace('\','/')
+   $expected.Add($relative,[pscustomobject]@{Bytes=[long]$file.Bytes;Sha256=$file.Sha256})
+  }
+ }
+}
+if($expected.Count -ne $integrity.TotalFiles){throw 'Incomplete expected raw-file inventory.'}
+foreach($relative in @('collections','audit','scripts')){New-Item -ItemType Directory -Path (Join-Path $dest $relative) | Out-Null}
+& robocopy.exe $stage (Join-Path $dest 'collections') /E /COPY:DAT /DCOPY:T /R:1 /W:1 /MT:8 /NFL /NDL /NP /NJH
+if($LASTEXITCODE -gt 7){throw ('Raw preservation copy failed: '+$LASTEXITCODE)}
+function Copy-ReviewFile([string]$Source,[string]$Relative){
+ [IO.File]::Copy($Source,(Join-Path $dest $Relative),$false)
+ $file=Get-Item -LiteralPath $Source
+ $expected.Add($Relative.Replace('\','/'),[pscustomobject]@{Bytes=[long]$file.Length;Sha256=(Get-FileHash -LiteralPath $Source -Algorithm SHA256).Hash.ToLowerInvariant()})
+}
+foreach($name in @('nessy','turtle','leopard')){
+ Copy-ReviewFile (Join-Path $audit ($name+'.json')) ('audit/'+$name+'.json')
+ Copy-ReviewFile (Join-Path $audit ($name+'.log')) ('audit/'+$name+'.log.txt')
+}
+foreach($name in @('collection-integrity.json','metrics.json','review-decision.json')){Copy-ReviewFile (Join-Path $audit $name) ('audit/'+$name)}
+Copy-ReviewFile (Join-Path $audit 'comparison.json') 'comparison.json'
+foreach($file in Get-ChildItem -LiteralPath $audit -File -Filter '*.ps1'){Copy-ReviewFile $file.FullName ('scripts/'+$file.Name+'.txt')}
+$files=@(Get-ChildItem -LiteralPath $dest -File -Recurse|Sort-Object FullName)
+if($files.Count -ne $expected.Count){throw 'Unexpected preserved file count.'}
+$records=New-Object 'Collections.Generic.List[object]'
+$bytes=0L
+foreach($file in $files){
+ $relative=$file.FullName.Substring($dest.Length+1).Replace('\','/')
+ if(-not $expected.ContainsKey($relative)){throw ('Unexpected preserved file: '+$relative)}
+ $hash=(Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+ if($file.Length -ne $expected[$relative].Bytes -or $hash -cne $expected[$relative].Sha256){throw ('Preserved bytes differ: '+$relative)}
+ $records.Add([pscustomobject]@{Path=$relative;Bytes=[long]$file.Length;Sha256=$hash});$bytes+=$file.Length
+}
+$inventory=[pscustomobject]@{SchemaVersion=1;Kind='H3GuardWindows7PreservationInventory';ReviewedDate='2026-11-14';RecordedUtc=[DateTime]::UtcNow.ToString('o');ReturnedFiles=[long]$integrity.TotalFiles;ReturnedBytes=[long]$integrity.TotalBytes;PreservedFiles=$records.Count;PreservedBytes=$bytes;AllPreservedBytesMatchVerifiedSources=$true;Files=$records.ToArray()}
+[IO.File]::WriteAllText((Join-Path $dest 'preserved-files.json'),($inventory|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+$inventory|Select-Object ReturnedFiles,ReturnedBytes,PreservedFiles,PreservedBytes,AllPreservedBytesMatchVerifiedSources|ConvertTo-Json -Compress
+exit 0

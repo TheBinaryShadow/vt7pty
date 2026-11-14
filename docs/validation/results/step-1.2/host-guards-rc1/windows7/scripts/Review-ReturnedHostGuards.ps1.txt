@@ -1,0 +1,28 @@
+[CmdletBinding()]
+param([Parameter(Mandatory=$true)][string]$RunFolder,[Parameter(Mandatory=$true)][string]$Machine)
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$repo='D:\Git\vt7pty'
+$stage=Join-Path $repo 'artifacts\fidelity\host-guards-rc1-returned-2026-11-14'
+$audit=Join-Path $repo 'artifacts\fidelity\host-guards-rc1-windows7-review-2026-11-14'
+$package=Join-Path $repo 'artifacts\fidelity\inspection-host-guards-rc1'
+$manifest=Join-Path $package 'manifest.json'
+if((Get-FileHash -LiteralPath $manifest -Algorithm SHA256).Hash.ToLowerInvariant() -cne 'd7f4c97e6ca6952d837b2cca566dd3a5479a44829f2a3ef19f63a11df5b05892'){throw 'Issued package manifest differs.'}
+$raw=Join-Path $stage $RunFolder
+$report=Get-Content -LiteralPath (Join-Path $raw 'report.json') -Raw | ConvertFrom-Json
+if($report.ComputerName -ine $Machine -or $report.Completed -ne 9 -or $report.PreflightErrors.Count -ne 0){throw 'Unexpected machine or incomplete collection.'}
+Write-Output ('BEGIN '+$Machine+' '+[DateTime]::UtcNow.ToString('o'))
+$output=Join-Path $audit ($Machine.ToLowerInvariant()+'.json')
+$null=& (Join-Path $repo 'tools\research\Test-HostGuardEvidence.ps1') -Directory $raw -PackageRoot $package -OutputPath $output
+$review=Get-Content -LiteralPath $output -Raw | ConvertFrom-Json
+[pscustomobject]@{Machine=$Machine;VerifiedEvidenceFiles=$review.VerifiedEvidenceFiles;SemanticReviewsCompleted=$review.SemanticReviewsCompleted;Trials=$review.Trials.Count} | ConvertTo-Json -Compress
+foreach($t in $review.Trials){
+ if($t.Role -eq 'Experiment'){
+  [pscustomobject]@{Machine=$Machine;Trial=$t.Order;Outcome=$t.Outcome;ReviewError=$t.NativeReviewError;Qualified=$t.Review.Guards.Qualified;Completed=$t.Review.Guards.CompletedContenders;Canceled=$t.Review.Guards.CanceledContenders;CoreGaps=$t.Review.Core.CoverageGaps.Count;Gaps=$t.Review.CoverageGaps.Count;Issues=$t.Review.OperationalIssues.Count;Owned=$t.Review.Coordination.OwnedScopes;Borrowed=$t.Review.Coordination.BorrowedScopes;Expiry=$t.Review.Coordination.ExpiryRefusals;ReceiptOnly=$t.Review.Coordination.ReceiptOnlyScopes}|ConvertTo-Json -Compress
+ }
+}
+if(-not $review.SemanticReviewsCompleted){throw 'One or more native semantic reviews did not complete.'}
+foreach($t in @($review.Trials | Where-Object {$_.Role -eq 'Experiment'})){
+ if($t.Outcome -ne 'Pass' -or -not $t.Review.Guards.Qualified -or $t.Review.Core.CoverageGaps.Count -ne 0 -or $t.Review.CoverageGaps.Count -ne 0 -or $t.Review.OperationalIssues.Count -ne 0){throw 'Guard qualification is incomplete.'}
+}
+Write-Output ('END '+$Machine+' '+[DateTime]::UtcNow.ToString('o'))

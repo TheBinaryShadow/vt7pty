@@ -1,0 +1,18 @@
+[0m[0K]0;VT7Pty dispatch research 24212462]0;VT7Pty dispatch research 24212977H3_PS[1]>[0K$m=Get-Module PSReadLine; $v='none'; $cfg='native'; if($m){$v=$m.Versi[0Ko[?25l
+n.ToString();$o=Get-PSReadLineOption;$cfg=$m.Path+'|'+$o.EditMode.ToString()+'|[0K'
++$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAllText('C:\Users\Binary\Desk[0Kt
+op\VT7Pty-host-guards-0.5.0-rc1\results\nonesu-guards-20261113-230934-af1af567\[0K0
+9-experiment\native\suite\child-ps7-native-host\guard-shell-identity.txt',$PSVe[0Kr
+sionTable.PSVersion.ToString()+'|'+$v+'|'+$Host.Name+'|'+$cfg)[0K
+[0K[?25hH3_PS[2]>[0K& "C:\Users\Binary\Desktop\VT7Pty-host-guards-0.5.0-rc1\experiment\bin[0K\[?25l
+HostCancellationGuardProbe.exe" --fixture "\\.\pipe\VT7Pty-H3-child-1864-242193[0K3
+71611" 1864[0K
+[0K[?25hHOST_INPUT>[0Kchildpending[0KHOST_INPUT>[0KGUARD_NEXT[0K[?25l
+[0K[?25hH3_PS[3]>[0K[IO.File]::WriteAllText('C:\Users\Binary\Desktop\VT7Pty-host-guards-0.[0K5[?25l
+.0-rc1\results\nonesu-guards-20261113-230934-af1af567\09-experiment\native\suit[0Ke
+\child-ps7-native-host\parent-child-exit.txt',$LASTEXITCODE.ToString()); [IO.Fi[0Kl
+e]::WriteAllText('C:\Users\Binary\Desktop\VT7Pty-host-guards-0.5.0-rc1\results\[0Kn
+onesu-guards-20261113-230934-af1af567\09-experiment\native\suite\child-ps7-nati[0Kv
+e-host\parent-continued.txt','CONTINUE')[0K
+[0K[?25hH3_PS[4]>[0Kexit 0[0K[?25l
+[0K[?25h

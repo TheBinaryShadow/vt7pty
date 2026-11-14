@@ -1,9 +1,11 @@
 # H3 guard qualification
 
-I've added the remaining research guards to the coordinated cancellation
-prototype. This package tests the request boundary, controlled native children
-and the pinned PowerShell 7 editor configurations. Windows 7 qualification is
-pending. H3 and production integration remain open.
+I've qualified the coordinated cancellation prototype and its remaining H3
+guards on NESSY, TURTLE and LEOPARD. The
+[Windows 7 review](validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
+accepts all nine guard trials and 282/282 cases. H3 is complete within the
+controlled research boundary. H4 runtime integration and production qualification
+are next. The instructions below reproduce the reviewed candidate.
 
 ## Run the candidate
 

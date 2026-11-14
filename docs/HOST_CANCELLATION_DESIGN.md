@@ -1,7 +1,7 @@
 # Console-host cancellation design
 
-Status: H1 and H2 accepted on Windows 7; coordinated baseline verified; guard candidate implemented and awaiting Windows 7 qualification.
-Updated: 2026-11-13.
+Status: H1, H2 and the controlled H3 prototype accepted on Windows 7; H4 runtime integration and production qualification next.
+Updated: 2026-11-14.
 
 I'm following the [cancellation investigation](INPUT_CANCELLATION.md) with
 four stages. I need correct line cancellation while preserving active-child
@@ -27,8 +27,8 @@ request rejection, input isolation and lifetime/failure controls.
 The [H3 prototype](HOST_CANCELLATION_PROBE.md) exercises core cancellation and
 shell recovery on private desktops. The
 [Windows 7 review](validation/2026-11-13-step-1.2-host-cancellation-rc1-windows7.md)
-records five failing repetitions out of nine. H3 remains open; no production
-hook mechanism is selected. The
+records five failing repetitions out of nine. That candidate did not pass H3;
+no production hook mechanism was selected. The
 [follow-up investigation](validation/2026-11-13-step-1.2-host-cancellation-rc1-investigation.md)
 records matched keyboard-state comparisons and a diagnostic-only experiment
 for the unobserved dispatch/read/handler boundaries. The
@@ -49,15 +49,19 @@ implements those changes with an explicit keyboard-scope completion marker and
 an expiry refusal control. The [coordinated Windows 7 review](validation/2026-11-13-step-1.2-host-coordination-rc1-windows7.md)
 passes all 126 baseline/expiry cases and 54 protected focused phases with no
 prototype trace loss. Unprotected contrasts and earlier controls retain their
-failures. True completion/close races, actual access denial, active-child and
-PowerShell 7 qualification keep H3 open.
+failures. I kept H3 open for true completion/close races, actual access denial,
+active-child and PowerShell 7 qualification.
 
-The [guard candidate](HOST_GUARDS.md) now implements concurrent completion and
+The [guard candidate](HOST_GUARDS.md) implements concurrent completion and
 channel-close checks, a restricted-token kernel access-denied path, controlled
 native children, and both pinned PowerShell 7 editor configurations. The public
 child route retains the event/exit contract; the host route also requires cooked
-read cancellation and a subsequent read. Its exact runtime controls remain
-unchanged. H3 acceptance awaits Windows 7 results.
+read cancellation and a subsequent read. The
+[Windows 7 guard review](validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
+accepts 282/282 cases across all nine guard trials. I accept H3 for this controlled
+x64 private-desktop prototype. H4 must define runtime routing and ownership, then
+qualify ordinary-desktop queues, keyboard layouts, access policy, concurrent
+API/session destruction, cleanup and integrated runtime regressions.
 
 ## H1 implementation
 
@@ -195,7 +199,7 @@ H2 is accepted on those configurations. H3 now tests cancellation; H2 alone
 does not prove read cancellation or qualify production use.
 
 
-## H3: Cancel the pending read (in progress)
+## H3: Cancel the pending read (research prototype accepted)
 
 After H2, evaluate the host's normal input-processing path. Define cancellation
 and event delivery as one operation; first measure whether the host already
@@ -244,7 +248,10 @@ and normal desktop. This contains the experiment; it does not establish the
 production architecture. The [probe guide](HOST_CANCELLATION_PROBE.md) lists
 the twelve cases and preserves the remaining H3 requirements: resolution of
 target failures, real completion/close races, actual denied-access behavior, the active-child
-shell matrix and PowerShell 7 guards. H4 remains blocked on those findings.
+shell matrix and PowerShell 7 guards. Those research guards are now qualified
+by the [Windows 7 guard review](validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md).
+Concurrent research-channel close and same-user restricted-token denial do not
+qualify production API destruction or cross-integrity access. Those belong to H4.
 
 The [process lifetime plan](PROCESS_LIFETIME.md) adds Windows 7 job inheritance,
 permitted/denied breakaway and descendant-cleanup qualification before 1.0.

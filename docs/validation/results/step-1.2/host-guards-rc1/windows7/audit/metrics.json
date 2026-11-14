@@ -1,0 +1,63 @@
+{
+  "SchemaVersion": 1,
+  "Kind": "H3GuardWindows7ReviewMetrics",
+  "ReviewedDate": "2026-11-14",
+  "Collections": 27,
+  "PassingCases": 561,
+  "TotalCases": 597,
+  "ControlPassing": 102,
+  "ControlCases": 108,
+  "ReferencePassing": 177,
+  "ReferenceCases": 207,
+  "GuardPassing": 282,
+  "GuardCases": 282,
+  "GuardBaselinePassing": 126,
+  "GuardBaselineCases": 126,
+  "VerifiedEvidenceHashes": 42125,
+  "VerifiedMetadataHashes": 33,
+  "ReturnedFiles": 42158,
+  "ReturnedBytes": 179104828,
+  "GuardCompletedReads": 15,
+  "GuardCanceledReads": 12,
+  "OwnedScopes": 222,
+  "BorrowedScopes": 0,
+  "ExpiryRefusals": 9,
+  "ReceiptOnlyScopes": 18,
+  "NeighborHostEvents": 84682,
+  "NeighborAgentEvents": 129240,
+  "NeighborHostLost": 0,
+  "NeighborAgentLost": 0,
+  "MinDrains": 208.0,
+  "MaxDrains": 337.0,
+  "MaxDrainGapMs": 546.0,
+  "MaxDrainDurationMs": 296.0,
+  "ReferenceConditions": [
+    {
+      "Condition": "coordinated",
+      "Passing": 18,
+      "Total": 18
+    },
+    {
+      "Condition": "delay-control",
+      "Passing": 15,
+      "Total": 18
+    },
+    {
+      "Condition": "quiet",
+      "Passing": 36,
+      "Total": 36
+    },
+    {
+      "Condition": "selected",
+      "Passing": 0,
+      "Total": 27
+    }
+  ],
+  "FailedCases": 36,
+  "DeliberateSelectedFailures": 27,
+  "OtherControlFailures": 6,
+  "OtherReferenceFailures": 3,
+  "H3ResearchAccepted": true,
+  "MilestoneAccepted": false,
+  "ProductionCancellationImplemented": false
+}
