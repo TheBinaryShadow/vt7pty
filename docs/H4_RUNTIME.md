@@ -4,9 +4,10 @@ I am integrating the qualified H3 cancellation mechanism into the real runtime.
 This is the first opt-in H4 test candidate. H4, Milestone 1 and VT7 integration
 remain open. The published runtime is still 0.5.0.
 
-The [rc2 review](validation/2026-11-14-step-1.2-h4-runtime-rc2-candidate.md) records
-passing byte-identical payload tests and a Windows hook-registration failure at
-new DLL paths on WOLF. The exact archive is held pending a fresh-session check.
+The [rc2 review](validation/2026-11-15-step-1.2-h4-runtime-rc2-candidate.md) records
+nine passing exact-package trials on WOLF after a fresh Windows sign-in. I've
+issued the unchanged archive for NESSY, TURTLE and LEOPARD. Windows 7 qualification
+remains open.
 
 ## What changes
 
@@ -103,7 +104,9 @@ reference files are verified and never rebuilt.
 Use tools/research/Test-H4RuntimeEvidence.ps1 to review a native directory, or
 supply -PackageRoot for an entire returned collection. The review checks file
 hashes, case inventories, retained identities, desktop placement, keyboard tables,
-reads, shell recovery, child status and original outcomes.
+reads, shell recovery, child status and original outcomes. It keeps separate
+session contexts when Windows reuses an agent PID. Test-H4EvidenceReviewer.ps1
+checks both accepted PID reuse and rejection of corrupted or mixed evidence.
 
 ## What still needs qualification
 

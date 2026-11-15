@@ -1,0 +1,15 @@
+[0m[0KH3_PS[1]>[0K$m=Get-Module PSReadLine; $v='none'; $cfg='native'; if($m){$v=$m.Versi[0Ko[?25l
+n.ToString();$o=Get-PSReadLineOption;$cfg=$m.Path+'|'+$o.EditMode.ToString()+'|[0K'
++$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAllText('D:\Git\vt7pty\artifa[0Kc
+ts\fidelity\h4-exact-rc2\results\developmenthost-h4-20261115-162907-39cbe87f\03[0K-
+runtime\native\powershell-partial\shell-identity.txt',$PSVersionTable.PSVersion[0K.
+ToString()+'|'+$v+'|'+$Host.Name+'|'+$cfg)[0K
+H3_PS[2]>[0K[?25h[IO.File]::WriteAllText('D:\Git\vt7pty\artifacts\fidelity\h4-exact-rc2[0K\[?25l
+results\developmenthost-h4-20261115-162907-39cbe87f\03-runtime\native\powershel[0Kl
+-partial\canceled-command.txt','BAD')[0K[?25h[?25l
+[0K[?25hH3_PS[3]>[0K[?25l
+H3_PS[4]>[IO.File]::WriteAllText('D:\Git\vt7pty\artifacts\fidelity\h4-exact-rc2[0K\
+results\developmenthost-h4-20261115-162907-39cbe87f\03-runtime\native\powershel[0Kl
+-partial\continued.txt','CONTINUE')[0K
+H3_PS[5]>[0K[?25hexit 0[0K[?25l
+[0K[?25h

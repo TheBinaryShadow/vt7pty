@@ -1,0 +1,45 @@
+{
+  "Kind": "H4Rc2AfterSignInQualification",
+  "RecordedUtc": "2026-11-15T16:42:55.8427144Z",
+  "Machine": "WOLF",
+  "PreviousLogonId": "S-1-5-5-0-1824281",
+  "CurrentLogonId": "S-1-5-5-0-195840",
+  "RuntimeSourceCommit": "b8fdcc5856aa7965384627b859344820f9d7c94d",
+  "RunId": "developmenthost-h4-20261115-162907-39cbe87f",
+  "ArchiveUnchanged": true,
+  "ManifestSha256": "e49e33da459d6c6dc97ec118fe733b503ebdbdd4fd1360c74f41b0ef767a2bd4",
+  "PackageFiles": 213,
+  "TrialsCompleted": 9,
+  "RuntimeCasesPassed": 123,
+  "ReferenceCasesPassed": 102,
+  "OriginalControlCasesPassed": 36,
+  "RuntimeKeyboardOperationsVerified": 111,
+  "ReviewerRejectedCorruptions": 11,
+  "ReviewerAcceptedReuseControl": true,
+  "ReviewerScripts": [
+    {
+      "File": "Test-H4RuntimeEvidence.ps1",
+      "Sha256": "3c09da34b9a46e58ae83349b901d81f356326f66a71c3036d6d9c902b385b249"
+    },
+    {
+      "File": "Test-H4EvidenceReviewer.ps1",
+      "Sha256": "6837e1202a32fd362a45eff663e724dc89611da14abd89f69b6566ea61c58693"
+    }
+  ],
+  "SharedCopies": [
+    {
+      "File": "VT7Pty-h4-runtime-0.5.1-dev-rc2.zip",
+      "Destination": "\\\\10.0.0.3\\KRMe\\VT7_work\\VT7Pty-h4-runtime-0.5.1-dev-rc2.zip",
+      "Bytes": 48022463,
+      "Sha256": "7b369038dfc15d16e5426bd96f2f38ef29969dd8b2ac0c7d4627f3e7c266dc78"
+    },
+    {
+      "File": "VT7Pty-h4-runtime-0.5.1-dev-rc2.zip.sha256",
+      "Destination": "\\\\10.0.0.3\\KRMe\\VT7_work\\VT7Pty-h4-runtime-0.5.1-dev-rc2.zip.sha256",
+      "Bytes": 103,
+      "Sha256": "32ae0972fc3592ce2a5df1a7026d987450c8a9a7f3a1efc99943c874fa09a922"
+    }
+  ],
+  "Windows7Qualified": false,
+  "H4Accepted": false
+}

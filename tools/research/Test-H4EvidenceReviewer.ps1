@@ -46,7 +46,66 @@ try {
     if(-not $rejected){throw ('Reviewer missed keyboard corruption: '+$reason)}
     $results+=@([ordered]@{Case='keyboard-corruption';Rejected=$true;Reason=$reason})
 } finally {[IO.File]::WriteAllBytes($path,$bytes)}
+# A duplicate ready record must not create another lifetime for the same desktop.
+$path=Join-Path $copy 'runtime-trace.jsonl';$bytes=[IO.File]::ReadAllBytes($path)
+$crlf=[string][char]13+[char]10
+try {
+    $text=[Text.Encoding]::UTF8.GetString($bytes)
+    $readyLine=@($text -split '\r?\n' | Where-Object {$_ -match 'host-cancel ready '})[0]
+    [IO.File]::WriteAllText($path,($text.TrimEnd()+$crlf+$readyLine+$crlf),[Text.UTF8Encoding]::new($false))
+    $rejected=$false;$reason=''
+    try{$null=& $reviewer -Directory $copy}catch{$reason=$_.Exception.Message;$rejected=$reason.Contains('one ready record per session')}
+    if(-not $rejected){throw ('Reviewer missed duplicate ready context: '+$reason)}
+    $results+=@([ordered]@{Case='duplicate-session-ready';Rejected=$true;Reason=$reason})
+} finally {[IO.File]::WriteAllBytes($path,$bytes)}
+
+# Reuse the cooked-empty agent PID for a later completed session, including its
+# sequence numbers. This exercises the correlation without changing raw evidence.
+$paths=@(
+    (Join-Path $copy 'cooked-partial\identity.json'),
+    (Join-Path $copy 'cooked-partial\lifetime.json'),
+    (Join-Path $copy 'runtime-trace.jsonl')
+)
+$saved=@{};foreach($path in $paths){$saved[$path]=[IO.File]::ReadAllBytes($path)}
+$positive=@()
+try {
+    $first=[IO.File]::ReadAllText((Join-Path $copy 'cooked-empty\identity.json')) | ConvertFrom-Json
+    $second=[IO.File]::ReadAllText($paths[0]) | ConvertFrom-Json
+    $life=[IO.File]::ReadAllText($paths[1]) | ConvertFrom-Json
+    $desktop=([IO.File]::ReadAllText((Join-Path $copy 'cooked-partial\desktop.json')) | ConvertFrom-Json).BackingDesktop
+    $originalPid=$second.Fixture.ParentId;$reusedPid=$first.Fixture.ParentId
+    $second.Fixture.ParentId=$reusedPid
+    $second.Fixture.ConsoleMembers=@($second.Fixture.ConsoleMembers | ForEach-Object {if($_ -eq $originalPid){$reusedPid}else{$_}})
+    $life.Agent=$reusedPid
+    [IO.File]::WriteAllText($paths[0],($second | ConvertTo-Json -Depth 32),[Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($paths[1],($life | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+    $active=@{}
+    $records=@([Text.Encoding]::UTF8.GetString($saved[$paths[2]]) -split '\r?\n' | Where-Object {$_} | ForEach-Object {
+        $r=$_ | ConvertFrom-Json;$pidKey=[string]$r.pid
+        if($r.message -match '^host-cancel ready .* desktop=(VT7Pty-Console-[0-9a-f]{32})$'){$active[$pidKey]=$Matches[1]}
+        if($r.pid -eq $originalPid -and $active.ContainsKey($pidKey) -and $active[$pidKey] -ceq $desktop){$r.pid=$reusedPid}
+        $r
+    })
+    $lines=@($records | ForEach-Object {$_ | ConvertTo-Json -Depth 8 -Compress})
+    [IO.File]::WriteAllText($paths[2],(($lines -join $crlf)+$crlf),[Text.UTF8Encoding]::new($false))
+    $review=& $reviewer -Directory $copy
+    if($review.ReusedAgentPids -lt 1){throw 'Reviewer did not record the synthetic PID reuse.'}
+    $positive+=@([ordered]@{Case='reused-agent-pid-and-sequence';Passed=$true;Cases=$review.Cases;KeyboardOperations=$review.KeyboardOperations})
+
+    # Removing the later readiness must not let its result borrow the old PID's
+    # session context or keyboard snapshots.
+    $withoutReady=@($records | Where-Object {-not ($_.message -like ('host-cancel ready * desktop='+$desktop))} |
+        ForEach-Object {$_ | ConvertTo-Json -Depth 8 -Compress})
+    [IO.File]::WriteAllText($paths[2],(($withoutReady -join $crlf)+$crlf),[Text.UTF8Encoding]::new($false))
+    $rejected=$false;$reason=''
+    try{$null=& $reviewer -Directory $copy}catch{
+        $reason=$_.Exception.Message
+        $rejected=$reason.Contains('accepted restored keyboard result') -or $reason.Contains('verified host callback context')
+    }
+    if(-not $rejected){throw ('Reviewer allowed a reused PID to borrow earlier session readiness: '+$reason)}
+    $results+=@([ordered]@{Case='reused-pid-missing-session-ready';Rejected=$true;Reason=$reason})
+} finally {foreach($path in $paths){[IO.File]::WriteAllBytes($path,$saved[$path])}}
 $null=& $reviewer -Directory $copy
-$result=[ordered]@{Kind='H4ReviewerFaultControls';Status='Pass';Rejected=$results.Count;Controls=$results;OriginalEvidenceUnmodified=$true}
+$result=[ordered]@{Kind='H4ReviewerFaultControls';Status='Pass';Rejected=$results.Count;Controls=$results;PositiveControls=$positive;OriginalEvidenceUnmodified=$true}
 [IO.File]::WriteAllText((Join-Path $OutputDirectory 'review.json'),($result | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
 $result

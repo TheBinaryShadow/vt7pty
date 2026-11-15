@@ -1,6 +1,6 @@
 # VT7Pty roadmap
 
-Updated: 2026-11-14.
+Updated: 2026-11-15.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
 behavior in Milestone 1. **Next: qualify the opt-in H4 runtime on Windows 7.** The [H3 Windows 7 review](docs/validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
@@ -100,10 +100,10 @@ public-API experiments failed. I'm now following the
   private-desktop prototype; ordinary-desktop and production lifetime work belong to H4.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
   The [H4 candidate](docs/H4_RUNTIME.md) uses approved opt-in backing-desktop
-  isolation and API 1.1 two-phase close. Local checks cover 41 runtime cases and
-  25 protocol/keyboard oracles. Windows 7, keyboard and sustained opt-in workload
-  qualification remain open. The [rc2 review](docs/validation/2026-11-14-step-1.2-h4-runtime-rc2-candidate.md)
-  holds archive issuance pending a fresh-session hook-registration check on WOLF.
+  isolation and API 1.1 two-phase close. The [rc2 review](docs/validation/2026-11-15-step-1.2-h4-runtime-rc2-candidate.md)
+  verifies 123/123 runtime and 102/102 reference cases from the exact archive on
+  WOLF. I've issued rc2 for all three Windows 7 tiers. Windows 7, keyboard and
+  sustained opt-in workload qualification remain open.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.
 - [ ] Add focused regressions and verify US/Croatian keyboard behavior where

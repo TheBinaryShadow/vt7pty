@@ -34,7 +34,7 @@ function Review-H4Native([string]$Root,[bool]$PowerShell7) {
     foreach($case in $cases) {
         Assert-H4 ($case.Passed -and $case.OwnedProcessesCleaned -and $case.HostExited -and -not $case.Error) ('case outcome '+$case.Case)
     }
-    $identities=@{};$sessions=0
+    $identities=@{};$hosts=@{};$agents=@{};$sessions=0
     foreach($file in @(Get-ChildItem -LiteralPath $Root -Filter identity.json -File -Recurse)) {
         $identity=Read-H4 $file.FullName
         Assert-H4 ($identity.IdentityEligible -and $identity.SameUserLogonIntegritySession -and $identity.NativeX64 -and -not $identity.Error) 'retained identity'
@@ -46,8 +46,15 @@ function Review-H4Native([string]$Root,[bool]$PowerShell7) {
             $desktop.ApplicationGuiOrdinary -and $desktop.HostWindowPrivate -and
             $life.Agent -eq [int]$agent -and $life.Fixture -eq $identity.Fixture.ProcessId -and
             $life.Host -eq $identity.HostProcessId -and $life.OwnedProcessesCleaned -and $life.HostExited -and -not $life.Error) 'desktop and lifetime'
-        Assert-H4 (-not $identities.ContainsKey($agent)) 'unique live session agent identities'
-        $identities[$agent]=$identity
+        # Windows can reuse an agent PID after an earlier session has exited.
+        # Bind evidence to its private desktop and retained host creation identity.
+        $session=$desktop.BackingDesktop
+        $hostKey=[string]$identity.HostProcessId+':'+$identity.HostCreationTime
+        Assert-H4 ([uint64]$identity.HostCreationTime -gt 0 -and
+            -not $identities.ContainsKey($session) -and -not $hosts.ContainsKey($hostKey)) 'unique retained session identities'
+        $identities[$session]=$identity;$hosts[$hostKey]=$true
+        if(-not $agents.ContainsKey($agent)) {$agents[$agent]=0}
+        $agents[$agent]++
         $sessions++
     }
     # Recompute read results, not just the harness's Passed flags.
@@ -119,29 +126,42 @@ function Review-H4Native([string]$Root,[bool]$PowerShell7) {
     Assert-H4 (([IO.File]::ReadAllText((Join-Path $Root 'collector-errors.txt'))).Length -eq 0) 'collector errors or truncation'
     $trace=@([IO.File]::ReadLines((Join-Path $Root 'runtime-trace.jsonl')) | ForEach-Object {$_ | ConvertFrom-Json})
     Assert-H4 ($trace.Count -gt 0) 'trace present'
-    $keys=@{};$ready=@{}
+    $keys=@{};$ready=@{};$current=@{}
     foreach($record in $trace) {
         Assert-H4 ($record.version -ceq $probe.PackageVersion -and $record.commit -ceq $probe.SourceCommit -and $record.api -ceq '1.1' -and $record.protocol -eq 2) 'trace build identity'
         if($record.message -match '^host-cancel ready host=(\d+) thread=(\d+) desktop=(VT7Pty-Console-[0-9a-f]{32})$') {
-            $ready[[string]$record.pid]=@{Host=[int]$Matches[1];Thread=[int]$Matches[2];Desktop=$Matches[3]}
+            $session=$Matches[3];$agent=[string]$record.pid
+            Assert-H4 (-not $ready.ContainsKey($session)) 'one ready record per session'
+            $context=@{Agent=$agent;Host=[int]$Matches[1];Thread=[int]$Matches[2];Desktop=$session}
+            if($identities.ContainsKey($session)) {
+                $identity=$identities[$session]
+                Assert-H4 ($identity.Fixture.ParentId -eq $record.pid -and $identity.HostProcessId -eq $context.Host) 'retained host matches trace'
+            }
+            $ready[$session]=$context;$current[$agent]=$context
         }
         if($record.message -match '^host-cancel result sequence=(\d+) result=(\d+) host=(\d+) thread=(\d+) captured=(\d+) applied=(\d+) sent=(\d+) restored=(\d+) equal=(\d+) error=(\d+)$') {
-            $key=[string]$record.pid+':'+$Matches[1]
+            $agent=[string]$record.pid
+            Assert-H4 ($current.ContainsKey($agent)) 'session ready before cancellation result'
+            $context=$current[$agent];$key=$context.Desktop+':'+$Matches[1]
             Assert-H4 (-not $keys.ContainsKey($key) -and $Matches[2] -eq '1' -and
                 ($Matches[5..9] -join '') -ceq '11111' -and $Matches[10] -eq '0') 'accepted restored keyboard result'
-            $keys[$key]=@{Agent=[string]$record.pid;Host=[int]$Matches[3];Thread=[int]$Matches[4]}
+            Assert-H4 ([int]$Matches[3] -eq $context.Host -and [int]$Matches[4] -eq $context.Thread) 'verified host callback context'
+            $keys[$key]=@{Context=$context}
         } elseif($record.message -match '^host-cancel (before|during|after) sequence=(\d+) keys=([0-9a-f]{512})$') {
-            $which=$Matches[1];$key=[string]$record.pid+':'+$Matches[2];$hex=$Matches[3]
+            $which=$Matches[1];$sequence=$Matches[2];$hex=$Matches[3];$agent=[string]$record.pid
+            Assert-H4 ($current.ContainsKey($agent)) 'session ready before keyboard snapshot'
+            $key=$current[$agent].Desktop+':'+$sequence
             Assert-H4 ($keys.ContainsKey($key) -and -not $keys[$key].ContainsKey($which)) 'one snapshot per result stage'
             $keys[$key][$which]=$hex
         }
     }
     foreach($key in $keys.Keys) {
         $k=$keys[$key]
-        Assert-H4 ($k.ContainsKey('before') -and $k.ContainsKey('during') -and $k.ContainsKey('after') -and $k.before -ceq $k.after -and $ready.ContainsKey($k.Agent)) 'all 256 keyboard bytes restored'
-        $r=$ready[$k.Agent]
-        Assert-H4 ($identities.ContainsKey($k.Agent) -and $identities[$k.Agent].HostProcessId -eq $r.Host) 'retained host matches trace'
-        Assert-H4 ($k.Host -eq $r.Host -and $k.Thread -eq $r.Thread) 'verified host callback context'
+        Assert-H4 ($k.ContainsKey('before') -and $k.ContainsKey('during') -and $k.ContainsKey('after') -and $k.before -ceq $k.after) 'all 256 keyboard bytes restored'
+        $r=$k.Context
+        Assert-H4 ($identities.ContainsKey($r.Desktop) -and
+            $identities[$r.Desktop].Fixture.ParentId -eq [int]$r.Agent -and
+            $identities[$r.Desktop].HostProcessId -eq $r.Host) 'retained host matches trace'
         $expectedBytes=New-Object byte[] 256
         for($i=0;$i -lt 256;$i++) {$expectedBytes[$i]=[Convert]::ToByte($k.before.Substring($i*2,2),16)}
         foreach($vk in @(16,160,161,17,162,163,18,164,165,91,92)) {$expectedBytes[$vk]=$expectedBytes[$vk] -band 1}
@@ -150,7 +170,7 @@ function Review-H4Native([string]$Root,[bool]$PowerShell7) {
     }
     $minimum=if($PowerShell7){36}else{30}
     Assert-H4 ($keys.Count -ge $minimum) 'all required cancellation trace records'
-    return [ordered]@{Kind='H4NativeReview';Status='Pass';Cases=$cases.Count;Sessions=$sessions;CanceledReadObservations=$cancellations;ExactNextReads=$nextReads;KeyboardOperations=$keys.Count;H4Accepted=$false}
+    return [ordered]@{Kind='H4NativeReview';Status='Pass';Cases=$cases.Count;Sessions=$sessions;ReusedAgentPids=@($agents.Values | Where-Object {$_ -gt 1}).Count;CanceledReadObservations=$cancellations;ExactNextReads=$nextReads;KeyboardOperations=$keys.Count;H4Accepted=$false}
 }
 $Directory=[IO.Path]::GetFullPath($Directory).TrimEnd('\')
 if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')) {

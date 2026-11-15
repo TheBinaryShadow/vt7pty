@@ -1,0 +1,30 @@
+$ErrorActionPreference='Stop'
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+public static class H4GuardPathCheck {
+ [DllImport("kernel32.dll",CharSet=CharSet.Unicode,SetLastError=true)] public static extern IntPtr LoadLibraryExW(string p,IntPtr f,uint flags);
+ [DllImport("kernel32.dll",CharSet=CharSet.Ansi,SetLastError=true)] public static extern IntPtr GetProcAddress(IntPtr m,string n);
+ [DllImport("kernel32.dll")] public static extern uint GetCurrentThreadId();
+ [DllImport("kernel32.dll")] public static extern bool FreeLibrary(IntPtr m);
+ [DllImport("kernel32.dll")] public static extern void SetLastError(uint e);
+ [DllImport("user32.dll",SetLastError=true)] public static extern IntPtr SetWindowsHookExW(int t,IntPtr c,IntPtr m,uint id);
+ [DllImport("user32.dll",SetLastError=true)] public static extern bool UnhookWindowsHookEx(IntPtr h);
+}
+"@
+$results=@()
+foreach($path in @('D:\Git\vt7pty\artifacts\fidelity\inspection-host-guards-rc1\experiment\bin\HostCancellationGuardHook.dll','D:\Git\vt7pty\artifacts\fidelity\h4-exact-rc2\reference\experiment\bin\HostCancellationGuardHook.dll')) {
+ $module=[H4GuardPathCheck]::LoadLibraryExW($path,[IntPtr]::Zero,8)
+ if($module -eq [IntPtr]::Zero){throw 'Own-process guard module load failed'}
+ $callback=[H4GuardPathCheck]::GetProcAddress($module,'HostCancellationCallback')
+ if($callback -eq [IntPtr]::Zero){throw 'Missing guard callback'}
+ [H4GuardPathCheck]::SetLastError(0)
+ $hook=[H4GuardPathCheck]::SetWindowsHookExW(4,$callback,$module,[H4GuardPathCheck]::GetCurrentThreadId())
+ $errorCode=[Runtime.InteropServices.Marshal]::GetLastWin32Error()
+ $results+=@(@{Path=$path;Sha256=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant();ModuleLoaded=$true;ExportFound=$true;HookInstalled=($hook -ne [IntPtr]::Zero);HookError=$errorCode})
+ if($hook -ne [IntPtr]::Zero){if(-not [H4GuardPathCheck]::UnhookWindowsHookEx($hook)){throw 'Own hook removal failed'}}
+ if(-not [H4GuardPathCheck]::FreeLibrary($module)){throw 'Own module release failed'}
+}
+$record=@{Kind='H4FrozenGuardPathContrast';NoHostTargeted=$true;NoHookMessagesSent=$true;Results=$results}
+[IO.File]::WriteAllText('D:\Git\vt7pty\artifacts\fidelity\h4-guard-path-contrast-after-signin-2026-11-15.json',($record | ConvertTo-Json -Depth 5),(New-Object Text.UTF8Encoding($false)))
+$record | ConvertTo-Json -Depth 5

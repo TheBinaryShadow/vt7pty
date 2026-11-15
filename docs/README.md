@@ -32,7 +32,8 @@ H3 prototype are accepted on all three Windows 7 tiers. The
 [guard review](validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
 verifies 282/282 cases, including races, actual access denial, native children
 and the applicable PowerShell 7 matrix. The opt-in H4 runtime candidate now
-implements the approved desktop and close contract; target qualification remains.
+implements the approved desktop and close contract. I've issued
+[rc2](validation/2026-11-15-step-1.2-h4-runtime-rc2-candidate.md) for target qualification.
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |
