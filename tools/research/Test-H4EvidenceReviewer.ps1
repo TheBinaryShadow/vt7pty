@@ -105,6 +105,45 @@ try {
     if(-not $rejected){throw ('Reviewer allowed a reused PID to borrow earlier session readiness: '+$reason)}
     $results+=@([ordered]@{Case='reused-pid-missing-session-ready';Rejected=$true;Reason=$reason})
 } finally {foreach($path in $paths){[IO.File]::WriteAllBytes($path,$saved[$path])}}
+# Exercise child-first logging without weakening the cause-specific module check.
+$probe=[IO.File]::ReadAllText((Join-Path $copy 'probe.json')) | ConvertFrom-Json
+if($null -ne $probe.PSObject.Properties['QualificationRevision']){
+    $path=Join-Path $copy 'runtime-trace.jsonl';$bytes=[IO.File]::ReadAllBytes($path)
+    try{
+        $startup=[IO.File]::ReadAllText((Join-Path $copy 'helper-missing\startup.json')) | ConvertFrom-Json
+        $records=@([Text.Encoding]::UTF8.GetString($bytes) -split '\r?\n' | Where-Object {$_} | ForEach-Object {$_ | ConvertFrom-Json})
+        $parentIndex=-1;$failureIndex=-1;$failedAgent=0
+        for($i=0;$i -lt $records.Count;$i++){
+            if($records[$i].pid -eq $startup.ActorPid -and $records[$i].message -match '^Created agent successfully, pid=(\d+)$'){
+                $parentIndex=$i;$failedAgent=[int]$Matches[1];break
+            }
+        }
+        for($i=0;$i -lt $records.Count;$i++){
+            if($records[$i].pid -eq $failedAgent -and $records[$i].message.StartsWith('Agent failure: Load colocated VT7Pty-Host.dll: Windows error ')){$failureIndex=$i;break}
+        }
+        if($parentIndex -lt 0 -or $failureIndex -lt 0){throw 'Missing module failure ordering control.'}
+        $reordered=@()
+        for($i=0;$i -lt $records.Count;$i++){
+            if($i -eq $parentIndex){$reordered+=@($records[$failureIndex])}
+            if($i -ne $failureIndex){$reordered+=@($records[$i])}
+        }
+        $lines=@($reordered | ForEach-Object {$_ | ConvertTo-Json -Depth 8 -Compress})
+        [IO.File]::WriteAllText($path,(($lines -join $crlf)+$crlf),[Text.UTF8Encoding]::new($false))
+        $review=& $reviewer -Directory $copy
+        $positive+=@([ordered]@{Case='module-failure-before-parent-created-log';Passed=$true;Cases=$review.Cases})
+        foreach($r in $reordered){
+            if($r.pid -eq $failedAgent -and $r.message.StartsWith('Agent failure: Load colocated VT7Pty-Host.dll: Windows error ')){
+                $r.message='Agent failure: generic refusal'
+            }
+        }
+        $lines=@($reordered | ForEach-Object {$_ | ConvertTo-Json -Depth 8 -Compress})
+        [IO.File]::WriteAllText($path,(($lines -join $crlf)+$crlf),[Text.UTF8Encoding]::new($false))
+        $reason=''
+        try{$null=& $reviewer -Directory $copy}catch{$reason=$_.Exception.Message}
+        if(-not $reason.Contains('actual missing/wrong module failure cause')){throw ('Reviewer missed a generic module cause: '+$reason)}
+        $results+=@([ordered]@{Case='generic-module-refusal';Rejected=$true;Reason=$reason})
+    }finally{[IO.File]::WriteAllBytes($path,$bytes)}
+}
 $null=& $reviewer -Directory $copy
 $result=[ordered]@{Kind='H4ReviewerFaultControls';Status='Pass';Rejected=$results.Count;Controls=$results;PositiveControls=$positive;OriginalEvidenceUnmodified=$true}
 [IO.File]::WriteAllText((Join-Path $OutputDirectory 'review.json'),($result | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))

@@ -187,7 +187,9 @@ function Review-H4Native([string]$Root,[bool]$PowerShell7) {
             }
             Assert-H4 ($created.Count -eq 2) 'failed and flagless control agents'
             $cause=@()
-            for($i=$created[0].Index+1;$i -lt $created[1].Index;$i++){
+            # The child may report failure before the parent logs CreateProcess.
+            # Each module failure stage occurs once in the exact case inventory.
+            for($i=0;$i -lt $created[1].Index;$i++){
                 if($trace[$i].pid -eq $created[0].Agent -and
                     $trace[$i].message.StartsWith('Agent failure: '+$expectedFailure+': Windows error ')){
                     $cause+=@($trace[$i])
