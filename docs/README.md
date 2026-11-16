@@ -33,8 +33,8 @@ H3 prototype are accepted on all three Windows 7 tiers. The
 verifies 282/282 cases, including races, actual access denial, native children
 and the applicable PowerShell 7 matrix. The opt-in H4 runtime candidate now
 implements the approved desktop and close contract. The
-[Windows 7 rc2 review](validation/2026-11-16-step-1.2-h4-runtime-rc2-windows7.md)
-verifies NESSY and LEOPARD; TURTLE is repeating its run after a desktop change.
+[completed Windows 7 rc2 matrix](validation/2026-11-16-step-1.2-h4-runtime-rc2-turtle-rerun.md)
+verifies 345/345 runtime cases across all three tiers. Production qualification remains.
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |

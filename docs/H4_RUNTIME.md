@@ -4,10 +4,10 @@ I am integrating the qualified H3 cancellation mechanism into the real runtime.
 This is the first opt-in H4 test candidate. H4, Milestone 1 and VT7 integration
 remain open. The published runtime is still 0.5.0.
 
-The [Windows 7 rc2 review](validation/2026-11-16-step-1.2-h4-runtime-rc2-windows7.md)
-verifies the automated matrix on NESSY and LEOPARD. TURTLE passed two runtime
-cohorts, then refused startup after a confirmed desktop change. Its repeat is
-underway. H4 remains open.
+The [TURTLE repeat review](validation/2026-11-16-step-1.2-h4-runtime-rc2-turtle-rerun.md)
+completes the automated rc2 matrix on all three Windows 7 tiers: 345/345 runtime
+cases pass. Physical keyboard, sustained opt-in workloads and the remaining
+production qualification gates keep H4 open.
 
 ## What changes
 
@@ -116,10 +116,10 @@ checks both accepted PID reuse and rejection of corrupted or mixed evidence.
 
 ## What still needs qualification
 
-I still need TURTLE's replacement run and the remaining production evidence.
-US/Croatian keyboard workflows, sustained opt-in workloads, desktop resource limits under
-larger concurrent workloads, lock/session transitions and broader access/job
-policies remain open. The current runtime has no test-only fault or acknowledgment
+The automated Windows 7 matrix is complete. I still need to qualify physical
+US/Croatian keyboard workflows and sustained opt-in workloads, and measure
+resource use with larger concurrent workloads. Lock/session transitions and
+broader access/job policies remain open. The current runtime has no test-only fault or acknowledgment
 suppression switches. H3 retains its fault controls; forced production callback
 timeout and rundown qualification still need their own concrete experiment.
 

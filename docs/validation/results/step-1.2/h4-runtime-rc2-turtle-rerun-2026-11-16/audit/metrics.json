@@ -1,0 +1,353 @@
+{
+  "Kind": "H4Rc2Windows7Metrics",
+  "Collections": [
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "RunId": "esu-h4-20261116-164503-2c7a04eb",
+      "PowerShellVersion": "5.1.14409.1005",
+      "CLRVersion": "4.0.30319.42000",
+      "Totals": {
+        "Control": {
+          "Passed": 33,
+          "Total": 36
+        },
+        "Reference": {
+          "Passed": 102,
+          "Total": 102
+        },
+        "Runtime": {
+          "Passed": 123,
+          "Total": 123
+        }
+      },
+      "Trials": [
+        {
+          "Order": 1,
+          "Role": "Control",
+          "NativeOutcome": "Fail",
+          "Passed": 11,
+          "Total": 12,
+          "FailedCases": [
+            {
+              "Case": "powershell-empty",
+              "Passed": false,
+              "OwnedProcessesCleaned": true,
+              "HostExited": true,
+              "HookRemoved": true,
+              "Error": "Case did not meet acceptance; inspect its raw records."
+            }
+          ],
+          "OwnedCleanupFalse": 0,
+          "HostExitFalse": 0,
+          "ErrorGroups": [
+            {
+              "Error": "Case did not meet acceptance; inspect its raw records.",
+              "Count": 1
+            }
+          ]
+        },
+        {
+          "Order": 2,
+          "Role": "Reference",
+          "NativeOutcome": "Pass",
+          "Passed": 34,
+          "Total": 34,
+          "FailedCases": [],
+          "OwnedCleanupFalse": 0,
+          "HostExitFalse": 0,
+          "ErrorGroups": []
+        },
+        {
+          "Order": 3,
+          "Role": "Runtime",
+          "NativeOutcome": "Pass",
+          "Passed": 41,
+          "Total": 41,
+          "FailedCases": [],
+          "OwnedCleanupFalse": 0,
+          "HostExitFalse": 0,
+          "ErrorGroups": []
+        },
+        {
+          "Order": 4,
+          "Role": "Control",
+          "NativeOutcome": "Fail",
+          "Passed": 11,
+          "Total": 12,
+          "FailedCases": [
+            {
+              "Case": "powershell-empty",
+              "Passed": false,
+              "OwnedProcessesCleaned": true,
+              "HostExited": true,
+              "HookRemoved": true,
+              "Error": "Case did not meet acceptance; inspect its raw records."
+            }
+          ],
+          "OwnedCleanupFalse": 0,
+          "HostExitFalse": 0,
+          "ErrorGroups": [
+            {
+              "Error": "Case did not meet acceptance; inspect its raw records.",
+              "Count": 1
+            }
+          ]
+        },
+        {
+          "Order": 5,
+          "Role": "Reference",
+          "NativeOutcome": "Pass",
+          "Passed": 34,
+          "Total": 34,
+          "FailedCases": [],
+          "OwnedCleanupFalse": 0,
+          "HostExitFalse": 0,
+          "ErrorGroups": []
+        },
+        {
+          "Order": 6,
+          "Role": "Runtime",
+          "NativeOutcome": "Pass",
+          "Passed": 41,
+          "Total": 41,
+          "FailedCases": [],
+          "OwnedCleanupFalse": 0,
+          "HostExitFalse": 0,
+          "ErrorGroups": []
+        },
+        {
+          "Order": 7,
+          "Role": "Control",
+          "NativeOutcome": "Fail",
+          "Passed": 11,
+          "Total": 12,
+          "FailedCases": [
+            {
+              "Case": "powershell-empty",
+              "Passed": false,
+              "OwnedProcessesCleaned": true,
+              "HostExited": true,
+              "HookRemoved": true,
+              "Error": "Case did not meet acceptance; inspect its raw records."
+            }
+          ],
+          "OwnedCleanupFalse": 0,
+          "HostExitFalse": 0,
+          "ErrorGroups": [
+            {
+              "Error": "Case did not meet acceptance; inspect its raw records.",
+              "Count": 1
+            }
+          ]
+        },
+        {
+          "Order": 8,
+          "Role": "Reference",
+          "NativeOutcome": "Pass",
+          "Passed": 34,
+          "Total": 34,
+          "FailedCases": [],
+          "OwnedCleanupFalse": 0,
+          "HostExitFalse": 0,
+          "ErrorGroups": []
+        },
+        {
+          "Order": 9,
+          "Role": "Runtime",
+          "NativeOutcome": "Pass",
+          "Passed": 41,
+          "Total": 41,
+          "FailedCases": [],
+          "OwnedCleanupFalse": 0,
+          "HostExitFalse": 0,
+          "ErrorGroups": []
+        }
+      ],
+      "RegressionPassed": 30,
+      "SoakDurationMilliseconds": 7204586,
+      "SoakOutput": "Soak cycles: 1421\r\nSession contract SOAK passed.",
+      "ManualKeyboardQualification": "Pending",
+      "OptInSustainedWorkloadQualification": "Pending",
+      "H4Accepted": false
+    }
+  ],
+  "H4Accepted": false,
+  "SemanticReviews": {
+    "RuntimeCases": 123,
+    "RetainedSessions": 126,
+    "KeyboardOperations": 111,
+    "CanceledReads": 60,
+    "ExactNextReads": 75,
+    "RuntimeCohorts": [
+      {
+        "Kind": "H4NativeReview",
+        "Status": "Pass",
+        "Cases": 41,
+        "Sessions": 42,
+        "ReusedAgentPids": 1,
+        "CanceledReadObservations": 20,
+        "ExactNextReads": 25,
+        "KeyboardOperations": 37,
+        "H4Accepted": false
+      },
+      {
+        "Kind": "H4NativeReview",
+        "Status": "Pass",
+        "Cases": 41,
+        "Sessions": 42,
+        "ReusedAgentPids": 1,
+        "CanceledReadObservations": 20,
+        "ExactNextReads": 25,
+        "KeyboardOperations": 37,
+        "H4Accepted": false
+      },
+      {
+        "Kind": "H4NativeReview",
+        "Status": "Pass",
+        "Cases": 41,
+        "Sessions": 42,
+        "ReusedAgentPids": 1,
+        "CanceledReadObservations": 20,
+        "ExactNextReads": 25,
+        "KeyboardOperations": 37,
+        "H4Accepted": false
+      }
+    ],
+    "ReferenceCases": 102,
+    "OriginalControlsRetainedAsFail": true
+  },
+  "OriginalControlObservations": [
+    {
+      "Order": 1,
+      "NativeStatus": "Fail",
+      "FailedCase": "powershell-empty",
+      "Shell": {
+        "ShellIdentity": "5.1.14409.1005|0|ConsoleHost",
+        "FreshPrompt": true,
+        "CanceledCommandAbsent": true,
+        "NextCommand": true,
+        "ShellAlive": true,
+        "KeyboardRestored": true,
+        "FixtureControlCount": 0
+      },
+      "ObservedControlCount": 0,
+      "DiagnosticViolations": [
+        "root status",
+        "root controls",
+        "case inventory",
+        "powershell-empty",
+        "shell prompt and file barriers"
+      ]
+    },
+    {
+      "Order": 4,
+      "NativeStatus": "Fail",
+      "FailedCase": "powershell-empty",
+      "Shell": {
+        "ShellIdentity": "5.1.14409.1005|0|ConsoleHost",
+        "FreshPrompt": true,
+        "CanceledCommandAbsent": true,
+        "NextCommand": true,
+        "ShellAlive": true,
+        "KeyboardRestored": true,
+        "FixtureControlCount": 0
+      },
+      "ObservedControlCount": 0,
+      "DiagnosticViolations": [
+        "root status",
+        "root controls",
+        "case inventory",
+        "powershell-empty",
+        "shell prompt and file barriers"
+      ]
+    },
+    {
+      "Order": 7,
+      "NativeStatus": "Fail",
+      "FailedCase": "powershell-empty",
+      "Shell": {
+        "ShellIdentity": "5.1.14409.1005|0|ConsoleHost",
+        "FreshPrompt": true,
+        "CanceledCommandAbsent": true,
+        "NextCommand": true,
+        "ShellAlive": true,
+        "KeyboardRestored": true,
+        "FixtureControlCount": 0
+      },
+      "ObservedControlCount": 0,
+      "DiagnosticViolations": [
+        "root status",
+        "root controls",
+        "case inventory",
+        "powershell-empty",
+        "shell prompt and file barriers"
+      ]
+    }
+  ],
+  "FreshRegression": {
+    "Path": "regression/windows7-esu-20261116-175138.json",
+    "Sha256": "6c0e35294ea0b10e862f3ee1f9152c71aa5f7e96b2d13e5d7c8e41a85a13d41b",
+    "StartedAt": "2026-11-16T16:51:38.7303911Z",
+    "CompletedAt": "2026-11-16T18:52:26.7838287Z",
+    "Status": "Pass"
+  },
+  "CurrentAcceptedAutomatedMatrix": {
+    "Collections": [
+      {
+        "Machine": "NESSY",
+        "RunId": "nonesu-h4-20261115-234626-c252b6cb",
+        "Tier": "NonESU",
+        "RuntimeCases": 123,
+        "RetainedSessions": 126,
+        "KeyboardOperations": 111,
+        "CanceledReads": 60,
+        "ExactNextReads": 75,
+        "ReferenceCases": 102,
+        "RegressionCases": 30,
+        "BaselineSoakMinutes": 120,
+        "ManualKeyboardQualification": "Pending",
+        "OptInSustainedWorkloadQualification": "Pending"
+      },
+      {
+        "Machine": "TURTLE",
+        "RunId": "esu-h4-20261116-164503-2c7a04eb",
+        "Tier": "ESU",
+        "RuntimeCases": 123,
+        "RetainedSessions": 126,
+        "KeyboardOperations": 111,
+        "CanceledReads": 60,
+        "ExactNextReads": 75,
+        "ReferenceCases": 102,
+        "RegressionCases": 30,
+        "BaselineSoakMinutes": 120,
+        "ManualKeyboardQualification": "Pending",
+        "OptInSustainedWorkloadQualification": "Pending"
+      },
+      {
+        "Machine": "LEOPARD",
+        "RunId": "legacy-h4-20261115-234613-4dac46d7",
+        "Tier": "Legacy",
+        "RuntimeCases": 99,
+        "RetainedSessions": 102,
+        "KeyboardOperations": 93,
+        "CanceledReads": 54,
+        "ExactNextReads": 69,
+        "ReferenceCases": 78,
+        "RegressionCases": 30,
+        "BaselineSoakMinutes": 120,
+        "ManualKeyboardQualification": "Pending",
+        "OptInSustainedWorkloadQualification": "Pending"
+      }
+    ],
+    "RuntimeCases": 345,
+    "ReferenceCases": 282,
+    "RetainedSessions": 354,
+    "KeyboardOperations": 315,
+    "CanceledReads": 174,
+    "ExactNextReads": 219,
+    "RegressionCases": 90,
+    "BaselineSoakMinutes": 360,
+    "H4Accepted": false
+  }
+}

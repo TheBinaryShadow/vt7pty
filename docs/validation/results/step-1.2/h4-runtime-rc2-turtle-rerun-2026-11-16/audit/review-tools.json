@@ -1,0 +1,25 @@
+{
+  "Kind": "H4Rc2TurtleRerunReviewTools",
+  "ReviewCommit": "26a7818bcec493aef64414ff9a62f55148e011de",
+  "BundleReviewer": "tools/research/Test-H4RuntimeEvidence.ps1",
+  "PackageRoot": "artifacts/fidelity/h4-exact-rc2",
+  "OriginalControlDiagnosticMode": "Records every violated strict predicate and retains Passed=false; no original evidence edited.",
+  "Tools": [
+    {
+      "Path": "tools/research/Test-H4RuntimeEvidence.ps1",
+      "Sha256": "3c09da34b9a46e58ae83349b901d81f356326f66a71c3036d6d9c902b385b249"
+    },
+    {
+      "Path": "tools/research/Test-HostCancellationEvidence.ps1",
+      "Sha256": "a4c102762adb5fa85ee95258fd0661807b9f20e7a33921876e83147f891a399f"
+    },
+    {
+      "Path": "tools/research/Test-HostGuardEvidence.ps1",
+      "Sha256": "19e25aa045b9535e3cf774f510a95f85d24c4a91e69c986ddf332b17806380da"
+    },
+    {
+      "Path": "tools/research/H4Cases.ps1",
+      "Sha256": "7c73a1432374e27453d463c025f367e7f3677aab3977aeec224c67d7b6af32f9"
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 Updated: 2026-11-16.
 
 I've completed Milestone 0 and published 0.5.0. I'm now improving console
-behavior in Milestone 1. **Next: qualify the opt-in H4 runtime on Windows 7.** The [H3 Windows 7 review](docs/validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
+behavior in Milestone 1. **Next: finish H4 production qualification.** The [H3 Windows 7 review](docs/validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
 accepts all 282 guard cases on NESSY, TURTLE and LEOPARD. H3 is complete within
 the controlled research boundary; production qualification and VT7 integration remain open.
 
@@ -100,11 +100,11 @@ public-API experiments failed. I'm now following the
   private-desktop prototype; ordinary-desktop and production lifetime work belong to H4.
 - [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
   The [H4 candidate](docs/H4_RUNTIME.md) uses approved opt-in backing-desktop
-  isolation and API 1.1 two-phase close. The [Windows 7 rc2 review](docs/validation/2026-11-16-step-1.2-h4-runtime-rc2-windows7.md)
-  verifies NESSY's 123/123 and LEOPARD's 99/99 runtime cases. TURTLE needs a repeat
-  after a confirmed desktop change interrupted its third runtime cohort.
-  All three baseline regression suites and 120-minute soaks pass. The TURTLE
-  repeat, keyboard, sustained opt-in and remaining production gates stay open.
+  isolation and API 1.1 two-phase close. The [completed rc2 matrix](docs/validation/2026-11-16-step-1.2-h4-runtime-rc2-turtle-rerun.md)
+  verifies 345/345 runtime cases across NESSY, TURTLE and LEOPARD, with all three
+  baseline regression suites and 120-minute soaks passing. Physical keyboard,
+  sustained opt-in, session/resource/access, timeout/rundown and harness
+  hardening gates remain open.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.
 - [ ] Add focused regressions and verify US/Croatian keyboard behavior where
