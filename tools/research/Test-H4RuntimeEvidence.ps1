@@ -168,6 +168,34 @@ function Review-H4Native([string]$Root,[bool]$PowerShell7) {
         $expectedBytes[17]=$expectedBytes[17] -bor 128;$expectedBytes[162]=$expectedBytes[162] -bor 128
         Assert-H4 (([BitConverter]::ToString($expectedBytes).Replace('-','').ToLowerInvariant()) -ceq $k.during) 'exact temporary Ctrl table'
     }
+    if($null -ne $probe.PSObject.Properties['QualificationRevision'] -and $probe.QualificationRevision -ge 1) {
+        $preflight=Read-H4 (Join-Path $Root 'preflight.json')
+        Assert-H4 ($preflight.Eligible -and $preflight.SourceCommit -ceq $probe.SourceCommit) 'native desktop preflight'
+        foreach($name in @('helper-missing','helper-wrong')){
+            $startup=Read-H4 (Join-Path $Root ($name+'\startup.json'))
+            foreach($stage in @('startup-before.json','startup-after.json')){
+                $state=Read-H4 (Join-Path $Root ($name+'\'+$stage))
+                Assert-H4 ($state.Eligible -and $state.SourceCommit -ceq $probe.SourceCommit) 'module-control desktop precondition'
+            }
+            $expectedFailure=if($name -eq 'helper-missing'){'Load colocated VT7Pty-Host.dll'}else{'Host callback export'}
+            Assert-H4 ($startup.ActorPid -gt 0 -and $startup.ExpectedAgentFailure -ceq $expectedFailure) 'specific module control identity'
+            $created=@()
+            for($i=0;$i -lt $trace.Count;$i++){
+                if($trace[$i].pid -eq $startup.ActorPid -and $trace[$i].message -match '^Created agent successfully, pid=(\d+)$'){
+                    $created+=@(@{Index=$i;Agent=[int]$Matches[1]})
+                }
+            }
+            Assert-H4 ($created.Count -eq 2) 'failed and flagless control agents'
+            $cause=@()
+            for($i=$created[0].Index+1;$i -lt $created[1].Index;$i++){
+                if($trace[$i].pid -eq $created[0].Agent -and
+                    $trace[$i].message.StartsWith('Agent failure: '+$expectedFailure+': Windows error ')){
+                    $cause+=@($trace[$i])
+                }
+            }
+            Assert-H4 ($cause.Count -eq 1) 'actual missing/wrong module failure cause'
+        }
+    }
     $minimum=if($PowerShell7){36}else{30}
     Assert-H4 ($keys.Count -ge $minimum) 'all required cancellation trace records'
     return [ordered]@{Kind='H4NativeReview';Status='Pass';Cases=$cases.Count;Sessions=$sessions;ReusedAgentPids=@($agents.Values | Where-Object {$_ -gt 1}).Count;CanceledReadObservations=$cancellations;ExactNextReads=$nextReads;KeyboardOperations=$keys.Count;H4Accepted=$false}
@@ -175,7 +203,10 @@ function Review-H4Native([string]$Root,[bool]$PowerShell7) {
 $Directory=[IO.Path]::GetFullPath($Directory).TrimEnd('\')
 if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')) {
     $root=Read-H4 (Join-Path $Directory 'probe.json')
-    $result=Review-H4Native $Directory ($root.Total -eq 41)
+    if($root.Kind -eq 'H4RuntimeProbe'){$result=Review-H4Native $Directory ($root.Total -eq 41)}
+    else {$result=& (Join-Path $PSScriptRoot 'Test-H4QualificationEvidence.ps1') -Directory $Directory -ExpectedSource $root.SourceCommit}
+} elseif((Read-H4 (Join-Path $Directory 'report.json')).Kind -eq 'VT7PtyH4ManualResults') {
+    $result=& (Join-Path $PSScriptRoot 'Test-H4ManualEvidence.ps1') -Directory $Directory -PackageRoot $PackageRoot
 } else {
     Assert-H4 ([bool]$PackageRoot) 'PackageRoot required for a combined run'
     $PackageRoot=[IO.Path]::GetFullPath($PackageRoot).TrimEnd('\')
@@ -228,7 +259,20 @@ if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')) {
         $trials+=@([ordered]@{Order=$trial.Order;Role=$role;Review=$review})
     }
     Assert-H4 ((@($report.Trials.Order) -join ',') -ceq '1,2,3,4,5,6,7,8,9') 'nine distinct ordered trials'
-    $result=[ordered]@{Kind='H4BundleReview';Trials=$trials;VerifiedEvidenceFiles=$hashes;Regression=$report.Regression;H4Accepted=$false}
+    $qualification=$null;$soak=$null
+    if($null -ne $manifest.PSObject.Properties['Qualification']){
+        Assert-H4 ($report.SchemaVersion -eq 2 -and -not $report.DesktopPreconditionFailed -and
+            $report.Qualification.Status -eq 'Pass' -and $report.Qualification.ExitCode -eq 0 -and
+            $report.OptInSoak.Status -eq 'Pass' -and $report.OptInSoak.ExitCode -eq 0 -and
+            $report.OptInSoak.Minutes -eq 120) 'new qualification and full opt-in soak phases'
+        foreach($trial in $report.Trials){
+            $state=Read-H4 (Join-Path (Join-Path $Directory $trial.Directory) 'desktop-preflight.json')
+            Assert-H4 ($state.Eligible -and $state.SourceCommit -ceq $manifest.Runtime.SourceCommit) 'per-trial native desktop preflight'
+        }
+        $qualification=& (Join-Path $PSScriptRoot 'Test-H4QualificationEvidence.ps1') -Directory (Join-Path $Directory $report.Qualification.Directory) -ExpectedSource $manifest.Runtime.SourceCommit
+        $soak=& (Join-Path $PSScriptRoot 'Test-H4QualificationEvidence.ps1') -Directory (Join-Path $Directory $report.OptInSoak.Directory) -ExpectedSource $manifest.Runtime.SourceCommit
+    }
+    $result=[ordered]@{Kind='H4BundleReview';Trials=$trials;VerifiedEvidenceFiles=$hashes;Regression=$report.Regression;Qualification=$qualification;OptInSoak=$soak;H4Accepted=$false}
 }
 if($OutputPath) {
     $path=[IO.Path]::GetFullPath($OutputPath)

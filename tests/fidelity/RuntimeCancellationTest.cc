@@ -4,6 +4,9 @@
 #define VT7PTY_H3_DIAGNOSTIC
 #define VT7PTY_H3_GUARDS
 #include "../../src/shared/HostCancellationProtocol.h"
+#include "../../src/shared/DesktopState.h"
+#include "../../src/shared/GenRandom.h"
+#include <psapi.h>
 #include "GenVersion.h"
 #include "HostCancellationResearch.h"
 #include <atomic>
@@ -15,6 +18,9 @@ using namespace cancelresearch;
 namespace
 {
 std::wstring outRoot, applicationDesktop;
+bool rootEvidenceCreated = false;
+std::string desktopJson();
+bool desktopPreflight(const std::wstring &path);
 unsigned int nextSession = 0;
 std::string boolean(bool v)
 {
@@ -183,7 +189,11 @@ IdentityPacket waitRead(Session &s, uint32_t events)
     check(s.until(
               [&] {
                   p = s.observe();
-                  return p.readReturned && p.controlCount >= events;
+                  bool handlerExited = events==0;
+                  for(uint32_t i=0;i<p.trace.eventCount;++i)
+                      handlerExited = handlerExited || (p.trace.events[i].kind==h3trace::HandlerExit &&
+                          p.trace.events[i].detail==events);
+                  return p.readReturned && p.controlCount >= events && handlerExited;
               },
               3000),
           "read/event deadline");
@@ -307,9 +317,11 @@ void agentDeath(Context &c)
     check(childExit && hostExit, "agent death must close its attached clients and host");
 }
 #include "H4RuntimeCases.h"
+#include "H4QualificationCases.h"
 void runtimeOracle()
 {
     using namespace vt7pty::internal::cancel;
+    manualEncodingOracle();
     unsigned int count = 0;
     const auto test = [&](bool ok) {
         check(ok, "runtime protocol oracle");
@@ -393,7 +405,13 @@ void runtimeOracle()
     bad = keys;
     bad.during['Q'] = 1;
     test(!restoredKeyboard(bad));
-    printf("Runtime cancellation oracle: %u checks passed\n", count);
+    h3trace::Timeline timeline;
+    for(unsigned int i=0;i<100;++i) timeline.append(h3trace::ReadEntry,i);
+    h3trace::Observation observation;
+    h3trace::observe(timeline,observation);
+    test(observation.eventCount==64 && observation.oldestSequence==37 && observation.nextSequence==101);
+    test(observation.events[0].sequence==37 && observation.events[63].sequence==100 && observation.overflow==0);
+    printf("Runtime cancellation oracle: %u checks passed, plus four keyboard-bridge checks\n", count);
 }
 struct Case
 {
@@ -406,7 +424,9 @@ int run(const std::wstring &out, const std::string &filter = "")
     runtimeOracle();
     outRoot = out;
     check(CreateDirectoryW(outRoot.c_str(), nullptr), "new runtime result directory");
+    rootEvidenceCreated = true;
     applicationDesktop = nameOf(GetThreadDesktop(GetCurrentThreadId()));
+    check(desktopPreflight(outRoot + L"\\preflight.json"), "ordinary desktop precondition");
     wchar_t layout[KL_NAMELENGTH] = {};
     check(GetKeyboardLayoutNameW(layout) != FALSE, "caller keyboard layout");
     check(SetEnvironmentVariableW(L"VT7PTY_DEBUG", L"trace"), "enable runtime evidence trace");
@@ -514,21 +534,43 @@ int run(const std::wstring &out, const std::string &filter = "")
     writeFile(outRoot + L"\\cases.json",
               "{\"Kind\":\"H4RuntimeCases\",\"SchemaVersion\":1,\"Cases\":" + rows + "}");
     writeFile(outRoot + L"\\probe.json",
-              "{\"Kind\":\"H4RuntimeProbe\",\"SchemaVersion\":1,\"Status\":" +
+              "{\"Kind\":\"H4RuntimeProbe\",\"SchemaVersion\":1,\"QualificationRevision\":1,\"Status\":" +
                   json(passed == cases.size() ? "Pass" : "Fail") + ",\"Passed\":" +
                   std::to_string(passed) + ",\"Total\":" + std::to_string(cases.size()) +
                   ",\"PackageVersion\":" + json(GenVersion_Version) +
                   ",\"SourceCommit\":" + json(GenVersion_Commit) +
                   ",\"ApplicationDesktop\":" + json(utf8(applicationDesktop)) +
                   ",\"CallerKeyboardLayout\":" + json(utf8(layout)) +
-                  ",\"OracleChecks\":25,\"RuntimeIntegrated\":true,\"H4Accepted\":false}");
+                  ",\"OracleChecks\":27,\"RuntimeIntegrated\":true,\"H4Accepted\":false}");
     return passed == cases.size() ? 0 : 1;
+}
+void recordNativeFailure(const std::string &message) noexcept
+{
+    if(!rootEvidenceCreated)return;
+    try {
+        const auto path=outRoot+L"\\failure.json";
+        if(GetFileAttributesW(path.c_str())!=INVALID_FILE_ATTRIBUTES)return;
+        writeFile(path,"{\"Kind\":\"H4NativeFailure\",\"Status\":\"Fail\",\"SourceCommit\":"+
+            json(GenVersion_Commit)+",\"Error\":"+json(message)+",\"H4Accepted\":false}");
+    }catch(...){}
 }
 } // namespace
 int wmain(int argc, wchar_t **argv)
 {
     try
     {
+        if (argc == 3 && std::wstring(argv[1]) == L"--preflight")
+            return desktopPreflight(argv[2]) ? 0 : 2;
+        if (argc == 3 && std::wstring(argv[1]) == L"--qualify")
+            return runQualification(argv[2]);
+        if (argc == 4 && std::wstring(argv[1]) == L"--soak")
+            return runOptInSoak(argv[3], static_cast<unsigned int>(_wtoi(argv[2])));
+        if (argc == 4 && std::wstring(argv[1]) == L"--keyboard")
+            return runKeyboard(argv[3], argv[2]);
+        if (argc == 3 && std::wstring(argv[1]) == L"--session-check")
+            return runSessionCheck(argv[2]);
+        if (argc == 3 && std::wstring(argv[1]) == L"--access-check")
+            return runAccessCheck(argv[2]);
         if (argc == 2 && std::wstring(argv[1]) == L"--self-test")
         {
             runtimeOracle();
@@ -553,8 +595,15 @@ int wmain(int argc, wchar_t **argv)
         check(argc == 3 && std::wstring(argv[1]) == L"--run", "usage: --run DIRECTORY");
         return run(argv[2]);
     }
+    catch (const Exception &e)
+    {
+        recordNativeFailure(utf8(e.what()));
+        fprintf(stderr, "Runtime cancellation: %s\n", utf8(e.what()).c_str());
+        return 1;
+    }
     catch (const std::exception &e)
     {
+        recordNativeFailure(e.what());
         fprintf(stderr, "Runtime cancellation: %s\n", e.what());
         return 1;
     }

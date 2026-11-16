@@ -92,7 +92,7 @@ struct IdentityPacket {
 #endif
     uint32_t magic=0x33494856,
 #if defined(VT7PTY_H4_RUNTIME)
-        schema=6,
+        schema=7,
 #elif defined(VT7PTY_H3_GUARDS)
         schema=5,
 #elif defined(VT7PTY_H3_COORDINATED)
@@ -272,7 +272,9 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
     // Preserve reader storage until completion, or exit this owned fixture.
     try {
         const ULONGLONG deadline=GetTickCount64()+
-#if defined(VT7PTY_H3_GUARDS)
+#if defined(VT7PTY_H4_RUNTIME)
+            8ull*60*60*1000;
+#elif defined(VT7PTY_H3_GUARDS)
             720000;
 #elif defined(VT7PTY_H3_FREEZE)
             480000;
@@ -540,7 +542,7 @@ public:
         IdentityPacket p; transfer(pipe_.value,&p,sizeof(p),false);
         check(p.magic==0x33494856 && p.schema==
 #if defined(VT7PTY_H4_RUNTIME)
-            6
+            7
 #elif defined(VT7PTY_H3_GUARDS)
             5
 #elif defined(VT7PTY_H3_COORDINATED)
@@ -558,7 +560,13 @@ public:
 #ifndef VT7PTY_H4_RUNTIME
             p.windowThread!=0 &&
 #endif
-            p.consoleCount>0 && p.consoleCount<=16 && p.readReturned<=1 && p.readSucceeded<=1 && p.textCount<=127 && p.keyCount<=16 && p.controlCount<=128,("identity packet: schema="+std::to_string(p.schema)+" pid="+std::to_string(p.processId)+" expected="+std::to_string(GetProcessId(child.value))+" parent="+std::to_string(p.parentId)+" agent="+std::to_string(GetProcessId(agent.value))+" hwnd="+std::to_string(p.window)+" windowThread="+std::to_string(p.windowThread)+" members="+std::to_string(p.consoleCount)).c_str());
+            p.consoleCount>0 && p.consoleCount<=16 && p.readReturned<=1 && p.readSucceeded<=1 && p.textCount<=127 && p.keyCount<=16 && p.controlCount<=
+#ifdef VT7PTY_H4_RUNTIME
+            100000
+#else
+            128
+#endif
+            ,("identity packet: schema="+std::to_string(p.schema)+" pid="+std::to_string(p.processId)+" expected="+std::to_string(GetProcessId(child.value))+" parent="+std::to_string(p.parentId)+" agent="+std::to_string(GetProcessId(agent.value))+" hwnd="+std::to_string(p.window)+" windowThread="+std::to_string(p.windowThread)+" members="+std::to_string(p.consoleCount)).c_str());
         const auto contains=[&](DWORD id) { return std::find(p.consoleProcesses,p.consoleProcesses+p.consoleCount,id)!=p.consoleProcesses+p.consoleCount; };
         check(contains(p.processId) && contains(p.parentId) && (p.consoleCount==2 || (p.consoleCount==3 && p.shellId && contains(p.shellId))
 #ifdef VT7PTY_H3_GUARDS

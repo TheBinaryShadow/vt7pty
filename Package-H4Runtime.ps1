@@ -53,6 +53,7 @@ foreach($pair in @(@($referenceRoot,$reference),@($regressionRoot,$regression)))
 $bin=Join-Path $stage 'runtime\bin'
 [IO.Directory]::CreateDirectory($bin) | Out-Null
 foreach($name in @('VT7Pty.dll','VT7Pty-Agent.exe','VT7Pty-Host.dll','VT7Pty-DebugServer.exe','RuntimeCancellationTest.exe',
+    'H4TestGate.dll','H4TestGate.pdb',
     'VT7Pty.pdb','VT7Pty-Agent.pdb','VT7Pty-Host.pdb','VT7Pty-DebugServer.pdb','RuntimeCancellationTest.pdb')) {
     $record=@($verification.Artifacts | Where-Object {$_.Name -ceq $name})
     $built=Join-Path $root ('artifacts\bin\x64\Release\'+$name)
@@ -69,6 +70,10 @@ $plan=[ordered]@{
     'README.md'='docs\H4_RUNTIME.md'
     'tools\research\Invoke-H4Runtime.ps1'='tools\research\Invoke-H4Runtime.ps1'
     'tools\research\H4Cases.ps1'='tools\research\H4Cases.ps1'
+    'tools\research\Invoke-H4Manual.ps1'='tools\research\Invoke-H4Manual.ps1'
+    'RUN-H4-MANUAL.cmd'='RUN-H4-MANUAL.cmd'
+    'RUN-H4-ACCESS.cmd'='RUN-H4-ACCESS.cmd'
+    'MANUAL-CHECKS.md'='docs\H4_MANUAL_CHECKS.md'
     'tools\platform\Windows7Compat.ps1'='tools\platform\Windows7Compat.ps1'
     'RUN-H4-NONESU.cmd'='RUN-H4-NONESU.cmd'
     'RUN-H4-ESU.cmd'='RUN-H4-ESU.cmd'
@@ -102,7 +107,10 @@ $manifest=[ordered]@{
         VerificationSha256=(Get-FileHash -LiteralPath $verifyPath -Algorithm SHA256).Hash.ToLowerInvariant()}
     Reference=[ordered]@{ArchiveSha256=$referenceHash;ManifestSha256=$referenceManifestHash;GuardSourceCommit=$reference.Experiment.SourceCommit;ControlSourceCommit=$reference.Control.SourceCommit;Unchanged=$true}
     Regression=[ordered]@{ArchiveSha256=(Get-FileHash -LiteralPath $RegressionArchive -Algorithm SHA256).Hash.ToLowerInvariant();ManifestSha256=(Get-FileHash -LiteralPath (Join-Path $regressionRoot 'manifest.json') -Algorithm SHA256).Hash.ToLowerInvariant();SourceCommit=$source;SoakMinutes=120;UsesOptInHostCancellation=$false}
-    RemainingQualification=@('Windows7Results','USAndCroatianKeyboardWorkflows','SustainedOptInWorkloads','BroaderApplicationAndJobPolicy')
+    Qualification=[ordered]@{Revision=1;Cases=7;ExternalTestGate='H4TestGate.dll';ProductFaultSwitches=$false}
+    OptInSoak=[ordered]@{Minutes=120;TraceByteLimit=268435456;LongLivedActiveAndNeighbor=$true}
+    Manual=[ordered]@{Required=@('US','HR','LockUnlock','ElevatedCaller');Launcher='RUN-H4-MANUAL.cmd';SyntheticPhysicalInput=$false}
+    RemainingQualification=@('Windows7Rc3Results','USAndCroatianKeyboardWorkflows','LockUnlock','ElevatedCaller','BroaderApplicationAndDescendantPolicy')
     Files=$files
 }
 [IO.File]::WriteAllText((Join-Path $stage 'manifest.json'),($manifest | ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))

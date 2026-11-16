@@ -31,6 +31,11 @@ inline std::string observationJson(const Observation &o) {
         ",\"SelectionFlags\":"+std::to_string(o.selectionFlags)+",\"SelectionError\":"+std::to_string(o.selectionError)+
         ",\"CustomHandlerRegistered\":"+std::to_string(o.customHandlerRegistered)+",\"IgnoreAttributeObserved\":"+std::to_string(o.ignoreAttributeObserved)+
         ",\"Overflow\":"+std::to_string(o.overflow)+",\"Events\":[";
+#ifdef VT7PTY_H4_RUNTIME
+    const auto eventPosition=s.rfind(",\"Events\":[");
+    s.insert(eventPosition,",\"Windowed\":true,\"OldestSequence\":"+std::to_string(o.oldestSequence)+
+        ",\"NextSequence\":"+std::to_string(o.nextSequence));
+#endif
     for(uint32_t i=0;i<o.eventCount && i<timelineCapacity;++i) {
         if(i) s+=','; const auto &e=o.events[i];
         s+="{\"Sequence\":"+std::to_string(e.sequence)+",\"Kind\":"+std::to_string(e.kind)+",\"Qpc\":"+u64(e.qpc)+",\"Tick\":"+u64(e.tick)+

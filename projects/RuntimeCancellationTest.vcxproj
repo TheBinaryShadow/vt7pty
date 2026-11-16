@@ -29,8 +29,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\tests\fidelity\RuntimeCancellationTest.cc" />
+    <ClCompile Include="..\src\shared\Exception.cc" />
+    <ClCompile Include="..\src\shared\GenRandom.cc" />
+    <ClCompile Include="..\src\shared\OwnedHandle.cc" />
+    <ClCompile Include="..\src\shared\WindowsSecurity.cc" />
+    <ClCompile Include="..\src\shared\DebugClient.cc" />
+    <ClCompile Include="..\src\shared\Assert.cc" />
+    <ClCompile Include="..\src\shared\StringUtil.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="H4TestGate.vcxproj">
+      <Project>{843AC3BD-5341-4F8C-BE51-739A69237041}</Project>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
     <ProjectReference Include="VT7Pty.vcxproj">
       <Project>{FCD1D231-A00E-4A06-AE98-A495F9BF25D1}</Project>
     </ProjectReference>

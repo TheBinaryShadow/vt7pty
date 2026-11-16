@@ -40,6 +40,7 @@ The released 0.5.0 runtime still has the recorded cancellation defect.
 | Guide | Purpose |
 | --- | --- |
 | [H4 runtime qualification](H4_RUNTIME.md) | Opt-in runtime contract, three-machine runner and remaining gates |
+| [H4 manual checks](H4_MANUAL_CHECKS.md) | Physical US/Croatian input, lock/unlock and elevated-caller refusal |
 | [Fidelity plan](FIDELITY.md) | Required applications, measurements and remaining coverage |
 | [Fidelity test bundle](FIDELITY_BASELINE.md) | Run and interpret the shell and fixture tests |
 | [Cancellation investigation](INPUT_CANCELLATION.md) | Failed approaches and what they established |

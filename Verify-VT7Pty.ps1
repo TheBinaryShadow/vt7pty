@@ -309,6 +309,7 @@ $expectedImports = [ordered]@{
     'VT7Pty.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
     'RuntimeCancellationTest.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll', 'VT7Pty.dll')
     'VT7Pty-Host.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
+    'H4TestGate.dll' = @('ADVAPI32.dll', 'KERNEL32.dll', 'USER32.dll')
     'VT7Pty-Agent.exe' = @('ADVAPI32.dll', 'KERNEL32.dll', 'SHELL32.dll', 'USER32.dll')
     'VT7Pty-DebugServer.exe' = @('ADVAPI32.dll', 'KERNEL32.dll')
     'BackendSmokeTest.exe' = @('KERNEL32.dll', 'VT7Pty.dll')
@@ -391,6 +392,7 @@ foreach ($configurationName in $configurations) {
         'VT7Pty-Agent.exe', 'VT7Pty-Agent.pdb',
         'VT7Pty-Host.dll', 'VT7Pty-Host.pdb',
         'RuntimeCancellationTest.exe', 'RuntimeCancellationTest.pdb',
+        'H4TestGate.dll', 'H4TestGate.pdb',
         'VT7Pty-DebugServer.exe', 'VT7Pty-DebugServer.pdb',
         'ModernCppTest.exe', 'ModernCppTest.pdb',
         'BackendSmokeTest.exe', 'BackendSmokeTest.pdb',
@@ -505,7 +507,7 @@ foreach ($configurationName in $configurations) {
         Assert-NativeTestPassed -Result $test
     }
     $runtimeOracle = @($tests | Where-Object { $_.Name -eq 'RuntimeCancellationTest.exe' })
-    if ($runtimeOracle.Count -ne 1 -or $runtimeOracle[0].StandardOutput -ne 'Runtime cancellation oracle: 25 checks passed') { throw 'Runtime cancellation oracle did not complete.' }
+    if ($runtimeOracle.Count -ne 1 -or $runtimeOracle[0].StandardOutput -ne 'Runtime cancellation oracle: 27 checks passed, plus four keyboard-bridge checks') { throw 'Runtime cancellation oracle did not complete.' }
     $cancellationOracle = @($tests | Where-Object { $_.Name -eq 'HostCancellationProbe.exe' })
     if ($cancellationOracle.Count -ne 1 -or $cancellationOracle[0].StandardOutput -ne 'Host cancellation oracle: 33 checks passed') { throw 'Host cancellation oracle did not complete.' }
     $traceOracle = @($tests | Where-Object { $_.Name -eq 'HostCancellationTraceProbe.exe' })

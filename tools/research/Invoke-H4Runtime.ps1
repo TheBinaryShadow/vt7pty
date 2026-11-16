@@ -2,7 +2,8 @@
 param(
     [Parameter(Mandatory=$true)][ValidateSet('DevelopmentHost','NonESU','ESU','Legacy')][string]$Tier,
     [string]$PackageRoot='',
-    [string]$PowerShell7Path='C:\Program Files\PowerShell\7\pwsh.exe'
+    [string]$PowerShell7Path='C:\Program Files\PowerShell\7\pwsh.exe',
+    [ValidateRange(1,120)][int]$OptInSoakMinutes=120
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version 2.0
@@ -11,6 +12,7 @@ if(-not $PackageRoot){$PackageRoot=Join-Path $taskScript '..\..'}
 $PackageRoot=[IO.Path]::GetFullPath($PackageRoot).TrimEnd('\')
 . (Join-Path $PackageRoot 'tools\platform\Windows7Compat.ps1')
 . (Join-Path $PackageRoot 'tools\research\H4Cases.ps1')
+if($Tier -ne 'DevelopmentHost' -and $OptInSoakMinutes -ne 120){throw 'Windows 7 acceptance requires the full 120-minute opt-in soak.'}
 $taskManifest=Read-VT7Json (Join-Path $PackageRoot 'manifest.json')
 if($taskManifest.Kind -ne 'VT7PtyH4RuntimeCandidate' -or $taskManifest.SchemaVersion -ne 1 -or
     -not $taskManifest.Runtime.SourceTreeClean -or $taskManifest.Runtime.ApiVersion -ne '1.1' -or
@@ -54,16 +56,20 @@ if($taskPs7.Required) {
 } else {$taskPs7.Reason='NotApplicable on LEOPARD; installed Windows PowerShell 2.0 remains required.'}
 $taskTrials=@()
 $taskRegression=@{Status='NotRun';ExitCode=$null;Directory='regression';SoakMinutes=120;Reason=''}
+$taskQualification=@{Status='NotRun';ExitCode=$null;Directory='qualification';Reason=''}
+$taskOptInSoak=@{Status='NotRun';ExitCode=$null;Directory='opt-in-soak';Minutes=$OptInSoakMinutes;Reason=''}
+$taskDesktopBlocked=$false
 function Save-H4Report {
     Write-VT7Json (Join-Path $taskOutput 'report.json') @{
-        SchemaVersion=1;Kind='VT7PtyH4RuntimeResults';RunId=$taskRunId;Tier=$Tier;ComputerName=$env:COMPUTERNAME
+        SchemaVersion=2;Kind='VT7PtyH4RuntimeResults';RunId=$taskRunId;Tier=$Tier;ComputerName=$env:COMPUTERNAME
         RecordedUtc=[DateTime]::UtcNow.ToString('o');OS=@{Caption=$taskOs.Caption;Version=$taskOs.Version;ServicePackMajorVersion=$taskOs.ServicePackMajorVersion;ProductType=$taskOs.ProductType}
         Machine=@{Manufacturer=$taskComputer.Manufacturer;Model=$taskComputer.Model};Updates=$taskUpdates;SystemShells=$taskShells
         PowerShellVersion=$PSVersionTable.PSVersion.ToString();CLRVersion=$PSVersionTable.CLRVersion.ToString();PowerShell7=$taskPs7
         ManifestSha256=(Get-VT7Sha256 (Join-Path $PackageRoot 'manifest.json'));Runtime=$taskManifest.Runtime;Reference=$taskManifest.Reference
         PreflightErrors=$taskPreflight;Trials=$taskTrials;ExpectedTrials=9;ExpectedRuntimeCases=@(Get-H4CaseNames $taskPs7.Required).Count
-        Regression=$taskRegression;ControlFailuresRetained=$true;H4Accepted=$false;MilestoneAccepted=$false
-        ManualKeyboardQualification='Pending';OptInSustainedWorkloadQualification='Pending'
+        Regression=$taskRegression;Qualification=$taskQualification;OptInSoak=$taskOptInSoak
+        DesktopPreconditionFailed=$taskDesktopBlocked;ControlFailuresRetained=$true;H4Accepted=$false;MilestoneAccepted=$false
+        ManualKeyboardQualification='Pending';ManualSessionQualification='Pending';OptInSustainedWorkloadQualification='PendingIndependentReview'
     }
 }
 # CLR 2-compatible readers drain both pipes while the controller is running.
@@ -117,7 +123,14 @@ function Invoke-H4Process([string]$Executable,[string]$Arguments,[string]$Workin
         if(-not $taskProcess.Start()){throw 'Cannot start the created test controller.'}
         $taskOut=New-Object VT7PtyH4Capture -ArgumentList $taskProcess.StandardOutput
         $taskErr=New-Object VT7PtyH4Capture -ArgumentList $taskProcess.StandardError
-        $taskTimedOut=-not $taskProcess.WaitForExit($TimeoutMs)
+        $taskLastProgress=0
+        while(-not $taskProcess.WaitForExit(1000) -and $taskClock.ElapsedMilliseconds -lt $TimeoutMs){
+            if($taskClock.ElapsedMilliseconds-$taskLastProgress -ge 60000){
+                Write-Host ('H4 controller active: '+[int]($taskClock.ElapsedMilliseconds/60000)+' minutes')
+                $taskLastProgress=$taskClock.ElapsedMilliseconds
+            }
+        }
+        $taskTimedOut=-not $taskProcess.HasExited
         if($taskTimedOut) {
             # Only this created controller. Session-bound monitors retire its
             # owned consoles; the runner never opens or terminates a conhost.
@@ -141,9 +154,16 @@ foreach($taskOrder in 1..9) {
     [IO.Directory]::CreateDirectory($taskTrial) | Out-Null
     $taskNative=Join-Path $taskTrial 'native'
     $taskRecord=@{Order=$taskOrder;Group=$taskGroup;Role=$taskRole;Directory=$taskName;Outcome='NotRun';NativeOutcome='NotRun';CollectionStatus='NotRun';Error='';TimedOut=$false;ExitCode=$null;DurationMilliseconds=0;StandardOutput='';StandardError=''}
-    if(-not $taskPreflight.Count) {
+    if(-not $taskPreflight.Count -and -not $taskDesktopBlocked) {
         try {
             Write-Host ('Trial '+$taskOrder+'/9: '+$taskRole)
+            $taskCheckPath=Join-Path $taskTrial 'desktop-preflight.json'
+            $taskCheck=Invoke-H4Process (Join-Path $PackageRoot 'runtime\bin\RuntimeCancellationTest.exe') ('--preflight "'+$taskCheckPath+'"') (Join-Path $PackageRoot 'runtime\bin') 10000 @{}
+            $taskDesktop=Read-VT7Json $taskCheckPath
+            if($taskCheck.ExitCode -ne 0 -or -not $taskDesktop.Eligible){
+                $taskDesktopBlocked=$true
+                throw ('Desktop precondition failed: caller='+$taskDesktop.CallerDesktop+'; input='+$taskDesktop.InputDesktop+'; error='+$taskDesktop.InputDesktopError+'. Keep this run and repeat from the normal unlocked desktop.')
+            }
             $taskEnv=@{'VT7PTY_H3_ORDER'=[string]($taskGroup-1);'VT7PTY_H3_GUARD_TIER'=$(if($Tier -eq 'DevelopmentHost'){'Development'}else{$Tier});'VT7PTY_H3_NEIGHBOR_SOAK_MS'='0'}
             if($taskPs7.Required){$taskEnv['VT7PTY_H3_PWSH']=$PowerShell7Path;$taskEnv['VT7PTY_H4_LEGACY']=''}
             else {$taskEnv['VT7PTY_H4_LEGACY']='1'}
@@ -169,7 +189,10 @@ foreach($taskOrder in 1..9) {
             if(($taskRecord.Outcome -eq 'Pass') -ne ($taskRecord.ExitCode -eq 0)){throw 'Native status and exit status disagree.'}
             $taskRecord.CollectionStatus='Completed'
         } catch {$taskRecord.Outcome='Fail';$taskRecord.CollectionStatus='Partial';$taskRecord.Error=$_.Exception.Message}
-    } else {$taskRecord.Error=$taskPreflight -join ' '}
+    } else {
+        if($taskDesktopBlocked){$taskRecord.CollectionStatus='Skipped';$taskRecord.Error='An earlier desktop precondition failed.'}
+        else {$taskRecord.Error=$taskPreflight -join ' '}
+    }
     [IO.File]::WriteAllText((Join-Path $taskTrial 'stdout.txt'),$taskRecord.StandardOutput,$script:vt7Utf8)
     [IO.File]::WriteAllText((Join-Path $taskTrial 'stderr.txt'),$taskRecord.StandardError,$script:vt7Utf8)
     $taskFiles=@([IO.Directory]::GetFiles($taskTrial,'*',[IO.SearchOption]::AllDirectories) | Sort-Object | ForEach-Object {
@@ -179,9 +202,33 @@ foreach($taskOrder in 1..9) {
     $taskTrials+=@($taskRecord);Save-H4Report
     Write-Host ($taskRole+': '+$taskRecord.Outcome+'; collection '+$taskRecord.CollectionStatus)
 }
+function Invoke-H4QualificationPhase($Record,[string]$Arguments,[int]$Timeout) {
+    try {
+        $taskPhasePath=Join-Path $taskOutput $Record.Directory
+        $taskRun=Invoke-H4Process (Join-Path $PackageRoot 'runtime\bin\RuntimeCancellationTest.exe') ($Arguments+' "'+$taskPhasePath+'"') (Join-Path $PackageRoot 'runtime\bin') $Timeout @{}
+        $Record.ExitCode=$taskRun.ExitCode
+        $Record.Status=if($taskRun.ExitCode -eq 0 -and -not $taskRun.TimedOut){'Pass'}else{'Fail'}
+        $Record.Reason=$taskRun.StandardError
+        [IO.File]::WriteAllText((Join-Path $taskOutput ($Record.Directory+'-stdout.txt')),$taskRun.StandardOutput,$script:vt7Utf8)
+        [IO.File]::WriteAllText((Join-Path $taskOutput ($Record.Directory+'-stderr.txt')),$taskRun.StandardError,$script:vt7Utf8)
+        if($Record.Status -eq 'Pass'){
+            $taskProbe=Read-VT7Json (Join-Path $taskPhasePath 'probe.json')
+            if($taskProbe.Status -ne 'Pass' -or $taskProbe.SourceCommit -ne $taskManifest.Runtime.SourceCommit){throw 'Wrong qualification phase identity/outcome.'}
+        }
+    }catch{$Record.Status='Fail';$Record.Reason=$_.Exception.Message}
+    Save-H4Report
+}
+if(-not $taskPreflight.Count -and -not $taskDesktopBlocked){
+    Write-Host 'Starting H4 timeout/rundown and concurrent resource qualification.'
+    Invoke-H4QualificationPhase $taskQualification '--qualify' 300000
+    if($taskQualification.Status -eq 'Pass'){
+        Write-Host ('Starting the real opt-in workload soak: '+$OptInSoakMinutes+' minutes.')
+        Invoke-H4QualificationPhase $taskOptInSoak ('--soak '+$OptInSoakMinutes) (($OptInSoakMinutes*60000)+180000)
+    }else{$taskOptInSoak.Reason='Qualification failed; the opt-in soak was not started.'}
+}
 if($Tier -eq 'DevelopmentHost') {
     $taskRegression.Status='NotApplicable';$taskRegression.Reason='Windows 7 acceptance runs on the three target tiers. Exact source Debug/Release verification is recorded in the package.'
-} elseif(-not $taskPreflight.Count) {
+} elseif(-not $taskPreflight.Count -and -not $taskDesktopBlocked) {
     try {
         Write-Host 'Starting the full regression suite and 120-minute baseline soak.'
         $taskScript=Join-Path $PackageRoot 'regression\tools\platform\Invoke-Windows7Acceptance.ps1'
@@ -197,7 +244,8 @@ if($Tier -eq 'DevelopmentHost') {
 }
 Save-H4Report
 $taskFailures=@($taskTrials | Where-Object {$_.CollectionStatus -ne 'Completed' -or ($_.Role -ne 'Control' -and $_.Outcome -ne 'Pass')}).Count
-$taskSummary='H4 collection: '+@($taskTrials | Where-Object {$_.CollectionStatus -eq 'Completed'}).Count+'/9 trials completed. Runtime/reference failures or incomplete trials: '+$taskFailures+'. Regression: '+$taskRegression.Status+'. Original control failures remain failures. H4 acceptance is pending independent review, keyboard and sustained opt-in workload qualification.'
+$taskPhaseFailures=@(@($taskQualification,$taskOptInSoak) | Where-Object {$_.Status -ne 'Pass'}).Count
+$taskSummary='H4 collection: '+@($taskTrials | Where-Object {$_.CollectionStatus -eq 'Completed'}).Count+'/9 trials completed. Runtime/reference failures or incomplete trials: '+$taskFailures+'. Qualification: '+$taskQualification.Status+'. Opt-in soak: '+$taskOptInSoak.Status+'. Regression: '+$taskRegression.Status+'. Original control failures remain failures. H4 acceptance is pending independent review, keyboard and sustained opt-in workload qualification.'
 [IO.File]::WriteAllText((Join-Path $taskOutput 'summary.txt'),$taskSummary+[Environment]::NewLine,$script:vt7Utf8)
 $taskAllFiles=@([IO.Directory]::GetFiles($taskOutput,'*',[IO.SearchOption]::AllDirectories) | Sort-Object | ForEach-Object {
     @{Path=$_.Substring($taskOutput.Length+1).Replace('\','/');Bytes=(Get-Item -LiteralPath $_).Length;Sha256=(Get-VT7Sha256 $_)}
@@ -206,5 +254,5 @@ Write-VT7Json (Join-Path $taskOutput 'evidence-files.json') @{SchemaVersion=1;Fi
 
 Write-Host $taskSummary
 Write-Host ('Results: '+$taskOutput)
-if($taskFailures -or $taskPreflight.Count -or $taskRegression.Status -eq 'Fail'){exit 1}
+if($taskFailures -or $taskPhaseFailures -or $taskDesktopBlocked -or $taskPreflight.Count -or $taskRegression.Status -eq 'Fail'){exit 1}
 exit 0

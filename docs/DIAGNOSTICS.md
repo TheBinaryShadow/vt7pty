@@ -23,10 +23,11 @@ VT7Pty session.
 
 The native server accepts `--output PATH` and writes complete JSON lines up to
 an 8 MiB default limit. `--max-bytes` can select a limit from zero through
-64 MiB. Once the limit is reached, collection continues to standard output
+256 MiB. Once the limit is reached, collection continues to standard output
 but the file does not grow. The pipe is local-only and grants access to the
-current owner, LocalSystem, and administrators. The former broad-access mode
-has been removed.
+current user, LocalSystem, and administrators. The former broad-access mode
+has been removed. I can read complete flushed log records while collection is
+active; the output file excludes other writers.
 
 ## Collection on a physical machine
 

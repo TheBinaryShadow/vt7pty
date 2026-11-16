@@ -22,6 +22,7 @@
 #include <windows.h>
 
 #include <cstdio>
+#include <share.h>
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
@@ -40,7 +41,7 @@ namespace {
 
 constexpr wchar_t kPipeName[] = L"\\\\.\\pipe\\VT7Pty-Debug-v1";
 constexpr unsigned long long kDefaultMaximumFileBytes = 8ULL * 1024 * 1024;
-constexpr unsigned long long kMaximumFileBytes = 64ULL * 1024 * 1024;
+constexpr unsigned long long kMaximumFileBytes = 256ULL * 1024 * 1024;
 
 struct Options {
     std::wstring outputPath;
@@ -142,8 +143,12 @@ int wmain(int argc, wchar_t *argv[]) {
         }
 
         FILE *output = nullptr;
-        if (!options.outputPath.empty() &&
-                _wfopen_s(&output, options.outputPath.c_str(), L"wb") != 0) {
+        if (!options.outputPath.empty()) {
+            // Live diagnostic readers may inspect complete flushed records.
+            // Other writers remain excluded.
+            output = _wfsopen(options.outputPath.c_str(), L"wb", _SH_DENYWR);
+        }
+        if (!options.outputPath.empty() && output == nullptr) {
             std::fwprintf(stderr, L"error: cannot open output file: %ls\n",
                 options.outputPath.c_str());
             return 1;

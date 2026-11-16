@@ -47,19 +47,34 @@ struct TimelineEvent {
 };
 struct Slot { TimelineEvent event; volatile LONG published=0; };
 struct Timeline {
+#ifdef VT7PTY_H4_RUNTIME
+    SRWLOCK lock=SRWLOCK_INIT;
+#endif
     volatile LONG reserved=0;
     Slot slots[timelineCapacity]={};
     void append(TimelineKind kind,uint32_t index=0,uint32_t value=0,uint32_t detail=0,uint32_t error=0) noexcept {
+#ifdef VT7PTY_H4_RUNTIME
+        AcquireSRWLockExclusive(&lock);
+        const LONG n=reserved++;
+        auto &s=slots[static_cast<unsigned long>(n)%timelineCapacity]; auto &e=s.event;
+#else
         const LONG n=InterlockedIncrement(&reserved)-1;
         if(n<0 || n>=static_cast<LONG>(timelineCapacity)) return;
         auto &s=slots[n]; auto &e=s.event;
+#endif
         e.qpc=qpc(); e.tick=GetTickCount64(); e.kind=kind; e.thread=GetCurrentThreadId();
         e.index=index; e.value=value; e.detail=detail; e.error=error; e.sequence=static_cast<uint32_t>(n+1);
-        InterlockedExchange(&s.published,n+1); // Publish immutable storage after all fields.
+        InterlockedExchange(&s.published,n+1); // Publish after all fields.
+#ifdef VT7PTY_H4_RUNTIME
+        ReleaseSRWLockExclusive(&lock);
+#endif
     }
 };
 struct Observation {
     uint64_t qpc=0,tick=0,frequency=0,beginQpc=0;
+#ifdef VT7PTY_H4_RUNTIME
+    uint32_t oldestSequence=0,nextSequence=0;
+#endif
     uint32_t eventCount=0,overflow=0,inputRecords=0,inputError=0,selectionFlags=0,selectionError=0;
     uint32_t readEntered=0,customHandlerRegistered=0,ignoreAttributeObserved=0,keyScanCount=0;
     uint32_t keyScanCodes[16]={};
@@ -69,12 +84,22 @@ inline Timeline fixtureTimeline;
 inline volatile LONG fixtureReadIndex=0;
 inline void observe(Timeline &timeline,Observation &o) noexcept {
     if(!o.beginQpc) o.beginQpc=qpc(); o.tick=GetTickCount64(); o.frequency=frequency();
+#ifdef VT7PTY_H4_RUNTIME
+    AcquireSRWLockShared(&timeline.lock);
+    const LONG reserved=timeline.reserved;
+    const LONG first=reserved>static_cast<LONG>(timelineCapacity) ? reserved-static_cast<LONG>(timelineCapacity) : 0;
+    o.oldestSequence=static_cast<uint32_t>(first+1); o.nextSequence=static_cast<uint32_t>(reserved+1);
+    for(LONG i=first;i<reserved;++i)
+        o.events[o.eventCount++]=timeline.slots[static_cast<unsigned long>(i)%timelineCapacity].event;
+    ReleaseSRWLockShared(&timeline.lock);
+#else
     const LONG reserved=InterlockedCompareExchange(&timeline.reserved,0,0);
     o.overflow=reserved>static_cast<LONG>(timelineCapacity) ? 1u : 0u;
     for(LONG i=0;i<reserved && i<static_cast<LONG>(timelineCapacity);++i) {
         if(InterlockedCompareExchange(&timeline.slots[i].published,0,0)==i+1)
             o.events[o.eventCount++]=timeline.slots[i].event;
     }
+#endif
     o.qpc=qpc();
 }
 }

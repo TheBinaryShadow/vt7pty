@@ -12,3 +12,8 @@ function Get-H4CaseNames([bool]$PowerShell7) {
     }
     return $names
 }
+
+function Get-H4QualificationNames {
+    return @('inactive-desktop','concurrent-resources','job-explicit-breakaway-allowed','job-silent-breakaway',
+        'timeout-before-dispatch','timeout-during-callback','agent-death-during-callback')
+}

@@ -436,7 +436,7 @@ struct Child
     {
         IdentityPacket p;
         transfer(pipe.value, &p, sizeof(p), false);
-        check(p.magic == 0x33494856 && p.schema == 6 && p.processId == pid &&
+        check(p.magic == 0x33494856 && p.schema == IdentityPacket{}.schema && p.processId == pid &&
                   p.parentId == GetProcessId(s.descendant.value) && p.textCount <= 127 &&
                   p.keyCount <= 16 && p.trace.eventCount <= 64 && p.guardInputCount <= 32 &&
                   (p.query.raw & ~ULONG_PTR{3}) == GetProcessId(s.host.value) &&
@@ -558,7 +558,7 @@ int lifetimeActor(const std::wstring &pipeName, DWORD server)
     s.quit();
     return 37;
 }
-void callerDeath(Context &context, bool both, bool jobControl = false)
+void callerDeath(Context &context, bool both, bool jobControl = false, DWORD jobFlags = 0)
 {
     const auto name = L"\\\\.\\pipe\\VT7Pty-H4-actor-" + std::to_wstring(GetCurrentProcessId()) +
                       L"-" + std::to_wstring(h3trace::qpc());
@@ -577,7 +577,7 @@ void callerDeath(Context &context, bool both, bool jobControl = false)
         job.reset(CreateJobObjectW(nullptr, nullptr));
         check(job.value != nullptr, "enclosing job");
         JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits = {};
-        limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+        limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE | jobFlags;
         check(SetInformationJobObject(job.value, JobObjectExtendedLimitInformation, &limits,
                                       sizeof(limits)),
               "enclosing job lifetime");
@@ -587,11 +587,18 @@ void callerDeath(Context &context, bool both, bool jobControl = false)
                          &startup, &pi),
           "owned lifetime actor");
     Handle actor(pi.hProcess), actorThread(pi.hThread), agent, child, host;
-    bool cleaned = true;
+    bool cleaned = true,actorInJob=false,agentInJob=false,fixtureInJob=false;
+    DWORD observedJobFlags=0;
     try
     {
-        if (jobControl)
+        if (jobControl) {
+            JOBOBJECT_EXTENDED_LIMIT_INFORMATION observed={};
+            check(QueryInformationJobObject(job.value,JobObjectExtendedLimitInformation,&observed,sizeof(observed),nullptr),
+                "observed enclosing job limits");
+            observedJobFlags=observed.BasicLimitInformation.LimitFlags;
+            check(observedJobFlags==(JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE|jobFlags),"job limits unchanged");
             check(AssignProcessToJobObject(job.value, actor.value), "actor enters enclosing job");
+        }
         check(ResumeThread(actorThread.value) != static_cast<DWORD>(-1), "start lifetime actor");
         connect(channel.value);
         ULONG peer = 0;
@@ -626,8 +633,12 @@ void callerDeath(Context &context, bool both, bool jobControl = false)
             for (HANDLE process : {actor.value, agent.value, child.value})
             {
                 BOOL inJob = FALSE;
-                check(IsProcessInJob(process, job.value, &inJob) && inJob,
-                      "runtime preserves enclosing job");
+                const bool expected=process==actor.value || !(jobFlags&JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK);
+                check(IsProcessInJob(process, job.value, &inJob) && (inJob!=FALSE)==expected,
+                      "runtime preserves native enclosing-job policy");
+                if(process==actor.value)actorInJob=inJob!=FALSE;
+                else if(process==agent.value)agentInJob=inJob!=FALSE;
+                else fixtureInJob=inJob!=FALSE;
             }
             char q = 'Q';
             transfer(channel.value, &q, 1, true);
@@ -654,8 +665,20 @@ void callerDeath(Context &context, bool both, bool jobControl = false)
         writeFile(context.out + L"\\caller.json",
                   "{\"Agent\":" + std::to_string(packet.agent) + ",\"Child\":" +
                       std::to_string(packet.child) + ",\"Host\":" + std::to_string(packet.host) +
+                      ",\"Actor\":" + std::to_string(GetProcessId(actor.value)) +
+                      ",\"ActorCreated\":" + h3trace::u64(creation(actor.value)) +
+                      ",\"AgentCreated\":" + h3trace::u64(packet.agentCreated) +
+                      ",\"ChildCreated\":" + h3trace::u64(packet.childCreated) +
+                      ",\"HostCreated\":" + h3trace::u64(packet.hostCreated) +
+                      ",\"BackingDesktop\":" + json(utf8(desktop.name)) +
                       ",\"SimultaneousAgentDeath\":" + boolean(both) +
                       ",\"EnclosingJobPreserved\":" + boolean(jobControl) +
+                      ",\"JobLimitFlags\":" + std::to_string(jobFlags) +
+                      ",\"ObservedJobLimitFlags\":" + std::to_string(observedJobFlags) +
+                      ",\"ActorInJob\":" + boolean(actorInJob) +
+                      ",\"AgentInJob\":" + boolean(agentInJob) +
+                      ",\"FixtureInJob\":" + boolean(fixtureInJob) +
+                      ",\"ExplicitBreakawayRequested\":false" +
                       ",\"AllOwnedProcessesExited\":true,\"HostExitedWithoutTermination\":true}");
     }
     catch (...)
@@ -694,6 +717,8 @@ void impersonationDenied(Context &context)
 
 int startupCheck(const std::wstring &out)
 {
+    check(desktopPreflight(out + L"\\startup-before.json"), "module control desktop before");
+    const bool wrong = GetFileAttributesW((directory() + L"\\VT7Pty-Host.dll").c_str()) != INVALID_FILE_ATTRIBUTES;
     auto *config = vt7pty_config_new(VT7PTY_FLAG_HOST_CANCELLATION, nullptr);
     vt7pty_config_set_agent_timeout(config, 5000);
     vt7pty_error_ptr_t error = nullptr;
@@ -705,6 +730,7 @@ int startupCheck(const std::wstring &out)
     if (failed)
         vt7pty_free(failed);
     check(!failed && code != 0, "missing or wrong helper fails startup");
+    check(desktopPreflight(out + L"\\startup-after.json"), "module control desktop after");
     config = vt7pty_config_new(0, nullptr);
     auto *plain = vt7pty_open(config, nullptr);
     vt7pty_config_free(config);
@@ -725,13 +751,20 @@ int startupCheck(const std::wstring &out)
           "flagless shutdown");
     writeFile(
         out + L"\\startup.json",
-        "{\"OptInDenied\":true,\"ErrorCode\":" + std::to_string(code) +
+        "{\"ActorPid\":" + std::to_string(GetCurrentProcessId()) +
+            ",\"ExpectedAgentFailure\":" + json(wrong ? "Host callback export" : "Load colocated VT7Pty-Host.dll") +
+            ",\"OptInDenied\":true,\"ErrorCode\":" + std::to_string(code) +
             ",\"Message\":" + json(message) +
             ",\"FlaglessOpenPassed\":true,\"OwnedAgentExited\":true,\"ObservedHostExited\":true}");
     return 0;
 }
 void helperFailure(Context &context, bool wrong)
 {
+    auto &positive = context.start();
+    startRead(positive, "helper-control");
+    positive.input("\x03");
+    check(canceled(waitRead(positive, 1), 1), "matched helper positive control");
+    nextRead(positive, context.out, 1);
     const auto bin = context.out + L"\\isolated";
     check(CreateDirectoryW(bin.c_str(), nullptr), "isolated missing-helper directory");
     for (const wchar_t *name : {L"RuntimeCancellationTest.exe", L"VT7Pty.dll", L"VT7Pty-Agent.exe"})
@@ -775,7 +808,7 @@ struct Collector
 {
     Handle process, thread, discard, error, job;
     bool stopped = false;
-    explicit Collector(const std::wstring &out)
+    explicit Collector(const std::wstring &out, DWORD maximumBytes = 16777216)
     {
         job.reset(CreateJobObjectW(nullptr, nullptr));
         check(job.value != nullptr, "collector containment job");
@@ -793,7 +826,7 @@ struct Collector
               "collector output handles");
         const auto exe = directory() + L"\\VT7Pty-DebugServer.exe";
         const auto command = quote(exe) + L" --output " + quote(out + L"\\runtime-trace.jsonl") +
-                             L" --max-bytes 16777216";
+                             L" --max-bytes " + std::to_wstring(maximumBytes);
         std::vector<wchar_t> line(command.begin(), command.end());
         line.push_back(0);
         STARTUPINFOW startup = {};
