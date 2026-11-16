@@ -92,7 +92,7 @@ writing keyboard state or adding product fault switches. A pause ends on release
 controller exit or a five-second bound. I verify the real timeout decision,
 all 256 restored keyboard bytes, no retry, retired RPCs and natural host exit.
 The live timeout monitor starts at a recorded log byte offset before the current
-request, so it cannot borrow an earlier agent PID\x27s timeout. An agent can remain
+request. It ignores timeouts from earlier uses of an agent PID. An agent can remain
 alive until a paused callback unwinds; that observation is
 retained without requiring premature process exit.
 
