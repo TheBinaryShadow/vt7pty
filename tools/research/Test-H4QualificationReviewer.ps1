@@ -26,6 +26,7 @@ $controls=@(
     @{Name='job-membership';Root=$qualification;File='job-silent-breakaway\caller.json';Expected='native enclosing-job policy';Edit={param($v)$v.AgentInJob=$true}},
     @{Name='early-c-dispatch';Root=$qualification;File='timeout-before-dispatch\fault.json';Expected='expired early request';Edit={param($v)$v.CMessageCount=1}},
     @{Name='late-timeout-decision';Root=$qualification;File='timeout-during-callback\fault.json';Expected='production unknown';Edit={param($v)$v.UnavailableObservedTick=$v.ReleasedTick+1}},
+    @{Name='borrowed-old-timeout';Root=$qualification;File='timeout-during-callback\fault.json';Expected='production unknown';Edit={param($v)$v.TraceStartOffset=2147483647}},
     @{Name='keyboard-corruption';Root=$qualification;File='timeout-during-callback\fault.json';Expected='all keyboard bytes restored';Edit={param($v)$v.After=('ff'+$v.After.Substring(2))}},
     @{Name='agent-not-dead';Root=$qualification;File='agent-death-during-callback\fault.json';Expected='agent death while callback active';Edit={param($v)$v.AgentExitedBeforeRelease=$false}},
     @{Name='short-duration';Root=$soak;File='probe.json';Expected='full requested opt-in duration';Edit={param($v)$v.ElapsedMilliseconds=1}},

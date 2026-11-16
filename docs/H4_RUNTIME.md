@@ -43,7 +43,7 @@ The [contract record](H4_RUNTIME_PROPOSAL.md) preserves the approved design.
 
 ## Run on the three Windows 7 machines
 
-Extract the complete rc3 ZIP to a fresh local directory. Close other VT7Pty debug
+Extract the complete rc4 ZIP to a fresh local directory. Close other VT7Pty debug
 collectors. Keep the ordinary desktop active for the entire automated run:
 disable automatic locking or screensaver activation for this run if needed.
 I check desktop eligibility before every trial and soak cycle. An interrupted
@@ -91,7 +91,9 @@ console host. It pauses before dispatch or during the real C callback, without
 writing keyboard state or adding product fault switches. A pause ends on release,
 controller exit or a five-second bound. I verify the real timeout decision,
 all 256 restored keyboard bytes, no retry, retired RPCs and natural host exit.
-An agent can remain alive until a paused callback unwinds; that observation is
+The live timeout monitor starts at a recorded log byte offset before the current
+request, so it cannot borrow an earlier agent PID\x27s timeout. An agent can remain
+alive until a paused callback unwinds; that observation is
 retained without requiring premature process exit.
 
 The opt-in soak records cold-start, post-warmup and final resources. The unchanged
@@ -127,6 +129,6 @@ identities, desktop placement, failure causes, keyboard bytes, fault timing,
 resources and continuous trace coverage, and verify complete file inventories.
 Historical rc2 collections remain reviewable.
 
-Windows 7 rc3 results and manual evidence are pending. Passing this candidate
+Windows 7 rc4 results and manual evidence are pending. Passing this candidate
 does not complete the broader application corpus, freeze the Milestone 2 API
 or authorize VT7 changes.

@@ -261,6 +261,8 @@ void callbackFailure(Context &context,unsigned int mode)
 {
     auto &s=context.start();startRead(s,"timeout-line");
     TestGate gate(s,context.desktop,mode);
+    const auto tracePath=std::filesystem::path(outRoot+L"\\runtime-trace.jsonl");
+    const auto traceStart=static_cast<std::streamoff>(std::filesystem::file_size(tracePath));
     s.input("\x03");
     check(WaitForSingleObject(gate.entered.value,3000)==WAIT_OBJECT_0,"actual production callback gate entered");
     const auto begin=GetTickCount64();
@@ -271,7 +273,8 @@ void callbackFailure(Context &context,unsigned int mode)
         const auto deadline=GetTickCount64()+2500;
         const auto pidToken="\"pid\":"+std::to_string(GetProcessId(s.agent.value))+",";
         do {
-            std::ifstream trace(std::filesystem::path(outRoot+L"\\runtime-trace.jsonl"));
+            std::ifstream trace(tracePath,std::ios::binary);
+            trace.seekg(traceStart);
             std::string line;
             while(std::getline(trace,line)) if(line.find(pidToken)!=std::string::npos &&
                 line.find("host-cancel unavailable sequence=2 outcome=unknown retry=disabled")!=std::string::npos)
@@ -301,6 +304,7 @@ void callbackFailure(Context &context,unsigned int mode)
     writeFile(context.out+L"\\fault.json","{\"Mode\":"+std::to_string(mode)+",\"ActualHost\":"+std::to_string(g.actualHost)+
         ",\"ActualThread\":"+std::to_string(g.actualThread)+",\"ExpectedHost\":"+std::to_string(g.host)+
         ",\"ExpectedThread\":"+std::to_string(g.thread)+",\"AgentExitedBeforeRelease\":"+boolean(agentExited)+
+        ",\"TraceStartOffset\":"+h3trace::u64(static_cast<uint64_t>(traceStart))+
         ",\"UnavailableBeforeRelease\":"+boolean(unavailable)+",\"UnavailableObservedTick\":"+h3trace::u64(unavailableTick)+
         ",\"EnteredTick\":"+h3trace::u64(g.enteredTick)+",\"ReleasedTick\":"+h3trace::u64(g.releasedTick)+
         ",\"GateInitialized\":"+std::to_string(g.initialized)+",\"GateEntered\":"+std::to_string(g.entered)+

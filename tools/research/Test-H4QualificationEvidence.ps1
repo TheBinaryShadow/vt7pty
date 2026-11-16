@@ -42,8 +42,10 @@ function Keyboard-Q([string]$Before,[string]$During,[string]$After){
 }
 function Trace-Q {
     Require-Q (([IO.File]::ReadAllText((Join-Path $Directory 'collector-errors.txt'))).Length -eq 0) 'collector errors'
-    $ready=@{};$active=@{};$keys=@{};$unknown=@{}
+    $ready=@{};$active=@{};$keys=@{};$unknown=@{};$traceOffset=0
     foreach($line in [IO.File]::ReadLines((Join-Path $Directory 'runtime-trace.jsonl'))){
+        $lineOffset=$traceOffset
+        $traceOffset+=[Text.Encoding]::UTF8.GetByteCount($line)+1
         $r=$line | ConvertFrom-Json
         Require-Q ($r.commit -ceq $ExpectedSource -and $r.api -ceq '1.1' -and $r.protocol -eq 2) 'trace source/API/protocol'
         if($r.message -match '^host-cancel ready host=(\d+) thread=(\d+) desktop=(VT7Pty-Console-[0-9a-f]{32})$'){
@@ -65,7 +67,7 @@ function Trace-Q {
             $keys[$key][$which]=$hex
         }elseif($r.message -match '^host-cancel unavailable sequence=(\d+) outcome=unknown retry=disabled$'){
             $context=$active[[string]$r.pid];Require-Q ($null -ne $context) 'unknown outcome retained session'
-            $unknown[$context.Desktop]=[int]$Matches[1]
+            $unknown[$context.Desktop]=@{Sequence=[int]$Matches[1];Offset=$lineOffset}
         }
     }
     $identities=@{};$retainedHosts=@{};$sessions=0
@@ -151,6 +153,8 @@ if($probe.Kind -eq 'H4QualificationProbe'){
         if($pair[1] -eq 3){Require-Q $f.AgentExitedBeforeRelease 'agent death while callback active'}
         else{
             Require-Q ($f.UnavailableBeforeRelease -and $trace.Unknown.ContainsKey($d.BackingDesktop) -and
+                [uint64]$f.TraceStartOffset -gt 0 -and
+                [uint64]$trace.Unknown[$d.BackingDesktop].Offset -ge [uint64]$f.TraceStartOffset -and
                 [uint64]$f.UnavailableObservedTick -ge [uint64]$f.EnteredTick -and
                 [uint64]$f.UnavailableObservedTick -le [uint64]$f.ReleasedTick) 'production unknown result disables dispatch before release'
         }

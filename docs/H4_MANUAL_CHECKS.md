@@ -6,7 +6,7 @@ elevated-caller run. H4 stays open until I review the underlying evidence.
 
 ## Before starting
 
-Extract the complete rc3 ZIP into a fresh local folder. Run the automated
+Extract the complete rc4 ZIP into a fresh local folder. Run the automated
 launcher for NESSY, TURTLE or LEOPARD first. Close other VT7Pty debug collectors.
 Use the ordinary Windows desktop and a classic console, with US and Croatian
 keyboard layouts available. Use the physical keyboard, without paste, macros,
