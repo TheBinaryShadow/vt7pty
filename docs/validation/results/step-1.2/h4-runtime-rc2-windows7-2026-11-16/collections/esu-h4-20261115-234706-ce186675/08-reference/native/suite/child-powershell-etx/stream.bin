@@ -1,0 +1,18 @@
+[0m[0K]0;VT7Pty dispatch research 2355003697]0;VT7Pty dispatch research 2355004212H3_PS[1]>[0K$m=Get-Module PSReadLine; $v='none'; $cfg='native'; if($m){$v=$m.Versi[0Ko[?25l
+n.ToString();$o=Get-PSReadLineOption;$cfg=$m.Path+'|'+$o.EditMode.ToString()+'|[0K'
++$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAllText('C:\Users\Binary\Desk[0Kt
+op\VT7Pty-h4-runtime-0.5.1-dev-rc2\results\esu-h4-20261115-234706-ce186675\08-r[0Ke
+ference\native\suite\child-powershell-etx\guard-shell-identity.txt',$PSVersionT[0Ka
+ble.PSVersion.ToString()+'|'+$v+'|'+$Host.Name+'|'+$cfg)[0K
+H3_PS[2]>[0K[?25h& "C:\Users\Binary\Desktop\VT7Pty-h4-runtime-0.5.1-dev-rc2\reference\e[0Kx[?25l
+periment\bin\HostCancellationGuardProbe.exe" --fixture "\\.\pipe\VT7Pty-H3-chil[0Kd
+-12504-7804706602750" 12504[0K
+[0K[?25hGUARD_CHILD_FINAL[0K[?25l
+H3_PS[3]>[0K[?25h[IO.File]::WriteAllText('C:\Users\Binary\Desktop\VT7Pty-h4-runtime-0.5[0K.[?25l
+1-dev-rc2\results\esu-h4-20261115-234706-ce186675\08-reference\native\suite\chi[0Kl
+d-powershell-etx\parent-child-exit.txt',$LASTEXITCODE.ToString()); [IO.File]::W[0Kr
+iteAllText('C:\Users\Binary\Desktop\VT7Pty-h4-runtime-0.5.1-dev-rc2\results\esu[0K-
+h4-20261115-234706-ce186675\08-reference\native\suite\child-powershell-etx\pare[0Kn
+t-continued.txt','CONTINUE')[0K
+H3_PS[4]>[0K[?25hexit 0[0K[?25l
+[0K[?25h

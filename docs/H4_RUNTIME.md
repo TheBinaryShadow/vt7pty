@@ -4,10 +4,10 @@ I am integrating the qualified H3 cancellation mechanism into the real runtime.
 This is the first opt-in H4 test candidate. H4, Milestone 1 and VT7 integration
 remain open. The published runtime is still 0.5.0.
 
-The [rc2 review](validation/2026-11-15-step-1.2-h4-runtime-rc2-candidate.md) records
-nine passing exact-package trials on WOLF after a fresh Windows sign-in. I've
-issued the unchanged archive for NESSY, TURTLE and LEOPARD. Windows 7 qualification
-remains open.
+The [Windows 7 rc2 review](validation/2026-11-16-step-1.2-h4-runtime-rc2-windows7.md)
+verifies the automated matrix on NESSY and LEOPARD. TURTLE passed two runtime
+cohorts, then refused startup after a confirmed desktop change. Its repeat is
+underway. H4 remains open.
 
 ## What changes
 
@@ -50,6 +50,12 @@ initial experiments, including the agent-death failure that led to the monitor.
 Extract the entire H4 ZIP to a new local directory. Keep its directory structure.
 Close any development VT7Pty debug collector before starting; the runtime suite
 starts its own collector and refuses to use another collector's channel.
+
+Keep the normal desktop active through all nine control/reference/runtime trials.
+The current startup guard requires the caller's desktop to match the input
+desktop. Lock and session-transition behavior needs separate qualification.
+Keep an interrupted run and repeat from the same extracted folder; the runner
+creates a new results directory.
 
 Run the launcher for the machine:
 
@@ -110,12 +116,17 @@ checks both accepted PID reuse and rejection of corrupted or mixed evidence.
 
 ## What still needs qualification
 
-I will review the Windows 7 results before accepting this path. US/Croatian
-keyboard workflows, sustained opt-in workloads, desktop resource limits under
+I still need TURTLE's replacement run and the remaining production evidence.
+US/Croatian keyboard workflows, sustained opt-in workloads, desktop resource limits under
 larger concurrent workloads, lock/session transitions and broader access/job
 policies remain open. The current runtime has no test-only fault or acknowledgment
 suppression switches. H3 retains its fault controls; forced production callback
 timeout and rundown qualification still need their own concrete experiment.
+
+The failed TURTLE cohort also exposed a harness limitation: an earlier desktop
+refusal can satisfy the missing/wrong-helper denial checks. I will make desktop
+preconditions and denial causes explicit before treating those checks as
+independent evidence in an interrupted cohort.
 
 Passing this candidate does not complete the broader fidelity corpus, freeze the
 Milestone 2 API or authorize VT7 changes.

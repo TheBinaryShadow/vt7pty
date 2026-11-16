@@ -1,0 +1,45 @@
+Diagnostic directory: C:\Users\Binary\Desktop\VT7Pty-h4-runtime-0.5.1-dev-rc2\results\nonesu-h4-20261115-234626-c252b6cb\regression\windows7-nonesu-20261116-005544-diagnostic-bundle
+Records: 3; invalid lines: 0
+VT7Pty Windows 7 acceptance: Pass
+Tier: NonESU
+Machine: NESSY (VMware, Inc. VMware20,1)
+OS: Microsoft Windows 7 Ultimate , version 6.1.7601.65536, SP1
+Package: VT7Pty 0.5.1-dev, commit b8fdcc5856aa7965384627b859344820f9d7c94d
+Manifest SHA-256: 8299fbbd2c8bc69dc994fa62f4c7d2552bed449a1dde39625b323433e0a7773b
+
+Preflight failures:
+  None
+
+Tests:
+  Pass: Modern C++ utility unit test (363 ms)
+  Pass: Client-agent protocol unit test (34 ms)
+  Pass: Diagnostic pipe security self-test (31 ms)
+  Pass: Diagnostic build identity (40 ms)
+  Pass: Structured diagnostic transport and bundle (5424 ms)
+  Pass: Inherited lifecycle session (102 ms)
+  Pass: Command Prompt and Windows PowerShell sessions (374 ms)
+  Pass: Session contract: OUTPUT (108 ms)
+  Pass: Session contract: UNICODE (92 ms)
+  Pass: Session contract: INPUT (93 ms)
+  Pass: Session contract: RESIZE (3228 ms)
+  Pass: Session contract: REPEAT (32057 ms)
+  Pass: Session contract: SHUTDOWN (2932 ms)
+  Pass: Session contract: SPAWN_FAILURE (104 ms)
+  Pass: Session contract: CONCURRENT (206 ms)
+  Pass: Session contract: SOAK 120 minutes (7204932 ms)
+  Pass: Negative control: NEGATIVE_OUTPUT (138 ms)
+  Pass: Negative control: NEGATIVE_STATUS (77 ms)
+  Pass: Negative control: NEGATIVE_ORDER (77 ms)
+  Pass: Negative control: NEGATIVE_TRUNCATION (77 ms)
+  Pass: Negative control: NEGATIVE_LEAK (31 ms)
+  Pass: Negative control: timeout (2105 ms)
+  Pass: Agent source identity (30 ms)
+  Pass: Argument quoting fixture (46 ms)
+  Pass: Bounded output fixture (58 ms)
+  Pass: Agent rejection: missing (213 ms)
+  Pass: Agent rejection: malformed (112 ms)
+  Pass: Agent rejection: wrong-identity (120 ms)
+  Pass: Agent rejection: older-protocol (353 ms)
+  Pass: Agent rejection: newer-protocol (119 ms)
+
+Machine-readable result: C:\Users\Binary\Desktop\VT7Pty-h4-runtime-0.5.1-dev-rc2\results\nonesu-h4-20261115-234626-c252b6cb\regression\windows7-nonesu-20261116-005544.json

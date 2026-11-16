@@ -1,0 +1,18 @@
+[0m[0KH3_PS[1]>[0K$m=Get-Module PSReadLine; $v='none'; $cfg='native'; if($m){$v=$m.Versi[0Ko[?25l
+n.ToString();$o=Get-PSReadLineOption;$cfg=$m.Path+'|'+$o.EditMode.ToString()+'|[0K'
++$o.HistorySaveStyle.ToString()}; [IO.File]::WriteAllText('C:\Users\Binary\Desk[0Kt
+op\VT7Pty-h4-runtime-0.5.1-dev-rc2\results\nonesu-h4-20261115-234626-c252b6cb\0[0K6
+-runtime\native\child-pwsh-native-event\shell-identity.txt',$PSVersionTable.PSV[0Ke
+rsion.ToString()+'|'+$v+'|'+$Host.Name+'|'+$cfg)[0K
+[0K[?25hH3_PS[2]>[0K& "C:\Users\Binary\Desktop\VT7Pty-h4-runtime-0.5.1-dev-rc2\runtime\bin[0K\[?25l
+RuntimeCancellationTest.exe" --fixture "\\.\pipe\VT7Pty-H4-child-204-4484712386[0K"
+ 204[0K
+[0K[?25hGUARD_CHILD_FINAL[0K[?25l
+[0K[?25hH3_PS[3]>[0K[IO.File]::WriteAllText('C:\Users\Binary\Desktop\VT7Pty-h4-runtime-0.5[0K.[?25l
+1-dev-rc2\results\nonesu-h4-20261115-234626-c252b6cb\06-runtime\native\child-pw[0Ks
+h-native-event\child-exit.txt',$LASTEXITCODE.ToString()); [IO.File]::WriteAllTe[0Kx
+t('C:\Users\Binary\Desktop\VT7Pty-h4-runtime-0.5.1-dev-rc2\results\nonesu-h4-20[0K2
+61115-234626-c252b6cb\06-runtime\native\child-pwsh-native-event\continued.txt',[0K'
+CONTINUE')[0K
+H3_PS[4]>[0K[?25hexit 0[0K[?25l
+[0K[?25h

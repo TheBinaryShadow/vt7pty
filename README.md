@@ -27,7 +27,9 @@ on all three Windows 7 machines, with 282/282 guard cases passing. Completion/cl
 races, actual access denial, native children and the applicable PowerShell 7
 checks pass within the controlled research boundary. The opt-in
 [H4 runtime candidate](docs/H4_RUNTIME.md) now integrates cancellation and two-phase
-close, with ordinary-desktop applications. Target qualification is pending.
+close, with ordinary-desktop applications. Its automated rc2 matrix passes on
+NESSY and LEOPARD; TURTLE is repeating its run after a desktop change. Production
+qualification remains open.
 VT7 integration comes after the backend and its API are ready. VT7Pty does not
 yet replace ConPTY for unmodified applications. I am not planning a kernel driver.
 

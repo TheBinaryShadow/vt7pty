@@ -1,0 +1,42 @@
+Runtime cancellation oracle: 25 checks passed
+FAIL: desktop-boundary runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: cooked-empty runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: cooked-partial runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: cooked-repeated runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: raw-input runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: input-burst runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: no-pending-read runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: completed-before-cancel runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: default-handler runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: mode-transitions runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: race-enter-biased runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: race-concurrent runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: race-cancel-biased runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: race-outcomes both completion outcomes (Win32 0)
+FAIL: close-rpc runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: close-input runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: agent-death runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: caller-death test-channel transfer (Win32 109)
+FAIL: caller-and-agent-death test-channel transfer (Win32 109)
+FAIL: enclosing-job test-channel transfer (Win32 109)
+FAIL: neighbor-isolation runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: recreate-resources runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+PASS: impersonation-denied 
+PASS: helper-missing 
+PASS: helper-wrong 
+FAIL: cmd-empty runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: cmd-partial runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: child-cmd-event runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: child-cmd-cooked runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: powershell-empty runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: powershell-partial runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: child-powershell-event runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: child-powershell-cooked runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: pwsh-native-empty runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: pwsh-native-partial runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: child-pwsh-native-event runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: child-pwsh-native-cooked runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: pwsh-readline-empty runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: pwsh-readline-partial runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: child-pwsh-readline-event runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13
+FAIL: child-pwsh-readline-cooked runtime startup: Host cancellation requires the ordinary caller desktop: Windows error 13

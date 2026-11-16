@@ -1,0 +1,46 @@
+{
+  "Kind": "H4Rc2ReviewToolIdentity",
+  "ReviewCommit": "207b9a0a53a774729a72cd651b1bb4de52b93c6e",
+  "PackageRoot": "D:\\Git\\vt7pty\\artifacts\\fidelity\\h4-exact-rc2",
+  "BundleReviews": [
+    {
+      "Directory": "nonesu-h4-20261115-234626-c252b6cb",
+      "Script": "tools/research/Test-H4RuntimeEvidence.ps1",
+      "PackageRootRequired": true
+    },
+    {
+      "Directory": "esu-h4-20261115-234706-ce186675",
+      "Script": "tools/research/Test-H4RuntimeEvidence.ps1",
+      "PackageRootRequired": true
+    },
+    {
+      "Directory": "legacy-h4-20261115-234613-4dac46d7",
+      "Script": "tools/research/Test-H4RuntimeEvidence.ps1",
+      "PackageRootRequired": true
+    }
+  ],
+  "ControlReviews": "Test-HostCancellationEvidence.ps1 for all eight passing original controls.",
+  "TurtleSeparateReviews": "Test-HostGuardEvidence.ps1 for orders 2/5/8; Test-H4RuntimeEvidence.ps1 for orders 3/6.",
+  "Tools": [
+    {
+      "Path": "tools/research/Test-H4RuntimeEvidence.ps1",
+      "Sha256": "3c09da34b9a46e58ae83349b901d81f356326f66a71c3036d6d9c902b385b249"
+    },
+    {
+      "Path": "tools/research/Test-H4EvidenceReviewer.ps1",
+      "Sha256": "6837e1202a32fd362a45eff663e724dc89611da14abd89f69b6566ea61c58693"
+    },
+    {
+      "Path": "tools/research/Test-HostCancellationEvidence.ps1",
+      "Sha256": "a4c102762adb5fa85ee95258fd0661807b9f20e7a33921876e83147f891a399f"
+    },
+    {
+      "Path": "tools/research/Test-HostGuardEvidence.ps1",
+      "Sha256": "19e25aa045b9535e3cf774f510a95f85d24c4a91e69c986ddf332b17806380da"
+    },
+    {
+      "Path": "tools/research/H4Cases.ps1",
+      "Sha256": "7c73a1432374e27453d463c025f367e7f3677aab3977aeec224c67d7b6af32f9"
+    }
+  ]
+}

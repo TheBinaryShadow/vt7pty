@@ -10,14 +10,15 @@ accepted on all three Windows 7 machines. The
 verifies 282/282 guard cases, with no prototype coverage gaps or neighbor trace
 loss. Original controls and unprotected contrasts retain their failures.
 The opt-in [H4 runtime candidate](../H4_RUNTIME.md) now implements the approved
-desktop and two-phase close contract. Its Windows 7 and remaining production
-qualification, Milestone 1 and VT7 integration remain open.
+desktop and two-phase close contract. Its automated matrix passes on NESSY and
+LEOPARD. TURTLE is repeating its run after a desktop change; remaining production
+qualification, Milestone 1 and VT7 integration stay open.
 
 ## Current fidelity work
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| H4 runtime integration | [rc2 exact-package qualification after fresh sign-in](2026-11-15-step-1.2-h4-runtime-rc2-candidate.md) | Pending; rc2 issued for all three tiers |
+| H4 runtime integration | [rc2 exact-package qualification after fresh sign-in](2026-11-15-step-1.2-h4-runtime-rc2-candidate.md) | [Reviewed: NESSY and LEOPARD pass; TURTLE repeat pending](2026-11-16-step-1.2-h4-runtime-rc2-windows7.md) |
 | H3 guard qualification | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-guards-rc1-candidate.md) | [Accepted: 282/282 guard cases; H4 remains](2026-11-14-step-1.2-host-guards-rc1-windows7.md) |
 | Coordinated H3 prototype | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-coordination-rc1-candidate.md) | [Reviewed: baseline and recording verified; H3 guards remain](2026-11-13-step-1.2-host-coordination-rc1-windows7.md) |
 | H3 scraper coordination | [rc1 candidate, controlled contrasts and retained failures](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-candidate.md) | [Reviewed: coordination supported; H3 open](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md) |

@@ -1,0 +1,45 @@
+Diagnostic directory: C:\Users\Binary\Desktop\VT7Pty-h4-runtime-0.5.1-dev-rc2\results\legacy-h4-20261115-234613-4dac46d7\regression\windows7-legacy-20261116-005240-diagnostic-bundle
+Records: 3; invalid lines: 0
+VT7Pty Windows 7 acceptance: Pass
+Tier: Legacy
+Machine: LEOPARD (VMware, Inc. VMware Virtual Platform)
+OS: Microsoft Windows 7 Ultimate , version 6.1.7601.65536, SP1
+Package: VT7Pty 0.5.1-dev, commit b8fdcc5856aa7965384627b859344820f9d7c94d
+Manifest SHA-256: 8299fbbd2c8bc69dc994fa62f4c7d2552bed449a1dde39625b323433e0a7773b
+
+Preflight failures:
+  None
+
+Tests:
+  Pass: Modern C++ utility unit test (58 ms)
+  Pass: Client-agent protocol unit test (110 ms)
+  Pass: Diagnostic pipe security self-test (24 ms)
+  Pass: Diagnostic build identity (24 ms)
+  Pass: Structured diagnostic transport and bundle (5459 ms)
+  Pass: Inherited lifecycle session (113 ms)
+  Pass: Command Prompt and Windows PowerShell sessions (530 ms)
+  Pass: Session contract: OUTPUT (124 ms)
+  Pass: Session contract: UNICODE (92 ms)
+  Pass: Session contract: INPUT (109 ms)
+  Pass: Session contract: RESIZE (3212 ms)
+  Pass: Session contract: REPEAT (34456 ms)
+  Pass: Session contract: SHUTDOWN (3188 ms)
+  Pass: Session contract: SPAWN_FAILURE (98 ms)
+  Pass: Session contract: CONCURRENT (243 ms)
+  Pass: Session contract: SOAK 120 minutes (7204316 ms)
+  Pass: Negative control: NEGATIVE_OUTPUT (82 ms)
+  Pass: Negative control: NEGATIVE_STATUS (77 ms)
+  Pass: Negative control: NEGATIVE_ORDER (78 ms)
+  Pass: Negative control: NEGATIVE_TRUNCATION (75 ms)
+  Pass: Negative control: NEGATIVE_LEAK (24 ms)
+  Pass: Negative control: timeout (2082 ms)
+  Pass: Agent source identity (23 ms)
+  Pass: Argument quoting fixture (99 ms)
+  Pass: Bounded output fixture (16 ms)
+  Pass: Agent rejection: missing (28 ms)
+  Pass: Agent rejection: malformed (45 ms)
+  Pass: Agent rejection: wrong-identity (47 ms)
+  Pass: Agent rejection: older-protocol (45 ms)
+  Pass: Agent rejection: newer-protocol (47 ms)
+
+Machine-readable result: C:\Users\Binary\Desktop\VT7Pty-h4-runtime-0.5.1-dev-rc2\results\legacy-h4-20261115-234613-4dac46d7\regression\windows7-legacy-20261116-005240.json
