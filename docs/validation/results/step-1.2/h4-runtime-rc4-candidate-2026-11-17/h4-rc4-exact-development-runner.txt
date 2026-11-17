@@ -1,0 +1,66 @@
+H4 uses an opt-in runtime. Original rc1 failures are retained separately.
+The Windows 7 regression phase includes the full 120-minute baseline soak.
+Trial 1/9: Control
+Control: Pass; collection Completed
+Trial 2/9: Reference
+H4 controller active: 1 minutes
+Reference: Pass; collection Completed
+Trial 3/9: Runtime
+Runtime: Pass; collection Completed
+Trial 4/9: Control
+Control: Pass; collection Completed
+Trial 5/9: Reference
+H4 controller active: 1 minutes
+Reference: Pass; collection Completed
+Trial 6/9: Runtime
+Runtime: Pass; collection Completed
+Trial 7/9: Control
+Control: Pass; collection Completed
+Trial 8/9: Reference
+H4 controller active: 1 minutes
+Reference: Pass; collection Completed
+Trial 9/9: Runtime
+Runtime: Pass; collection Completed
+Starting H4 timeout/rundown and concurrent resource qualification.
+Starting the real opt-in workload soak: 120 minutes.
+H4 controller active: 1 minutes
+H4 controller active: 2 minutes
+H4 controller active: 3 minutes
+H4 controller active: 4 minutes
+H4 controller active: 5 minutes
+H4 controller active: 6 minutes
+H4 controller active: 7 minutes
+H4 controller active: 8 minutes
+H4 controller active: 9 minutes
+H4 controller active: 10 minutes
+H4 controller active: 11 minutes
+H4 controller active: 12 minutes
+H4 controller active: 13 minutes
+H4 controller active: 14 minutes
+H4 controller active: 15 minutes
+H4 controller active: 16 minutes
+H4 controller active: 17 minutes
+H4 controller active: 18 minutes
+H4 controller active: 19 minutes
+H4 controller active: 20 minutes
+H4 controller active: 21 minutes
+H4 controller active: 22 minutes
+H4 controller active: 23 minutes
+H4 controller active: 24 minutes
+H4 controller active: 25 minutes
+H4 controller active: 26 minutes
+H4 controller active: 27 minutes
+H4 controller active: 28 minutes
+H4 controller active: 29 minutes
+H4 controller active: 30 minutes
+H4 controller active: 31 minutes
+H4 controller active: 32 minutes
+H4 controller active: 33 minutes
+H4 controller active: 34 minutes
+H4 controller active: 35 minutes
+H4 controller active: 36 minutes
+H4 controller active: 37 minutes
+H4 controller active: 38 minutes
+H4 controller active: 39 minutes
+H4 collection: 9/9 trials completed. Runtime/reference failures or incomplete trials: 0. Qualification: Pass. Opt-in soak: Fail. Regression: NotApplicable. Original control failures remain failures. H4 acceptance is pending independent review, keyboard and sustained opt-in workload qualification.
+Results: D:\Git\vt7pty\artifacts\fidelity\h4-exact-rc4\results\developmenthost-h4-20261116-211209-f3026d70

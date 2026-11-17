@@ -6,8 +6,12 @@ this test runtime is 0.5.1-dev, public API 1.1 and client-agent protocol 2.
 The DLL and agent must be a matched pair.
 
 The [completed rc2 review](validation/2026-11-16-step-1.2-h4-runtime-rc2-turtle-rerun.md)
-records 345/345 runtime cases across NESSY, TURTLE and LEOPARD. The next candidate
+records 345/345 runtime cases across NESSY, TURTLE and LEOPARD. The rc4 candidate
 adds the remaining qualification experiments. I preserve rc2 and its results.
+
+The [rc4 local review](validation/2026-11-17-step-1.2-h4-runtime-rc4-candidate.md)
+records 123/123 runtime cases, all seven qualification cases and the full
+120-minute opt-in soak. Windows 7 rc4 results and manual checks remain pending.
 
 ## Runtime contract
 

@@ -34,7 +34,9 @@ verifies 282/282 cases, including races, actual access denial, native children
 and the applicable PowerShell 7 matrix. The opt-in H4 runtime candidate now
 implements the approved desktop and close contract. The
 [completed Windows 7 rc2 matrix](validation/2026-11-16-step-1.2-h4-runtime-rc2-turtle-rerun.md)
-verifies 345/345 runtime cases across all three tiers. Production qualification remains.
+verifies 345/345 runtime cases across all three tiers. The
+[rc4 candidate](validation/2026-11-17-step-1.2-h4-runtime-rc4-candidate.md) passes
+local qualification and its full opt-in soak. Windows 7 rc4 and manual results remain.
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |

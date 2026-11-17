@@ -102,8 +102,10 @@ public-API experiments failed. I'm now following the
   The [H4 candidate](docs/H4_RUNTIME.md) uses approved opt-in backing-desktop
   isolation and API 1.1 two-phase close. The [completed rc2 matrix](docs/validation/2026-11-16-step-1.2-h4-runtime-rc2-turtle-rerun.md)
   verifies 345/345 runtime cases across NESSY, TURTLE and LEOPARD, with all three
-  baseline regression suites and 120-minute soaks passing. The next candidate
-  adds seven qualification cases, a separate 120-minute opt-in soak, explicit
+  baseline regression suites and 120-minute soaks passing. The
+  [rc4 candidate](docs/validation/2026-11-17-step-1.2-h4-runtime-rc4-candidate.md)
+  passes local qualification and its full opt-in soak. It adds seven qualification
+  cases, a separate 120-minute opt-in soak, explicit
   desktop/module-failure checks and [physical input/session/access checks](docs/H4_MANUAL_CHECKS.md).
   I need the three-machine results and manual evidence before accepting H4.
   Broader descendant/job policy remains in Step 1.5.

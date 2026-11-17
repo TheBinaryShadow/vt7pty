@@ -1,0 +1,74 @@
+{
+  "Kind": "H4QualificationReviewerControls",
+  "Status": "Pass",
+  "Rejected": 13,
+  "Controls": [
+    {
+      "Case": "case-missing",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: qualification case inventory and cleanup"
+    },
+    {
+      "Case": "inactive-wrong-cause",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: specific inactive desktop denial"
+    },
+    {
+      "Case": "resource-leak",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: caller resource budgets"
+    },
+    {
+      "Case": "job-membership",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: native enclosing-job policy"
+    },
+    {
+      "Case": "early-c-dispatch",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: expired early request has no key dispatch"
+    },
+    {
+      "Case": "late-timeout-decision",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: production unknown result disables dispatch before release"
+    },
+    {
+      "Case": "borrowed-old-timeout",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: production unknown result disables dispatch before release"
+    },
+    {
+      "Case": "keyboard-corruption",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: all keyboard bytes restored"
+    },
+    {
+      "Case": "agent-not-dead",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: agent death while callback active"
+    },
+    {
+      "Case": "short-duration",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: full requested opt-in duration"
+    },
+    {
+      "Case": "cold-baseline-substitution",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: recorded cold, warm and final resource snapshots"
+    },
+    {
+      "Case": "trace-gap",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: no lost fixture trace window"
+    },
+    {
+      "Case": "neighbor-interrupted",
+      "Rejected": true,
+      "Reason": "H4 qualification evidence: long-lived pending neighbor"
+    }
+  ],
+  "OriginalEvidenceUnmodified": true,
+  "MinimumSoakMinutes": 120
+}

@@ -1,0 +1,81 @@
+{
+  "Kind": "H4ReviewerFaultControls",
+  "Status": "Pass",
+  "Rejected": 12,
+  "Controls": [
+    {
+      "Case": "missing-case",
+      "Rejected": true,
+      "Reason": "H4 evidence: exact case inventory"
+    },
+    {
+      "Case": "retained-old-line",
+      "Rejected": true,
+      "Reason": "H4 evidence: canceled-read evidence"
+    },
+    {
+      "Case": "duplicate-control",
+      "Rejected": true,
+      "Reason": "H4 evidence: one handler exit per event"
+    },
+    {
+      "Case": "wrong-next-line",
+      "Rejected": true,
+      "Reason": "H4 evidence: exact subsequent read"
+    },
+    {
+      "Case": "raw-duplicate-control",
+      "Rejected": true,
+      "Reason": "H4 evidence: raw modifier/C/z records"
+    },
+    {
+      "Case": "retired-allocation",
+      "Rejected": true,
+      "Reason": "H4 evidence: two-phase close contract"
+    },
+    {
+      "Case": "wrong-child-status",
+      "Rejected": true,
+      "Reason": "H4 evidence: active child and parent"
+    },
+    {
+      "Case": "handle-leak",
+      "Rejected": true,
+      "Reason": "H4 evidence: caller handle budget"
+    },
+    {
+      "Case": "keyboard-corruption",
+      "Rejected": true,
+      "Reason": "H4 evidence: all 256 keyboard bytes restored"
+    },
+    {
+      "Case": "duplicate-session-ready",
+      "Rejected": true,
+      "Reason": "H4 evidence: one ready record per session"
+    },
+    {
+      "Case": "reused-pid-missing-session-ready",
+      "Rejected": true,
+      "Reason": "H4 evidence: accepted restored keyboard result"
+    },
+    {
+      "Case": "generic-module-refusal",
+      "Rejected": true,
+      "Reason": "H4 evidence: actual missing/wrong module failure cause"
+    }
+  ],
+  "PositiveControls": [
+    {
+      "Case": "reused-agent-pid-and-sequence",
+      "Passed": true,
+      "Cases": 41,
+      "KeyboardOperations": 39
+    },
+    {
+      "Case": "module-failure-before-parent-created-log",
+      "Passed": true,
+      "Cases": 41
+    }
+  ],
+  "OriginalEvidenceUnmodified": true
+}

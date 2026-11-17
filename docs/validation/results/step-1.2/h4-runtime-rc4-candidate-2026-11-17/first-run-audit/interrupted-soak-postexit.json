@@ -1,0 +1,23 @@
+{
+  "Kind": "InterruptedSoakPostExitObservation",
+  "RecordedUtc": "2026-11-16T22:04:47.3923681Z",
+  "Hosts": [
+    {
+      "Session": "primary",
+      "RecordedHost": 13200,
+      "RecordedHostCreated": "134393375683365376",
+      "CurrentHostCreated": null,
+      "OriginalHostObservedExited": true,
+      "ObservationOnly": true
+    },
+    {
+      "Session": "neighbor",
+      "RecordedHost": 50436,
+      "RecordedHostCreated": "134393375690235403",
+      "CurrentHostCreated": null,
+      "OriginalHostObservedExited": true,
+      "ObservationOnly": true
+    }
+  ],
+  "DoesNotReplaceMissingLifetimeEvidence": true
+}

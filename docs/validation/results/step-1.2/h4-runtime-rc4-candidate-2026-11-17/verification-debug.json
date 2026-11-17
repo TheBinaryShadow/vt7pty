@@ -1,0 +1,1715 @@
+{
+  "SchemaVersion": 1,
+  "SourceCommit": "5f36ce40b4578dd8d04614351c379d0738b84e74",
+  "SourceVersion": "0.5.1-dev",
+  "ApiVersion": "1.1",
+  "ProtocolVersion": 2,
+  "SourceTreeClean": true,
+  "SourceTreeChanges": [],
+  "Configuration": "Debug",
+  "Architecture": "x64",
+  "WindowsApiFloor": "Windows 7 SP1 (0x0601)",
+  "SubsystemVersion": "6.01",
+  "Host": {
+    "ProductName": "Windows 10 IoT Enterprise LTSC 2021",
+    "Version": "10.0.19044.0",
+    "BuildNumber": "19044",
+    "Architecture": "AMD64"
+  },
+  "InspectionTool": {
+    "DumpbinPath": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.44.35207\\bin\\Hostx64\\x64\\dumpbin.exe",
+    "DumpbinFileVersion": "14.44.35228.0",
+    "ManifestToolPath": "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.26100.0\\x64\\mt.exe",
+    "ManifestToolFileVersion": "10.0.26100.8249 (WinBuild.160101.0800)"
+  },
+  "Tests": [
+    {
+      "Name": "RuntimeCancellationTest.exe",
+      "DurationMilliseconds": 51,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Runtime cancellation oracle: 27 checks passed, plus four keyboard-bridge checks",
+      "StandardError": ""
+    },
+    {
+      "Name": "HostCancellationProbe.exe",
+      "DurationMilliseconds": 37,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Host cancellation oracle: 33 checks passed",
+      "StandardError": ""
+    },
+    {
+      "Name": "HostCancellationFreezeProbe.exe",
+      "DurationMilliseconds": 36,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Host cancellation oracle: 33 checks passed\r\nHost cancellation trace oracle: 6 checks passed\r\nHost freeze oracle: 3 checks passed",
+      "StandardError": ""
+    },
+    {
+      "Name": "HostCancellationCoordinatedProbe.exe",
+      "DurationMilliseconds": 37,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Host cancellation oracle: 33 checks passed\r\nHost cancellation trace oracle: 6 checks passed\r\nHost freeze oracle: 3 checks passed",
+      "StandardError": ""
+    },
+    {
+      "Name": "HostCancellationGuardProbe.exe",
+      "DurationMilliseconds": 36,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Host cancellation oracle: 33 checks passed\r\nHost cancellation trace oracle: 6 checks passed\r\nHost freeze oracle: 3 checks passed\r\nHost guard oracle: 13 checks passed",
+      "StandardError": ""
+    },
+    {
+      "Name": "HostCancellationTraceProbe.exe",
+      "DurationMilliseconds": 35,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Host cancellation oracle: 33 checks passed\r\nHost cancellation trace oracle: 6 checks passed",
+      "StandardError": ""
+    },
+    {
+      "Name": "HostDispatchProbe.exe",
+      "DurationMilliseconds": 33,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Host dispatch oracle: 13 checks passed",
+      "StandardError": ""
+    },
+    {
+      "Name": "HostIdentityProbe.exe",
+      "DurationMilliseconds": 34,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Host identity oracle: 10 checks passed",
+      "StandardError": ""
+    },
+    {
+      "Name": "ModernCppTest.exe",
+      "DurationMilliseconds": 34,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "VT7Pty modern C++ utility tests passed.",
+      "StandardError": ""
+    },
+    {
+      "Name": "ProtocolTest.exe",
+      "DurationMilliseconds": 33,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "VT7Pty protocol tests passed",
+      "StandardError": ""
+    },
+    {
+      "Name": "VT7Pty-DebugServer.exe",
+      "DurationMilliseconds": 35,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "VT7Pty diagnostic security self-test passed.",
+      "StandardError": ""
+    },
+    {
+      "Name": "VT7Pty-DebugServer.exe",
+      "DurationMilliseconds": 26,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "VT7Pty version 0.5.1-dev\r\ncommit 5f36ce40b4578dd8d04614351c379d0738b84e74\r\nAPI version 1.1\r\nprotocol version 2",
+      "StandardError": ""
+    },
+    {
+      "Name": "Structured diagnostic transport",
+      "DurationMilliseconds": 311,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "{\"timestamp\":\"2026-11-16T22:00:21.282Z\",\"severity\":\"info\",\"subsystem\":\"general\",\"product\":\"VT7Pty\",\"version\":\"0.5.1-dev\",\"commit\":\"5f36ce40b4578dd8d04614351c379d0738b84e74\",\"api\":\"1.1\",\"protocol\":2,\"process\":\"ProtocolTest.exe\",\"pid\":3732,\"tid\":49872,\"message\":\"diagnostic transport test 1\"}\r\n{\"timestamp\":\"2026-11-16T22:00:21.282Z\",\"severity\":\"warning\",\"subsystem\":\"ipc\",\"product\":\"VT7Pty\",\"version\":\"0.5.1-dev\",\"commit\":\"5f36ce40b4578dd8d04614351c379d0738b84e74\",\"api\":\"1.1\",\"protocol\":2,\"process\":\"ProtocolTest.exe\",\"pid\":3732,\"tid\":49872,\"message\":\"diagnostic transport test 2\"}\r\n{\"timestamp\":\"2026-11-16T22:00:21.283Z\",\"severity\":\"error\",\"subsystem\":\"security\",\"product\":\"VT7Pty\",\"version\":\"0.5.1-dev\",\"commit\":\"5f36ce40b4578dd8d04614351c379d0738b84e74\",\"api\":\"1.1\",\"protocol\":2,\"process\":\"ProtocolTest.exe\",\"pid\":3732,\"tid\":49872,\"message\":\"diagnostic transport test 3\"}",
+      "StandardError": ""
+    },
+    {
+      "Name": "BackendSmokeTest.exe",
+      "DurationMilliseconds": 153,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "",
+      "StandardError": ""
+    },
+    {
+      "Name": "BackendSmokeTest.exe",
+      "DurationMilliseconds": 535,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Command Prompt and Windows PowerShell sessions passed.",
+      "StandardError": ""
+    },
+    {
+      "Name": "Session contract: OUTPUT",
+      "DurationMilliseconds": 156,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Session contract OUTPUT passed.",
+      "StandardError": ""
+    },
+    {
+      "Name": "Session contract: UNICODE",
+      "DurationMilliseconds": 137,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Session contract UNICODE passed.",
+      "StandardError": ""
+    },
+    {
+      "Name": "Session contract: INPUT",
+      "DurationMilliseconds": 139,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Session contract INPUT passed.",
+      "StandardError": ""
+    },
+    {
+      "Name": "Session contract: RESIZE",
+      "DurationMilliseconds": 1767,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Session contract RESIZE passed.",
+      "StandardError": ""
+    },
+    {
+      "Name": "Session contract: REPEAT",
+      "DurationMilliseconds": 48747,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Session contract REPEAT passed.",
+      "StandardError": ""
+    },
+    {
+      "Name": "Session contract: SHUTDOWN",
+      "DurationMilliseconds": 4781,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Session contract SHUTDOWN passed.",
+      "StandardError": ""
+    },
+    {
+      "Name": "Session contract: SPAWN_FAILURE",
+      "DurationMilliseconds": 104,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Session contract SPAWN_FAILURE passed.",
+      "StandardError": ""
+    },
+    {
+      "Name": "Session contract: CONCURRENT",
+      "DurationMilliseconds": 391,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Session contract CONCURRENT passed.",
+      "StandardError": ""
+    },
+    {
+      "Name": "Negative control: NEGATIVE_OUTPUT",
+      "DurationMilliseconds": 126,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Observed exit=1, timeout=False",
+      "StandardError": ""
+    },
+    {
+      "Name": "Negative control: NEGATIVE_STATUS",
+      "DurationMilliseconds": 120,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Observed exit=1, timeout=False",
+      "StandardError": ""
+    },
+    {
+      "Name": "Negative control: NEGATIVE_ORDER",
+      "DurationMilliseconds": 147,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Observed exit=1, timeout=False",
+      "StandardError": ""
+    },
+    {
+      "Name": "Negative control: NEGATIVE_TRUNCATION",
+      "DurationMilliseconds": 137,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Observed exit=1, timeout=False",
+      "StandardError": ""
+    },
+    {
+      "Name": "Negative control: NEGATIVE_LEAK",
+      "DurationMilliseconds": 29,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Observed exit=1, timeout=False",
+      "StandardError": ""
+    },
+    {
+      "Name": "Negative control: NEGATIVE_TIMEOUT",
+      "DurationMilliseconds": 2211,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Observed exit=, timeout=True",
+      "StandardError": ""
+    },
+    {
+      "Name": "VT7Pty-Agent.exe",
+      "DurationMilliseconds": 31,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "VT7Pty version 0.5.1-dev\r\ncommit 5f36ce40b4578dd8d04614351c379d0738b84e74\r\nAPI version 1.1\r\nprotocol version 2",
+      "StandardError": ""
+    },
+    {
+      "Name": "fixture-show-argv.exe",
+      "DurationMilliseconds": 33,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "cmdline = [\"D:\\Git\\vt7pty\\artifacts\\bin\\x64\\Debug\\fixture-show-argv.exe\" \"alpha\" \"two words\"]\r\n[D:\\Git\\vt7pty\\artifacts\\bin\\x64\\Debug\\fixture-show-argv.exe]\r\n[alpha]\r\n[two words]",
+      "StandardError": ""
+    },
+    {
+      "Name": "fixture-output-lines.exe",
+      "DurationMilliseconds": 32,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "1 XXXXX\r\n2 XXXXX\r\n3 XXXXX",
+      "StandardError": ""
+    },
+    {
+      "Name": "Agent rejection: missing",
+      "DurationMilliseconds": 203,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Expected VT7Pty failure: VT7Pty agent executable is missing: 'D:\\Git\\vt7pty\\artifacts\\verification\\x64\\Debug\\agent-failure-missing\\VT7Pty-Agent.exe'",
+      "StandardError": ""
+    },
+    {
+      "Name": "Agent rejection: malformed",
+      "DurationMilliseconds": 218,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Expected VT7Pty failure: VT7Pty agent handshake is missing or malformed",
+      "StandardError": ""
+    },
+    {
+      "Name": "Agent rejection: wrong-identity",
+      "DurationMilliseconds": 83,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Expected VT7Pty failure: VT7Pty agent identity mismatch: expected 'VT7Pty-Agent', received 'Not-VT7Pty-Agent'",
+      "StandardError": ""
+    },
+    {
+      "Name": "Agent rejection: older-protocol",
+      "DurationMilliseconds": 84,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Expected VT7Pty failure: VT7Pty agent protocol mismatch: client=2, agent=1",
+      "StandardError": ""
+    },
+    {
+      "Name": "Agent rejection: newer-protocol",
+      "DurationMilliseconds": 87,
+      "ExitCode": 0,
+      "TimedOut": false,
+      "StandardOutput": "Expected VT7Pty failure: VT7Pty agent protocol mismatch: client=2, agent=3",
+      "StandardError": ""
+    }
+  ],
+  "Artifacts": [
+    {
+      "Name": "VT7Pty.dll",
+      "Bytes": 3244544,
+      "Sha256": "5fa620bfee6150f803819561f811596f1081c32a90db36a8c5af07a74ebeb5e4"
+    },
+    {
+      "Name": "VT7Pty.lib",
+      "Bytes": 5946,
+      "Sha256": "5b082613a14145be9f0e282f25ba4ea5d6b80d16c3dac21802f55dffefb3724a"
+    },
+    {
+      "Name": "VT7Pty.pdb",
+      "Bytes": 20131840,
+      "Sha256": "6596771dcd26e1cc9d45a4116e8da542075dceb004a3d229aa6323f3266777d4"
+    },
+    {
+      "Name": "VT7Pty-Agent.exe",
+      "Bytes": 3567104,
+      "Sha256": "568c4a665f33fa3e9c5e496ec247a12f164a168f721baeda9d1e1c36699c43eb"
+    },
+    {
+      "Name": "VT7Pty-Agent.pdb",
+      "Bytes": 26742784,
+      "Sha256": "cc23834cf6a0cee1bc3abaa61d08de44bc225e419f15145a50103b0acbfcce10"
+    },
+    {
+      "Name": "VT7Pty-Host.dll",
+      "Bytes": 3096576,
+      "Sha256": "3c3200e619af769fdb732b9f6def3d8649ffef572861c6748f4c2f4c204d53ba"
+    },
+    {
+      "Name": "VT7Pty-Host.pdb",
+      "Bytes": 17321984,
+      "Sha256": "f42b6b637e96a1df8dc85ce895dfb3cf5d51781307c8dde54598a4775a28c1ef"
+    },
+    {
+      "Name": "RuntimeCancellationTest.exe",
+      "Bytes": 3890176,
+      "Sha256": "123038c7ca677b6a4b451bace67841ddb6a763359e063109eb1d18e4910a123a"
+    },
+    {
+      "Name": "RuntimeCancellationTest.pdb",
+      "Bytes": 24285184,
+      "Sha256": "1fc3cee1ba64053c1fb3a368398931319b49a76f6a48e77eb6af6756e38a5228"
+    },
+    {
+      "Name": "H4TestGate.dll",
+      "Bytes": 1296384,
+      "Sha256": "c2f97d7f8518717097440255f9c47943cfaf8cd3dd736d2885f229715b2ea5ac"
+    },
+    {
+      "Name": "H4TestGate.pdb",
+      "Bytes": 8482816,
+      "Sha256": "db6c183bd27979c4e4621e35dd6d987d0e55edec9ae646dcd9674c869b84ae79"
+    },
+    {
+      "Name": "VT7Pty-DebugServer.exe",
+      "Bytes": 3081216,
+      "Sha256": "809ad4c34dd8d78facad2fb9f3f0022ea04d3bfafb4894b95cb79e1440e6ddc1"
+    },
+    {
+      "Name": "VT7Pty-DebugServer.pdb",
+      "Bytes": 17035264,
+      "Sha256": "b0490fc0cbf0897f115f9a49911d897df939931920cdb51e0d15cae1c2b73a64"
+    },
+    {
+      "Name": "ModernCppTest.exe",
+      "Bytes": 2979840,
+      "Sha256": "ad807526e8916c3e37b384e98e1fcb8c252a336c6cda0efe5aa9026961d750e8"
+    },
+    {
+      "Name": "ModernCppTest.pdb",
+      "Bytes": 15298560,
+      "Sha256": "4b3574e3f558d6b3f941dcb06217f7382f5a80cc388c28ceb2bbdb6cf7157181"
+    },
+    {
+      "Name": "BackendSmokeTest.exe",
+      "Bytes": 1811968,
+      "Sha256": "98c0901c3bab53ce52c014e2c4b420a0594bb604bcf76a035218668e5582a73d"
+    },
+    {
+      "Name": "BackendSmokeTest.pdb",
+      "Bytes": 10555392,
+      "Sha256": "51b6285c2106dd12ef36d94792722a02cda6dbda8da7f33f207bf3a88869f263"
+    },
+    {
+      "Name": "SessionContractTest.exe",
+      "Bytes": 1803264,
+      "Sha256": "397928ab6988a9161dc8726804f181bae0847ac4c0d1336798288e1fc48fa531"
+    },
+    {
+      "Name": "SessionContractTest.pdb",
+      "Bytes": 10629120,
+      "Sha256": "65c53f6f980969f232b5bc19a15e6302bafc8b0944f42b1a9e2cf4dcd195a071"
+    },
+    {
+      "Name": "SessionFixture.exe",
+      "Bytes": 1245696,
+      "Sha256": "aad3bf6941a675f673b3fabbffd7bba6d164141a50d01bd36d2e711f8e6c0c87"
+    },
+    {
+      "Name": "SessionFixture.pdb",
+      "Bytes": 7892992,
+      "Sha256": "c14a00bde87efd39d366a7cba4133de93804ab943ea3fd32d810c8fff104cc3a"
+    },
+    {
+      "Name": "VtStateTest.exe",
+      "Bytes": 1464832,
+      "Sha256": "d8289e6f87b9c9c4d34547ef26321573abeb05c30f81fea26b62761b747dbd70"
+    },
+    {
+      "Name": "VtStateTest.pdb",
+      "Bytes": 9965568,
+      "Sha256": "a37fcad0f168d5cd225976bb8fd4dc713a507405e2bfb0b697f334de3509b0c5"
+    },
+    {
+      "Name": "FidelityFixture.exe",
+      "Bytes": 1355776,
+      "Sha256": "579fb2014ad38dde467c1722e191a8aec370c9fa0c84686378acba4c25cbb2db"
+    },
+    {
+      "Name": "FidelityFixture.pdb",
+      "Bytes": 9318400,
+      "Sha256": "414630bcce24e108e8e8088253e8553af3f4eea1217dfafe5a1b7bbab27239fe"
+    },
+    {
+      "Name": "FidelityTest.exe",
+      "Bytes": 2824704,
+      "Sha256": "79a34224dabfe19907f81020e0d0c6c274b440591ee315f4be872c81ffbb4387"
+    },
+    {
+      "Name": "FidelityTest.pdb",
+      "Bytes": 17207296,
+      "Sha256": "44467ef6d7b1794b3e92c639d510184a1dd690720cbc96d8744ec287d8d0ad10"
+    },
+    {
+      "Name": "HostIdentityProbe.exe",
+      "Bytes": 1986560,
+      "Sha256": "8b9519122c6ec092a755649181ab550ea6704fd6fbcef8e581d925682b33b142"
+    },
+    {
+      "Name": "HostIdentityProbe.pdb",
+      "Bytes": 11759616,
+      "Sha256": "9e136ecb2a21891eb71be786b10c5cbfd8294f3adfce41fa107d978c28646ac3"
+    },
+    {
+      "Name": "HostCancellationProbe.exe",
+      "Bytes": 2988032,
+      "Sha256": "276d83e7eb8e59b918c06b5bf323d3223ac9e2ab2e9616a55df499efe22de5fb"
+    },
+    {
+      "Name": "HostCancellationProbe.pdb",
+      "Bytes": 19001344,
+      "Sha256": "78586367d6c2955c47ae6d647c8b7a79c3216171e81fdafff289ebd736879166"
+    },
+    {
+      "Name": "HostCancellationHook.dll",
+      "Bytes": 1806848,
+      "Sha256": "c64c94593cece2ac56d5a5b408f0947ea0c6f284e5ac2e79e5be21105ef71331"
+    },
+    {
+      "Name": "HostCancellationHook.pdb",
+      "Bytes": 10981376,
+      "Sha256": "d9b478a516deee466b0ed53a5b7f86288fe34f5be2df7ff250b9113ec325fbc5"
+    },
+    {
+      "Name": "HostCancellationFreezeProbe.exe",
+      "Bytes": 3228160,
+      "Sha256": "54ef2f5eff4b8ee086bab35c53299ab38bb9f7fc96a69364eaa46a098db0abfd"
+    },
+    {
+      "Name": "HostCancellationFreezeProbe.pdb",
+      "Bytes": 18477056,
+      "Sha256": "a885d2bec39782010c7645f6e8948b43c3cdbedeef348a789659770e6c09af78"
+    },
+    {
+      "Name": "HostCancellationFreezeHook.dll",
+      "Bytes": 1815552,
+      "Sha256": "1870fd35863996ea1c2bf5b6fc3c61049fe052b6ad07feac8a770eeaa10762c7"
+    },
+    {
+      "Name": "HostCancellationFreezeHook.pdb",
+      "Bytes": 10702848,
+      "Sha256": "0d87130bf3ff1a3d70870374ab301fddb6141f0e67775380db32664aa4cbd354"
+    },
+    {
+      "Name": "VT7Pty-FreezeAgent.exe",
+      "Bytes": 3602432,
+      "Sha256": "d9291148ff47158316855884715a3fea4748f28e4cfa811c8a9df7f5aea7174e"
+    },
+    {
+      "Name": "VT7Pty-FreezeAgent.pdb",
+      "Bytes": 23523328,
+      "Sha256": "0d7138d729b816626bf186b9dedf5c81ca6cc6567078db92433874a1286b8cf4"
+    },
+    {
+      "Name": "HostCancellationCoordinatedProbe.exe",
+      "Bytes": 3280896,
+      "Sha256": "e98adbd6dc29d0fcb2f87cf7b4dc766b5ebb57d4fa752caf1a0f03547fc2222e"
+    },
+    {
+      "Name": "HostCancellationCoordinatedProbe.pdb",
+      "Bytes": 18280448,
+      "Sha256": "05cddf844a5ab1269e7237afce8eaa773e42f19a3557d834e67b44cc2f32d7a6"
+    },
+    {
+      "Name": "HostCancellationCoordinatedHook.dll",
+      "Bytes": 1817088,
+      "Sha256": "028d0bae8c44719f40130bde015433e0a2e1c04e278d70f44b5f9018f20fcdfb"
+    },
+    {
+      "Name": "HostCancellationCoordinatedHook.pdb",
+      "Bytes": 10571776,
+      "Sha256": "dc434cedc73184f2666e1fa899a7e4434b858db94ea7696459506c5bd9633350"
+    },
+    {
+      "Name": "HostCancellationGuardProbe.exe",
+      "Bytes": 3489280,
+      "Sha256": "9d7d1034e9bea92f53351c0e764bf0cd6445746dfc0e01fd523ded0bb5fc4c2b"
+    },
+    {
+      "Name": "HostCancellationGuardProbe.pdb",
+      "Bytes": 20000768,
+      "Sha256": "37d48de588d5294b7360b214e0bc2ddf9ab04dd2d8647aec730e55843098add4"
+    },
+    {
+      "Name": "HostCancellationGuardHook.dll",
+      "Bytes": 1817088,
+      "Sha256": "632f7c48b42dcd1b197195c797555474645d313c0a975c44153cd214fb613ca9"
+    },
+    {
+      "Name": "HostCancellationGuardHook.pdb",
+      "Bytes": 10645504,
+      "Sha256": "8bd8aa90b7e9ee88973099be8ced45b2589dd2df4a5d82974eb613fc4593814a"
+    },
+    {
+      "Name": "VT7Pty-CoordinatedAgent.exe",
+      "Bytes": 3602432,
+      "Sha256": "648eb6b5ce8affeba1423bf5259b7e9b22ebde62e7e82220bbf5027aadf578ac"
+    },
+    {
+      "Name": "VT7Pty-CoordinatedAgent.pdb",
+      "Bytes": 23113728,
+      "Sha256": "ad42b2dda58df72fc3e0c9ac0fb7f1f885d9755729fdcc191cd2d00eaae759d3"
+    },
+    {
+      "Name": "VT7Pty-GuardAgent.exe",
+      "Bytes": 3602432,
+      "Sha256": "3731d23052d60ebd5a3346cb24d38d332f5db2da11d6ff8b62e390d9f995c410"
+    },
+    {
+      "Name": "VT7Pty-GuardAgent.pdb",
+      "Bytes": 22065152,
+      "Sha256": "22211b88b102b98dcc9583bc1ae5d105385e1954b4f9f45e402379beb8a94653"
+    },
+    {
+      "Name": "HostCancellationTraceProbe.exe",
+      "Bytes": 3092992,
+      "Sha256": "864dbc6f4f83805a55b58ea20ad8d45dd75e197e83a163b9ea06f029596c5ed9"
+    },
+    {
+      "Name": "HostCancellationTraceProbe.pdb",
+      "Bytes": 18624512,
+      "Sha256": "91968c8719c430daccdbc90a62b97df038d2c38595582766281bed31faf4f1a3"
+    },
+    {
+      "Name": "HostCancellationTraceHook.dll",
+      "Bytes": 1811456,
+      "Sha256": "41e5d42bb9345a64e2dcbb97ede131952460e2a044437688a44421d72b7fe2f0"
+    },
+    {
+      "Name": "HostCancellationTraceHook.pdb",
+      "Bytes": 11005952,
+      "Sha256": "b84e171dee61a7def9c2429b26aa0382c87a78eb2b5f5956211a69dda8f90d51"
+    },
+    {
+      "Name": "HostDispatchProbe.exe",
+      "Bytes": 2085376,
+      "Sha256": "9ef16d6765c87b52b102c75c65c7f8964b946dc0506adbc4a339463fffcddc28"
+    },
+    {
+      "Name": "HostDispatchProbe.pdb",
+      "Bytes": 11866112,
+      "Sha256": "25f006253e51d3629d49d79179f99c1a073411f3d15c6e9f66af721a0b120e67"
+    },
+    {
+      "Name": "HostDispatchHook.dll",
+      "Bytes": 1799168,
+      "Sha256": "11f01f53394bed2364e3c4e7e695ab7811947872b6052c53509adea1d2bab863"
+    },
+    {
+      "Name": "HostDispatchHook.pdb",
+      "Bytes": 10489856,
+      "Sha256": "d8542b75e9f19c75c63b4053b4a0d22496c562965ea2b1ecda36892815b21e15"
+    },
+    {
+      "Name": "ProtocolTest.exe",
+      "Bytes": 1872384,
+      "Sha256": "e9c9dc41df679de9cf36120c586f897c4db1ae4add97e0884715ca2ed62b8c18"
+    },
+    {
+      "Name": "ProtocolTest.pdb",
+      "Bytes": 11431936,
+      "Sha256": "cbc0b709497b4967a5644f1b33182d0f7bad68fbd62dd6585b9e47ddc3eb3f1c"
+    },
+    {
+      "Name": "ProtocolTestAgent.exe",
+      "Bytes": 1844224,
+      "Sha256": "dbc8c4293067a30926d10a4ccf8fee2770d0e3d3645f27388e46e58af51d31a3"
+    },
+    {
+      "Name": "ProtocolTestAgent.pdb",
+      "Bytes": 11202560,
+      "Sha256": "bc76efa85f14ce64bc2afbd245abd7a8c23324152f50a476bff7e0a09539ec71"
+    },
+    {
+      "Name": "fixture-console-color-grid.exe",
+      "Bytes": 1233920,
+      "Sha256": "8da0642cef178024ba4bf5aae6de487b1597b456e0a2dfea9c8a72578d04ab21"
+    },
+    {
+      "Name": "fixture-console-color-grid.pdb",
+      "Bytes": 7811072,
+      "Sha256": "82727962bfabc4ebc7bbc72fd0de92307e2a07c354619d1dcc5ec4c909f6a751"
+    },
+    {
+      "Name": "fixture-output-lines.exe",
+      "Bytes": 1274880,
+      "Sha256": "7787e5a93199533767414f32de6f93f03305e79462ce576d0014ee4717161dea"
+    },
+    {
+      "Name": "fixture-output-lines.pdb",
+      "Bytes": 8630272,
+      "Sha256": "409ed723331fdc4f3ca8a8faa39eb6c862a7e8378bbb64b36ecab1bb6c4db913"
+    },
+    {
+      "Name": "fixture-show-argv.exe",
+      "Bytes": 1233408,
+      "Sha256": "7713211febc7424340be47f854f591f48ef1b4658bfef3e9185086acb0523074"
+    },
+    {
+      "Name": "fixture-show-argv.pdb",
+      "Bytes": 7786496,
+      "Sha256": "22e4d0df2da6de017f3cffe0454a7e8a202eb462884c7bc65daa606f35cc1365"
+    },
+    {
+      "Name": "fixture-show-console-input.exe",
+      "Bytes": 1237504,
+      "Sha256": "d7f0b05144ccdaf5784caaf249386ad82a07552f065907e8ab582a1b6715a266"
+    },
+    {
+      "Name": "fixture-show-console-input.pdb",
+      "Bytes": 7827456,
+      "Sha256": "7936809b8cb578a99966f1cdc4c28befd85c255f62afa6011f97e52b83f7ab32"
+    },
+    {
+      "Name": "fixture-utf16-echo.exe",
+      "Bytes": 1377280,
+      "Sha256": "27a2d9bad587a6871706c5f2a460a7fc0a7f8594f1819bb0e82ceafe6e15cb8f"
+    },
+    {
+      "Name": "fixture-utf16-echo.pdb",
+      "Bytes": 9269248,
+      "Sha256": "9dab3b77ac38a1b272a66cdd0d94e119f5fbb57deac902447d30e40fd83b0af7"
+    },
+    {
+      "Name": "fixture-win32-echo1.exe",
+      "Bytes": 1233408,
+      "Sha256": "48041765700a2a7dc665415980e95ac19d83b7bcfa88579e00addf69eb133046"
+    },
+    {
+      "Name": "fixture-win32-echo1.pdb",
+      "Bytes": 7794688,
+      "Sha256": "21983245bcd4aa7ff81f56b77cd2cf90e6f26a6a6e54cbf318340b5d7638e110"
+    },
+    {
+      "Name": "fixture-win32-echo2.exe",
+      "Bytes": 1244160,
+      "Sha256": "6c2204b791a7aad877643036484a98dcd0f6479f4849daf64a8a39b4f107d375"
+    },
+    {
+      "Name": "fixture-win32-echo2.pdb",
+      "Bytes": 7835648,
+      "Sha256": "05ddc4c35cb18f35750a20df76bce051fd6dadd577ea4f5ead0193ee9e5d8b04"
+    },
+    {
+      "Name": "fixture-win32-write1.exe",
+      "Bytes": 1233920,
+      "Sha256": "a06729ba18036fec9aeb93d5053bd8a29da8af249601d5f85f26f30dafb8477e"
+    },
+    {
+      "Name": "fixture-win32-write1.pdb",
+      "Bytes": 7786496,
+      "Sha256": "8450d3e1f528153b35e96784541cbb4e9d9feb792aeb73384b360bb0d58e0771"
+    },
+    {
+      "Name": "fixture-write-console.exe",
+      "Bytes": 1329152,
+      "Sha256": "bd3e9df39f8ab915dee8427aa5a04d7eb7a9cc51ac0b2c92b2b25cffa7c6e359"
+    },
+    {
+      "Name": "fixture-write-console.pdb",
+      "Bytes": 9105408,
+      "Sha256": "5857bc684ff534184d45cfe129f09735a26db7682394c04ed8d59f59ae78abea"
+    },
+    {
+      "Name": "tool-conin-mode.exe",
+      "Bytes": 1293312,
+      "Sha256": "15a05396c57b59a6eea5c4854a1936990e0fa71f6b98b2c017397440b2071c6a"
+    },
+    {
+      "Name": "tool-conin-mode.pdb",
+      "Bytes": 8908800,
+      "Sha256": "35f15e3c69789c162074aa6fd16b4c22b6283f93823553cfb1b473e3a6e6d8d7"
+    },
+    {
+      "Name": "tool-conout-mode.exe",
+      "Bytes": 1293312,
+      "Sha256": "0b264663511d5adc217d040783460cacf56c3aa7addf9f790b93f056ae10ea8f"
+    },
+    {
+      "Name": "tool-conout-mode.pdb",
+      "Bytes": 8908800,
+      "Sha256": "cde087e9dc18e1eeef639fa262ff0d6d12f5b2804363ea0b9e591c2cd4b23aad"
+    }
+  ],
+  "Binaries": [
+    {
+      "Name": "VT7Pty.dll",
+      "Bytes": 3244544,
+      "Sha256": "5fa620bfee6150f803819561f811596f1081c32a90db36a8c5af07a74ebeb5e4",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty client library",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "VT7Pty.dll"
+    },
+    {
+      "Name": "RuntimeCancellationTest.exe",
+      "Bytes": 3890176,
+      "Sha256": "123038c7ca677b6a4b451bace67841ddb6a763359e063109eb1d18e4910a123a",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll",
+        "VT7Pty.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty integrated cancellation qualification",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "RuntimeCancellationTest.exe"
+    },
+    {
+      "Name": "VT7Pty-Host.dll",
+      "Bytes": 3096576,
+      "Sha256": "3c3200e619af769fdb732b9f6def3d8649ffef572861c6748f4c2f4c204d53ba",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty isolated console-host cancellation",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "VT7Pty-Host.dll"
+    },
+    {
+      "Name": "H4TestGate.dll",
+      "Bytes": 1296384,
+      "Sha256": "c2f97d7f8518717097440255f9c47943cfaf8cd3dd736d2885f229715b2ea5ac",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty fidelity H4TestGate",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "H4TestGate.dll"
+    },
+    {
+      "Name": "VT7Pty-Agent.exe",
+      "Bytes": 3567104,
+      "Sha256": "568c4a665f33fa3e9c5e496ec247a12f164a168f721baeda9d1e1c36699c43eb",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "SHELL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty console agent",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "VT7Pty-Agent.exe"
+    },
+    {
+      "Name": "VT7Pty-DebugServer.exe",
+      "Bytes": 3081216,
+      "Sha256": "809ad4c34dd8d78facad2fb9f3f0022ea04d3bfafb4894b95cb79e1440e6ddc1",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty inherited diagnostic server",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "VT7Pty-DebugServer.exe"
+    },
+    {
+      "Name": "BackendSmokeTest.exe",
+      "Bytes": 1811968,
+      "Sha256": "98c0901c3bab53ce52c014e2c4b420a0594bb604bcf76a035218668e5582a73d",
+      "Imports": [
+        "KERNEL32.dll",
+        "VT7Pty.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty inherited lifecycle test",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "BackendSmokeTest.exe"
+    },
+    {
+      "Name": "SessionContractTest.exe",
+      "Bytes": 1803264,
+      "Sha256": "397928ab6988a9161dc8726804f181bae0847ac4c0d1336798288e1fc48fa531",
+      "Imports": [
+        "KERNEL32.dll",
+        "VT7Pty.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty session component test",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "SessionContractTest.exe"
+    },
+    {
+      "Name": "SessionFixture.exe",
+      "Bytes": 1245696,
+      "Sha256": "aad3bf6941a675f673b3fabbffd7bba6d164141a50d01bd36d2e711f8e6c0c87",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty controlled session fixture",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "SessionFixture.exe"
+    },
+    {
+      "Name": "VtStateTest.exe",
+      "Bytes": 1464832,
+      "Sha256": "d8289e6f87b9c9c4d34547ef26321573abeb05c30f81fea26b62761b747dbd70",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty fidelity VtStateTest",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "VtStateTest.exe"
+    },
+    {
+      "Name": "FidelityFixture.exe",
+      "Bytes": 1355776,
+      "Sha256": "579fb2014ad38dde467c1722e191a8aec370c9fa0c84686378acba4c25cbb2db",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty fidelity FidelityFixture",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "FidelityFixture.exe"
+    },
+    {
+      "Name": "FidelityTest.exe",
+      "Bytes": 2824704,
+      "Sha256": "79a34224dabfe19907f81020e0d0c6c274b440591ee315f4be872c81ffbb4387",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "VT7Pty.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty fidelity FidelityTest",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "FidelityTest.exe"
+    },
+    {
+      "Name": "HostCancellationProbe.exe",
+      "Bytes": 2988032,
+      "Sha256": "276d83e7eb8e59b918c06b5bf323d3223ac9e2ab2e9616a55df499efe22de5fb",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll",
+        "VT7Pty.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty fidelity HostCancellationProbe",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostCancellationProbe.exe"
+    },
+    {
+      "Name": "HostCancellationHook.dll",
+      "Bytes": 1806848,
+      "Sha256": "c64c94593cece2ac56d5a5b408f0947ea0c6f284e5ac2e79e5be21105ef71331",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty fidelity HostCancellationHook",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostCancellationHook.dll"
+    },
+    {
+      "Name": "HostCancellationTraceProbe.exe",
+      "Bytes": 3092992,
+      "Sha256": "864dbc6f4f83805a55b58ea20ad8d45dd75e197e83a163b9ea06f029596c5ed9",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll",
+        "VT7Pty.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty diagnostic HostCancellationTraceProbe",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostCancellationTraceProbe.exe"
+    },
+    {
+      "Name": "HostCancellationTraceHook.dll",
+      "Bytes": 1811456,
+      "Sha256": "41e5d42bb9345a64e2dcbb97ede131952460e2a044437688a44421d72b7fe2f0",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty diagnostic HostCancellationTraceHook",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostCancellationTraceHook.dll"
+    },
+    {
+      "Name": "HostCancellationFreezeProbe.exe",
+      "Bytes": 3228160,
+      "Sha256": "54ef2f5eff4b8ee086bab35c53299ab38bb9f7fc96a69364eaa46a098db0abfd",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll",
+        "VT7Pty.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty diagnostic HostCancellationFreezeProbe",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostCancellationFreezeProbe.exe"
+    },
+    {
+      "Name": "HostCancellationFreezeHook.dll",
+      "Bytes": 1815552,
+      "Sha256": "1870fd35863996ea1c2bf5b6fc3c61049fe052b6ad07feac8a770eeaa10762c7",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty diagnostic HostCancellationFreezeHook",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostCancellationFreezeHook.dll"
+    },
+    {
+      "Name": "HostCancellationCoordinatedProbe.exe",
+      "Bytes": 3280896,
+      "Sha256": "e98adbd6dc29d0fcb2f87cf7b4dc766b5ebb57d4fa752caf1a0f03547fc2222e",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll",
+        "VT7Pty.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty diagnostic HostCancellationCoordinatedProbe",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostCancellationCoordinatedProbe.exe"
+    },
+    {
+      "Name": "HostCancellationCoordinatedHook.dll",
+      "Bytes": 1817088,
+      "Sha256": "028d0bae8c44719f40130bde015433e0a2e1c04e278d70f44b5f9018f20fcdfb",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty diagnostic HostCancellationCoordinatedHook",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostCancellationCoordinatedHook.dll"
+    },
+    {
+      "Name": "HostCancellationGuardProbe.exe",
+      "Bytes": 3489280,
+      "Sha256": "9d7d1034e9bea92f53351c0e764bf0cd6445746dfc0e01fd523ded0bb5fc4c2b",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll",
+        "VT7Pty.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty diagnostic HostCancellationGuardProbe",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostCancellationGuardProbe.exe"
+    },
+    {
+      "Name": "HostCancellationGuardHook.dll",
+      "Bytes": 1817088,
+      "Sha256": "632f7c48b42dcd1b197195c797555474645d313c0a975c44153cd214fb613ca9",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty diagnostic HostCancellationGuardHook",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostCancellationGuardHook.dll"
+    },
+    {
+      "Name": "VT7Pty-CoordinatedAgent.exe",
+      "Bytes": 3602432,
+      "Sha256": "648eb6b5ce8affeba1423bf5259b7e9b22ebde62e7e82220bbf5027aadf578ac",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "SHELL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty research-only coordinated agent",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "VT7Pty-CoordinatedAgent.exe"
+    },
+    {
+      "Name": "VT7Pty-GuardAgent.exe",
+      "Bytes": 3602432,
+      "Sha256": "3731d23052d60ebd5a3346cb24d38d332f5db2da11d6ff8b62e390d9f995c410",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "SHELL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty research-only coordinated agent",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "VT7Pty-GuardAgent.exe"
+    },
+    {
+      "Name": "VT7Pty-FreezeAgent.exe",
+      "Bytes": 3602432,
+      "Sha256": "d9291148ff47158316855884715a3fea4748f28e4cfa811c8a9df7f5aea7174e",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "SHELL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty research-only freeze agent",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "VT7Pty-FreezeAgent.exe"
+    },
+    {
+      "Name": "HostDispatchProbe.exe",
+      "Bytes": 2085376,
+      "Sha256": "9ef16d6765c87b52b102c75c65c7f8964b946dc0506adbc4a339463fffcddc28",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll",
+        "VT7Pty.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty fidelity HostDispatchProbe",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostDispatchProbe.exe"
+    },
+    {
+      "Name": "HostDispatchHook.dll",
+      "Bytes": 1799168,
+      "Sha256": "11f01f53394bed2364e3c4e7e695ab7811947872b6052c53509adea1d2bab863",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty fidelity HostDispatchHook",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostDispatchHook.dll"
+    },
+    {
+      "Name": "HostIdentityProbe.exe",
+      "Bytes": 1986560,
+      "Sha256": "8b9519122c6ec092a755649181ab550ea6704fd6fbcef8e581d925682b33b142",
+      "Imports": [
+        "ADVAPI32.dll",
+        "KERNEL32.dll",
+        "USER32.dll",
+        "VT7Pty.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty fidelity HostIdentityProbe",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "HostIdentityProbe.exe"
+    },
+    {
+      "Name": "ProtocolTest.exe",
+      "Bytes": 1872384,
+      "Sha256": "e9c9dc41df679de9cf36120c586f897c4db1ae4add97e0884715ca2ed62b8c18",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty client-agent protocol test",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "ProtocolTest.exe"
+    },
+    {
+      "Name": "ProtocolTestAgent.exe",
+      "Bytes": 1844224,
+      "Sha256": "dbc8c4293067a30926d10a4ccf8fee2770d0e3d3645f27388e46e58af51d31a3",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty incompatible-agent test fixture",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "ProtocolTestAgent.exe"
+    },
+    {
+      "Name": "ModernCppTest.exe",
+      "Bytes": 2979840,
+      "Sha256": "ad807526e8916c3e37b384e98e1fcb8c252a336c6cda0efe5aa9026961d750e8",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty modern C++ utility test",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "ModernCppTest.exe"
+    },
+    {
+      "Name": "fixture-console-color-grid.exe",
+      "Bytes": 1233920,
+      "Sha256": "8da0642cef178024ba4bf5aae6de487b1597b456e0a2dfea9c8a72578d04ab21",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty console color-grid fixture",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "fixture-console-color-grid.exe"
+    },
+    {
+      "Name": "fixture-output-lines.exe",
+      "Bytes": 1274880,
+      "Sha256": "7787e5a93199533767414f32de6f93f03305e79462ce576d0014ee4717161dea",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty bounded output-lines fixture",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "fixture-output-lines.exe"
+    },
+    {
+      "Name": "fixture-show-argv.exe",
+      "Bytes": 1233408,
+      "Sha256": "7713211febc7424340be47f854f591f48ef1b4658bfef3e9185086acb0523074",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty argument-reporting fixture",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "fixture-show-argv.exe"
+    },
+    {
+      "Name": "fixture-show-console-input.exe",
+      "Bytes": 1237504,
+      "Sha256": "d7f0b05144ccdaf5784caaf249386ad82a07552f065907e8ab582a1b6715a266",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty console-input fixture",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "fixture-show-console-input.exe"
+    },
+    {
+      "Name": "fixture-utf16-echo.exe",
+      "Bytes": 1377280,
+      "Sha256": "27a2d9bad587a6871706c5f2a460a7fc0a7f8594f1819bb0e82ceafe6e15cb8f",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty UTF-16 echo fixture",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "fixture-utf16-echo.exe"
+    },
+    {
+      "Name": "fixture-win32-echo1.exe",
+      "Bytes": 1233408,
+      "Sha256": "48041765700a2a7dc665415980e95ac19d83b7bcfa88579e00addf69eb133046",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty console echo fixture",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "fixture-win32-echo1.exe"
+    },
+    {
+      "Name": "fixture-win32-echo2.exe",
+      "Bytes": 1244160,
+      "Sha256": "6c2204b791a7aad877643036484a98dcd0f6479f4849daf64a8a39b4f107d375",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty direct-input echo fixture",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "fixture-win32-echo2.exe"
+    },
+    {
+      "Name": "fixture-win32-write1.exe",
+      "Bytes": 1233920,
+      "Sha256": "a06729ba18036fec9aeb93d5053bd8a29da8af249601d5f85f26f30dafb8477e",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty native-output fixture",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "fixture-win32-write1.exe"
+    },
+    {
+      "Name": "fixture-write-console.exe",
+      "Bytes": 1329152,
+      "Sha256": "bd3e9df39f8ab915dee8427aa5a04d7eb7a9cc51ac0b2c92b2b25cffa7c6e359",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty console-output fixture",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "fixture-write-console.exe"
+    },
+    {
+      "Name": "tool-conin-mode.exe",
+      "Bytes": 1293312,
+      "Sha256": "15a05396c57b59a6eea5c4854a1936990e0fa71f6b98b2c017397440b2071c6a",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty console-input mode tool",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "tool-conin-mode.exe"
+    },
+    {
+      "Name": "tool-conout-mode.exe",
+      "Bytes": 1293312,
+      "Sha256": "0b264663511d5adc217d040783460cacf56c3aa7addf9f790b93f056ae10ea8f",
+      "Imports": [
+        "KERNEL32.dll"
+      ],
+      "DelayImports": [],
+      "ProhibitedPostWindows7Imports": [],
+      "SupportedOsIds": [
+        "{35138b9a-5d96-4fbd-8e2d-a2440225f93a}",
+        "{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}",
+        "{1f676c76-80e1-4239-95bb-83d0f6d0da78}",
+        "{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"
+      ],
+      "FileDescription": "VT7Pty console-output mode tool",
+      "FileVersion": "0.5.1-dev",
+      "ProductName": "VT7Pty",
+      "ProductVersion": "0.5.1-dev",
+      "OriginalFilename": "tool-conout-mode.exe"
+    }
+  ],
+  "Exports": [
+    "vt7pty_agent_process",
+    "vt7pty_close",
+    "vt7pty_conerr_name",
+    "vt7pty_config_free",
+    "vt7pty_config_new",
+    "vt7pty_config_set_agent_timeout",
+    "vt7pty_config_set_initial_size",
+    "vt7pty_config_set_mouse_mode",
+    "vt7pty_conin_name",
+    "vt7pty_conout_name",
+    "vt7pty_error_code",
+    "vt7pty_error_free",
+    "vt7pty_error_msg",
+    "vt7pty_free",
+    "vt7pty_get_console_process_list",
+    "vt7pty_open",
+    "vt7pty_set_size",
+    "vt7pty_spawn",
+    "vt7pty_spawn_config_free",
+    "vt7pty_spawn_config_new"
+  ]
+}
