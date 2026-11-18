@@ -1,0 +1,16 @@
+{
+  "Imports": [
+    "ADVAPI32.dll",
+    "KERNEL32.dll",
+    "USER32.dll",
+    "VT7Pty.dll"
+  ],
+  "FileVersion": "0.5.1-dev",
+  "HarnessSourceCommit": "4926916df1d12e0990717bc3e89a04256588dfd5",
+  "RuntimeUnchangedFromRc4": true,
+  "SubsystemVersion": "6.01",
+  "Status": "Pass",
+  "ProhibitedPostWindows7Imports": [],
+  "Architecture": "x64",
+  "DelayImports": []
+}

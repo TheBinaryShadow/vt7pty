@@ -1,0 +1,103 @@
+{
+  "Kind": "H4ManualReviewerControls",
+  "Status": "Pass",
+  "SyntheticAcceptance": false,
+  "Reviews": [
+    {
+      "Kind": "H4QualificationReview",
+      "Probe": "H4ManualKeyboard",
+      "Status": "Pass",
+      "SourceCommit": "4926916df1d12e0990717bc3e89a04256588dfd5",
+      "RuntimeSourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+      "SyntheticSmoke": true,
+      "H4Accepted": false,
+      "Layout": "US",
+      "KeyboardOperations": 1
+    },
+    {
+      "Kind": "H4QualificationReview",
+      "Probe": "H4ManualKeyboard",
+      "Status": "Pass",
+      "SourceCommit": "4926916df1d12e0990717bc3e89a04256588dfd5",
+      "RuntimeSourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+      "SyntheticSmoke": true,
+      "H4Accepted": false,
+      "Layout": "HR",
+      "KeyboardOperations": 1
+    },
+    {
+      "Kind": "H4QualificationReview",
+      "Probe": "H4ManualSession",
+      "Status": "Pass",
+      "SourceCommit": "4926916df1d12e0990717bc3e89a04256588dfd5",
+      "RuntimeSourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+      "SyntheticSmoke": true,
+      "H4Accepted": false,
+      "KeyboardOperations": 2,
+      "SessionTransition": "Observed"
+    }
+  ],
+  "Rejected": 12,
+  "Controls": [
+    {
+      "Case": "synthetic-US",
+      "Reason": "H4 qualification evidence: synthetic smoke is not manual acceptance",
+      "Rejected": true
+    },
+    {
+      "Case": "synthetic-HR",
+      "Reason": "H4 qualification evidence: synthetic smoke is not manual acceptance",
+      "Rejected": true
+    },
+    {
+      "Case": "synthetic-Session",
+      "Reason": "H4 qualification evidence: synthetic smoke is not manual acceptance",
+      "Rejected": true
+    },
+    {
+      "Case": "wrong-runtime",
+      "Reason": "H4 qualification evidence: manual revision and qualified runtime identity",
+      "Rejected": true
+    },
+    {
+      "Case": "incomplete-keys",
+      "Reason": "H4 qualification evidence: complete input under the required layout",
+      "Rejected": true
+    },
+    {
+      "Case": "mixed-layout",
+      "Reason": "H4 qualification evidence: confirmed layout and complete keyboard step",
+      "Rejected": true
+    },
+    {
+      "Case": "unconfirmed-layout",
+      "Reason": "H4 qualification evidence: confirmed layout and complete keyboard step",
+      "Rejected": true
+    },
+    {
+      "Case": "wrong-backend-line",
+      "Reason": "H4 qualification evidence: exact subsequent read",
+      "Rejected": true
+    },
+    {
+      "Case": "wrong-key-layout-id",
+      "Reason": "H4 qualification evidence: complete input under the required layout",
+      "Rejected": true
+    },
+    {
+      "Case": "wrong-session-transition",
+      "Reason": "H4 qualification evidence: real session transition or explicit synthetic smoke",
+      "Rejected": true
+    },
+    {
+      "Case": "missing-unlock",
+      "Reason": "H4 qualification evidence: observed lock/unlock transition",
+      "Rejected": true
+    },
+    {
+      "Case": "wrong-runtime-trace",
+      "Reason": "H4 qualification evidence: trace source/API/protocol",
+      "Rejected": true
+    }
+  ]
+}

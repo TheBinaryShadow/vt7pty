@@ -1,0 +1,42 @@
+{
+  "Kind": "H4ManualCandidateIssuance",
+  "Status": "ReadyLocally",
+  "RecordedDate": "2026-11-19",
+  "TimeZone": "Europe/Zagreb",
+  "HarnessSourceCommit": "4926916df1d12e0990717bc3e89a04256588dfd5",
+  "HarnessSourceTreeClean": true,
+  "RuntimeSourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+  "RuntimeUnchangedFromRc4": true,
+  "ArchiveName": "VT7Pty-h4-manual-0.5.1-dev-rc1.zip",
+  "ArchiveBytes": 10223114,
+  "ArchiveSha256": "c649187802692d278af148c94ec269bc96bfba055e12e3e929ca5f95b9642961",
+  "ManifestSha256": "7abf9a978084574b3ebe9fbe099d0f05eb1a39125b7d82c0216b142cae79c8bb",
+  "LocalChecks": {
+    "DebugManualOracle": 11,
+    "ReleaseManualOracle": 11,
+    "StaticAnalysisFinalWarnings": 0,
+    "StaticAnalysisInitialWarningFixed": true,
+    "OwnedConsoleProfiles": [
+      "US",
+      "HR",
+      "Session"
+    ],
+    "RealLauncherF12PartialControl": "Pass",
+    "RejectedReviewControls": 12,
+    "RetainedRc4ElevatedReviews": 3,
+    "NativeX64Windows7PE": "Pass",
+    "ProductBinariesUnchanged": 4
+  },
+  "PhysicalAcceptance": false,
+  "Windows7ManualResultsPending": [
+    "NESSY",
+    "TURTLE",
+    "LEOPARD"
+  ],
+  "H4Accepted": false,
+  "SharedCopy": {
+    "Status": "ApprovalReviewRejected",
+    "RequestedPath": "K:\\VT7_work",
+    "Reason": "Network transfer of the private repository package needs explicit authorization."
+  }
+}
