@@ -1,0 +1,187 @@
+{
+  "Kind": "H4Rc4Windows7Summary",
+  "Machines": [
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "Run": "esu-h4-20261117-002047-10060989",
+      "RuntimeCases": 123,
+      "ReferenceCases": 102,
+      "QualificationCases": 7,
+      "RegressionCases": 30,
+      "OptInSoak": {
+        "Kind": "H4OptInSoak",
+        "SchemaVersion": 1,
+        "Status": "Pass",
+        "SourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+        "Minutes": 120,
+        "ElapsedMilliseconds": "7200180",
+        "Cycles": 1369,
+        "RecreatedSessions": 137,
+        "Before": {
+          "Handles": 91,
+          "UserObjects": 1,
+          "GdiObjects": 4,
+          "PrivateBytes": "5173248"
+        },
+        "After": {
+          "Handles": 95,
+          "UserObjects": 1,
+          "GdiObjects": 4,
+          "PrivateBytes": "5611520"
+        },
+        "LongLivedActiveAndNeighbor": true,
+        "H4Accepted": false
+      },
+      "MaxOptInCycleGapMilliseconds": 7036,
+      "Controls": [
+        {
+          "Order": 1,
+          "Passed": 11,
+          "Total": 12,
+          "Failures": [
+            "powershell-empty"
+          ]
+        },
+        {
+          "Order": 4,
+          "Passed": 11,
+          "Total": 12,
+          "Failures": [
+            "powershell-empty"
+          ]
+        },
+        {
+          "Order": 7,
+          "Passed": 11,
+          "Total": 12,
+          "Failures": [
+            "powershell-empty"
+          ]
+        }
+      ],
+      "PowerShell": "5.1.14409.1005",
+      "CLR": "4.0.30319.42000",
+      "KB3191566Present": true
+    },
+    {
+      "Machine": "LEOPARD",
+      "Tier": "Legacy",
+      "Run": "legacy-h4-20261117-001941-3a84a3e4",
+      "RuntimeCases": 99,
+      "ReferenceCases": 78,
+      "QualificationCases": 7,
+      "RegressionCases": 30,
+      "OptInSoak": {
+        "Kind": "H4OptInSoak",
+        "SchemaVersion": 1,
+        "Status": "Pass",
+        "SourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+        "Minutes": 120,
+        "ElapsedMilliseconds": "7200132",
+        "Cycles": 1376,
+        "RecreatedSessions": 138,
+        "Before": {
+          "Handles": 79,
+          "UserObjects": 1,
+          "GdiObjects": 4,
+          "PrivateBytes": "3358720"
+        },
+        "After": {
+          "Handles": 83,
+          "UserObjects": 1,
+          "GdiObjects": 4,
+          "PrivateBytes": "4313088"
+        },
+        "LongLivedActiveAndNeighbor": true,
+        "H4Accepted": false
+      },
+      "MaxOptInCycleGapMilliseconds": 8393,
+      "Controls": [
+        {
+          "Order": 1,
+          "Passed": 12,
+          "Total": 12,
+          "Failures": []
+        },
+        {
+          "Order": 4,
+          "Passed": 12,
+          "Total": 12,
+          "Failures": []
+        },
+        {
+          "Order": 7,
+          "Passed": 12,
+          "Total": 12,
+          "Failures": []
+        }
+      ],
+      "PowerShell": "2.0",
+      "CLR": "2.0.50727.8806",
+      "KB3191566Present": false
+    },
+    {
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "Run": "nonesu-h4-20261117-001940-8fe460b4",
+      "RuntimeCases": 123,
+      "ReferenceCases": 102,
+      "QualificationCases": 7,
+      "RegressionCases": 30,
+      "OptInSoak": {
+        "Kind": "H4OptInSoak",
+        "SchemaVersion": 1,
+        "Status": "Pass",
+        "SourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+        "Minutes": 120,
+        "ElapsedMilliseconds": "7200180",
+        "Cycles": 1363,
+        "RecreatedSessions": 137,
+        "Before": {
+          "Handles": 74,
+          "UserObjects": 1,
+          "GdiObjects": 4,
+          "PrivateBytes": "3362816"
+        },
+        "After": {
+          "Handles": 78,
+          "UserObjects": 1,
+          "GdiObjects": 4,
+          "PrivateBytes": "3813376"
+        },
+        "LongLivedActiveAndNeighbor": true,
+        "H4Accepted": false
+      },
+      "MaxOptInCycleGapMilliseconds": 7644,
+      "Controls": [
+        {
+          "Order": 1,
+          "Passed": 12,
+          "Total": 12,
+          "Failures": []
+        },
+        {
+          "Order": 4,
+          "Passed": 11,
+          "Total": 12,
+          "Failures": [
+            "close-in-request"
+          ]
+        },
+        {
+          "Order": 7,
+          "Passed": 12,
+          "Total": 12,
+          "Failures": []
+        }
+      ],
+      "PowerShell": "5.1.14409.1018",
+      "CLR": "4.0.30319.42000",
+      "KB3191566Present": true
+    }
+  ],
+  "H4Accepted": false,
+  "ManualKeyboardPending": true,
+  "LockUnlockPending": true
+}

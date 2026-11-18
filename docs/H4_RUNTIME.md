@@ -11,7 +11,9 @@ adds the remaining qualification experiments. I preserve rc2 and its results.
 
 The [rc4 local review](validation/2026-11-17-step-1.2-h4-runtime-rc4-candidate.md)
 records 123/123 runtime cases, all seven qualification cases and the full
-120-minute opt-in soak. Windows 7 rc4 results and manual checks remain pending.
+120-minute opt-in soak. The [Windows 7 rc4 review](validation/2026-11-18-step-1.2-h4-runtime-rc4-windows7.md)
+now verifies the automated matrix and elevated-caller checks on all three machines.
+Keyboard and lock/unlock checks remain open because the manual UI hides typing.
 
 ## Runtime contract
 
@@ -133,6 +135,7 @@ identities, desktop placement, failure causes, keyboard bytes, fault timing,
 resources and continuous trace coverage, and verify complete file inventories.
 Historical rc2 collections remain reviewable.
 
-Windows 7 rc4 results and manual evidence are pending. Passing this candidate
-does not complete the broader application corpus, freeze the Milestone 2 API
+The automated Windows 7 rc4 matrix and elevated-caller checks pass. Physical
+keyboard and lock/unlock evidence remain pending a corrected manual runner.
+Passing this candidate does not complete the broader application corpus, freeze the Milestone 2 API
 or authorize VT7 changes.

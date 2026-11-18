@@ -36,7 +36,10 @@ implements the approved desktop and close contract. The
 [completed Windows 7 rc2 matrix](validation/2026-11-16-step-1.2-h4-runtime-rc2-turtle-rerun.md)
 verifies 345/345 runtime cases across all three tiers. The
 [rc4 candidate](validation/2026-11-17-step-1.2-h4-runtime-rc4-candidate.md) passes
-local qualification and its full opt-in soak. Windows 7 rc4 and manual results remain.
+local qualification and its full opt-in soak. The
+[Windows 7 rc4 review](validation/2026-11-18-step-1.2-h4-runtime-rc4-windows7.md)
+verifies all automated and elevated-caller checks. Keyboard and lock/unlock
+qualification remain pending a corrected manual display.
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |

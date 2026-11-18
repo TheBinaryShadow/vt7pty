@@ -1,0 +1,64 @@
+{
+  "Kind": "H4ManualKeyboardReview",
+  "Status": "HarnessDisplayDefect",
+  "Attempts": [
+    {
+      "Run": "leopard-h4-manual-20261118-223152-6486265c",
+      "Machine": "LEOPARD",
+      "Outcome": "FailedManualAttemptNotAccepted",
+      "Error": "exact manual line (Win32 0)",
+      "CharactersReachedBackend": true,
+      "TypedUtf8": "AZaz\r",
+      "BackendText": "AZaz\r\n",
+      "ActualLayoutLanguage": 1050,
+      "RequiredLayoutLanguage": 1033,
+      "NoVisibleEchoInHarness": true,
+      "FixtureReadSucceeded": true,
+      "AllFileHashesVerified": true
+    },
+    {
+      "Run": "nessy-h4-manual-20261118-223224-a1474ac6",
+      "Machine": "NESSY",
+      "Outcome": "FailedManualAttemptNotAccepted",
+      "Error": "exact manual line (Win32 0)",
+      "CharactersReachedBackend": true,
+      "TypedUtf8": "aAA\r",
+      "BackendText": "aAA\r\n",
+      "ActualLayoutLanguage": 1050,
+      "RequiredLayoutLanguage": 1033,
+      "NoVisibleEchoInHarness": true,
+      "FixtureReadSucceeded": true,
+      "AllFileHashesVerified": true
+    },
+    {
+      "Run": "turtle-h4-manual-20261118-222729-492dc1d7",
+      "Machine": "TURTLE",
+      "Outcome": "FailedManualAttemptNotAccepted",
+      "Error": "exact manual line (Win32 0)",
+      "CharactersReachedBackend": true,
+      "TypedUtf8": "AaAAAAaaaaa\b\b\b\b\b\b\b\b\b\b\b\bbbbA\b\b\b\b\b\b\b\b\b\b\b\b\bAYay0-\r",
+      "BackendText": "AYay0-\r\n",
+      "ActualLayoutLanguage": 1033,
+      "RequiredLayoutLanguage": 1033,
+      "NoVisibleEchoInHarness": true,
+      "FixtureReadSucceeded": true,
+      "AllFileHashesVerified": true
+    },
+    {
+      "Run": "turtle-h4-manual-20261118-222931-d5e23d4e",
+      "Machine": "TURTLE",
+      "Outcome": "FailedManualAttemptNotAccepted",
+      "Error": "exact manual line (Win32 0)",
+      "CharactersReachedBackend": true,
+      "TypedUtf8": "AZaz09@{\u20ac\u20ac\\_\r",
+      "BackendText": "AZaz09@{\u20ac\u20ac\\_\r\n",
+      "ActualLayoutLanguage": 1050,
+      "RequiredLayoutLanguage": 1033,
+      "NoVisibleEchoInHarness": true,
+      "FixtureReadSucceeded": true,
+      "AllFileHashesVerified": true
+    }
+  ],
+  "PhysicalKeyboardAccepted": false,
+  "LockUnlockAccepted": false
+}

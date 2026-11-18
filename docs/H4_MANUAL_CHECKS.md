@@ -4,6 +4,15 @@ I use these checks after the automated H4 collection has finished. I need both
 result directories from each machine: the normal manual run and the separate
 elevated-caller run. H4 stays open until I review the underlying evidence.
 
+## Known rc4 display problem
+
+The [Windows 7 review](validation/2026-11-18-step-1.2-h4-runtime-rc4-windows7.md)
+confirms that RUN-H4-MANUAL.cmd hides typed input even when the backend receives
+it. I have not qualified the US/Croatian or lock/unlock workflows. I need to repair
+the display before requesting another manual run; do not repeat blind typing.
+The automated runs and separate elevated-caller checks passed on all three machines.
+The rc4 instructions below are retained for reference.
+
 ## Before starting
 
 Extract the complete rc4 ZIP into a fresh local folder. Run the automated

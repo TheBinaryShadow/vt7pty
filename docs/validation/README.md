@@ -12,15 +12,17 @@ loss. Original controls and unprotected contrasts retain their failures.
 The opt-in [H4 runtime candidate](../H4_RUNTIME.md) now implements the approved
 desktop and two-phase close contract. Its automated rc2 matrix passes on all
 three Windows 7 tiers, with 345/345 runtime cases. The
-[rc4 candidate](2026-11-17-step-1.2-h4-runtime-rc4-candidate.md) passes local
-qualification and a full two-hour opt-in soak. Windows 7 rc4 results, manual
-qualification, Milestone 1 and VT7 integration stay open.
+[rc4 Windows 7 review](2026-11-18-step-1.2-h4-runtime-rc4-windows7.md) verifies
+345 runtime, 21 qualification and 90 regression cases, with both full soaks and
+elevated-caller checks on every machine. Keyboard and lock/unlock qualification
+remain open while I repair the manual display. Milestone 1 and VT7 integration
+stay open.
 
 ## Current fidelity work
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| H4 runtime integration | [rc4 full local qualification and issuance](2026-11-17-step-1.2-h4-runtime-rc4-candidate.md) | [Automated matrix passed: 345/345; H4 remains open](2026-11-16-step-1.2-h4-runtime-rc2-turtle-rerun.md) |
+| H4 runtime integration | [rc4 full local qualification and issuance](2026-11-17-step-1.2-h4-runtime-rc4-candidate.md) | [rc4 automated matrix passed; manual display fix remains](2026-11-18-step-1.2-h4-runtime-rc4-windows7.md) |
 | H3 guard qualification | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-guards-rc1-candidate.md) | [Accepted: 282/282 guard cases; H4 remains](2026-11-14-step-1.2-host-guards-rc1-windows7.md) |
 | Coordinated H3 prototype | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-coordination-rc1-candidate.md) | [Reviewed: baseline and recording verified; H3 guards remain](2026-11-13-step-1.2-host-coordination-rc1-windows7.md) |
 | H3 scraper coordination | [rc1 candidate, controlled contrasts and retained failures](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-candidate.md) | [Reviewed: coordination supported; H3 open](2026-11-13-step-1.2-host-freeze-diagnostics-rc1-windows7.md) |

@@ -104,10 +104,10 @@ public-API experiments failed. I'm now following the
   verifies 345/345 runtime cases across NESSY, TURTLE and LEOPARD, with all three
   baseline regression suites and 120-minute soaks passing. The
   [rc4 candidate](docs/validation/2026-11-17-step-1.2-h4-runtime-rc4-candidate.md)
-  passes local qualification and its full opt-in soak. It adds seven qualification
-  cases, a separate 120-minute opt-in soak, explicit
-  desktop/module-failure checks and [physical input/session/access checks](docs/H4_MANUAL_CHECKS.md).
-  I need the three-machine results and manual evidence before accepting H4.
+  passes its [automated Windows 7 matrix](docs/validation/2026-11-18-step-1.2-h4-runtime-rc4-windows7.md):
+  345 runtime, 21 qualification and 90 regression cases, with both full soaks
+  on every machine. Elevated-caller checks also pass. I still need to repair
+  the manual display and qualify US/Croatian input and lock/unlock before accepting H4.
   Broader descendant/job policy remains in Step 1.5.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.
