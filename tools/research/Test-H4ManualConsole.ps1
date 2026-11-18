@@ -1,0 +1,147 @@
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory=$true)][string]$Executable,
+    [Parameter(Mandatory=$true)][string]$OutputDirectory,
+    [string]$RuntimeSource='54b0d23146dfde7528c9e4db1aa92d12e662f883',
+    [string]$PackageRoot=''
+)
+# Synthetic records in a newly created hidden console, never the user's console.
+# No SendInput, workstation lock, foreground change or user-desktop switch.
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$Executable=[IO.Path]::GetFullPath($Executable)
+$OutputDirectory=[IO.Path]::GetFullPath($OutputDirectory)
+if(Test-Path -LiteralPath $OutputDirectory){throw 'Use a fresh smoke-test directory.'}
+[void][IO.Directory]::CreateDirectory($OutputDirectory)
+Add-Type -TypeDefinition @"
+using System;
+using System.IO;
+using System.Text;
+using System.Threading;
+using System.Runtime.InteropServices;
+public static class H4ManualConsoleSmoke {
+    [StructLayout(LayoutKind.Sequential)] struct Coord { public short X,Y; public Coord(short x,short y){X=x;Y=y;} }
+    [StructLayout(LayoutKind.Sequential)] struct Rect { public short L,T,R,B; }
+    [StructLayout(LayoutKind.Sequential)] struct Info { public Coord Size,Cursor; public ushort Attributes; public Rect Window; public Coord Maximum; }
+    [StructLayout(LayoutKind.Sequential,CharSet=CharSet.Unicode)] struct Startup {
+        public uint cb;public string reserved,desktop,title;public uint x,y,cx,cy,xchars,ychars,fill,flags;public ushort show,reserved2;
+        public IntPtr reservedPtr,input,output,error;
+    }
+    [StructLayout(LayoutKind.Sequential)] struct Proc { public IntPtr process,thread;public uint pid,tid; }
+    [StructLayout(LayoutKind.Explicit,Size=20)] struct Key {
+        [FieldOffset(0)]public ushort type;[FieldOffset(4)]public int down;[FieldOffset(8)]public ushort repeat;
+        [FieldOffset(10)]public ushort vk;[FieldOffset(12)]public ushort scan;[FieldOffset(14)]public ushort ch;[FieldOffset(16)]public uint mods;
+    }
+    [DllImport("kernel32.dll",CharSet=CharSet.Unicode,SetLastError=true)] static extern bool CreateProcess(string app,StringBuilder args,IntPtr pa,IntPtr ta,bool inherit,uint flags,IntPtr env,string cwd,ref Startup si,out Proc pi);
+    [DllImport("kernel32.dll",SetLastError=true)] static extern bool FreeConsole();
+    [DllImport("kernel32.dll",SetLastError=true)] static extern bool AttachConsole(uint pid);
+    [DllImport("kernel32.dll")] static extern IntPtr GetStdHandle(int id);
+    [DllImport("kernel32.dll")] static extern bool SetStdHandle(int id,IntPtr h);
+    [DllImport("kernel32.dll",CharSet=CharSet.Unicode,SetLastError=true)] static extern IntPtr CreateFile(string name,uint access,uint share,IntPtr sa,uint disp,uint flags,IntPtr template);
+    [DllImport("kernel32.dll")] static extern bool CloseHandle(IntPtr h);
+    [DllImport("kernel32.dll",SetLastError=true)] static extern bool GetConsoleScreenBufferInfo(IntPtr h,out Info info);
+    [DllImport("kernel32.dll",CharSet=CharSet.Unicode,SetLastError=true)] static extern bool ReadConsoleOutputCharacter(IntPtr h,StringBuilder text,uint length,Coord start,out uint read);
+    [DllImport("kernel32.dll",CharSet=CharSet.Unicode,SetLastError=true)] static extern bool WriteConsoleInput(IntPtr h,Key[] keys,uint count,out uint written);
+    [DllImport("kernel32.dll")] static extern uint WaitForSingleObject(IntPtr h,uint ms);
+    [DllImport("kernel32.dll")] static extern bool GetExitCodeProcess(IntPtr h,out uint code);
+    [DllImport("kernel32.dll")] static extern bool TerminateProcess(IntPtr h,uint code);
+    static IntPtr input,output;static string folder;static Proc child;
+    static void Need(bool ok,string operation){if(!ok)throw new Exception(operation+" (Windows "+Marshal.GetLastWin32Error()+")");}
+    static string Screen() {
+        Info i;Need(GetConsoleScreenBufferInfo(output,out i),"screen info");
+        short start=(short)Math.Max(0,i.Cursor.Y-120);
+        uint n=(uint)(i.Size.X*Math.Min(121,i.Size.Y-start));
+        var text=new StringBuilder((int)n+1);uint got;
+        Need(ReadConsoleOutputCharacter(output,text,n,new Coord(0,start),out got),"read owned console");
+        return text.ToString();
+    }
+    static void Save(string step){File.WriteAllText(Path.Combine(folder,"screen-"+step+".txt"),Screen(),new UTF8Encoding(false));}
+    static void WaitText(string text) {
+        var end=DateTime.UtcNow.AddSeconds(20);
+        while(DateTime.UtcNow<end) {
+            if(Screen().Contains(text))return;
+            if(WaitForSingleObject(child.process,0)==0)throw new Exception("Child exited before: "+text);
+            Thread.Sleep(20);
+        }
+        throw new Exception("Missing visible console text: "+text);
+    }
+    static void KeyRecord(ushort vk,char ch,uint mods) {
+        var a=new Key[2];
+        a[0]=new Key{type=1,down=1,repeat=1,vk=vk,ch=ch,mods=mods};
+        a[1]=new Key{type=1,down=0,repeat=1,vk=vk,ch=ch,mods=0};
+        uint n;Need(WriteConsoleInput(input,a,2,out n)&&n==2,"owned-console synthetic key");
+    }
+    static void Text(string text) {
+        foreach(char c in text) {
+            ushort vk=c<128 && Char.IsLetterOrDigit(c)?(ushort)Char.ToUpperInvariant(c):(ushort)0xba;
+            uint mods=Char.IsUpper(c)?16u:0u;
+            if(c=='@'||c=='['||c==']'||c=='{'||c=='}'||c==92||c=='|')mods|=9;
+            KeyRecord(vk,c,mods);
+        }
+    }
+    public static void Run(string exe,string directory,string profile,string packageRoot) {
+        folder=directory;Directory.CreateDirectory(folder);input=output=IntPtr.Zero;
+        IntPtr oldIn=GetStdHandle(-10),oldOut=GetStdHandle(-11),oldErr=GetStdHandle(-12);
+        Startup si=new Startup();si.cb=(uint)Marshal.SizeOf(si);si.flags=1;si.show=0;
+        string evidence=Path.Combine(folder,"native");
+        string args="\""+exe+"\" "+(profile=="Session"?"--session-smoke":"--manual-smoke "+profile)+" \""+evidence+"\"";
+        if(profile=="Launcher")args="\""+exe+"\" -NoLogo -NoProfile -ExecutionPolicy Bypass -File \""+Path.Combine(packageRoot,"tools/research/Invoke-H4Manual.ps1")+"\" -PackageRoot \""+packageRoot+"\" -Check US";
+        Need(CreateProcess(exe,new StringBuilder(args),IntPtr.Zero,IntPtr.Zero,false,0x10,IntPtr.Zero,Path.GetDirectoryName(exe),ref si,out child),"create owned hidden console");
+        try {
+            FreeConsole();var end=DateTime.UtcNow.AddSeconds(5);
+            while(!AttachConsole(child.pid)){if(DateTime.UtcNow>end)throw new Exception("Attach owned console");Thread.Sleep(20);}
+            input=CreateFile("CONIN$",0xc0000000,3,IntPtr.Zero,3,0,IntPtr.Zero);
+            output=CreateFile("CONOUT$",0x80000000,3,IntPtr.Zero,3,0,IntPtr.Zero);
+            Need(input!=new IntPtr(-1)&&output!=new IntPtr(-1),"owned console handles");
+            if(profile=="Launcher"){WaitText("then press Enter to begin.");KeyRecord(0x7b,'\0',0);WaitText("US: Fail");Save("f12-partial");}
+            else if(profile=="Session"){WaitText("Session-transition check passed.");Save("session-recovery");}
+            else {
+            WaitText("then press Enter to begin.");
+            KeyRecord(13,'\r',0);
+            WaitText("That is not the required layout.");Save("wrong-layout-refused");
+            KeyRecord(0x71,'\0',0);KeyRecord(13,'\r',0);WaitText("Typed input (local preview): ");
+            string expected=profile=="US"?"AZaz09[]{}\\|":"\u010d\u0107\u0111\u0161\u017e \u010c\u0106\u0110\u0160\u017d @[]{}\\|";
+            Text("Q");KeyRecord(8,'\b',0);Text(expected);
+            WaitText("Typed input (local preview): "+expected);Save("preview-before-enter");
+            KeyRecord(13,'\r',0);WaitText("Backend returned: "+expected+"<CR><LF>");
+            if(profile=="HR") {
+                WaitText("Use a dead-key composition");KeyRecord(0x39,'\0',9);Text("\u00e1");KeyRecord(13,'\r',0);
+                WaitText("Backend returned: \u00e1<CR><LF>");Save("unicode-and-dead-prefix");
+            }
+            WaitText("Type OLD, then press Ctrl+C");Text("OLD");WaitText("Typed input (local preview): OLD");KeyRecord(67,(char)3,8);
+            WaitText("Backend canceled the line: error 995");Save("cooked-cancel");
+            WaitText("Type NEXT, then press Enter.");Text("NEXT");KeyRecord(13,'\r',0);
+            WaitText("Backend returned: NEXT<CR><LF>");WaitText("Raw-input check:");
+            KeyRecord(67,(char)3,8);Text("z");WaitText("Backend raw records verified");
+            WaitText("Keyboard check passed.");Save("completed");
+            }
+            Need(WaitForSingleObject(child.process,15000)==0,"manual smoke completion");uint code;
+            Need(GetExitCodeProcess(child.process,out code)&&code==(profile=="Launcher"?1u:0u),"manual smoke exit");
+        } finally {
+            if(output!=IntPtr.Zero&&output!=new IntPtr(-1)){try{Save("last");}catch{} CloseHandle(output);}
+            if(input!=IntPtr.Zero&&input!=new IntPtr(-1))CloseHandle(input);
+            if(WaitForSingleObject(child.process,0)!=0){TerminateProcess(child.process,125);WaitForSingleObject(child.process,10000);}
+            CloseHandle(child.thread);CloseHandle(child.process);FreeConsole();
+            SetStdHandle(-10,oldIn);SetStdHandle(-11,oldOut);SetStdHandle(-12,oldErr);
+        }
+    }
+}
+"@
+$taskPrevious=$env:VT7PTY_H4_RUNTIME_SOURCE
+try{
+    $env:VT7PTY_H4_RUNTIME_SOURCE=$RuntimeSource
+    foreach($taskProfile in @('US','HR','Session')){
+        [H4ManualConsoleSmoke]::Run($Executable,(Join-Path $OutputDirectory $taskProfile),$taskProfile,'')
+        Write-Output ($taskProfile+' synthetic console smoke passed.')
+    }
+    if($PackageRoot){
+        $PackageRoot=[IO.Path]::GetFullPath($PackageRoot)
+        [H4ManualConsoleSmoke]::Run((Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'),(Join-Path $OutputDirectory 'Launcher'),'Launcher',$PackageRoot)
+        Write-Output 'Real launcher F12/partial-evidence control passed.'
+    }
+}catch{[IO.File]::WriteAllText((Join-Path $OutputDirectory 'failure.txt'),$_.Exception.ToString());throw}
+finally{$env:VT7PTY_H4_RUNTIME_SOURCE=$taskPrevious}
+[IO.File]::WriteAllText((Join-Path $OutputDirectory 'smoke.json'),(@{
+    Kind='H4OwnedConsoleSmoke';Status='Pass';SyntheticInputUsed=$true;PhysicalAcceptance=$false
+    Profiles=@('US','HR','Session');RuntimeSourceCommit=$RuntimeSource;DesktopSwitched=$false;ActualKeyboardLayoutQualified=$false
+} | ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))

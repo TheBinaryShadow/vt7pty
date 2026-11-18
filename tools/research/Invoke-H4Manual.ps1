@@ -10,8 +10,13 @@ if(-not $PackageRoot){$PackageRoot=Join-Path $taskScript '..\..'}
 $PackageRoot=[IO.Path]::GetFullPath($PackageRoot).TrimEnd('\')
 . (Join-Path $PackageRoot 'tools\platform\Windows7Compat.ps1')
 $taskManifest=Read-VT7Json (Join-Path $PackageRoot 'manifest.json')
-if($taskManifest.Kind -ne 'VT7PtyH4RuntimeCandidate' -or $taskManifest.Qualification.Revision -ne 1){
-    throw 'Use the H4 qualification candidate containing this launcher.'
+$taskManualOnly=$taskManifest.Kind -eq 'VT7PtyH4ManualCandidate'
+if(-not $taskManualOnly -and ($taskManifest.Kind -ne 'VT7PtyH4RuntimeCandidate' -or $taskManifest.Qualification.Revision -ne 1)){
+    throw 'Use the H4 candidate containing this launcher.'
+}
+$taskHarnessSource=if($taskManualOnly){$taskManifest.Harness.SourceCommit}else{$taskManifest.Runtime.SourceCommit}
+if($taskManualOnly -and ($taskManifest.Harness.ManualRevision -ne 2 -or -not $taskManifest.Runtime.UnchangedFromRc4)){
+    throw 'Wrong manual-only candidate identity.'
 }
 foreach($taskFile in $taskManifest.Files){
     $taskPath=[IO.Path]::GetFullPath((Join-Path $PackageRoot $taskFile.Path))
@@ -27,8 +32,9 @@ $taskSteps=@()
 $taskChecks=@(if($Check -eq 'All'){'US';'HR';'Session'}else{$Check})
 function Save-H4Manual {
     Write-VT7Json (Join-Path $taskOutput 'report.json') @{
-        Kind='VT7PtyH4ManualResults';SchemaVersion=1;RunId=$taskRunId;ComputerName=$env:COMPUTERNAME
-        RecordedUtc=[DateTime]::UtcNow.ToString('o');SourceCommit=$taskManifest.Runtime.SourceCommit
+        Kind='VT7PtyH4ManualResults';SchemaVersion=$(if($taskManualOnly){2}else{1});RunId=$taskRunId;ComputerName=$env:COMPUTERNAME
+        RecordedUtc=[DateTime]::UtcNow.ToString('o');SourceCommit=$taskHarnessSource
+        HarnessSourceCommit=$taskHarnessSource;RuntimeSourceCommit=$taskManifest.Runtime.SourceCommit
         ManifestSha256=(Get-VT7Sha256 (Join-Path $PackageRoot 'manifest.json'))
         RequestedChecks=$taskChecks;Steps=$taskSteps;PhysicalInputRequired=$true
         PowerShellVersion=$PSVersionTable.PSVersion.ToString();CLRVersion=$PSVersionTable.CLRVersion.ToString()
@@ -36,7 +42,8 @@ function Save-H4Manual {
     }
 }
 Save-H4Manual
-Write-Host 'Run this after the automated H4 collection has finished.'
+if($taskManualOnly){Write-Host 'Manual-only follow-up. The qualified rc4 automated and elevated-caller results remain valid.'}
+else{Write-Host 'Run this after the automated H4 collection has finished.'}
 if($Check -eq 'Elevated'){Write-Host 'This check requires an elevated classic console. It does not elevate itself.'}
 else {Write-Host 'I will ask for physical keyboard input and a manual lock/unlock. I do not change Windows settings.'}
 foreach($taskCheck in $taskChecks){
@@ -50,6 +57,7 @@ foreach($taskCheck in $taskChecks){
         $taskStart.Arguments=$taskArguments+' "'+$taskDirectory+'"'
         $taskStart.WorkingDirectory=Join-Path $PackageRoot 'runtime\bin'
         $taskStart.UseShellExecute=$false;$taskStart.CreateNoWindow=$false
+        $taskStart.EnvironmentVariables['VT7PTY_H4_RUNTIME_SOURCE']=$taskManifest.Runtime.SourceCommit
         $taskProcess=New-Object Diagnostics.Process;$taskProcess.StartInfo=$taskStart
         try {
             if(-not $taskProcess.Start()){throw 'Cannot start the manual test.'}
@@ -62,7 +70,11 @@ foreach($taskCheck in $taskChecks){
         $taskProbePath=Join-Path $taskDirectory 'probe.json'
         if(Test-Path -LiteralPath $taskProbePath){
             $taskProbe=Read-VT7Json $taskProbePath
-            if($taskProbe.SourceCommit -cne $taskManifest.Runtime.SourceCommit){throw 'Manual test build does not match the package.'}
+            if($taskProbe.SourceCommit -cne $taskHarnessSource){throw 'Manual test build does not match the package.'}
+            if($taskManualOnly -and ($taskProbe.ManualRevision -ne 2 -or
+                $taskProbe.RuntimeSourceCommit -cne $taskManifest.Runtime.SourceCommit -or $taskProbe.SyntheticInputUsed)){
+                throw 'Manual result is not a physical revision-2 check of the qualified runtime.'
+            }
             $taskEntry.Status=$taskProbe.Status;$taskEntry.CollectionStatus='Completed'
         }else{
             $taskEntry.Status='Fail';$taskEntry.CollectionStatus='Partial'
@@ -81,6 +93,6 @@ $taskFiles=@([IO.Directory]::GetFiles($taskOutput,'*',[IO.SearchOption]::AllDire
 })
 Write-VT7Json (Join-Path $taskOutput 'evidence-files.json') @{SchemaVersion=1;Files=$taskFiles}
 Write-Host ('Keep the complete manual results: '+$taskOutput)
-if($Check -eq 'All'){Write-Host 'Then right-click RUN-H4-ACCESS.cmd and choose Run as administrator for the separate elevated-caller denial check.'}
+if($Check -eq 'All' -and -not $taskManualOnly){Write-Host 'Then right-click RUN-H4-ACCESS.cmd and choose Run as administrator for the separate elevated-caller denial check.'}
 if($taskSteps.Count -ne $taskChecks.Count -or @($taskSteps | Where-Object {$_.Status -ne 'Pass'}).Count){exit 1}
 exit 0

@@ -559,6 +559,11 @@ int wmain(int argc, wchar_t **argv)
 {
     try
     {
+        if (argc == 2 && std::wstring(argv[1]) == L"--manual-self-test") {
+            manualDisplayOracle();return 0;
+        }
+        if (argc == 4 && std::wstring(argv[1]) == L"--manual-smoke")
+            return runKeyboard(argv[3],argv[2],true);
         if (argc == 3 && std::wstring(argv[1]) == L"--preflight")
             return desktopPreflight(argv[2]) ? 0 : 2;
         if (argc == 3 && std::wstring(argv[1]) == L"--qualify")
@@ -567,6 +572,8 @@ int wmain(int argc, wchar_t **argv)
             return runOptInSoak(argv[3], static_cast<unsigned int>(_wtoi(argv[2])));
         if (argc == 4 && std::wstring(argv[1]) == L"--keyboard")
             return runKeyboard(argv[3], argv[2]);
+        if (argc == 3 && std::wstring(argv[1]) == L"--session-smoke")
+            return runSessionCheck(argv[2],true);
         if (argc == 3 && std::wstring(argv[1]) == L"--session-check")
             return runSessionCheck(argv[2]);
         if (argc == 3 && std::wstring(argv[1]) == L"--access-check")

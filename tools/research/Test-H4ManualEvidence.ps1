@@ -18,9 +18,19 @@ function Files-M([string]$Root,$Files){
 }
 $manifest=Read-M (Join-Path $PackageRoot 'manifest.json')
 $report=Read-M (Join-Path $Directory 'report.json')
-Assert-M ($manifest.Kind -ceq 'VT7PtyH4RuntimeCandidate' -and $manifest.Qualification.Revision -eq 1 -and
-    $report.Kind -ceq 'VT7PtyH4ManualResults' -and $report.SchemaVersion -eq 1 -and
-    $report.SourceCommit -ceq $manifest.Runtime.SourceCommit -and
+$manualOnly=$manifest.Kind -ceq 'VT7PtyH4ManualCandidate'
+$harnessSource=if($manualOnly){$manifest.Harness.SourceCommit}else{$manifest.Runtime.SourceCommit}
+if($manualOnly){
+    Assert-M ($report.SchemaVersion -eq 2 -and $manifest.Harness.ManualRevision -eq 2 -and
+        $manifest.Runtime.UnchangedFromRc4 -and $manifest.Harness.SourceTreeClean -and $harnessSource -cmatch '^[0-9a-f]{40}$' -and
+        $manifest.Runtime.SourceCommit -ceq '54b0d23146dfde7528c9e4db1aa92d12e662f883' -and
+        $manifest.Runtime.ArchiveSha256 -ceq '910a4920b06872c4756e814d5e5851fe2c3ed9b4c802854b59e2aaa0966d16ce' -and
+        $manifest.Runtime.ManifestSha256 -ceq '43a767650d720b1f9dc1bf5d8a17420d0ead7991461df65d088dcab206956a98' -and $report.HarnessSourceCommit -ceq $harnessSource -and
+        $report.RuntimeSourceCommit -ceq $manifest.Runtime.SourceCommit) 'separate harness and qualified runtime identities'
+}
+Assert-M (($manualOnly -or ($manifest.Kind -ceq 'VT7PtyH4RuntimeCandidate' -and $manifest.Qualification.Revision -eq 1)) -and
+    $report.Kind -ceq 'VT7PtyH4ManualResults' -and $report.SchemaVersion -in @(1,2) -and
+    $report.SourceCommit -ceq $harnessSource -and $report.PhysicalInputRequired -and
     $report.ManifestSha256 -ceq (Get-FileHash -LiteralPath (Join-Path $PackageRoot 'manifest.json') -Algorithm SHA256).Hash.ToLowerInvariant() -and
     -not $report.H4Accepted -and -not $report.ManualQualificationAccepted) 'matched candidate collection'
 Files-M $PackageRoot $manifest.Files
@@ -38,7 +48,9 @@ foreach($step in $report.Steps){
     $probe=Read-M (Join-Path $native 'probe.json')
     $kind=if($step.Check -eq 'Session'){'H4ManualSession'}elseif($step.Check -eq 'Elevated'){'H4ManualAccess'}else{'H4ManualKeyboard'}
     Assert-M ($probe.Kind -ceq $kind) 'native check identity'
+    if($manualOnly){Assert-M ($probe.ManualRevision -eq 2 -and $probe.RuntimeSourceCommit -ceq $manifest.Runtime.SourceCommit -and
+        -not $probe.SyntheticInputUsed) 'physical revision-2 native result'}
     if($kind -eq 'H4ManualKeyboard'){Assert-M ($probe.DeclaredLayout -ceq $step.Check) 'native physical layout'}
-    $reviews+=@(& (Join-Path $PSScriptRoot 'Test-H4QualificationEvidence.ps1') -Directory $native -ExpectedSource $manifest.Runtime.SourceCommit)
+    $reviews+=@(& (Join-Path $PSScriptRoot 'Test-H4QualificationEvidence.ps1') -Directory $native -ExpectedSource $harnessSource -ExpectedRuntimeSource $manifest.Runtime.SourceCommit)
 }
 [ordered]@{Kind='H4ManualBundleReview';Status='Pass';ComputerName=$report.ComputerName;Checks=$requested;Reviews=$reviews;H4Accepted=$false}

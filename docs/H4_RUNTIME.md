@@ -13,7 +13,9 @@ The [rc4 local review](validation/2026-11-17-step-1.2-h4-runtime-rc4-candidate.m
 records 123/123 runtime cases, all seven qualification cases and the full
 120-minute opt-in soak. The [Windows 7 rc4 review](validation/2026-11-18-step-1.2-h4-runtime-rc4-windows7.md)
 now verifies the automated matrix and elevated-caller checks on all three machines.
-Keyboard and lock/unlock checks remain open because the manual UI hides typing.
+The corrected [manual-only runner](H4_MANUAL_CHECKS.md) is ready for keyboard
+and lock/unlock qualification. Those physical checks remain open; I do not need
+to repeat the accepted automated or elevated-caller runs.
 
 ## Runtime contract
 

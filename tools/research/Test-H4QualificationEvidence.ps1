@@ -2,6 +2,8 @@
 param(
     [Parameter(Mandatory=$true)][string]$Directory,
     [string]$ExpectedSource='',
+    [string]$ExpectedRuntimeSource='',
+    [switch]$AllowSyntheticSmoke,
     [ValidateRange(1,120)][int]$MinimumSoakMinutes=120,
     [string]$OutputPath=''
 )
@@ -47,7 +49,7 @@ function Trace-Q {
         $lineOffset=$traceOffset
         $traceOffset+=[Text.Encoding]::UTF8.GetByteCount($line)+1
         $r=$line | ConvertFrom-Json
-        Require-Q ($r.commit -ceq $ExpectedSource -and $r.api -ceq '1.1' -and $r.protocol -eq 2) 'trace source/API/protocol'
+        Require-Q (($r.commit -ceq $ExpectedRuntimeSource -or ($r.commit -ceq $ExpectedSource -and $r.process -ceq 'RuntimeCancellationTest.exe')) -and $r.api -ceq '1.1' -and $r.protocol -eq 2) 'trace source/API/protocol'
         if($r.message -match '^host-cancel ready host=(\d+) thread=(\d+) desktop=(VT7Pty-Console-[0-9a-f]{32})$'){
             $context=@{Host=[int]$Matches[1];Thread=[int]$Matches[2];Desktop=$Matches[3];Agent=[int]$r.pid}
             Require-Q (-not $ready.ContainsKey($context.Desktop)) 'unique trace session'
@@ -110,8 +112,17 @@ function Trace-Q {
 }
 $probe=Read-Q 'probe.json'
 if(-not $ExpectedSource){$ExpectedSource=$probe.SourceCommit}
+if(-not $ExpectedRuntimeSource){
+    $ExpectedRuntimeSource=if($null -ne $probe.PSObject.Properties['RuntimeSourceCommit']){$probe.RuntimeSourceCommit}else{$ExpectedSource}
+}
+$synthetic=$null -ne $probe.PSObject.Properties['SyntheticInputUsed'] -and $probe.SyntheticInputUsed
+Require-Q (-not $synthetic -or $AllowSyntheticSmoke) 'synthetic smoke is not manual acceptance'
+
 Require-Q ($probe.Status -eq 'Pass' -and $probe.SourceCommit -ceq $ExpectedSource -and -not $probe.H4Accepted) 'native identity and outcome'
-$summary=[ordered]@{Kind='H4QualificationReview';Probe=$probe.Kind;Status='Pass';SourceCommit=$ExpectedSource;H4Accepted=$false}
+if($null -ne $probe.PSObject.Properties['ManualRevision']){
+    Require-Q ($probe.ManualRevision -eq 2 -and $probe.RuntimeSourceCommit -ceq $ExpectedRuntimeSource) 'manual revision and qualified runtime identity'
+}
+$summary=[ordered]@{Kind='H4QualificationReview';Probe=$probe.Kind;Status='Pass';SourceCommit=$ExpectedSource;RuntimeSourceCommit=$ExpectedRuntimeSource;SyntheticSmoke=$synthetic;H4Accepted=$false}
 if($probe.Kind -eq 'H4QualificationProbe'){
     $cases=(Read-Q 'cases.json').Cases;$expected=@(Get-H4QualificationNames)
     Require-Q (($cases.Case -join '|') -ceq ($expected -join '|') -and $probe.Total -eq $expected.Count -and
@@ -198,12 +209,33 @@ if($probe.Kind -eq 'H4QualificationProbe'){
 }elseif($probe.Kind -eq 'H4ManualKeyboard'){
     Preflight-Q 'preflight.json'
     $expectedLayout=if($probe.DeclaredLayout -ceq 'US'){1033}elseif($probe.DeclaredLayout -ceq 'HR'){1050}else{0}
-    Require-Q ($expectedLayout -ne 0 -and $probe.LayoutLanguage -eq $expectedLayout -and $probe.PhysicalInputRequired) 'physical layout profile'
+    Require-Q ($expectedLayout -ne 0 -and $probe.LayoutLanguage -eq $expectedLayout -and ($probe.PhysicalInputRequired -or ($synthetic -and $AllowSyntheticSmoke))) 'physical layout profile'
     $text=if($expectedLayout -eq 1033){'AZaz09[]{}\|'}else{([string][char]269+[char]263+[char]273+[char]353+[char]382+' '+[char]268+[char]262+[char]272+[char]352+[char]381+' @[]{}\|')}
     $textKeys=Read-Q 'text-keys.json'
+    $physicalSource=if($synthetic){'OwnedConsoleSyntheticSmoke'}else{'PhysicalConsoleInput'}
+    if($null -ne $probe.PSObject.Properties['ManualRevision'] -and $probe.ManualRevision -ge 2){
+        $ready=Read-Q 'layout-ready.json'
+        Require-Q ($ready.Confirmed -and $ready.LayoutLanguage -eq $expectedLayout -and
+            $textKeys.Complete -and $textKeys.AllTextUsedRequiredLayout) 'confirmed layout and complete keyboard step'
+        $ui=[IO.File]::ReadAllText((Join-Path $Directory 'ui-transcript.txt'))
+        Require-Q ($ui.Contains('Typed input (local preview): ') -and $ui.Contains('Backend returned: ')) 'visible input and backend feedback'
+    }
+    if($null -ne $probe.PSObject.Properties['ManualRevision']){
+        foreach($name in @('text','cancel','next','raw')+$(if($expectedLayout -eq 1050){@('dead')}else{@()})){
+            $k=Read-Q ($name+'-keys.json')
+            Require-Q ($k.Complete -and $k.AllTextUsedRequiredLayout -and $k.Source -ceq $physicalSource -and
+                $k.SyntheticInputUsed -eq $synthetic -and @($k.Keys | Where-Object {$_.Down -and $_.Character -ne 0 -and ([Convert]::ToInt32($_.LayoutId,16) -band 65535) -ne $expectedLayout}).Count -eq 0) 'complete input under the required layout'
+        }
+    }
+    $forwardedLine=''
+    foreach($c in $textKeys.ForwardedUtf8.ToCharArray()){
+        if([int]$c -eq 13){break}
+        if([int]$c -eq 8){if($forwardedLine.Length){$forwardedLine=$forwardedLine.Substring(0,$forwardedLine.Length-1)}}
+        else{$forwardedLine+=$c}
+    }
     Next-Q (Read-Q 'text-read.json') $text 0
-    Require-Q ($textKeys.Source -ceq 'PhysicalConsoleInput' -and -not $textKeys.SyntheticInputUsed -and
-        $textKeys.LayoutLanguage -eq $expectedLayout -and $textKeys.ForwardedUtf8 -ceq ($text+[char]13) -and
+    Require-Q ($textKeys.Source -ceq $physicalSource -and $textKeys.SyntheticInputUsed -eq $synthetic -and
+        $textKeys.LayoutLanguage -eq $expectedLayout -and $forwardedLine -ceq $text -and
         $textKeys.ShiftObserved -and @($textKeys.Keys).Count -ge $text.Length) 'physical text and Shift records'
     if($expectedLayout -eq 1050){
         Require-Q ($textKeys.AltGrObserved -and @($textKeys.Keys | Where-Object {$_.Down -and $_.Character -ne 0 -and
@@ -217,7 +249,7 @@ if($probe.Kind -eq 'H4QualificationProbe'){
     }
     foreach($name in @('cancel','next','raw')){
         $k=Read-Q ($name+'-keys.json')
-        Require-Q ($k.Source -ceq 'PhysicalConsoleInput' -and -not $k.SyntheticInputUsed -and
+        Require-Q ($k.Source -ceq $physicalSource -and $k.SyntheticInputUsed -eq $synthetic -and
             $k.LayoutLanguage -eq $expectedLayout -and @($k.Keys).Count -gt 0 -and @($k.Keys).Count -le 512) ('physical '+$name+' records')
     }
     Require-Q ((Read-Q 'cancel-keys.json').ForwardedUtf8 -ceq ('OLD'+[char]3)) 'physical cancellation input'
@@ -246,6 +278,9 @@ if($probe.Kind -eq 'H4QualificationProbe'){
     Next-Q (Read-Q 'existing\next-read.json') 'NEXT_PROBE' 1
     $trace=Trace-Q
     Require-Q ($trace.Keys.Count -eq 2 -and $trace.Unknown.Count -eq 0 -and $trace.Sessions -eq 2) 'recovery and newly opened session'
+    if($null -ne $probe.PSObject.Properties['ManualRevision']){
+        Require-Q ($probe.CallerThreadDesktopChangedBySmoke -eq $synthetic) 'real session transition or explicit synthetic smoke'
+    }
     $summary.KeyboardOperations=$trace.Keys.Count;$summary.SessionTransition='Observed'
 }elseif($probe.Kind -eq 'H4ManualAccess'){
     $preflight=Read-Q 'preflight.json'

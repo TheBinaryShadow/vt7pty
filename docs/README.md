@@ -39,7 +39,8 @@ verifies 345/345 runtime cases across all three tiers. The
 local qualification and its full opt-in soak. The
 [Windows 7 rc4 review](validation/2026-11-18-step-1.2-h4-runtime-rc4-windows7.md)
 verifies all automated and elevated-caller checks. Keyboard and lock/unlock
-qualification remain pending a corrected manual display.
+qualification remain open. The corrected manual-only runner is ready for the
+remaining physical checks on all three machines.
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |
