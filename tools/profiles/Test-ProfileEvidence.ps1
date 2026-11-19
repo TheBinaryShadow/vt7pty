@@ -200,6 +200,7 @@ if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')){
         -not $m.Step12Accepted -and $m.CtrlBreakTransport -ceq 'Unsupported') 'matched profile candidate and unchanged runtime'
     Need-P ($r.Mode -in @('Automated','Manual') -and $r.Tier -in @('DevelopmentHost','NonESU','ESU','Legacy') -and @($r.PreflightErrors).Count -eq 0 -and
         -not $r.PolicyOverrideInherited -and -not $r.ProfileContentCollected -and -not $r.HistoryContentCollected -and -not $r.ShellOutputCollectedInManual) 'profile report prerequisites/privacy'
+    Need-P ($r.OrdinaryUserProfiles -ceq $(if($r.Mode -ceq 'Manual'){'PendingReview'}else{'NotRun'})) 'ordinary profiles remain explicitly unqualified before review'
     if($r.Tier -ne 'DevelopmentHost'){Need-P ($r.OS.Version.StartsWith('6.1.') -and $r.OS.ServicePackMajorVersion -eq 1 -and $r.OS.ProductType -eq 1) 'Windows 7 SP1 tier'}
     if($r.Tier -ceq 'Legacy'){
         Need-P ($r.PowerShellVersion -ceq '2.0' -and $r.CLRVersion.StartsWith('2.0.') -and -not $r.PowerShell7.Required -and
