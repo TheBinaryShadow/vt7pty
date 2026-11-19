@@ -1,0 +1,33 @@
+
+  VT7Pty.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty.dll
+  VT7Pty-DebugServer.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-DebugServer.exe
+  H4TestGate.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\H4TestGate.dll
+  VT7Pty-Host.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-Host.dll
+  VT7Pty-Agent.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-Agent.exe
+  RuntimeCancellationTest.cc
+D:\Git\vt7pty\tests\fidelity\ProfileCases.h(204,15): error C3688: invalid literal suffix 'Case'; literal operator or literal operator template 'operator ""Case' not found [D:\Git\vt7pty\projects\RuntimeCancellationTest.vcxproj]
+  (compiling source file '../tests/fidelity/RuntimeCancellationTest.cc')
+  
+D:\Git\vt7pty\tests\fidelity\ProfileCases.h(204,42): error C3688: invalid literal suffix 'Engine'; literal operator or literal operator template 'operator ""Engine' not found [D:\Git\vt7pty\projects\RuntimeCancellationTest.vcxproj]
+  (compiling source file '../tests/fidelity/RuntimeCancellationTest.cc')
+  
+D:\Git\vt7pty\tests\fidelity\ProfileCases.h(204,84): error C3688: invalid literal suffix 'Editor'; literal operator or literal operator template 'operator ""Editor' not found [D:\Git\vt7pty\projects\RuntimeCancellationTest.vcxproj]
+  (compiling source file '../tests/fidelity/RuntimeCancellationTest.cc')
+  
+D:\Git\vt7pty\tests\fidelity\ProfileCases.h(205,13): error C3688: invalid literal suffix 'Layered'; literal operator or literal operator template 'operator ""Layered' not found [D:\Git\vt7pty\projects\RuntimeCancellationTest.vcxproj]
+  (compiling source file '../tests/fidelity/RuntimeCancellationTest.cc')
+  
+D:\Git\vt7pty\tests\fidelity\ProfileCases.h(205,49): error C3688: invalid literal suffix 'EditMode'; literal operator or literal operator template 'operator ""EditMode' not found [D:\Git\vt7pty\projects\RuntimeCancellationTest.vcxproj]
+  (compiling source file '../tests/fidelity/RuntimeCancellationTest.cc')
+  
+D:\Git\vt7pty\tests\fidelity\ProfileCases.h(206,13): error C3688: invalid literal suffix 'PredictionSource'; literal operator or literal operator template 'operator ""PredictionSource' not found [D:\Git\vt7pty\projects\RuntimeCancellationTest.vcxproj]
+  (compiling source file '../tests/fidelity/RuntimeCancellationTest.cc')
+  
+D:\Git\vt7pty\tests\fidelity\ProfileCases.h(207,27): error C3680: cannot concatenate user-defined string literals with mismatched literal suffix identifiers [D:\Git\vt7pty\projects\RuntimeCancellationTest.vcxproj]
+  (compiling source file '../tests/fidelity/RuntimeCancellationTest.cc')
+      D:\Git\vt7pty\tests\fidelity\ProfileCases.h(207,27):
+      Concatenating suffix 'SchemaVersion' with suffix 'Cases'
+  
+D:\Git\vt7pty\tests\fidelity\ProfileCases.h(207,11): error C3688: invalid literal suffix 'SchemaVersion'; literal operator or literal operator template 'operator ""SchemaVersion' not found [D:\Git\vt7pty\projects\RuntimeCancellationTest.vcxproj]
+  (compiling source file '../tests/fidelity/RuntimeCancellationTest.cc')
+  

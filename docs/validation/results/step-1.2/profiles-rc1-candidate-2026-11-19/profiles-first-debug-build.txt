@@ -1,0 +1,86 @@
+
+  H4TestGate.cc
+  HostCancellation.cc
+  OwnedHandle.cc
+  Exception.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  AgentLocation.cc
+  DebugClient.cc
+  GenRandom.cc
+  Version.cc
+  vt7pty.cc
+  Buffer.cc
+  WindowsVersion.cc
+  Assert.cc
+  DebugClient.cc
+  GenRandom.cc
+  OwnedHandle.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  WindowsVersion.cc
+  Assert.cc
+  Exception.cc
+  Version.cc
+  DebugServer.cc
+  DebugClient.cc
+  OwnedHandle.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  WindowsVersion.cc
+  Assert.cc
+  Exception.cc
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Debug\H4TestGate.lib and object D:\Git\vt7pty\artifacts\bin\x64\Debug\H4TestGate.exp
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-Host.lib and object D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-Host.exp
+  H4TestGate.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\H4TestGate.dll
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty.lib and object D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty.exp
+  VT7Pty-Host.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-Host.dll
+  VT7Pty-DebugServer.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-DebugServer.exe
+  VT7Pty.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty.dll
+  Agent.cc
+  HostCancellation.cc
+  ConsoleFont.cc
+  ConsoleInput.cc
+  ConsoleInputReencoding.cc
+  ConsoleLine.cc
+  DebugShowInput.cc
+  DefaultInputMap.cc
+  EventLoop.cc
+  InputMap.cc
+  LargeConsoleRead.cc
+  main.cc
+  NamedPipe.cc
+  Scraper.cc
+  Terminal.cc
+  Win32Console.cc
+  Win32ConsoleBuffer.cc
+  Buffer.cc
+  DebugClient.cc
+  GenRandom.cc
+  OwnedHandle.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  WindowsVersion.cc
+  Assert.cc
+  Exception.cc
+  Version.cc
+  VT7Pty-Agent.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Debug\VT7Pty-Agent.exe
+  RuntimeCancellationTest.cc
+  Exception.cc
+  GenRandom.cc
+  OwnedHandle.cc
+  WindowsSecurity.cc
+  DebugClient.cc
+  Assert.cc
+  StringUtil.cc
+D:\Git\vt7pty\tests\fidelity\ProfileCases.h(8,8): error C2653: 'h3guards': is not a class or namespace name [D:\Git\vt7pty\projects\RuntimeCancellationTest.vcxproj]
+  (compiling source file '../tests/fidelity/RuntimeCancellationTest.cc')
+  
+D:\Git\vt7pty\tests\fidelity\ProfileCases.h(8,18): error C3861: 'powerShell7Required': identifier not found [D:\Git\vt7pty\projects\RuntimeCancellationTest.vcxproj]
+  (compiling source file '../tests/fidelity/RuntimeCancellationTest.cc')
+  
+D:\Git\vt7pty\tests\fidelity\ProfileCases.h(82,16): warning C4459: declaration of 'controls' hides global declaration [D:\Git\vt7pty\projects\RuntimeCancellationTest.vcxproj]
+  (compiling source file '../tests/fidelity/RuntimeCancellationTest.cc')
+      D:\Git\vt7pty\tests\fidelity\HostCancellationResearch.h(237,22):
+      see declaration of 'cancelresearch::controls'
+  

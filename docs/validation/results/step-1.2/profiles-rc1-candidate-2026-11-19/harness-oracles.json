@@ -1,0 +1,22 @@
+[
+  {
+    "Arguments": "--profiles-self-test",
+    "ExitCode": 0,
+    "Output": "Profile oracle: 3 checks passed."
+  },
+  {
+    "Arguments": "--input-self-test",
+    "ExitCode": 0,
+    "Output": "Input fidelity oracle: 5 checks passed."
+  },
+  {
+    "Arguments": "--manual-self-test",
+    "ExitCode": 0,
+    "Output": "Manual runner oracle: 11 checks passed."
+  },
+  {
+    "Arguments": "--self-test",
+    "ExitCode": 0,
+    "Output": "Runtime cancellation oracle: 27 checks passed, plus four keyboard-bridge checks"
+  }
+]

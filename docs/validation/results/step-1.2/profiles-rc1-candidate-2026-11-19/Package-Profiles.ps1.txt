@@ -1,0 +1,90 @@
+[CmdletBinding()]
+param([ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')][string]$Suffix='rc1',[string]$InputRc2Archive='')
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$root=$PSScriptRoot;$source=(& git -C $root rev-parse HEAD).Trim()
+if($LASTEXITCODE -ne 0 -or @(& git -C $root status --porcelain=v1).Count){throw 'Profile packaging requires clean committed source.'}
+$version=[IO.File]::ReadAllText((Join-Path $root 'VERSION.txt')).Trim()
+if($version -cne '0.5.1-dev'){throw 'Wrong profile candidate version.'}
+$runtimeSource='0ca6e3fa78481cd4df35820b9fe3988f46e0bff4'
+$archiveHash='93d1a1b290d796124b143d490181a861d6224bc61f36ca1cbe46113585a57fb5'
+$manifestHash='e66b761b06c4c99fb885dcfe1862537cd9fb3dd577365569668639ccd09f7517'
+if(-not $InputRc2Archive){$InputRc2Archive=Join-Path $root 'artifacts\fidelity\packages\VT7Pty-input-0.5.1-dev-rc2.zip'}
+function Hash-P([string]$Path){(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()}
+if((Hash-P $InputRc2Archive) -cne $archiveHash){throw 'Use the exact accepted input rc2 ZIP.'}
+$stage=Join-Path $root ('artifacts\fidelity\packages\VT7Pty-profiles-'+$version+'-'+$Suffix);$zip=$stage+'.zip'
+foreach($path in @($stage,$zip,($zip+'.sha256'))){if(Test-Path -LiteralPath $path){throw 'Candidate exists; choose a fresh suffix.'}}
+$referenceBin=Join-Path $stage 'reference\bin';$bin=Join-Path $stage 'profiles\bin'
+foreach($path in @($referenceBin,$bin)){[void][IO.Directory]::CreateDirectory($path)}
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+function Entry-P($Archive,[string]$Name){$entries=@($Archive.Entries | Where-Object {$_.FullName.Replace('\','/') -ceq $Name.Replace('\','/')});if($entries.Count -ne 1){throw ('Wrong frozen ZIP entry '+$Name)};return $entries[0]}
+$archive=[IO.Compression.ZipFile]::OpenRead([IO.Path]::GetFullPath($InputRc2Archive))
+$runtimeNames=@('VT7Pty.dll','VT7Pty-Agent.exe','VT7Pty-Host.dll','VT7Pty-DebugServer.exe','VT7Pty.pdb','VT7Pty-Agent.pdb','VT7Pty-Host.pdb','VT7Pty-DebugServer.pdb')
+try{
+    $referenceManifest=Join-Path $stage 'reference\manifest.json'
+    [IO.Compression.ZipFileExtensions]::ExtractToFile((Entry-P $archive 'manifest.json'),$referenceManifest)
+    if((Hash-P $referenceManifest) -cne $manifestHash){throw 'Wrong accepted input rc2 manifest.'}
+    $original=[IO.File]::ReadAllText($referenceManifest) | ConvertFrom-Json
+    if($original.Runtime.SourceCommit -cne $runtimeSource -or -not $original.Runtime.SourceTreeClean){throw 'Wrong accepted runtime source.'}
+    $frozen=@()
+    foreach($file in @($original.Files | Where-Object {$_.Path.StartsWith('runtime/bin/')})){
+        $name=[IO.Path]::GetFileName($file.Path);$destination=Join-Path $referenceBin $name
+        [IO.Compression.ZipFileExtensions]::ExtractToFile((Entry-P $archive $file.Path),$destination)
+        if((Get-Item -LiteralPath $destination).Length -ne $file.Bytes -or (Hash-P $destination) -cne $file.Sha256){throw ('Changed frozen file '+$name)}
+        $frozen+=@([ordered]@{Name=$name;Bytes=$file.Bytes;Sha256=$file.Sha256})
+        if($runtimeNames -contains $name){Copy-Item -LiteralPath $destination -Destination (Join-Path $bin $name)}
+    }
+    [IO.Compression.ZipFileExtensions]::ExtractToFile((Entry-P $archive 'tools/input/decoder-cases.json'),(Join-Path $stage 'reference\input-cases.json'))
+}finally{$archive.Dispose()}
+$vswhere=Join-Path ([Environment]::GetFolderPath('ProgramFilesX86')) 'Microsoft Visual Studio\Installer\vswhere.exe'
+$vs=(& $vswhere -latest -products * -version '[17.0,18.0)' -requires Microsoft.Component.MSBuild -property installationPath).Trim()
+if(-not $vs){throw 'Visual Studio 2022 is required on the build machine.'}
+& (Join-Path $vs 'MSBuild\Current\Bin\MSBuild.exe') (Join-Path $root 'projects\RuntimeCancellationTest.vcxproj') /nologo /m /t:Build /p:Configuration=Release /p:Platform=x64 /verbosity:minimal *> (Join-Path $stage 'harness-build.txt')
+if($LASTEXITCODE){throw 'Profile harness build failed.'}
+$identity=[IO.File]::ReadAllLines((Join-Path $root 'build\obj\RuntimeCancellationTest\x64\Release\generated\SourceIdentity.txt'))
+if($identity[0] -cne $version -or $identity[1] -cne $source){throw 'Wrong profile harness identity.'}
+foreach($name in @('RuntimeCancellationTest.exe','RuntimeCancellationTest.pdb')){Copy-Item -LiteralPath (Join-Path $root ('artifacts\bin\x64\Release\'+$name)) -Destination (Join-Path $bin $name)}
+$compiled=@(& (Join-Path $bin 'RuntimeCancellationTest.exe') --profiles-list) -join [Environment]::NewLine
+if($LASTEXITCODE){throw 'Cannot read compiled profile case recipe.'}
+$golden=[IO.File]::ReadAllText((Join-Path $root 'tools\profiles\cases.json')) | ConvertFrom-Json
+$recipe=$compiled | ConvertFrom-Json
+if(@($recipe.Cases).Count -ne @($golden.Cases).Count){throw 'Wrong compiled profile inventory.'}
+for($i=0;$i -lt @($golden.Cases).Count;$i++){foreach($field in @('Case','Engine','Editor','Layered','EditMode','PredictionSource')){
+    if($recipe.Cases[$i].$field -cne $golden.Cases[$i].$field){throw ('Compiled profile cases differ at '+$field)}
+}}
+[IO.File]::WriteAllText((Join-Path $stage 'compiled-profile-cases.json'),$compiled,[Text.UTF8Encoding]::new($false))
+$checks=@()
+foreach($option in @('--profiles-self-test','--input-self-test','--manual-self-test','--self-test')){
+    $output=@(& (Join-Path $bin 'RuntimeCancellationTest.exe') $option)
+    if($LASTEXITCODE){throw ('Failed harness oracle '+$option)}
+    $checks+=@([ordered]@{Arguments=$option;ExitCode=0;Output=($output -join [Environment]::NewLine)})
+}
+[IO.File]::WriteAllText((Join-Path $stage 'harness-oracles.json'),($checks | ConvertTo-Json -Depth 6),[Text.UTF8Encoding]::new($false))
+$plan=[ordered]@{'README.md'='docs\PROFILE_TESTS.md';'tools\profiles\Invoke-ProfileTests.ps1'='tools\profiles\Invoke-ProfileTests.ps1'
+    'tools\profiles\ProfileProbe.ps1'='tools\profiles\ProfileProbe.ps1';'tools\profiles\cases.json'='tools\profiles\cases.json';'tools\platform\NativeCapture.ps1'='tools\platform\NativeCapture.ps1'
+    'tools\platform\Windows7Compat.ps1'='tools\platform\Windows7Compat.ps1';'LICENSE.txt'='LICENSE';'CREDITS.md'='CREDITS.md';'UPSTREAM.md'='UPSTREAM.md'}
+foreach($tier in @('NONESU','ESU','LEGACY')){foreach($manual in @('','MANUAL-')){$name='RUN-PROFILES-'+$manual+$tier+'.cmd';$plan[$name]=$name}}
+foreach($name in $plan.Keys){$destination=Join-Path $stage $name;[void][IO.Directory]::CreateDirectory((Split-Path -Parent $destination));Copy-Item -LiteralPath (Join-Path $root $plan[$name]) -Destination $destination}
+$readme=Join-Path $stage 'README.md';$text=[IO.File]::ReadAllText($readme)
+$text=[regex]::Replace($text,'\]\(([^)]+)\)',{param($match)
+    $link=$match.Groups[1].Value;if($link -match '^[a-zA-Z]+:' -or $link.StartsWith('#')){return $match.Value}
+    $path=[IO.Path]::GetFullPath((Join-Path (Join-Path $root 'docs') $link.Split('#')[0]))
+    if(-not $path.StartsWith($root+'\',[StringComparison]::OrdinalIgnoreCase)){throw 'Profile readme link leaves the repository.'}
+    $fragment=if($link.Contains('#')){'#'+$link.Split('#',2)[1]}else{''}
+    return '](https://github.com/TheBinaryShadow/vt7pty/blob/'+$source+'/'+$path.Substring($root.Length+1).Replace('\','/')+$fragment+')'
+})
+[IO.File]::WriteAllText($readme,$text,[Text.UTF8Encoding]::new($false))
+$files=@(Get-ChildItem -LiteralPath $stage -Recurse -File | Sort-Object FullName | ForEach-Object {[ordered]@{Path=$_.FullName.Substring($stage.Length+1).Replace('\','/');Bytes=$_.Length;Sha256=(Hash-P $_.FullName)}})
+$manifest=[ordered]@{Kind='VT7PtyProfileCandidate';SchemaVersion=1;Step12Accepted=$false
+    Runtime=[ordered]@{SourceCommit=$runtimeSource;UnchangedFromInputRc2=$true;ArchiveSha256=$archiveHash;ManifestSha256=$manifestHash;Version=$version;ApiVersion='1.1';ProtocolVersion=2;Architecture='x64'}
+    Harness=[ordered]@{SourceCommit=$source;SourceTreeClean=$true;Architecture='x64';Configuration='Release'}
+    Reference=[ordered]@{SourceCommit=$runtimeSource;Files=$frozen;GuardCasesByTier=@{DevelopmentHost=41;NonESU=41;ESU=41;Legacy=33};InputCases=43}
+    Profiles=[ordered]@{CasesByTier=@{DevelopmentHost=4;NonESU=4;ESU=4;Legacy=2};Repetitions=3;Source='ControlledInlineFixtures';OrdinaryUserProfiles='NotRun'}
+    Manual=[ordered]@{Required=$true;EnginesByTier=@{DevelopmentHost=@('wps','pwsh');NonESU=@('wps','pwsh');ESU=@('wps','pwsh');Legacy=@('wps')};Stages=8
+        Source='PhysicalConsoleInput';LoadsRealProfiles=$true;SavesShellOutput=$false;ChangesGlobalProfiles=$false;OverridesExecutionPolicy=$false}
+    CtrlBreakTransport='Unsupported';ApiFramingLimitsUnchanged=$true;Files=$files}
+[IO.File]::WriteAllText((Join-Path $stage 'manifest.json'),($manifest | ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
+if($source -cne (& git -C $root rev-parse HEAD).Trim() -or @(& git -C $root status --porcelain=v1).Count){throw 'Source changed during profile packaging.'}
+[IO.Compression.ZipFile]::CreateFromDirectory($stage,$zip,[IO.Compression.CompressionLevel]::Optimal,$false)
+$hash=Hash-P $zip;[IO.File]::WriteAllText(($zip+'.sha256'),$hash+'  '+[IO.Path]::GetFileName($zip)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+Write-Host ('Profile candidate: '+$zip);Write-Host ('SHA-256: '+$hash)

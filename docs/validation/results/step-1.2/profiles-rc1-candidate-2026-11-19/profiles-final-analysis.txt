@@ -1,0 +1,77 @@
+
+  HostCancellation.cc
+  AgentLocation.cc
+  DebugServer.cc
+  vt7pty.cc
+  H4TestGate.cc
+  OwnedHandle.cc
+  Buffer.cc
+  Exception.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  DebugClient.cc
+  OwnedHandle.cc
+  DebugClient.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  GenRandom.cc
+  DebugClient.cc
+  WindowsVersion.cc
+  GenRandom.cc
+  Version.cc
+  OwnedHandle.cc
+  StringUtil.cc
+  Assert.cc
+  Exception.cc
+  WindowsVersion.cc
+  WindowsSecurity.cc
+  Assert.cc
+  WindowsVersion.cc
+  Assert.cc
+  Exception.cc
+  Version.cc
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Release\H4TestGate.lib and object D:\Git\vt7pty\artifacts\bin\x64\Release\H4TestGate.exp
+  H4TestGate.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\H4TestGate.dll
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty-Host.lib and object D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty-Host.exp
+  VT7Pty-Host.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty-Host.dll
+  VT7Pty-DebugServer.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty-DebugServer.exe
+  Agent.cc
+  HostCancellation.cc
+  ConsoleFont.cc
+  ConsoleInput.cc
+  ConsoleInputReencoding.cc
+  ConsoleLine.cc
+  DebugShowInput.cc
+  DefaultInputMap.cc
+  EventLoop.cc
+  InputMap.cc
+  LargeConsoleRead.cc
+  main.cc
+  NamedPipe.cc
+  Scraper.cc
+  Terminal.cc
+  Win32Console.cc
+  Win32ConsoleBuffer.cc
+  Buffer.cc
+  DebugClient.cc
+  GenRandom.cc
+  OwnedHandle.cc
+  StringUtil.cc
+  WindowsSecurity.cc
+  WindowsVersion.cc
+  Assert.cc
+  Exception.cc
+  Version.cc
+     Creating library D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty.lib and object D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty.exp
+  VT7Pty.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty.dll
+  VT7Pty-Agent.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\VT7Pty-Agent.exe
+  RuntimeCancellationTest.cc
+  Exception.cc
+  GenRandom.cc
+  OwnedHandle.cc
+  WindowsSecurity.cc
+  DebugClient.cc
+  Assert.cc
+  StringUtil.cc
+  RuntimeCancellationTest.vcxproj -> D:\Git\vt7pty\artifacts\bin\x64\Release\RuntimeCancellationTest.exe
+D:\Git\vt7pty\tests\fidelity\ProfileCases.h(45): error C6262: Function uses '65536' bytes of stack.  Consider moving some data to heap. [D:\Git\vt7pty\projects\RuntimeCancellationTest.vcxproj]

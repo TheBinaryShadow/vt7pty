@@ -1,0 +1,32 @@
+param([Parameter(Mandatory=$true)][string]$PackageRoot,[Parameter(Mandatory=$true)][string]$OutputDirectory)
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$OutputDirectory=[IO.Path]::GetFullPath($OutputDirectory)
+if(Test-Path -LiteralPath $OutputDirectory){throw 'Fresh binary inspection directory required.'}
+[void][IO.Directory]::CreateDirectory($OutputDirectory)
+$repo='D:\Git\vt7pty'
+$vswhere=Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+$vs=(& $vswhere -latest -products * -version '[17.0,18.0)' -requires Microsoft.Component.MSBuild -property installationPath).Trim()
+$dumpbin=(Get-ChildItem -LiteralPath (Join-Path $vs 'VC\Tools\MSVC') -Filter dumpbin.exe -File -Recurse | Where-Object {$_.FullName -match '\\Hostx64\\x64\\dumpbin.exe$'} | Sort-Object FullName -Descending | Select-Object -First 1).FullName
+$tokens=$null;$parseProblems=$null;$ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'Verify-VT7Pty.ps1'),[ref]$tokens,[ref]$parseProblems)
+$assignment=$ast.Find({param($node)$node -is [Management.Automation.Language.AssignmentStatementAst] -and $node.Left -is [Management.Automation.Language.VariableExpressionAst] -and $node.Left.VariablePath.UserPath -ceq 'postWindows7Imports'},$true)
+$prohibited=@($assignment.Right.FindAll({param($node)$node -is [Management.Automation.Language.StringConstantExpressionAst]},$true) | ForEach-Object {$_.Value})
+if($prohibited.Count -lt 10){throw 'Missing maintained post-Windows 7 import rules.'}
+$records=@()
+foreach($kind in @('reference','profiles')){
+    $path=Join-Path $PackageRoot ($kind+'\bin\RuntimeCancellationTest.exe')
+    $inspection=(& $dumpbin /headers /imports $path 2>&1 | Out-String)
+    if($LASTEXITCODE){throw 'dumpbin failed.'}
+    [IO.File]::WriteAllText((Join-Path $OutputDirectory ($kind+'-headers-imports.txt')),$inspection,[Text.UTF8Encoding]::new($false))
+    if($inspection -notmatch '(?im)^\s*8664 machine \(x64\)' -or $inspection -notmatch '(?im)^\s*6\.01 subsystem version' -or
+        $inspection -notmatch '(?im)^\s*0 \[\s*0\] RVA \[size\] of Delay Import Directory'){throw 'Wrong PE platform or delay imports.'}
+    foreach($api in $prohibited){if($inspection -match ('(?im)^\s+[0-9a-f]+\s+'+[regex]::Escape($api)+'\s*$')){throw ('Post-Windows 7 import '+$api)}}
+    $imports=@([regex]::Matches($inspection,'(?im)^\s+([A-Za-z0-9_.-]+\.dll)\s*$') | ForEach-Object {$_.Groups[1].Value.ToLowerInvariant()} | Sort-Object -Unique)
+    if(@($imports | Where-Object {$_ -match '^(msvcp|msvcr|vcruntime|ucrtbase)'}).Count){throw 'Dynamic CRT dependency.'}
+    $records+=@([ordered]@{Role=$kind;Sha256=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant();Imports=$imports;X64=$true;Subsystem='6.01';PostWindows7Imports=0;DelayImports=0})
+}
+if(($records[0].Imports -join '|') -cne ($records[1].Imports -join '|')){throw 'Profile harness dependency set changed.'}
+$m=Get-Content -Raw -LiteralPath (Join-Path $PackageRoot 'manifest.json') | ConvertFrom-Json
+$result=[ordered]@{Kind='ProfileBinaryReview';Status='Pass';HarnessSource=$m.Harness.SourceCommit;RuntimeSource=$m.Runtime.SourceCommit;ProhibitedApiRules=$prohibited.Count;Binaries=$records;Windows7RuntimeQualification=$false}
+[IO.File]::WriteAllText((Join-Path $OutputDirectory 'review.json'),($result | ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+$result

@@ -1,0 +1,215 @@
+// Copyright (c) 2026 VT7Pty contributors
+// SPDX-License-Identifier: MIT
+#pragma once
+namespace profilecases {
+struct Spec {std::string name;bool pwsh=false,layered=false;};
+std::vector<Spec> specs() {
+    std::vector<Spec> result={{"wps-clean-native",false,false},{"wps-layered-native",false,true}};
+    wchar_t legacy[8]={};GetEnvironmentVariableW(L"VT7PTY_H4_LEGACY",legacy,8);
+    if(std::wstring(legacy)!=L"1"){
+        result.push_back({"pwsh-clean-readline",true,false});result.push_back({"pwsh-layered-readline",true,true});
+    }
+    return result;
+}
+std::wstring wide(std::string_view value) {
+    const int n=MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,value.data(),static_cast<int>(value.size()),nullptr,0);
+    check(n>0,"profile UTF-8 source");std::wstring result(n,0);
+    check(MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,value.data(),static_cast<int>(value.size()),result.data(),n)==n,"profile source conversion");return result;
+}
+std::wstring replace(std::wstring value,const std::wstring &from,const std::wstring &to) {
+    size_t at=0;while((at=value.find(from,at))!=std::wstring::npos){value.replace(at,from.size(),to);at+=to.size();}return value;
+}
+std::wstring encoded(const std::wstring &value) {
+    constexpr wchar_t table[]=L"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    const auto *p=reinterpret_cast<const unsigned char *>(value.data());const size_t bytes=value.size()*2;
+    std::wstring result;for(size_t i=0;i<bytes;i+=3){
+        const unsigned n=(static_cast<unsigned>(p[i])<<16)|(i+1<bytes?static_cast<unsigned>(p[i+1])<<8:0)|(i+2<bytes?p[i+2]:0);
+        result+=table[(n>>18)&63];result+=table[(n>>12)&63];result+=i+1<bytes?table[(n>>6)&63]:L'=';result+=i+2<bytes?table[n&63]:L'=';
+    }return result;
+}
+uint64_t number(const std::string &value,const std::string &name) {
+    auto at=value.find('"'+name+'"');check(at!=std::string::npos,"profile numeric field");at=value.find(':',at);check(at!=std::string::npos,"profile numeric delimiter");
+    do{++at;}while(at<value.size() && isspace(static_cast<unsigned char>(value[at])));
+    size_t end=at;while(end<value.size() && value[end]>='0' && value[end]<='9')++end;
+    check(end>at,"profile positive numeric value");return std::stoull(value.substr(at,end-at));
+}
+bool truth(const std::string &value,const std::string &name) {
+    auto at=value.find('"'+name+'"');if(at==std::string::npos)return false;at=value.find(':',at);if(at==std::string::npos)return false;
+    do{++at;}while(at<value.size() && isspace(static_cast<unsigned char>(value[at])));return value.compare(at,4,"true")==0;
+}
+std::wstring engine(bool pwsh) {
+    if(pwsh)return guardEnvironment(L"VT7PTY_H3_PWSH");
+    wchar_t system[MAX_PATH]={};check(GetSystemDirectoryW(system,MAX_PATH)>0,"profile system directory");
+    return std::wstring(system)+L"\\WindowsPowerShell\\v1.0\\powershell.exe";
+}
+std::wstring currentExe(){std::wstring path(32768,0);const auto length=GetModuleFileNameW(nullptr,path.data(),static_cast<DWORD>(path.size()));check(length>0&&length<path.size(),"profile harness path");path.resize(length);return path;}
+std::wstring probeSource(const std::wstring &out,const std::string &nonce,bool controlled=true) {
+    auto result=wide(fileText(guardEnvironment(L"VT7PTY_PROFILE_PROBE_SOURCE")));
+    for(const auto &pair:std::vector<std::pair<std::wstring,std::wstring>>{{L"__CONTROLLED__",controlled?L"$true":L"$false"},{L"__ROOT__",psLiteral(out)},{L"__NONCE__",psLiteral(wide(nonce))},{L"__EXE__",psLiteral(currentExe())},
+        {L"__HASH__",L"VT7PtyHash_"+wide(nonce)},{L"__JSON__",L"VT7PtyJson_"+wide(nonce)},{L"__SNAPSHOT__",L"VT7PtySnapshot_"+wide(nonce)},
+        {L"__CHECK__",L"VT7PtyCheck_"+wide(nonce)},{L"__COMPLETE__",L"VT7PtyProfileComplete_"+wide(nonce)},{L"__CHILD__",L"VT7PtyProfileChild_"+wide(nonce)}})result=replace(result,pair.first,pair.second);
+    return result;
+}
+std::wstring flattened(std::wstring source) {
+    std::vector<std::wstring> lines;size_t at=0;
+    while(at<source.size()){
+        const auto end=source.find(L'\n',at);auto line=source.substr(at,end==std::wstring::npos?source.size()-at:end-at);
+        while(!line.empty() && (line.back()==L'\r'||line.back()==L' '))line.pop_back();
+        const auto first=line.find_first_not_of(L" \t");
+        if(first!=std::wstring::npos && line[first]!=L'#')lines.push_back(line.substr(first));
+        if(end==std::wstring::npos)break;at=end+1;
+    }
+    std::wstring result;
+    for(size_t i=0;i<lines.size();++i){
+        result+=lines[i];
+        const bool continued=i+1<lines.size() && (lines[i+1].starts_with(L"else")||lines[i+1].starts_with(L"catch")||lines[i+1].starts_with(L"finally"));
+        if(lines[i].back()!=L'{' && lines[i].back()!=L';' && !continued)result+=L';';result+=L' ';
+    }return result;
+}
+std::string schema(const std::string &nonce,DWORD pid,const std::string &kind) {
+    return "{\"SchemaVersion\":1,\"Nonce\":"+json(nonce)+",\"ProcessId\":"+std::to_string(pid)+",\"Kind\":"+json(kind);
+}
+LONG volatile childControls=0;
+BOOL WINAPI childHandler(DWORD event){if(event!=CTRL_C_EVENT)return FALSE;InterlockedIncrement(&childControls);return TRUE;}
+int child(const std::wstring &out,const std::string &nonce) {
+    check(nonce.find_first_not_of("0123456789abcdef")==std::string::npos,"profile child nonce");
+    check(SetConsoleCtrlHandler(nullptr,FALSE) && SetConsoleCtrlHandler(childHandler,TRUE),"profile native child handler");
+    const auto input=GetStdHandle(STD_INPUT_HANDLE);DWORD mode=0;check(GetConsoleMode(input,&mode),"profile child input mode");
+    check(SetConsoleMode(input,ENABLE_EXTENDED_FLAGS|ENABLE_PROCESSED_INPUT),"profile child processed mode");
+    const auto pid=GetCurrentProcessId(),parent=parentProcessId(pid);const auto host=hostQuery(GetCurrentProcess());
+    writeFile(out+L"\\child-ready.json",schema(nonce,pid,"ProfileNativeChildReady")+",\"ParentId\":"+std::to_string(parent)+",\"HostQuery\":"+queryJson(host)+"}");
+    puts("PROFILE_CHILD_READY: press Ctrl+C");const auto deadline=GetTickCount64()+180000;
+    while(!InterlockedCompareExchange(&childControls,0,0) && GetTickCount64()<deadline)Sleep(5);
+    const auto received=InterlockedCompareExchange(&childControls,0,0);
+    writeFile(out+L"\\child-result.json",schema(nonce,pid,"ProfileNativeChildResult")+",\"ParentId\":"+std::to_string(parent)+",\"CtrlC\":"+std::to_string(received)+",\"NaturalExit\":37}");
+    check(SetConsoleMode(input,mode),"profile native child mode restored");return received==1?37:38;
+}
+struct Shell {
+    Context &c;Session &s;Spec spec;std::string nonce;DWORD pid=0;uint32_t generation=0;Handle nativeChild;
+    Shell(Context &context,const Spec &which,bool ordinary=false,bool synthetic=false):c(context),s(*context.session),spec(which) {
+        nonce=std::format("{:x}{:x}",GetCurrentProcessId(),GetTickCount64());
+        if(ordinary){s.profilePrivateOutput=true;s.raw.clear();s.frames.clear();}
+        const auto exe=engine(spec.pwsh);std::wstring line=quote(exe)+L" -NoLogo";
+        if(!ordinary){
+            std::wstring boot=probeSource(c.out,nonce);
+            boot+=L";$global:VT7PtyFixtureOrder=@();$global:VT7PtyFixtureWinner='';";
+            if(spec.layered)for(const auto scope:{L"AllUsersAllHosts",L"AllUsersCurrentHost",L"CurrentUserAllHosts",L"CurrentUserCurrentHost"})
+                boot+=L". { $global:VT7PtyFixtureOrder+="+psLiteral(scope)+L";$global:VT7PtyFixtureWinner="+psLiteral(scope)+L" };";
+            if(spec.pwsh){
+                const auto module=exe.substr(0,exe.find_last_of(L'\\'))+L"\\Modules\\PSReadLine\\PSReadLine.psd1";
+                boot+=L"Import-Module "+psLiteral(module)+L" -ErrorAction Stop;Set-PSReadLineOption -HistorySaveStyle SaveNothing -HistorySavePath "+
+                    psLiteral(c.out+L"\\private-history.txt")+L" -EditMode "+(spec.layered?L"Emacs":L"Windows")+L" -PredictionSource "+(spec.layered?L"History":L"None")+L";";
+                if(spec.layered)boot+=L"Set-PSReadLineKeyHandler -Key F6 -ScriptBlock { [Microsoft.PowerShell.PSConsoleReadLine]::Insert('BINDING_OK') };";
+            }else boot+=L"if(Get-Module PSReadLine){Remove-Module PSReadLine -ErrorAction Stop};";
+            boot+=L"$global:VT7PtyProfileSerial=0;function global:prompt { $global:VT7PtyProfileSerial++;";
+            if(spec.layered)boot+=L"[Console]::WriteLine('PROFILE "+std::wstring(L"\u010d\u0107\u0111\u0161\u017e")+L"');";
+            boot+=L"'PROFILE['+$global:VT7PtyProfileSerial.ToString()+']>' };";
+            line+=L" -NoProfile -NoExit -EncodedCommand "+encoded(boot);
+        }
+        if(ordinary && synthetic){
+            std::wstring boot=L"";
+            if(spec.pwsh){const auto module=exe.substr(0,exe.find_last_of(L'\\'))+L"\\Modules\\PSReadLine\\PSReadLine.psd1";
+                boot=L"Import-Module "+psLiteral(module)+L";Set-PSReadLineOption -HistorySaveStyle SaveNothing -HistorySavePath "+psLiteral(c.out+L"\\smoke-history.txt")+L" -PredictionSource None;";}
+            if(!spec.pwsh)boot+=L"if(Get-Module -ListAvailable PSReadLine){Import-Module PSReadLine -ErrorAction Stop;Set-PSReadLineOption -HistorySaveStyle SaveNothing -HistorySavePath "+psLiteral(c.out+L"\\smoke-history.txt")+L" -EditMode Windows};";
+            boot+=L"$global:VT7PtyProfileSerial=0;function global:prompt { $global:VT7PtyProfileSerial++; 'SMOKE['+$global:VT7PtyProfileSerial.ToString()+']>' }";
+            line+=L" -NoProfile -NoExit -EncodedCommand "+encoded(boot);
+        }
+        const auto p=s.launchProfile(exe,line);pid=p.shellId;
+        s.descendant.reset(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION|SYNCHRONIZE|PROCESS_TERMINATE,FALSE,pid));
+        check(s.descendant.value && parentProcessId(pid)==GetProcessId(s.child.value) && agrees(hostQuery(s.descendant.value),hostQuery(s.agent.value)),"retained profile shell and console");
+        const TokenIdentity ours(GetCurrentProcess()),theirs(s.descendant.value);check(ours.same(theirs),"profile shell token identity");
+        writeFile(c.out+L"\\shell-launch.json",schema(nonce,pid,"ProfileShellLaunch")+",\"ParentId\":"+std::to_string(p.parentId)+
+            ",\"FixtureId\":"+std::to_string(GetProcessId(s.child.value))+",\"ShellParentId\":"+std::to_string(parentProcessId(pid))+
+            ",\"ShellCreationTime\":"+json(std::to_string(creation(s.descendant.value)))+",\"Executable\":"+json(utf8(exe))+
+            ",\"Ordinary\":"+boolean(ordinary)+",\"NoProfile\":"+boolean(!ordinary||synthetic)+",\"SyntheticInputUsed\":"+boolean(synthetic)+",\"PolicyOverride\":false,\"ControlledInlineFixtures\":"+boolean(!ordinary)+"}");
+        if(!ordinary)check(s.until([&]{return atPrompt();},30000),"controlled profile initial prompt");
+    }
+    bool atPrompt(){
+        const auto text=row(s);if(!text.starts_with(U"PROFILE[") || !text.ends_with(U"]>"))return false;
+        uint32_t n=0;for(size_t i=8;i+2<text.size();++i){if(text[i]<U'0'||text[i]>U'9')return false;n=n*10+text[i]-U'0';}generation=n;return n>0;
+    }
+    std::wstring checkName()const{return L"VT7PtyCheck_"+wide(nonce);}
+    std::wstring snapshotName()const{return L"VT7PtySnapshot_"+wide(nonce);}
+    bool valid(const std::string &value){return value.find("\"Nonce\":"+json(nonce))!=std::string::npos && number(value,"ProcessId")==pid;}
+    void command(const std::wstring &line){const auto before=generation;s.input(utf8(line+L"\r"));check(s.until([&]{return atPrompt() && generation>before;},15000),"profile command returns to configured prompt");}
+    std::string snapshot(int stage,bool ordinary=false) {
+        const auto path=c.out+L"\\snapshot-"+std::to_wstring(stage)+L".json";
+        if(ordinary)s.input(utf8(snapshotName()+L" "+std::to_wstring(stage)+L"\r"));else command(snapshotName()+L" "+std::to_wstring(stage));
+        check(s.until([&]{try{const auto data=fileText(path);return valid(data)&&number(data,"Stage")==static_cast<uint64_t>(stage);}catch(...){return false;}},15000),"profile snapshot completion");
+        const auto data=fileText(path);check(valid(data) && number(data,"Stage")==stage,"profile snapshot identity");return data;
+    }
+    std::string proof(const std::wstring &name){
+        std::string data;const auto path=c.out+L"\\"+name+L".json";
+        check(s.until([&]{try{data=fileText(path);return !data.empty()&&data.back()=='}'&&valid(data)&&truth(data,"Matched");}catch(...){return false;}},5000),
+            ("exact profile command result: "+utf8(name)).c_str());return data;
+    }
+    void retainChild(){
+        if(nativeChild.value!=INVALID_HANDLE_VALUE)return;
+        const auto path=c.out+L"\\child-ready.json";
+        check(s.until([&]{try{const auto value=fileText(path);return !value.empty()&&value.back()=='}'&&validChild(value)&&number(value,"ProcessId")>0;}catch(...){return false;}}),"profile child readiness identity");
+        const auto value=fileText(path);
+        const auto childPid=static_cast<DWORD>(number(value,"ProcessId"));nativeChild.reset(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION|SYNCHRONIZE,FALSE,childPid));
+        check(nativeChild.value && parentProcessId(childPid)==pid && agrees(hostQuery(nativeChild.value),hostQuery(s.agent.value)),"retained native child association");
+    }
+    bool validChild(const std::string &value){return value.find("\"Nonce\":"+json(nonce))!=std::string::npos && number(value,"ParentId")==pid;}
+    void childProof(){
+        const auto value=fileText(c.out+L"\\child-result.json");DWORD exit=0;
+        check(validChild(value) && number(value,"CtrlC")==1 && WaitForSingleObject(nativeChild.value,5000)==WAIT_OBJECT_0 && GetExitCodeProcess(nativeChild.value,&exit)&&exit==37,"native child single event and natural exit");
+    }
+    void quit(){s.input("exit 37\r");check(s.until([&]{return WaitForSingleObject(s.descendant.value,0)==WAIT_OBJECT_0;},10000),"profile natural shell exit");DWORD code=0;check(GetExitCodeProcess(s.descendant.value,&code)&&code==37,"profile shell exit 37");}
+};
+void exercise(Context &c,const Spec &spec){
+    auto &s=c.start();Shell shell(c,spec);shell.snapshot(0);
+    const auto name=shell.checkName();std::string proofs="[";
+    auto keep=[&](const std::wstring &which){if(proofs.size()>1)proofs+=',';proofs+=shell.proof(which);};
+    s.input(utf8(name+L" Editing 'EDXT \u010d\u0107\u0111\u0161\u017e'"));
+    for(int n=0;n<8;++n)s.input("\x1b[D");s.input("\x7fI\x1b[F\r");
+    check(s.until([&]{return shell.atPrompt() && GetFileAttributesW((c.out+L"\\Editing.json").c_str())!=INVALID_FILE_ATTRIBUTES;}),"profile editing result");keep(L"Editing");
+    shell.command(name+L" History 'HISTORY_OK'");const auto first=number(shell.proof(L"History"),"Invocation");
+    s.input("\x1b[A\r");check(s.until([&]{try{return shell.atPrompt() && number(fileText(c.out+L"\\History.json"),"Invocation")>first;}catch(...){return false;}}),"profile in-memory history recall");keep(L"History");
+    shell.command(L"VT7PtyProfileComple\t");keep(L"Completion");
+    s.input(utf8(name+L" Multiline @'\rfirst\u010d\rsecond\u017e\r'@\r\r"));
+    check(s.until([&]{return GetFileAttributesW((c.out+L"\\Multiline.json").c_str())!=INVALID_FILE_ATTRIBUTES && shell.atPrompt();},15000),"profile multiline result");keep(L"Multiline");
+    const auto before=shell.generation;
+    s.input(utf8(name+L" Cancelled 'SHOULD_NOT_RUN'"));check(s.until([&]{return !shell.atPrompt();}),"profile partial line visibly pending");s.input("\x03");
+    check(s.until([&]{return shell.atPrompt() && shell.generation>before;}),"profile cancellation preserves prompt function");s.input("\r");
+    shell.command(name+L" Continue 'CONTINUE_OK'");keep(L"Continue");
+    check(GetFileAttributesW((c.out+L"\\Cancelled.json").c_str())==INVALID_FILE_ATTRIBUTES,"profile canceled text never executes");
+    writeFile(c.out+L"\\cancel.json","{\"PartialLineDiscarded\":true,\"NextCommandPassed\":true}");
+    const auto previous=shell.generation;s.input(utf8(L"VT7PtyProfileChild_"+wide(shell.nonce)+L"\r"));
+    check(s.until([&]{return GetFileAttributesW((c.out+L"\\child-ready.json").c_str())!=INVALID_FILE_ATTRIBUTES;}),"profile native child ready");shell.retainChild();s.input("\x03");
+    check(s.until([&]{return shell.atPrompt() && shell.generation>previous;}),"profile parent survives native child");shell.childProof();
+    check(vt7pty_set_size(s.runtimeHandle(),100,32,nullptr),"profile resize request");s.state.resize(100,32);
+    shell.command(name+L" Resize 'RESIZE_OK'");keep(L"Resize");shell.snapshot(1);
+    if(spec.pwsh && spec.layered){s.input(utf8(name+L" Binding '"));s.input("\x1b[17~");shell.command(L"'");keep(L"Binding");}
+    shell.quit();writeFile(c.out+L"\\command-proofs.json","{\"Proofs\":"+proofs+"]}");
+    writeFile(c.out+L"\\profile-result.json","{\"ShellId\":"+std::to_string(shell.pid)+",\"NaturalExit\":37,\"WorkflowsPassed\":true}");
+}
+int run(const std::wstring &out){
+    outRoot=out;check(CreateDirectoryW(out.c_str(),nullptr),"new profile collection");rootEvidenceCreated=true;
+    applicationDesktop=nameOf(GetThreadDesktop(GetCurrentThreadId()));if(!desktopPreflight(out+L"\\preflight.json"))return 2;
+    check(SetEnvironmentVariableW(L"VT7PTY_DEBUG",L"trace"),"controlled profile trace");Collector collector(out);
+    std::string rows="[";size_t total=0,passed=0;
+    for(const auto &spec:specs()){
+        Context c(out+L"\\"+wide(spec.name));bool okay=false;std::string error;
+        try{check(desktopPreflight(c.out+L"\\preflight.json"),"controlled profile desktop");exercise(c,spec);okay=true;}
+        catch(const std::exception &e){error=e.what();}
+        okay=c.finish()&&okay;if(error.empty()&&!c.error.empty())error=c.error;
+        if(total++)rows+=',';if(okay)++passed;
+        rows+="{\"Case\":"+json(spec.name)+",\"Passed\":"+boolean(okay)+",\"OwnedProcessesCleaned\":"+boolean(c.cleaned)+",\"HostExited\":"+boolean(c.hostExited)+",\"Error\":"+json(error)+"}";
+        printf("%s: %s %s\n",okay?"PASS":"FAIL",spec.name.c_str(),error.c_str());
+    }
+    collector.stop();writeFile(out+L"\\cases.json","{\"SchemaVersion\":1,\"Cases\":"+rows+"]}");
+    writeFile(out+L"\\probe.json","{\"Kind\":\"ProfileFixtureProbe\",\"SchemaVersion\":1,\"Status\":"+json(passed==total?"Pass":"Fail")+
+        ",\"SourceCommit\":"+json(GenVersion_Commit)+",\"RuntimeSourceCommit\":"+json(manualRuntimeSource())+",\"Passed\":"+std::to_string(passed)+",\"Total\":"+std::to_string(total)+
+        ",\"OrdinaryUserProfiles\":\"NotRun\",\"ControlledInlineFixtures\":true,\"Step12Accepted\":false}");return passed==total?0:1;
+}
+void list(){
+    std::string rows="[";for(const auto &spec:specs()){if(rows.size()>1)rows+=',';
+        rows+="{"+json("Case")+":"+json(spec.name)+","+json("Engine")+":"+json(spec.pwsh?"pwsh":"wps")+","+json("Editor")+":"+json(spec.pwsh?"PSReadLine":"Native")+
+            ","+json("Layered")+":"+boolean(spec.layered)+","+json("EditMode")+":"+json(spec.pwsh?(spec.layered?"Emacs":"Windows"):"Native")+
+            ","+json("PredictionSource")+":"+json(spec.pwsh?(spec.layered?"History":"None"):"NotApplicable")+"}";}
+    puts(("{"+json("SchemaVersion")+":1,"+json("Cases")+":"+rows+"]}").c_str());
+}
+void oracle(){check(encoded(L"A")==L"QQA=","PowerShell UTF-16 encoded command");check(truth("{\"Matched\":true}","Matched")&&!truth("{\"Matched\":false}","Matched"),"profile truth oracle");check(number("{\"Stage\":7}","Stage")==7,"profile numeric oracle");puts("Profile oracle: 3 checks passed.");}
+}
