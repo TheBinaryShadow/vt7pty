@@ -4,7 +4,9 @@ I use input rc2 to qualify the UTF-8 decoder and cursor-reply framing fixes
 against the [rc1 Windows 7 failures](validation/2026-11-19-step-1.2-input-rc1-windows7.md).
 The candidate rebuilds the runtime. API 1.1, protocol 2 and the accepted H4
 cancellation contract stay the same; the changed runtime needs its own
-Windows 7 results. Step 1.2 remains open.
+Windows 7 results. Step 1.2 remains open. The [exact rc2 review](validation/2026-11-19-step-1.2-input-rc2-candidate.md)
+records 129/129 input and 123/123 H4 guards passing locally, with focused
+qualification and regression checks.
 
 ## Run on the Windows 7 machines
 

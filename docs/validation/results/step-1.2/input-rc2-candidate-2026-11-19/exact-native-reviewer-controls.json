@@ -1,0 +1,116 @@
+{
+  "Kind": "InputReviewerControls",
+  "Status": "Pass",
+  "Rejected": 21,
+  "BaselineOutcome": "Pass",
+  "BaselinePassed": 43,
+  "Total": 43,
+  "Controls": [
+    {
+      "Case": "wrong-runtime",
+      "Reason": "Input evidence: explicit native source and transport limits",
+      "Rejected": true
+    },
+    {
+      "Case": "missing-case",
+      "Reason": "Input evidence: complete case inventory",
+      "Rejected": true
+    },
+    {
+      "Case": "changed-golden",
+      "Reason": "Input evidence: unaltered golden recipe raw-text-controls ExpectedText",
+      "Rejected": true
+    },
+    {
+      "Case": "lost-text",
+      "Reason": "Input evidence: recomputed outcome raw-text-controls",
+      "Rejected": true
+    },
+    {
+      "Case": "invalid-repeat",
+      "Reason": "Input evidence: bounded complete key record",
+      "Rejected": true
+    },
+    {
+      "Case": "missing-key-up",
+      "Reason": "Input evidence: recomputed outcome raw-modifiers",
+      "Rejected": true
+    },
+    {
+      "Case": "wrong-mouse-wheel",
+      "Reason": "Input evidence: recomputed outcome mouse-sgr",
+      "Rejected": true
+    },
+    {
+      "Case": "borrowed-break-group",
+      "Reason": "Input evidence: recomputed outcome native-break-processed",
+      "Rejected": true
+    },
+    {
+      "Case": "reference-child-not-exited",
+      "Reason": "Input evidence: recomputed outcome native-break-unprocessed",
+      "Rejected": true
+    },
+    {
+      "Case": "false-break-support",
+      "Reason": "Input evidence: explicit native source and transport limits",
+      "Rejected": true
+    },
+    {
+      "Case": "false-acceptance",
+      "Reason": "Input evidence: explicit native source and transport limits",
+      "Rejected": true
+    },
+    {
+      "Case": "unclean-host",
+      "Reason": "Input evidence: retained ordinary/private session and owned cleanup",
+      "Rejected": true
+    },
+    {
+      "Case": "fixture-read-canceled",
+      "Reason": "Input evidence: capture ended without fixture read cancellation",
+      "Rejected": true
+    },
+    {
+      "Case": "different-input-writes",
+      "Reason": "Input evidence: complete recorded input writes",
+      "Rejected": true
+    },
+    {
+      "Case": "failed-case-laundered",
+      "Reason": "Input evidence: recomputed outcome utf8-timeout-fragment",
+      "Rejected": true
+    },
+    {
+      "Case": "missing-live-reply",
+      "Reason": "Input evidence: complete terminal reply writes",
+      "Rejected": true
+    },
+    {
+      "Case": "changed-reply-write",
+      "Reason": "Input evidence: complete terminal reply writes",
+      "Rejected": true
+    },
+    {
+      "Case": "changed-idle",
+      "Reason": "Input evidence: declared idle interval",
+      "Rejected": true
+    },
+    {
+      "Case": "changed-reply-chunk",
+      "Reason": "Input evidence: unaltered golden recipe escape-fragmented-replies ReplyChunkBytes",
+      "Rejected": true
+    },
+    {
+      "Case": "lost-recovery-byte",
+      "Reason": "Input evidence: recomputed outcome utf8-malformed-recovery",
+      "Rejected": true
+    },
+    {
+      "Case": "wrong-trace-runtime",
+      "Reason": "Input evidence: trace runtime/harness/API/protocol",
+      "Rejected": true
+    }
+  ],
+  "Step12Accepted": false
+}

@@ -1,0 +1,41 @@
+{
+  "Kind": "InputDecoderCandidateReview",
+  "SchemaVersion": 1,
+  "Status": "LocalCandidateQualifiedWindows7Pending",
+  "SourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "RunId": "developmenthost-input-20261119-081107-459bdab7",
+  "CandidateOutcome": "Pass",
+  "ReferenceOutcome": "Fail",
+  "ReferenceFailuresRetained": true,
+  "CandidateInputPassed": 129,
+  "CandidateH4Passed": 123,
+  "QualificationPassed": 7,
+  "RegressionPassed": 14,
+  "Runtime": "0.5.1-dev",
+  "Api": "1.1",
+  "Protocol": 2,
+  "Step12Accepted": false,
+  "Windows7": "Pending",
+  "CtrlBreakTransport": "Unsupported",
+  "OrdinaryUserProfiles": "NotRun",
+  "Archives": [
+    {
+      "Archive": "exact-development-collection.zip",
+      "Files": 3126,
+      "Bytes": 1993420,
+      "Sha256": "fa33c8ca8e4aaac894015a6e6e3429cf57fa8f87978f7d3604f03fd6696de8bb"
+    },
+    {
+      "Archive": "precommit-input-cases.zip",
+      "Files": 918,
+      "Bytes": 446952,
+      "Sha256": "3a28020fee1c2aa059b605c746d08eb643a621c3bc034c61d408f434d07cd783"
+    },
+    {
+      "Archive": "build-and-pe-verification.zip",
+      "Files": 213,
+      "Bytes": 9747801,
+      "Sha256": "de5b8bc12c1c25a7f4d7ea571646407b08e42f1d574d9a799067694203cd9abf"
+    }
+  ]
+}

@@ -1,0 +1,357 @@
+{
+  "Kind": "InputDecoderRawAudit",
+  "Status": "Pass",
+  "SourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "RuntimeSourceFilesChanged": [
+    "src/agent/ConsoleInput.cc",
+    "src/agent/ConsoleInput.h",
+    "src/agent/CursorReportFilter.h",
+    "src/agent/UnicodeEncoding.h"
+  ],
+  "UnchangedPublicAndH4Contracts": [
+    "src/include/vt7pty.h",
+    "src/include/vt7pty_version.h",
+    "src/shared/Protocol.h",
+    "tests/fidelity/H4RuntimeCases.h",
+    "tests/fidelity/H4QualificationCases.h",
+    "tools/research/H4Cases.ps1"
+  ],
+  "RunId": "developmenthost-input-20261119-081107-459bdab7",
+  "CandidateInputPassed": 129,
+  "CandidateH4Passed": 123,
+  "QualificationPassed": 7,
+  "RegressionPassed": 14,
+  "ReferencePassed": 30,
+  "ReferenceTotal": 33,
+  "ReferenceFailedCasesRetained": 3,
+  "InputHostLifetimes": 129,
+  "ReferenceHostLifetimes": 33,
+  "KeyboardOperations": 3,
+  "Repetitions": [
+    {
+      "Order": 3,
+      "Passed": 43,
+      "Total": 43,
+      "HostLifetimes": 43,
+      "Focused": [
+        {
+          "Case": "utf8-timeout-fragment",
+          "Text": "\u010dz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 2,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-live-replies",
+          "Text": "A\u010d\u20ac\ud83d\ude42Z",
+          "ReplyCount": 3,
+          "ReplyWriteCount": 3,
+          "IncompleteUtf8TraceCount": 6,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-timeout-three",
+          "Text": "\u20acz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 4,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-timeout-four",
+          "Text": "\ud83d\ude42z",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 6,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-malformed-recovery",
+          "Text": "zzzzzzzz",
+          "ReplyCount": 0,
+          "ReplyWriteCount": 0,
+          "IncompleteUtf8TraceCount": 0,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-malformed-bytewise",
+          "Text": "zzzzzzzz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 7,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "escape-alone-live",
+          "Text": "\u001b",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 0,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "escape-alone-no-reply",
+          "Text": "\u001b",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 0,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "alt-unicode-timeout",
+          "Text": "\u010dz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 2,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "alt-unicode-live-replies",
+          "Text": "\u010dz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 1,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-fragmented-replies",
+          "Text": "A\u010d\u20ac\ud83d\ude42Z",
+          "ReplyCount": 3,
+          "ReplyWriteCount": 18,
+          "IncompleteUtf8TraceCount": 6,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "escape-live-replies",
+          "SignificantKeys": 11,
+          "ReplyCount": 10,
+          "ReplyWriteCount": 10
+        },
+        {
+          "Case": "escape-fragmented-replies",
+          "SignificantKeys": 11,
+          "ReplyCount": 10,
+          "ReplyWriteCount": 60
+        }
+      ]
+    },
+    {
+      "Order": 5,
+      "Passed": 43,
+      "Total": 43,
+      "HostLifetimes": 43,
+      "Focused": [
+        {
+          "Case": "utf8-timeout-fragment",
+          "Text": "\u010dz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 2,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-live-replies",
+          "Text": "A\u010d\u20ac\ud83d\ude42Z",
+          "ReplyCount": 3,
+          "ReplyWriteCount": 3,
+          "IncompleteUtf8TraceCount": 6,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-timeout-three",
+          "Text": "\u20acz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 4,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-timeout-four",
+          "Text": "\ud83d\ude42z",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 6,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-malformed-recovery",
+          "Text": "zzzzzzzz",
+          "ReplyCount": 0,
+          "ReplyWriteCount": 0,
+          "IncompleteUtf8TraceCount": 0,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-malformed-bytewise",
+          "Text": "zzzzzzzz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 7,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "escape-alone-live",
+          "Text": "\u001b",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 0,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "escape-alone-no-reply",
+          "Text": "\u001b",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 0,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "alt-unicode-timeout",
+          "Text": "\u010dz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 2,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "alt-unicode-live-replies",
+          "Text": "\u010dz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 1,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-fragmented-replies",
+          "Text": "A\u010d\u20ac\ud83d\ude42Z",
+          "ReplyCount": 3,
+          "ReplyWriteCount": 18,
+          "IncompleteUtf8TraceCount": 6,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "escape-live-replies",
+          "SignificantKeys": 11,
+          "ReplyCount": 10,
+          "ReplyWriteCount": 10
+        },
+        {
+          "Case": "escape-fragmented-replies",
+          "SignificantKeys": 11,
+          "ReplyCount": 10,
+          "ReplyWriteCount": 60
+        }
+      ]
+    },
+    {
+      "Order": 7,
+      "Passed": 43,
+      "Total": 43,
+      "HostLifetimes": 43,
+      "Focused": [
+        {
+          "Case": "utf8-timeout-fragment",
+          "Text": "\u010dz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 2,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-live-replies",
+          "Text": "A\u010d\u20ac\ud83d\ude42Z",
+          "ReplyCount": 3,
+          "ReplyWriteCount": 3,
+          "IncompleteUtf8TraceCount": 6,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-timeout-three",
+          "Text": "\u20acz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 4,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-timeout-four",
+          "Text": "\ud83d\ude42z",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 6,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-malformed-recovery",
+          "Text": "zzzzzzzz",
+          "ReplyCount": 0,
+          "ReplyWriteCount": 0,
+          "IncompleteUtf8TraceCount": 0,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-malformed-bytewise",
+          "Text": "zzzzzzzz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 7,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "escape-alone-live",
+          "Text": "\u001b",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 0,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "escape-alone-no-reply",
+          "Text": "\u001b",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 0,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "alt-unicode-timeout",
+          "Text": "\u010dz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 2,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "alt-unicode-live-replies",
+          "Text": "\u010dz",
+          "ReplyCount": 1,
+          "ReplyWriteCount": 1,
+          "IncompleteUtf8TraceCount": 1,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "utf8-fragmented-replies",
+          "Text": "A\u010d\u20ac\ud83d\ude42Z",
+          "ReplyCount": 3,
+          "ReplyWriteCount": 18,
+          "IncompleteUtf8TraceCount": 6,
+          "AgentPidReused": false
+        },
+        {
+          "Case": "escape-live-replies",
+          "SignificantKeys": 11,
+          "ReplyCount": 10,
+          "ReplyWriteCount": 10
+        },
+        {
+          "Case": "escape-fragmented-replies",
+          "SignificantKeys": 11,
+          "ReplyCount": 10,
+          "ReplyWriteCount": 60
+        }
+      ]
+    }
+  ],
+  "Step12Accepted": false
+}

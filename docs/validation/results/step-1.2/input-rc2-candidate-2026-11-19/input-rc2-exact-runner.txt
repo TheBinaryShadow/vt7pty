@@ -1,0 +1,38 @@
+I test the rebuilt decoder runtime, with API 1.1 and protocol 2.
+I first retain one unchanged rc1 input control, then run three pairs of H4 guards and 43 input cases.
+Keep Windows unlocked. Physical keyboard, lock/unlock and soak repeats are not requested.
+The rc1 reference retains its three original failures. Candidate failures remain actual failures.
+Starting 01-reference
+01-reference: Fail 
+Starting 02-guard
+02-guard: Pass 
+Starting 03-input
+Input controller active: 1 minutes
+03-input: Pass 
+Starting 04-guard
+04-guard: Pass 
+Starting 05-input
+Input controller active: 1 minutes
+05-input: Pass 
+Starting 06-guard
+06-guard: Pass 
+Starting 07-input
+Input controller active: 1 minutes
+07-input: Pass 
+Starting the seven focused H4 lifetime and fault guards.
+Starting 14 focused unit, protocol and flagless session regressions.
+modern-cpp-and-input-decoder: Pass
+protocol: Pass
+terminal-state: Pass
+diagnostic-security: Pass
+backend: Pass
+backend-applications: Pass
+session-output: Pass
+session-unicode: Pass
+session-input: Pass
+session-resize: Pass
+session-repeat: Pass
+session-shutdown: Pass
+session-spawn_failure: Pass
+session-concurrent: Pass
+Keep the complete results: D:\Git\vt7pty\artifacts\fidelity\input-rc2-exact\results\developmenthost-input-20261119-081107-459bdab7

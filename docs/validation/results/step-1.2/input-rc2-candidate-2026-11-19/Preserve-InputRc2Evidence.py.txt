@@ -1,0 +1,75 @@
+from pathlib import Path
+import json,hashlib,zipfile,shutil,subprocess
+root=Path(__file__).resolve().parents[2]
+art=root/'artifacts/fidelity'
+exact=art/'input-rc2-exact'
+runs=list((exact/'results').iterdir())
+assert len(runs)==1
+run=runs[0]
+report=json.loads((run/'report.json').read_bytes())
+assert len(report['Trials'])==7 and all(t['CollectionStatus']=='Completed' for t in report['Trials'])
+assert report['Qualification']['Status']=='Pass' and report['Regression']['Status']=='Pass'
+review=json.loads((art/'input-rc2-exact-review.json').read_bytes())
+assert review['CandidateOutcome']=='Pass' and review['ReferenceOutcome']=='Fail'
+out=root/'docs/validation/results/step-1.2/input-rc2-candidate-2026-11-19'
+assert not out.exists();out.mkdir(parents=True)
+def sha(b):return hashlib.sha256(b).hexdigest()
+def dump(p,obj):p.write_text(json.dumps(obj,indent=2)+'\n',encoding='utf-8')
+def archive(name,trees):
+ records=[]
+ with zipfile.ZipFile(out/name,'w',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
+  for tree in trees:
+   for path in sorted(tree.rglob('*')):
+    if not path.is_file():continue
+    b=path.read_bytes();member=tree.name+'/'+path.relative_to(tree).as_posix()
+    z.writestr(member,b);records.append(dict(Path=member,Bytes=len(b),Sha256=sha(b)))
+ with zipfile.ZipFile(out/name) as z:
+  assert len(z.infolist())==len(records)
+  for item in records:
+   b=z.read(item['Path']);assert len(b)==item['Bytes'] and sha(b)==item['Sha256']
+ dump(out/(name+'.files.json'),dict(SchemaVersion=1,Files=records))
+ return dict(Archive=name,Files=len(records),Bytes=(out/name).stat().st_size,Sha256=sha((out/name).read_bytes()))
+archives=[]
+archives.append(archive('exact-development-collection.zip',[run]))
+archives.append(archive('precommit-input-cases.zip',[art/'input-rc2-first-debug-native',art/'input-rc2-expanded-debug-native']))
+archives.append(archive('build-and-pe-verification.zip',[root/'artifacts/verification/x64/Debug',root/'artifacts/verification/x64/Release',art/'input-rc2-b373-build-proof']))
+files=[
+ 'input-rc2-initial-debug-build.txt','input-rc2-expanded-debug-build.txt','input-rc2-first-debug-native.txt',
+ 'input-rc2-expanded-debug-native.txt','input-rc2-expanded-debug-review.json','input-rc2-debug-reviewer-controls-extended.txt',
+ 'input-rc2-final-build.txt','input-rc2-final-analysis.txt','input-rc2-final-verify.txt','input-rc2-final-package.txt',
+ 'input-rc2-exact-runner.txt','input-rc2-identity.json','input-rc2-exact-review.json','input-rc2-exact-audit.json',
+ 'input-rc2-rc1-backward-review.json','input-rc2-shared-archive.json',
+ 'Review-InputRc2Evidence.py','Test-InputRc2BundleControls.ps1','Preserve-InputRc2Evidence.py'
+]
+for name in files:
+ p=art/name;assert p.is_file(),name
+ shutil.copyfile(p,out/(name+'.txt' if p.suffix in ['.py','.ps1'] else name))
+for folder,name in [('input-rc2-debug-reviewer-controls-extended','debug-native-reviewer-controls.json'),
+ ('input-rc2-exact-native-controls','exact-native-reviewer-controls.json'),('input-rc2-exact-bundle-controls','exact-bundle-reviewer-controls.json')]:
+ shutil.copyfile(art/folder/'review.json',out/name)
+shutil.copyfile(exact/'manifest.json',out/'package-manifest.json')
+shutil.copyfile(exact/'reference/manifest.json',out/'reference-manifest.json')
+shutil.copyfile(art/'packages/VT7Pty-input-0.5.1-dev-rc2.zip.sha256',out/'candidate.zip.sha256')
+code=['Package-InputFidelity.ps1','src/agent/ConsoleInput.cc','src/agent/ConsoleInput.h','src/agent/CursorReportFilter.h',
+ 'src/agent/UnicodeEncoding.h','tests/unit/InputDecoderTests.h','tests/fidelity/InputFidelityCases.h',
+ 'tests/fidelity/InputFidelityFixture.h','tests/fidelity/HostCancellationResearch.h',
+ 'tools/input/Invoke-InputFidelity.ps1','tools/input/Test-InputEvidence.ps1','tools/input/Test-InputCandidateEvidence.ps1',
+ 'tools/input/Test-InputReviewer.ps1','tools/input/cases.json','tools/input/decoder-cases.json','tools/input/regression-cases.json',
+ 'tools/research/Test-H4RuntimeEvidence.ps1','tools/research/Test-H4QualificationEvidence.ps1','tools/research/H4Cases.ps1',
+ 'tools/platform/NativeCapture.ps1','tools/platform/Windows7Compat.ps1']
+for name in code:
+ shutil.copyfile(root/name,out/(Path(name).name+'.txt'))
+source=json.loads((exact/'manifest.json').read_bytes())['Runtime']['SourceCommit']
+dump(out/'review-decision.json',dict(Kind='InputDecoderCandidateReview',SchemaVersion=1,
+ Status='LocalCandidateQualifiedWindows7Pending',SourceCommit=source,RunId=run.name,
+ CandidateOutcome='Pass',ReferenceOutcome='Fail',ReferenceFailuresRetained=True,
+ CandidateInputPassed=129,CandidateH4Passed=123,QualificationPassed=7,RegressionPassed=14,
+ Runtime='0.5.1-dev',Api='1.1',Protocol=2,Step12Accepted=False,Windows7='Pending',
+ CtrlBreakTransport='Unsupported',OrdinaryUserProfiles='NotRun',Archives=archives))
+inventory=[]
+for p in sorted(out.iterdir()):
+ if p.is_file():b=p.read_bytes();inventory.append(dict(Path=p.name,Bytes=len(b),Sha256=sha(b)))
+dump(out/'preservation.json',dict(SchemaVersion=1,Files=inventory))
+for item in inventory:
+ b=(out/item['Path']).read_bytes();assert len(b)==item['Bytes'] and sha(b)==item['Sha256']
+print(json.dumps(dict(Directory=str(out),ReviewFiles=len(inventory)+1,ArchivedOriginals=sum(x['Files'] for x in archives),Archives=archives),indent=2))

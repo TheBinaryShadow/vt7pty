@@ -1,0 +1,310 @@
+// Copyright (c) 2026 VT7Pty contributors
+// SPDX-License-Identifier: MIT
+#pragma once
+namespace inputcases {
+using Packet=inputfidelity::Packet;
+struct Spec {
+    std::string name,kind,input;
+    std::wstring expected,second;
+    uint32_t mode=0,chunk=0,gap=0;
+    uint32_t idle=0,replyChunk=0;
+    bool liveReplies=false;
+};
+std::vector<Spec> specs() {
+    const std::string nav="\x1b[D\x1b[C\x1b[A\x1b[B\x1b[H\x1b[F\x1b[3~\x1b[2~\x1b[5~\x1b[6~z";
+    const std::wstring mixed=L"A\u010d\u20ac\U0001f642Z";
+    const std::wstring paste=L"paste \u010d\u0107\u0111\u0161\u017e @[]{}\\| "+std::wstring(128,L'p');
+    std::vector<Spec> r;
+    auto add=[&](const char *name,const char *kind,uint32_t mode,std::string input,std::wstring expected,uint32_t chunk=0,uint32_t gap=0,std::wstring second=L""){
+        r.push_back({name,kind,std::move(input),std::move(expected),std::move(second),mode,chunk,gap});
+    };
+    add("raw-text-controls","text",0,"azAZ09\t\r\x7f",L"azAZ09\t\r\b");
+    add("raw-navigation","navigation",0,nav,L"");
+    add("raw-modifiers","modifiers",0,"\x1b[1;5D\x1b[1;2C\x1b[1;3H\x1b""az",L"");
+    add("raw-key-repeat","text",0,std::string(128,'r')+"z",std::wstring(128,L'r')+L"z");
+    add("utf8-combined","text",0,utf8(mixed),mixed);
+    add("utf8-bytewise","text",0,utf8(mixed),mixed,1,5);
+    add("utf8-two-byte","text",0,utf8(L"\u010d"),L"\u010d",1,20);
+    add("utf8-three-byte","text",0,utf8(L"\u20ac"),L"\u20ac",1,20);
+    add("utf8-four-byte","text",0,utf8(L"\U0001f642"),L"\U0001f642",1,20);
+    add("escape-bytewise","navigation",0,nav,L"",1,5);
+    add("alt-text-bytewise","alt",0,"\x1b""az",L"az",1,20);
+    add("raw-crlf","text",0,"a\r\nb",L"a\r\nb");
+    add("committed-paste-burst","text",0,utf8(paste),paste);
+    add("committed-paste-fragmented","text",0,utf8(paste),paste,7,5);
+    const std::string mouse="\x1b[<0;10;5M\x1b[<32;11;6M\x1b[<0;11;6m\x1b[<64;12;7M\x1b[<65;12;7M\x1b[<20;20;8M\x1b[<0;20;8m";
+    add("mouse-sgr","mouse",3,mouse,L"");
+    add("mouse-sgr-bytewise","mouse",3,mouse,L"",1,2);
+    std::string x10="\x1b[M";x10+=char(32);x10+=char(42);x10+=char(37);
+    x10+="\x1b[M";x10+=char(35);x10+=char(42);x10+=char(37);
+    add("mouse-x10","x10",3,x10,L"");
+    add("mouse-disabled","text",0,mouse,L"");
+    add("cooked-unicode","cooked",1,utf8(L"line \u010d\u20ac\r"),L"line \u010d\u20ac\r\n");
+    add("cooked-delete-backspace","cooked",1,"abcd\x1b[D\x1b[D\x1b[3~X\x1b[F\x7f!\r",L"abX!\r\n");
+    add("cooked-home-end","cooked",1,"abc\x1b[D\x1b[DX\x1b[HY\x1b[FZ\r",L"YaXbcZ\r\n");
+    add("cooked-tab","cooked",1,"ab\tcd\r",L"ab\tcd\r\n");
+    add("cooked-repeat","cooked",1,std::string(200,'x')+std::string(100,'\x7f')+std::string(10,'Y')+"\r",std::wstring(100,L'x')+std::wstring(10,L'Y')+L"\r\n");
+    add("cooked-multiline-paste","multiline",1,utf8(L"first \u010d\rsecond \u017e\r"),L"first \u010d\r\n",0,0,L"second \u017e\r\n");
+    add("cooked-cancel-unicode","cancel",1,utf8(L"old \u010d\u0107\u017e"),L"");
+    add("processed-ctrl-c","processed",2,"\x03z",L"z");
+    add("unprocessed-ctrl-c","text",0,"\x03z",std::wstring(1,3)+L"z");
+    add("native-break-processed","reference",2,"",L"");
+    add("native-break-unprocessed","reference",0,"",L"");
+    add("ctrl-backslash-byte","text",0,"\x1c""z",std::wstring(1,28)+L"z");
+    add("utf8-timeout-fragment","text",0,utf8(L"\u010d")+std::string("z"),L"\u010dz",1,1200);
+    add("utf8-live-replies","text",0,utf8(mixed),mixed,1,20);r.back().liveReplies=true;
+    add("escape-live-replies","navigation",0,nav,L"",1,20);r.back().liveReplies=true;
+    add("utf8-timeout-three","text",0,utf8(L"\u20acz"),L"\u20acz",1,1200);
+    add("utf8-timeout-four","text",0,utf8(L"\U0001f642z"),L"\U0001f642z",1,1200);
+    const std::string malformed="\xc2z\xe2\x82z\xf0\x9f" "z\xc0\xaf" "z\xed\xa0\x80" "z\xf4\x90\x80\x80" "z\xf5\x80\x80\x80" "z\x80z";
+    add("utf8-malformed-recovery","text",0,malformed,L"zzzzzzzz");
+    add("utf8-malformed-bytewise","text",0,malformed,L"zzzzzzzz",1,5);
+    add("escape-alone-live","text",0,"\x1b",L"\x1b");r.back().idle=1200;r.back().liveReplies=true;
+    add("escape-alone-no-reply","text",0,"\x1b",L"\x1b");r.back().idle=1200;
+    add("utf8-fragmented-replies","text",0,utf8(mixed),mixed,1,20);r.back().liveReplies=true;r.back().replyChunk=1;
+    add("escape-fragmented-replies","navigation",0,nav,L"",1,20);r.back().liveReplies=true;r.back().replyChunk=1;
+    add("alt-unicode-timeout","alt-unicode",0,"\x1b"+utf8(L"\u010dz"),L"\u010dz",2,1200);
+    add("alt-unicode-live-replies","alt-unicode",0,"\x1b"+utf8(L"\u010dz"),L"\u010dz",1,20);r.back().liveReplies=true;
+    return r;
+}
+std::string hex(std::string_view bytes) {
+    std::string s;constexpr char digit[]="0123456789abcdef";
+    for(unsigned char c:bytes){s+=digit[c>>4];s+=digit[c&15];}return s;
+}
+std::string specJson(const Spec &s) {
+    return "{\"Case\":"+json(s.name)+",\"Kind\":"+json(s.kind)+",\"Mode\":"+std::to_string(s.mode)+
+        ",\"InputHex\":"+json(hex(s.input))+",\"ExpectedText\":"+json(utf8(s.expected))+
+        ",\"SecondText\":"+json(utf8(s.second))+",\"ChunkBytes\":"+std::to_string(s.chunk)+
+        ",\"GapMilliseconds\":"+std::to_string(s.gap)+",\"LiveReplies\":"+boolean(s.liveReplies)+",\"IdleMilliseconds\":"+std::to_string(s.idle)+
+        ",\"ReplyChunkBytes\":"+std::to_string(s.replyChunk)+"}";
+}
+std::string listJson() {
+    std::string s="{\"SchemaVersion\":1,\"Cases\":[";bool first=true;
+    for(const auto &v:specs()){if(!first)s+=',';first=false;s+=specJson(v);}return s+"]}";
+}
+void validate(const Packet &p) {
+    check(p.magic==0x31464e49 && p.schema==1 && p.pid && p.mode<=3 && p.recordCount<=1024 &&
+        p.textCount<=2047 && !p.overflow,"bounded input capture packet");
+}
+std::string packet(const Packet &p) {
+    validate(p);std::string records="[";
+    for(DWORD i=0;i<p.recordCount;++i){if(i)records+=',';const auto &r=p.records[i];
+        records+="{\"Type\":"+std::to_string(r.type)+",\"Down\":"+std::to_string(r.down)+
+            ",\"Repeat\":"+std::to_string(r.repeat)+",\"VirtualKey\":"+std::to_string(r.vk)+
+            ",\"ScanCode\":"+std::to_string(r.scan)+",\"Character\":"+std::to_string(r.character)+
+            ",\"Modifiers\":"+std::to_string(r.modifiers)+",\"X\":"+std::to_string(r.x)+",\"Y\":"+std::to_string(r.y)+
+            ",\"Buttons\":"+std::to_string(r.buttons)+",\"Flags\":"+std::to_string(r.flags)+"}";
+    }
+    return "{\"SchemaVersion\":1,\"ProcessId\":"+std::to_string(p.pid)+",\"Mode\":"+std::to_string(p.mode)+
+        ",\"InputMode\":"+std::to_string(p.inputMode)+",\"Overflow\":"+std::to_string(p.overflow)+
+        ",\"ReadStarted\":"+std::to_string(p.readStarted)+",\"ReadReturned\":"+std::to_string(p.readReturned)+
+        ",\"ReadSucceeded\":"+std::to_string(p.readSucceeded)+",\"ReadError\":"+std::to_string(p.readError)+
+        ",\"Text\":"+json(utf8(std::wstring(p.text,p.textCount)))+
+        ",\"CtrlC\":"+std::to_string(p.c)+",\"CtrlBreak\":"+std::to_string(p.brk)+
+        ",\"StopCanceledRead\":"+std::to_string(p.stopCanceledRead)+
+        ",\"WindowLeft\":"+std::to_string(p.windowLeft)+",\"WindowTop\":"+std::to_string(p.windowTop)+
+        ",\"Columns\":"+std::to_string(p.columns)+",\"Rows\":"+std::to_string(p.rows)+
+        ",\"Reference\":{\"ProcessId\":"+std::to_string(p.reference.pid)+",\"ProcessGroupId\":"+std::to_string(p.referenceGroup)+
+        ",\"InputMode\":"+std::to_string(p.reference.inputMode)+",\"CtrlC\":"+std::to_string(p.reference.c)+
+        ",\"CtrlBreak\":"+std::to_string(p.reference.brk)+",\"ExitCode\":"+std::to_string(p.referenceExit)+
+        ",\"ChildExited\":"+std::to_string(p.referenceChildExited)+"},\"Records\":"+records+"]}";
+}
+struct Capture {
+    Session &s;std::wstring out;bool active=false;
+    std::unique_ptr<Packet> p=std::make_unique<Packet>();
+    Capture(Session &session,const std::wstring &path,uint32_t mode):s(session),out(path) {
+        char command='V';s.inputCaptureTransfer(&command,1,true);s.inputCaptureTransfer(&mode,sizeof(mode),true);
+        active=true;receive();writeFile(out+L"\\capture-ready.json",packet(*p));
+    }
+    void receive(){s.inputCaptureTransfer(p.get(),sizeof(*p),false);validate(*p);}
+    const Packet &get(char command='S'){s.inputCaptureTransfer(&command,1,true);receive();return *p;}
+    bool until(const std::function<bool(const Packet &)> &test,DWORD ms=5000){
+        return s.until([&]{return test(get());},ms);
+    }
+    void close() {
+        if(!active)return;get('Q');active=false;
+        writeFile(out+L"\\capture-stopped.json",packet(*p));
+        check(!p->stopCanceledRead,"capture finished without canceled fixture read");
+    }
+    ~Capture(){if(active){try{close();}catch(...){}}}
+};
+std::vector<inputfidelity::Record> keys(const Packet &p,bool includeMarker=false) {
+    std::vector<inputfidelity::Record> v;
+    for(DWORD i=0;i<p.recordCount;++i){const auto &r=p.records[i];
+        if(r.type!=KEY_EVENT || !r.down || r.vk==VK_SHIFT || r.vk==VK_CONTROL || r.vk==VK_MENU)continue;
+        if(!includeMarker && r.character==0xe000)continue;
+        check(r.repeat>0 && r.repeat<=1024,"positive bounded repeat");
+        for(DWORD n=0;n<r.repeat;++n)v.push_back(r);
+    }
+    return v;
+}
+std::wstring text(const Packet &p) {
+    std::wstring s;for(const auto &r:keys(p))s+=static_cast<wchar_t>(r.character);return s;
+}
+bool marker(const Packet &p) {
+    for(DWORD i=0;i<p.recordCount;++i)if(p.records[i].type==KEY_EVENT && !p.records[i].down && p.records[i].character==0xe000)return true;
+    return false;
+}
+void keyStateReleased(const Packet &p) {
+    std::array<int,256> state={};
+    for(DWORD i=0;i<p.recordCount;++i){const auto &r=p.records[i];if(r.type!=KEY_EVENT)continue;
+        check(r.vk<state.size() && r.repeat>0,"key record bound");
+        state[r.vk]+=r.down?static_cast<int>(r.repeat):-static_cast<int>(r.repeat);
+        check(state[r.vk]>=0,"key-up follows key-down");
+    }
+    check(std::all_of(state.begin(),state.end(),[](int value){return value==0;}),"all generated key states released");
+}
+void rawOracle(const Spec &s,const Packet &p) {
+    const auto v=keys(p);
+    check(p.c==(s.kind=="processed"?1u:0u) && p.brk==0,"distinct control count");
+    if(s.kind=="navigation"){
+        const std::vector<DWORD> expected={VK_LEFT,VK_RIGHT,VK_UP,VK_DOWN,VK_HOME,VK_END,VK_DELETE,VK_INSERT,VK_PRIOR,VK_NEXT,'Z'};
+        check(v.size()==expected.size(),"exact navigation count");
+        for(size_t i=0;i<v.size();++i){check(v[i].vk==expected[i],"navigation order");
+            if(i+1<v.size())check(v[i].character==0 && v[i].modifiers==ENHANCED_KEY,"enhanced navigation record");
+            else check(v[i].character=='z' && !v[i].modifiers,"ordinary next key after navigation");
+        }
+    }else if(s.kind=="modifiers"){
+        const std::vector<DWORD> vk={VK_LEFT,VK_RIGHT,VK_HOME,'A','Z'},mods={8,16,2,2,0};
+        check(v.size()==vk.size(),"modifier count");
+        const std::vector<DWORD> characters={0,0,0,97,122};
+        for(size_t i=0;i<v.size();++i)check(v[i].vk==vk[i] && v[i].character==characters[i] &&
+            v[i].modifiers==(mods[i]+(i<3?ENHANCED_KEY:0u)),"exact chord and released next key");
+    }else if(s.kind=="alt"){
+        check(v.size()==2 && v[0].character=='a' && (v[0].modifiers&LEFT_ALT_PRESSED) && v[1].character=='z' && !(v[1].modifiers&31),"fragmented Alt text");
+    }else if(s.kind=="alt-unicode"){
+        check(v.size()==2 && text(p)==s.expected && (v[0].modifiers&LEFT_ALT_PRESSED) &&
+            v[1].character=='z' && !(v[1].modifiers&31),"fragmented Alt Unicode and released next key");
+    }else if(s.kind=="mouse" || s.kind=="x10"){
+        std::vector<inputfidelity::Record> m;
+        for(DWORD i=0;i<p.recordCount;++i)if(p.records[i].type==MOUSE_EVENT)m.push_back(p.records[i]);
+        const std::vector<DWORD> buttons=s.kind=="mouse"?std::vector<DWORD>{1,1,0,0x780000,0xff880000,1,0}:std::vector<DWORD>{1,0};
+        const std::vector<DWORD> flags=s.kind=="mouse"?std::vector<DWORD>{0,1,0,4,4,0,0}:std::vector<DWORD>{0,0};
+        const std::vector<int> x=s.kind=="mouse"?std::vector<int>{9,10,10,11,11,19,19}:std::vector<int>{9,9};
+        const std::vector<int> y=s.kind=="mouse"?std::vector<int>{4,5,5,6,6,7,7}:std::vector<int>{4,4};
+        check(m.size()==buttons.size() && v.empty(),"exact mouse-only delivery");
+        for(size_t i=0;i<m.size();++i)check(m[i].buttons==buttons[i] && m[i].flags==flags[i] &&
+            m[i].x==static_cast<int>(p.windowLeft)+x[i] && m[i].y==static_cast<int>(p.windowTop)+y[i] &&
+            m[i].modifiers==(s.kind=="mouse" && i==5 ? 24u:0u),"mouse coordinate, button, wheel and modifier");
+    }else if(s.kind=="reference"){
+        check(p.reference.pid && p.reference.pid==p.referenceGroup && p.referenceChildExited &&
+            p.referenceExit==37 && p.reference.brk==1 && p.reference.c==0 && v.empty(),"native Break reference only");
+        check(static_cast<bool>(p.reference.inputMode&ENABLE_PROCESSED_INPUT)==(s.mode==2),"native Break mode");
+    }else{
+        check(text(p)==s.expected,"exact text order and multiplicity");
+        for(DWORD i=0;i<p.recordCount;++i)check(p.records[i].type!=MOUSE_EVENT,"no stray mouse event");
+    }
+    keyStateReleased(p);
+}
+void send(Session &s,const Spec &spec,const std::wstring &out) {
+    std::string chunks="[";size_t count=0;
+    const size_t chunk=spec.chunk?spec.chunk:std::max<size_t>(1,spec.input.size());
+    for(size_t i=0;i<spec.input.size();i+=chunk){
+        const auto bytes=spec.input.substr(i,chunk);s.input(bytes);
+        if(count++)chunks+=',';chunks+=json(hex(bytes));
+        if(i+chunk<spec.input.size() && spec.gap){
+            const auto until=GetTickCount64()+spec.gap;
+            do{if(spec.liveReplies)s.pump();Sleep(2);}while(GetTickCount64()<until);
+        }
+    }
+    if(spec.idle) {
+        const auto until=GetTickCount64()+spec.idle;
+        do{if(spec.liveReplies)s.pump();Sleep(2);}while(GetTickCount64()<until);
+    }
+    writeFile(out+L"\\writes.json","{\"ChunkHex\":"+chunks+"],\"GapMilliseconds\":"+std::to_string(spec.gap)+",\"IdleMilliseconds\":"+std::to_string(spec.idle)+"}");
+}
+void exercise(Context &c,const Spec &spec) {
+    auto &s=c.start();s.inputReplyRecording=true;s.inputReplyChunkBytes=spec.replyChunk;
+    {
+        const auto modeOffset=s.raw.size();
+        Capture capture(s,c.out,spec.mode);
+        check(capture.until([&](const Packet &p){return spec.mode!=1 || p.readStarted;}),"capture readiness");
+        if(spec.mode==inputfidelity::Mouse){
+            check(s.until([&]{return s.raw.find("\x1b[?1006h",modeOffset)!=std::string::npos;}),"agent mouse-mode negotiation");
+            writeFile(c.out+L"\\mouse-ready.json","{\"Mode1006Observed\":true,\"StreamStartOffset\":"+std::to_string(modeOffset)+"}");
+        }
+        send(s,spec,c.out);
+        DWORD observedRecords=0;
+        if(spec.mode==1){
+            if(spec.kind=="cancel"){
+                s.input("\x03");
+                check(capture.until([](const Packet &p){return p.readReturned && p.c==1;}),"Unicode cooked cancellation");
+            }else check(capture.until([](const Packet &p){return p.readReturned!=0;}),"cooked read completion");
+            writeFile(c.out+L"\\input-observed.json",packet(*capture.p));
+            if(spec.kind=="cancel")check(capture.p->readError==995 && capture.p->textCount==0 && capture.p->c==1 && !capture.p->brk,"cooked Unicode line canceled exactly once");
+            else check(capture.p->readSucceeded && !capture.p->readError && !capture.p->c && !capture.p->brk &&
+                std::wstring(capture.p->text,capture.p->textCount)==spec.expected,"exact cooked editing/paste readback");
+            if(spec.kind=="cancel" || spec.kind=="multiline"){
+                capture.get('R');
+                if(spec.kind=="cancel")s.input(utf8(L"NEXT \u017e\r"));
+                check(capture.until([](const Packet &p){return p.readReturned!=0;}),"second cooked read");
+                writeFile(c.out+L"\\second-read.json",packet(*capture.p));
+                const auto expected=spec.kind=="cancel"?L"NEXT \u017e\r\n":spec.second;
+                check(!capture.p->readError && capture.p->readSucceeded && std::wstring(capture.p->text,capture.p->textCount)==expected,"exact next queued line");
+            }
+        }else{
+            if(spec.kind=="reference")capture.get('B');
+            s.input("\xee\x80\x80");
+            check(capture.until([&](const Packet &p){return marker(p) && (spec.kind!="processed" || p.c>=1);}),"input stream completion fence");
+            // A second observed fence interval catches trailing records. It is
+            // not an interactive latency benchmark.
+            const auto quiet=GetTickCount64()+200;
+            while(GetTickCount64()<quiet){s.pump();capture.get();Sleep(5);}
+            writeFile(c.out+L"\\input-observed.json",packet(*capture.p));
+            std::string replies="[";
+            for(size_t i=0;i<s.inputTerminalReplies.size();++i){if(i)replies+=',';replies+=json(hex(s.inputTerminalReplies[i]));}
+            std::string replyWrites="[";
+            for(size_t i=0;i<s.inputReplyWrites.size();++i){if(i)replyWrites+=',';replyWrites+=json(hex(s.inputReplyWrites[i]));}
+            writeFile(c.out+L"\\terminal-replies.json","{\"ReplyHex\":"+replies+"],\"WriteHex\":"+replyWrites+"]}");
+            if(spec.liveReplies)check(!s.inputTerminalReplies.empty(),"live cursor reply was exercised");
+            rawOracle(spec,*capture.p);observedRecords=capture.p->recordCount;
+        }
+        capture.close();
+        if(spec.mode!=1)check(capture.p->recordCount==observedRecords,"no late input records after completion fence");
+    }
+    nextRead(s,c.out,0);
+}
+void oracle() {
+    auto storage=std::make_unique<Packet>();auto &p=*storage;p.pid=1;p.recordCount=2;
+    p.records[0]={KEY_EVENT,1,1,'A',0,'a',0};
+    p.records[1]={KEY_EVENT,0,1,'A',0,'a',0};
+    check(text(p)==L"a","input text oracle");
+    keyStateReleased(p);
+    p.records[0].repeat=2;
+    check(text(p)==L"aa","repeat normalization oracle");
+    bool rejected=false;try{keyStateReleased(p);}catch(...){rejected=true;}
+    check(rejected,"unbalanced input rejected");
+    p.overflow=1;rejected=false;try{validate(p);}catch(...){rejected=true;}
+    check(rejected,"overflow rejected");
+    check(specs().size()==43,"complete input inventory");
+    printf("Input fidelity oracle: 5 checks passed.\n");
+}
+int run(const std::wstring &out,const std::string &only="") {
+    outRoot=out;check(CreateDirectoryW(out.c_str(),nullptr),"new input collection");rootEvidenceCreated=true;
+    applicationDesktop=nameOf(GetThreadDesktop(GetCurrentThreadId()));
+    if(!desktopPreflight(out+L"\\preflight.json"))return 2;
+    check(SetEnvironmentVariableW(L"VT7PTY_DEBUG",L"trace"),"input runtime trace");
+    Collector collector(out);std::string rows="[";size_t total=0,passed=0;
+    for(const auto &spec:specs()){
+        if(!only.empty() && spec.name!=only)continue;
+        Context c(out+L"\\"+std::wstring(spec.name.begin(),spec.name.end()));
+        writeFile(c.out+L"\\recipe.json",specJson(spec));
+        bool okay=false;std::string error;
+        try{check(desktopPreflight(c.out+L"\\preflight.json"),"input case eligible desktop");exercise(c,spec);okay=true;}
+        catch(const std::exception &e){error=e.what();}
+        okay=c.finish() && okay;
+        if(error.empty() && !c.error.empty())error=c.error;
+        if(total++)rows+=',';if(okay)++passed;
+        rows+="{\"Case\":"+json(spec.name)+",\"Passed\":"+boolean(okay)+",\"OwnedProcessesCleaned\":"+boolean(c.cleaned)+
+            ",\"HostExited\":"+boolean(c.hostExited)+",\"Error\":"+json(error)+"}";
+        printf("%s: %s %s\n",okay?"PASS":"FAIL",spec.name.c_str(),error.c_str());
+    }
+    collector.stop();check(total>0,"input case selection");
+    writeFile(out+L"\\cases.json","{\"SchemaVersion\":1,\"Cases\":"+rows+"]}");
+    writeFile(out+L"\\probe.json","{\"Kind\":\"InputFidelityProbe\",\"SchemaVersion\":1,\"Status\":"+json(passed==total?"Pass":"Fail")+
+        ",\"SourceCommit\":"+json(GenVersion_Commit)+",\"RuntimeSourceCommit\":"+json(manualRuntimeSource())+
+        ",\"Passed\":"+std::to_string(passed)+",\"Total\":"+std::to_string(total)+
+        ",\"FullInventory\":"+boolean(only.empty())+",\"CtrlBreakTransport\":\"Unsupported\",\"NativeBreakReferenceOnly\":true,\"Step12Accepted\":false}");
+    return passed==total?0:1;
+}
+}

@@ -27,6 +27,7 @@ Milestone 1 and VT7 integration stay open.
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
+| Step 1.2 input decoder | [rc2: exact archive, 129 input and 123 H4 guards pass locally](2026-11-19-step-1.2-input-rc2-candidate.md) | Pending on NESSY, TURTLE and LEOPARD |
 | Step 1.2 input coverage | [rc1 characterization, 33 new cases and frozen guards](2026-11-19-step-1.2-input-rc1-candidate.md) | [Reviewed: 345 guards pass; three input failures confirmed](2026-11-19-step-1.2-input-rc1-windows7.md) |
 | H4 manual follow-up | [Corrected runner and exact-package verification](2026-11-19-step-1.2-h4-manual-rc1-candidate.md) | [Accepted: 9/9 physical workflows; H4 complete](2026-11-19-step-1.2-h4-manual-rc1-windows7.md) |
 | H4 runtime integration | [rc4 full local qualification and issuance](2026-11-17-step-1.2-h4-runtime-rc4-candidate.md) | [Automated matrix passed](2026-11-18-step-1.2-h4-runtime-rc4-windows7.md); [manual completion](2026-11-19-step-1.2-h4-manual-rc1-windows7.md) |

@@ -1,0 +1,74 @@
+{
+  "Kind": "InputCandidateReviewerControls",
+  "Status": "Pass",
+  "Rejected": 13,
+  "CandidateOutcome": "Pass",
+  "ReferenceOutcome": "Fail",
+  "Controls": [
+    {
+      "Case": "wrong-runtime",
+      "Reason": "Input candidate evidence: matched changed runtime and harness identity",
+      "Rejected": true
+    },
+    {
+      "Case": "false-unchanged-runtime",
+      "Reason": "Input candidate evidence: matched changed runtime and harness identity",
+      "Rejected": true
+    },
+    {
+      "Case": "wrong-reference",
+      "Reason": "Input candidate evidence: unchanged rc1 reference identity",
+      "Rejected": true
+    },
+    {
+      "Case": "false-acceptance",
+      "Reason": "Input candidate evidence: explicit transport and acceptance limits",
+      "Rejected": true
+    },
+    {
+      "Case": "false-break-support",
+      "Reason": "Input candidate evidence: explicit transport and acceptance limits",
+      "Rejected": true
+    },
+    {
+      "Case": "false-profile-coverage",
+      "Reason": "Input candidate evidence: retained pending coverage",
+      "Rejected": true
+    },
+    {
+      "Case": "wrong-tier",
+      "Reason": "Input candidate evidence: declared tier and complete prerequisites",
+      "Rejected": true
+    },
+    {
+      "Case": "wrong-target-os",
+      "Reason": "Input candidate evidence: actual Windows 7 SP1 tier",
+      "Rejected": true
+    },
+    {
+      "Case": "false-legacy-prerequisites",
+      "Reason": "Input candidate evidence: legacy PowerShell 2.0/CLR2 prerequisites",
+      "Rejected": true
+    },
+    {
+      "Case": "wrong-pinned-engine",
+      "Reason": "Input candidate evidence: pinned PowerShell 7 inventory",
+      "Rejected": true
+    },
+    {
+      "Case": "wrong-trial-order",
+      "Reason": "Input candidate evidence: frozen reference and three interleaved pairs",
+      "Rejected": true
+    },
+    {
+      "Case": "laundered-reference-failures",
+      "Reason": "Input candidate evidence: original rc1 failures remain actual failures",
+      "Rejected": true
+    },
+    {
+      "Case": "regression-output-lost",
+      "Reason": "Input candidate evidence: regression completion modern-cpp-and-input-decoder",
+      "Rejected": true
+    }
+  ]
+}

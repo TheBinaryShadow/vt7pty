@@ -1,0 +1,11 @@
+{
+  "Kind": "PackagingInvestigationNote",
+  "Status": "ResolvedBeforeIssuingCandidate",
+  "AttemptSourceCommit": "b373538fe5ccbabae92c578c49fad5788e3d4ae2",
+  "Error": "ExtractToFile: Value cannot be null (source)",
+  "Cause": "The frozen .NET ZIP uses backslashes in entry names while its manifest uses forward slashes.",
+  "Correction": "Resolve a unique ZIP entry after normalizing either separator; preserve extracted bytes and verify the frozen hashes.",
+  "PartialStageRetained": "artifacts/fidelity/packages/VT7Pty-input-0.5.1-dev-rc2-package-attempt1",
+  "IssuedArchiveInFailedAttempt": false,
+  "FinalSourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4"
+}

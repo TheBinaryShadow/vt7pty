@@ -1,0 +1,103 @@
+{
+  "SchemaVersion": 1,
+  "Cases": [
+    {
+      "Name": "modern-cpp-and-input-decoder",
+      "Executable": "ModernCppTest.exe",
+      "Arguments": "",
+      "ExpectedOutput": "VT7Pty modern C++ utility tests passed.",
+      "TimeoutMilliseconds": 90000
+    },
+    {
+      "Name": "protocol",
+      "Executable": "ProtocolTest.exe",
+      "Arguments": "",
+      "ExpectedOutput": "VT7Pty protocol tests passed",
+      "TimeoutMilliseconds": 90000
+    },
+    {
+      "Name": "terminal-state",
+      "Executable": "VtStateTest.exe",
+      "Arguments": "",
+      "ExpectedOutput": "VT7Pty VT state oracle tests passed.",
+      "TimeoutMilliseconds": 90000
+    },
+    {
+      "Name": "diagnostic-security",
+      "Executable": "VT7Pty-DebugServer.exe",
+      "Arguments": "--self-test",
+      "ExpectedOutput": "diagnostic security self-test passed",
+      "TimeoutMilliseconds": 90000
+    },
+    {
+      "Name": "backend",
+      "Executable": "BackendSmokeTest.exe",
+      "Arguments": "",
+      "ExpectedOutput": "",
+      "TimeoutMilliseconds": 90000
+    },
+    {
+      "Name": "backend-applications",
+      "Executable": "BackendSmokeTest.exe",
+      "Arguments": "APPLICATIONS",
+      "ExpectedOutput": "Command Prompt and Windows PowerShell sessions passed.",
+      "TimeoutMilliseconds": 90000
+    },
+    {
+      "Name": "session-output",
+      "Executable": "SessionContractTest.exe",
+      "Arguments": "OUTPUT",
+      "ExpectedOutput": "Session contract OUTPUT passed.",
+      "TimeoutMilliseconds": 90000
+    },
+    {
+      "Name": "session-unicode",
+      "Executable": "SessionContractTest.exe",
+      "Arguments": "UNICODE",
+      "ExpectedOutput": "Session contract UNICODE passed.",
+      "TimeoutMilliseconds": 90000
+    },
+    {
+      "Name": "session-input",
+      "Executable": "SessionContractTest.exe",
+      "Arguments": "INPUT",
+      "ExpectedOutput": "Session contract INPUT passed.",
+      "TimeoutMilliseconds": 90000
+    },
+    {
+      "Name": "session-resize",
+      "Executable": "SessionContractTest.exe",
+      "Arguments": "RESIZE",
+      "ExpectedOutput": "Session contract RESIZE passed.",
+      "TimeoutMilliseconds": 90000
+    },
+    {
+      "Name": "session-repeat",
+      "Executable": "SessionContractTest.exe",
+      "Arguments": "REPEAT",
+      "ExpectedOutput": "Session contract REPEAT passed.",
+      "TimeoutMilliseconds": 300000
+    },
+    {
+      "Name": "session-shutdown",
+      "Executable": "SessionContractTest.exe",
+      "Arguments": "SHUTDOWN",
+      "ExpectedOutput": "Session contract SHUTDOWN passed.",
+      "TimeoutMilliseconds": 90000
+    },
+    {
+      "Name": "session-spawn_failure",
+      "Executable": "SessionContractTest.exe",
+      "Arguments": "SPAWN_FAILURE",
+      "ExpectedOutput": "Session contract SPAWN_FAILURE passed.",
+      "TimeoutMilliseconds": 90000
+    },
+    {
+      "Name": "session-concurrent",
+      "Executable": "SessionContractTest.exe",
+      "Arguments": "CONCURRENT",
+      "ExpectedOutput": "Session contract CONCURRENT passed.",
+      "TimeoutMilliseconds": 90000
+    }
+  ]
+}

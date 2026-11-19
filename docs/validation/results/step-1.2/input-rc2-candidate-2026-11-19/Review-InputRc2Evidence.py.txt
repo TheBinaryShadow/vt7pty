@@ -1,0 +1,73 @@
+from pathlib import Path
+import json,collections,hashlib,subprocess
+root=Path(__file__).resolve().parents[2];art=root/'artifacts/fidelity';exact=art/'input-rc2-exact'
+run=next((exact/'results').iterdir())
+def read(p):return json.loads(p.read_bytes())
+def keys(p):
+ out=[]
+ for x in p['Records']:
+  if x['Type']==1 and x['Down'] and x['VirtualKey'] not in [16,17,18] and x['Character']!=57344:
+   out.extend([x]*x['Repeat'])
+ return out
+def text(p):return ''.join(chr(x['Character']) for x in keys(p)).encode('utf-16-le','surrogatepass').decode('utf-16-le')
+report=read(run/'report.json');assert len(report['Trials'])==7
+summary=[]
+for trial in report['Trials']:
+ assert trial['CollectionStatus']=='Completed' and not trial['TimedOut'] and not trial['Error']
+ native=run/trial['Directory']/'native'
+ if trial['Role']=='Guard':
+  assert trial['Outcome']=='Pass' and trial['Passed']==41 and trial['Total']==41
+  continue
+ cases=read(native/'cases.json')['Cases']
+ if trial['Role']=='Reference':
+  assert len(cases)==33
+  failed=[c['Case'] for c in cases if not c['Passed']]
+  assert failed==['utf8-timeout-fragment','utf8-live-replies','escape-live-replies']
+  assert text(read(native/'utf8-timeout-fragment/input-observed.json'))=='z'
+  assert text(read(native/'utf8-live-replies/input-observed.json'))=='A[1;1R\u20ac\U0001f642Z'
+  assert len(keys(read(native/'escape-live-replies/input-observed.json')))==35
+  continue
+ assert len(cases)==43 and all(c['Passed'] and c['OwnedProcessesCleaned'] and c['HostExited'] for c in cases)
+ identities={c['Case']:read(native/c['Case']/'identity.json') for c in cases}
+ agents=collections.Counter(x['Fixture']['ParentId'] for x in identities.values())
+ trace=[json.loads(line) for line in (native/'runtime-trace.jsonl').read_bytes().splitlines()]
+ observations=[]
+ for name,want in [('utf8-timeout-fragment','\u010dz'),('utf8-live-replies','A\u010d\u20ac\U0001f642Z'),
+   ('utf8-timeout-three','\u20acz'),('utf8-timeout-four','\U0001f642z'),
+   ('utf8-malformed-recovery','z'*8),('utf8-malformed-bytewise','z'*8),
+   ('escape-alone-live','\x1b'),('escape-alone-no-reply','\x1b'),('alt-unicode-timeout','\u010dz'),
+   ('alt-unicode-live-replies','\u010dz'),('utf8-fragmented-replies','A\u010d\u20ac\U0001f642Z')]:
+  packet=read(native/name/'input-observed.json');assert text(packet)==want,(trial['Order'],name,text(packet))
+  replies=read(native/name/'terminal-replies.json')
+  assert ''.join(replies['ReplyHex'])==''.join(replies['WriteHex'])
+  pid=identities[name]['Fixture']['ParentId']
+  events=[x for x in trace if x['pid']==pid and x['process']=='VT7Pty-Agent.exe']
+  incomplete=sum('Incomplete UTF-8 character' in x['message'] for x in events)
+  if agents[pid]==1 and name in ['utf8-timeout-fragment','utf8-timeout-three','utf8-timeout-four','alt-unicode-timeout']:
+   expected={'utf8-timeout-fragment':2,'utf8-timeout-three':4,'utf8-timeout-four':6,'alt-unicode-timeout':2}[name]
+   assert incomplete==expected,(trial['Order'],name,incomplete)
+  if name=='escape-alone-live':assert len(replies['ReplyHex'])==1
+  if 'fragmented-replies' in name:assert all(len(x)==2 for x in replies['WriteHex'])
+  observations.append(dict(Case=name,Text=want,ReplyCount=len(replies['ReplyHex']),ReplyWriteCount=len(replies['WriteHex']),
+    IncompleteUtf8TraceCount=incomplete,AgentPidReused=(agents[pid]!=1)))
+ for name in ['escape-live-replies','escape-fragmented-replies']:
+  packet=read(native/name/'input-observed.json');actual=keys(packet)
+  assert [x['VirtualKey'] for x in actual]==[37,39,38,40,36,35,46,45,33,34,90]
+  replies=read(native/name/'terminal-replies.json');assert replies['ReplyHex']
+  if name=='escape-fragmented-replies':assert all(len(x)==2 for x in replies['WriteHex'])
+  observations.append(dict(Case=name,SignificantKeys=len(actual),ReplyCount=len(replies['ReplyHex']),ReplyWriteCount=len(replies['WriteHex'])))
+ summary.append(dict(Order=trial['Order'],Passed=43,Total=43,HostLifetimes=43,Focused=observations))
+assert len(summary)==3
+# Independently retain the narrow product diff and unchanged public contracts.
+source=read(exact/'manifest.json')['Runtime']['SourceCommit'];parent='54b0d23146dfde7528c9e4db1aa92d12e662f883'
+changed=subprocess.check_output(['git','diff','--name-only',parent,source,'--','src'],cwd=root,text=True).splitlines()
+assert set(changed)=={'src/agent/ConsoleInput.cc','src/agent/ConsoleInput.h','src/agent/CursorReportFilter.h','src/agent/UnicodeEncoding.h'}
+unchanged=['src/include/vt7pty.h','src/include/vt7pty_version.h','src/shared/Protocol.h','tests/fidelity/H4RuntimeCases.h',
+ 'tests/fidelity/H4QualificationCases.h','tools/research/H4Cases.ps1']
+for path in unchanged:assert not subprocess.check_output(['git','diff',parent,source,'--',path],cwd=root)
+result=dict(Kind='InputDecoderRawAudit',Status='Pass',SourceCommit=source,RuntimeSourceFilesChanged=changed,
+ UnchangedPublicAndH4Contracts=unchanged,RunId=run.name,CandidateInputPassed=129,CandidateH4Passed=123,
+ QualificationPassed=7,RegressionPassed=14,ReferencePassed=30,ReferenceTotal=33,ReferenceFailedCasesRetained=3,
+ InputHostLifetimes=129,ReferenceHostLifetimes=33,KeyboardOperations=3,Repetitions=summary,Step12Accepted=False)
+(art/'input-rc2-exact-audit.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps({k:v for k,v in result.items() if k!='Repetitions'},indent=2))

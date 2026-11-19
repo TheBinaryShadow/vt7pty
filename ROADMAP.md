@@ -182,6 +182,9 @@ repository. Changes to VT7 itself belong to a separate integration task.
   resize/close races, output draining, process lifetime, job inheritance and
   breakaway policy, version negotiation, and distribution requirements before
   freezing an ABI.
+- [ ] Resolve the [input/reply framing](docs/INPUT_FIDELITY.md#input-and-reply-contract)
+  policy before freezing the API, including standalone Escape latency and the
+  cursor-report/modified-F3 ambiguity of the inherited byte stream.
 - [ ] Implement documented headers and the API over the proven backend.
 - [ ] Build a standalone consumer and contract tests in this repository.
 - [ ] Validate the contract on Windows 7 and publish examples and migration

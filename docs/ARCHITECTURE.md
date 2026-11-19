@@ -1,7 +1,7 @@
 # VT7Pty Architecture
 
-Status: released 0.5.0 architecture with the opt-in H4 development path.
-Updated: 2026-11-14.
+Status: released 0.5.0 architecture, accepted H4 and the input rc2 candidate.
+Updated: 2026-11-19.
 
 I use this guide to explain the released native backend and its planned
 boundaries. The source code is authoritative if an implementation detail
@@ -26,8 +26,16 @@ application and GUI descendants retain the ordinary desktop. Processed cooked
 ETX uses one verified host callback, serialized with agent work. Raw input keeps
 its existing record path. A pinned host-local monitor handles caller/agent death.
 The development API is 1.1 and its client-agent protocol is 2. Two-phase close
-retires a session before its allocation is freed. This path is opt-in and still
-needs target qualification; it is not part of the published 0.5.0 runtime.
+retires a session before its allocation is freed. H4 is
+[accepted on all three Windows 7 tiers](validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
+within that opt-in contract. It is not part of the published 0.5.0 runtime.
+
+The [input rc2 candidate](INPUT_FIDELITY.md) rebuilds this path with strict,
+incremental UTF-8 validation and a separate solicited cursor-report filter.
+A reply can arrive between key fragments without finishing the key token.
+Valid unfinished UTF-8 survives idle periods; ambiguous Escape uses the
+one-second fallback. The guide records reply serialization and remaining
+byte-stream ambiguity. Windows 7 qualification of this changed runtime is pending.
 
 ## Released components
 

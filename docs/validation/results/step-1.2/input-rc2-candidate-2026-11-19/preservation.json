@@ -1,0 +1,275 @@
+{
+  "SchemaVersion": 1,
+  "Files": [
+    {
+      "Path": "build-and-pe-verification.zip",
+      "Bytes": 9747801,
+      "Sha256": "de5b8bc12c1c25a7f4d7ea571646407b08e42f1d574d9a799067694203cd9abf"
+    },
+    {
+      "Path": "build-and-pe-verification.zip.files.json",
+      "Bytes": 39740,
+      "Sha256": "dfa29c0de1b161e76457f211423c5b19dd02104b801796d6f7009a732050906c"
+    },
+    {
+      "Path": "candidate.zip.sha256",
+      "Bytes": 98,
+      "Sha256": "17af86cb9a15b83e75d9d3c4195c151519d57b70a01b654f4c88175df9695803"
+    },
+    {
+      "Path": "cases.json.txt",
+      "Bytes": 11236,
+      "Sha256": "874b647f79ab73e1fb5677dd536428fe3a293e51c2a6a868863e516c58798788"
+    },
+    {
+      "Path": "ConsoleInput.cc.txt",
+      "Bytes": 32454,
+      "Sha256": "aaa36876ad1434d5bf5ac6117b93ec4740c989dee62d85bfeb8fa42d341462ee"
+    },
+    {
+      "Path": "ConsoleInput.h.txt",
+      "Bytes": 4397,
+      "Sha256": "6edaff2dca1411c98dc2be54f138ad2dc8d7319630a360de5d988e2bb810ffae"
+    },
+    {
+      "Path": "CursorReportFilter.h.txt",
+      "Bytes": 2608,
+      "Sha256": "fbba95c662ee505e7223ea30a5fdf543dbd96f8a503a5d67c3f6cdf0a0b92764"
+    },
+    {
+      "Path": "debug-native-reviewer-controls.json",
+      "Bytes": 3354,
+      "Sha256": "9e78e52c540b334a07699600d7b9d7a749a6a28078e01715db50ef0888a53883"
+    },
+    {
+      "Path": "decoder-cases.json.txt",
+      "Bytes": 17021,
+      "Sha256": "a333b379337927d75a09bca0977429cefec881524fd41bc19bbe4c75ab31c3ce"
+    },
+    {
+      "Path": "exact-bundle-reviewer-controls.json",
+      "Bytes": 2279,
+      "Sha256": "b4abdfa4e16894cb461f2dc4bdef2237cfa062b5e8a896541ff028e8c92d17c3"
+    },
+    {
+      "Path": "exact-development-collection.zip",
+      "Bytes": 1993420,
+      "Sha256": "fa33c8ca8e4aaac894015a6e6e3429cf57fa8f87978f7d3604f03fd6696de8bb"
+    },
+    {
+      "Path": "exact-development-collection.zip.files.json",
+      "Bytes": 735030,
+      "Sha256": "178d8968bc9ed047e7e8ee785bc54f694cadffb18978e153ecb95cfc9d98d042"
+    },
+    {
+      "Path": "exact-native-reviewer-controls.json",
+      "Bytes": 3354,
+      "Sha256": "e875c2839b3389f210c3221d6c8ac3c62780366b23032435f059fd4f15aae9f4"
+    },
+    {
+      "Path": "H4Cases.ps1.txt",
+      "Bytes": 1144,
+      "Sha256": "872f7de2ab9a2f4efee5b23532563a664fadac9ee64fac6783083b74ae3f2178"
+    },
+    {
+      "Path": "HostCancellationResearch.h.txt",
+      "Bytes": 46839,
+      "Sha256": "66a2bae7acfc22ae3c0a52634183441819bd2a433c23a48b9d2ef3b41e54b9bb"
+    },
+    {
+      "Path": "input-rc2-debug-reviewer-controls-extended.txt",
+      "Bytes": 475,
+      "Sha256": "d3aa86f94487ce4a8d22512daa6978f79ad667225895e597e8f3ce917f966170"
+    },
+    {
+      "Path": "input-rc2-exact-audit.json",
+      "Bytes": 10220,
+      "Sha256": "dae8b66b1c8470e5f1ebe1b0c16a7282a9dc5f316091823c1ee287a9a4c31215"
+    },
+    {
+      "Path": "input-rc2-exact-review.json",
+      "Bytes": 40750,
+      "Sha256": "7157cffda431f21dc2e565573ec3ba3aedeb8ee13f5dcd1ab34cfb62c9b8718d"
+    },
+    {
+      "Path": "input-rc2-exact-runner.txt",
+      "Bytes": 1320,
+      "Sha256": "a19ea4bd214c98654c20fb0221cfadc52cd723b9ca489b0c8278be47df583ff3"
+    },
+    {
+      "Path": "input-rc2-expanded-debug-build.txt",
+      "Bytes": 2097,
+      "Sha256": "c4e19c38b1320dec3e0fadeba32ccd4ba83e9cc4284571b9aaf5d31b17214e86"
+    },
+    {
+      "Path": "input-rc2-expanded-debug-native.txt",
+      "Bytes": 1134,
+      "Sha256": "6760aa5246ee0329204a60c55c03fe6f39112fe9fa8dac666b22897edc8f09b3"
+    },
+    {
+      "Path": "input-rc2-expanded-debug-review.json",
+      "Bytes": 7948,
+      "Sha256": "c993cc0e66f0e67dbba9e0ef6d472236aed7a74ba8e4ed84112c5872825f25b8"
+    },
+    {
+      "Path": "input-rc2-final-analysis.txt",
+      "Bytes": 9140,
+      "Sha256": "95055df6f4e993d0f245e015f04558e58e09b18577ae86c4d682a739399e266a"
+    },
+    {
+      "Path": "input-rc2-final-build.txt",
+      "Bytes": 13727,
+      "Sha256": "db0c6ceb2a60f379f64ba480e8fe3ae0182c70ddf3b9b5d9cda00a7728333b25"
+    },
+    {
+      "Path": "input-rc2-final-package.txt",
+      "Bytes": 174,
+      "Sha256": "3b3a279db249d1d8feeac9b9cb376891a289d83609010ca8784dbe933f20d4dc"
+    },
+    {
+      "Path": "input-rc2-final-verify.txt",
+      "Bytes": 154,
+      "Sha256": "4866f3c4878a8c04a16f21820ef18f961deb6e5929883ad9cae489ff52d84579"
+    },
+    {
+      "Path": "input-rc2-first-debug-native.txt",
+      "Bytes": 834,
+      "Sha256": "28ab2acd2ecc2b972152695aa9673ceb7201ac86cfacd7d1251cae252c7b044a"
+    },
+    {
+      "Path": "input-rc2-identity.json",
+      "Bytes": 437,
+      "Sha256": "83a81197ad0776ea0f5b372ac9df6819460c561b292456789cde4de4b5b3a99c"
+    },
+    {
+      "Path": "input-rc2-initial-debug-build.txt",
+      "Bytes": 7006,
+      "Sha256": "9986d9119ea4d00d2a036ae6738905311907ded59314000fdab5a08d33491178"
+    },
+    {
+      "Path": "input-rc2-rc1-backward-review.json",
+      "Bytes": 6411,
+      "Sha256": "0c39096ebf690f64bd9244360c5d122309040804970405125959255bf654a974"
+    },
+    {
+      "Path": "input-rc2-shared-archive.json",
+      "Bytes": 877,
+      "Sha256": "2defb3c1643e31cb5a8a9e0b3924e2d9031c4ddd6fec10d9737f51abf5633766"
+    },
+    {
+      "Path": "InputDecoderTests.h.txt",
+      "Bytes": 3463,
+      "Sha256": "35db47789dce689721920aa068864f944036bcfd922f80189b73f27b69cb4c0e"
+    },
+    {
+      "Path": "InputFidelityCases.h.txt",
+      "Bytes": 20687,
+      "Sha256": "a7891328904dcbea68a841bf7e09ce344ec46ff362be5e625060bf78564cdfee"
+    },
+    {
+      "Path": "InputFidelityFixture.h.txt",
+      "Bytes": 11364,
+      "Sha256": "af1b69be4a59569d645261529759bd30942bf05b7ef3b2c4cc0de48d73987977"
+    },
+    {
+      "Path": "Invoke-InputFidelity.ps1.txt",
+      "Bytes": 12501,
+      "Sha256": "fbde787bad167aede0c525e5924333eb8bb6145ceb0305195148f9703e29ec4c"
+    },
+    {
+      "Path": "NativeCapture.ps1.txt",
+      "Bytes": 3925,
+      "Sha256": "48d8f24ea254558afb96f1ded929613149ede96269c9c2e9286c5be6bcca4d20"
+    },
+    {
+      "Path": "Package-InputFidelity.ps1.txt",
+      "Bytes": 10926,
+      "Sha256": "ed526425357cd5e412880ef086131c45391aea56fe8d922e88b519eb8dfacb9f"
+    },
+    {
+      "Path": "package-manifest.json",
+      "Bytes": 13163,
+      "Sha256": "e66b761b06c4c99fb885dcfe1862537cd9fb3dd577365569668639ccd09f7517"
+    },
+    {
+      "Path": "packaging-attempt1-note.json",
+      "Bytes": 681,
+      "Sha256": "d70d3259652bb9b3fa9fa715059479636b2cccacaa525b6b91d9ece06a2d9fd6"
+    },
+    {
+      "Path": "precommit-input-cases.zip",
+      "Bytes": 446952,
+      "Sha256": "3a28020fee1c2aa059b605c746d08eb643a621c3bc034c61d408f434d07cd783"
+    },
+    {
+      "Path": "precommit-input-cases.zip.files.json",
+      "Bytes": 185539,
+      "Sha256": "374ed98190741137cf2b2708845d5ba847102ddcfac6a510c25333223d8cd065"
+    },
+    {
+      "Path": "Preserve-InputRc2Evidence.py.txt",
+      "Bytes": 5333,
+      "Sha256": "40a8482b6cdef68a671458ee89b0d26887862ab0f9b9d01ab00f2cc4ab177e92"
+    },
+    {
+      "Path": "reference-manifest.json",
+      "Bytes": 15431,
+      "Sha256": "4edbdacedd8faa1ad888a3dd6ca61d1badd805eef0959d62f4f7b737c1165041"
+    },
+    {
+      "Path": "regression-cases.json.txt",
+      "Bytes": 3173,
+      "Sha256": "d68d6919ea9eeddc7e574f0cc96ce97bc9499d5bcf2c38de4fbcf4ec05dbd8b1"
+    },
+    {
+      "Path": "review-decision.json",
+      "Bytes": 1269,
+      "Sha256": "a616f9062b78d9ae2fed6211038ee8f774297a0ef8400eb7e5edce810c4c43b4"
+    },
+    {
+      "Path": "Review-InputRc2Evidence.py.txt",
+      "Bytes": 5429,
+      "Sha256": "987961cd7e417b10b02500232ffc07320f4fdcfaa2a54c1bae79dfd3489d073c"
+    },
+    {
+      "Path": "Test-H4QualificationEvidence.ps1.txt",
+      "Bytes": 23191,
+      "Sha256": "717018d24dd86bdd952bd22b403bff1f60bd520263d42756e51aaad576c39cba"
+    },
+    {
+      "Path": "Test-H4RuntimeEvidence.ps1.txt",
+      "Bytes": 21522,
+      "Sha256": "70044aa6e843ca87c34a1f08638cfc32ad7316f5c508c1200734427a193ed594"
+    },
+    {
+      "Path": "Test-InputCandidateEvidence.ps1.txt",
+      "Bytes": 11542,
+      "Sha256": "794bc657cede35cc22c595f8d60e500622dc2aac50231962dcdc171c1ad16981"
+    },
+    {
+      "Path": "Test-InputEvidence.ps1.txt",
+      "Bytes": 22844,
+      "Sha256": "185ea264396426ae16afbc8164852fcb47f13e21d310c4457055e83730f51845"
+    },
+    {
+      "Path": "Test-InputRc2BundleControls.ps1.txt",
+      "Bytes": 4314,
+      "Sha256": "afaabc3d1d8683a157c38f1c7a6baf337f65f9a22da615200116f80e8e776ff5"
+    },
+    {
+      "Path": "Test-InputReviewer.ps1.txt",
+      "Bytes": 6384,
+      "Sha256": "3f55b344faa70366bb9c31ac026685bf1ae56f8b435ae28a1a7fc5ee76b00485"
+    },
+    {
+      "Path": "UnicodeEncoding.h.txt",
+      "Bytes": 6838,
+      "Sha256": "b9fb6fa746fa86ce25ddf79420a6e4e395a712131bc6b103f4d2de9f57d36d85"
+    },
+    {
+      "Path": "Windows7Compat.ps1.txt",
+      "Bytes": 3716,
+      "Sha256": "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+    }
+  ]
+}

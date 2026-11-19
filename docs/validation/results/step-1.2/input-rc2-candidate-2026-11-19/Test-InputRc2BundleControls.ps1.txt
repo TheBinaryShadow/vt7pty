@@ -1,0 +1,50 @@
+param([string]$Directory,[string]$PackageRoot,[string]$OutputDirectory)
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+if(Test-Path -LiteralPath $OutputDirectory){throw 'Use a fresh control directory.'}
+[void][IO.Directory]::CreateDirectory($OutputDirectory)
+$copy=Join-Path $OutputDirectory 'evidence'
+Copy-Item -LiteralPath $Directory -Destination $copy -Recurse
+$reviewer=Join-Path $PSScriptRoot '..\..\tools\input\Test-InputCandidateEvidence.ps1'
+$baseline=& $reviewer -Directory $copy -PackageRoot $PackageRoot
+if($baseline.CandidateOutcome -cne 'Pass' -or $baseline.ReferenceOutcome -cne 'Fail'){throw 'Wrong control baseline.'}
+$reportPath=Join-Path $copy 'report.json';$inventoryPath=Join-Path $copy 'evidence-files.json'
+$reportOriginal=[IO.File]::ReadAllBytes($reportPath);$inventoryOriginal=[IO.File]::ReadAllBytes($inventoryPath)
+$checks=@(
+    @{Name='wrong-runtime';Expected='changed runtime';Edit={param($v)$v.Runtime.SourceCommit=('0'*40)}},
+    @{Name='false-unchanged-runtime';Expected='changed runtime';Edit={param($v)$v.Runtime.UnchangedFromH4=$true}},
+    @{Name='wrong-reference';Expected='reference identity';Edit={param($v)$v.Reference.ArchiveSha256=('0'*64)}},
+    @{Name='false-acceptance';Expected='acceptance limits';Edit={param($v)$v.Step12Accepted=$true}},
+    @{Name='false-break-support';Expected='acceptance limits';Edit={param($v)$v.CtrlBreakTransport='Supported'}},
+    @{Name='false-profile-coverage';Expected='pending coverage';Edit={param($v)($v.PendingCoverage | Where-Object {$_.Capability -eq 'OrdinaryUserProfiles'}).Status='Pass'}},
+    @{Name='wrong-tier';Expected='declared tier';Edit={param($v)$v.Tier='Unknown'}},
+    @{Name='wrong-target-os';Expected='Windows 7 SP1';Edit={param($v)$v.Tier='NonESU';$v.OS.Version='6.3.9600'}},
+    @{Name='false-legacy-prerequisites';Expected='legacy PowerShell';Edit={param($v)$v.Tier='Legacy';$v.OS.Version='6.1.7601';$v.OS.ServicePackMajorVersion=1;$v.OS.ProductType=1;$v.PowerShellVersion='5.1'}},
+    @{Name='wrong-pinned-engine';Expected='PowerShell 7 inventory';Edit={param($v)$v.PowerShell7.Version='7.3.0'}},
+    @{Name='wrong-trial-order';Expected='interleaved pairs';Edit={param($v)$v.Trials[1].Role='Input'}},
+    @{Name='laundered-reference-failures';Expected='remain actual failures';Edit={param($v)$v.Trials[0].Outcome='Pass';$v.Trials[0].ExitCode=0}},
+    @{Name='regression-output-lost';Expected='regression completion';Edit={param($v)$v.Regression.Cases[0].StandardOutput=''}}
+)
+$results=@()
+foreach($check in $checks){
+    try{
+        $value=[Text.Encoding]::UTF8.GetString($reportOriginal) | ConvertFrom-Json
+        & $check.Edit $value
+        [IO.File]::WriteAllText($reportPath,($value | ConvertTo-Json -Depth 40),[Text.UTF8Encoding]::new($false))
+        $inventory=[Text.Encoding]::UTF8.GetString($inventoryOriginal) | ConvertFrom-Json
+        $record=$inventory.Files | Where-Object {$_.Path -ceq 'report.json'}
+        $record.Bytes=(Get-Item -LiteralPath $reportPath).Length
+        $record.Sha256=(Get-FileHash -LiteralPath $reportPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        [IO.File]::WriteAllText($inventoryPath,($inventory | ConvertTo-Json -Depth 15),[Text.UTF8Encoding]::new($false))
+        $reason=''
+        try{$null=& $reviewer -Directory $copy -PackageRoot $PackageRoot}catch{$reason=$_.Exception.Message}
+        if(-not $reason.Contains($check.Expected)){throw ('Missed '+$check.Name+': '+$reason)}
+        $results+=@(@{Case=$check.Name;Rejected=$true;Reason=$reason})
+        Write-Host ($check.Name+': rejected')
+    }finally{[IO.File]::WriteAllBytes($reportPath,$reportOriginal);[IO.File]::WriteAllBytes($inventoryPath,$inventoryOriginal)}
+}
+$again=& $reviewer -Directory $copy -PackageRoot $PackageRoot
+if($again.CandidateOutcome -cne $baseline.CandidateOutcome -or $again.ReferenceOutcome -cne $baseline.ReferenceOutcome){throw 'Restoration changed the result.'}
+$result=[ordered]@{Kind='InputCandidateReviewerControls';Status='Pass';Rejected=$results.Count;CandidateOutcome=$baseline.CandidateOutcome;ReferenceOutcome=$baseline.ReferenceOutcome;Controls=$results}
+[IO.File]::WriteAllText((Join-Path $OutputDirectory 'review.json'),($result | ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))
+$result
