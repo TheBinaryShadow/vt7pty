@@ -1,0 +1,33 @@
+PASS: raw-text-controls 
+PASS: raw-navigation 
+PASS: raw-modifiers 
+PASS: raw-key-repeat 
+PASS: utf8-combined 
+PASS: utf8-bytewise 
+PASS: utf8-two-byte 
+PASS: utf8-three-byte 
+PASS: utf8-four-byte 
+PASS: escape-bytewise 
+PASS: alt-text-bytewise 
+PASS: raw-crlf 
+PASS: committed-paste-burst 
+PASS: committed-paste-fragmented 
+PASS: mouse-sgr 
+PASS: mouse-sgr-bytewise 
+PASS: mouse-x10 
+PASS: mouse-disabled 
+PASS: cooked-unicode 
+PASS: cooked-delete-backspace 
+PASS: cooked-home-end 
+PASS: cooked-tab 
+PASS: cooked-repeat 
+PASS: cooked-multiline-paste 
+PASS: cooked-cancel-unicode 
+PASS: processed-ctrl-c 
+PASS: unprocessed-ctrl-c 
+PASS: native-break-processed 
+PASS: native-break-unprocessed 
+PASS: ctrl-backslash-byte 
+FAIL: utf8-timeout-fragment exact text order and multiplicity (Win32 0)
+FAIL: utf8-live-replies exact text order and multiplicity (Win32 0)
+FAIL: escape-live-replies exact navigation count (Win32 0)

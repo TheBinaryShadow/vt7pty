@@ -1,0 +1,17 @@
+I keep the accepted H4 product binaries unchanged in this input candidate.
+I run three input repetitions interleaved with the frozen H4 guards.
+Keep Windows unlocked. Physical keyboard, lock/unlock and soak repeats are not requested.
+Fragmented-input failures are retained from development. A test failure does not stop the remaining collection.
+Starting 01-guard
+01-guard: Pass 
+Starting 02-input
+02-input: Fail 
+Starting 03-guard
+03-guard: Pass 
+Starting 04-input
+04-input: Fail 
+Starting 05-guard
+05-guard: Pass 
+Starting 06-input
+06-input: Fail 
+Keep the complete results: D:\Git\vt7pty\artifacts\fidelity\input-devcheck1-exact\results\developmenthost-input-20261119-070757-2333a1e1

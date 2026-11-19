@@ -1,0 +1,59 @@
+{
+  "Kind": "InputCandidateIssuance",
+  "Status": "ReadyForWindows7Characterization",
+  "RecordedDate": "2026-11-19",
+  "TimeZone": "Europe/Zagreb",
+  "HarnessSourceCommit": "23254008e421080d762804938ecce1cd1c710106",
+  "HarnessSourceTreeClean": true,
+  "RuntimeSourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+  "RuntimeUnchangedFromH4": true,
+  "Api": "1.1",
+  "Protocol": 2,
+  "Archive": "VT7Pty-input-0.5.1-dev-rc1.zip",
+  "ArchiveBytes": 21400268,
+  "ArchiveSha256": "84f1bd227af856ec624c88d77c504417dea312bf0e4b3e1df03f28b73c4ab8ac",
+  "ManifestSha256": "4edbdacedd8faa1ad888a3dd6ca61d1badd805eef0959d62f4f7b737c1165041",
+  "Development": {
+    "GuardPass": 123,
+    "GuardTotal": 123,
+    "InputPass": 90,
+    "InputTotal": 99,
+    "CollectionComplete": true,
+    "DurationMilliseconds": 276884,
+    "RetainedInputFailures": [
+      "utf8-timeout-fragment",
+      "utf8-live-replies",
+      "escape-live-replies"
+    ],
+    "OriginalCollectionFiles": 2267
+  },
+  "ExactRc1": {
+    "OperationalFilesIdenticalToDevelopment": 35,
+    "InputPass": 30,
+    "InputTotal": 33,
+    "RetainedInputFailures": [
+      "utf8-timeout-fragment",
+      "utf8-live-replies",
+      "escape-live-replies"
+    ],
+    "OriginalNativeFiles": 396
+  },
+  "ReviewerRejectedControls": 16,
+  "DebugOracles": {
+    "Input": 5,
+    "Runtime": 27,
+    "Bridge": 4,
+    "Manual": 11
+  },
+  "FinalStaticAnalysisWarnings": 0,
+  "CtrlBreakDecision": "Preserve accepted H4, add native Windows reference only, keep missing public transport explicit.",
+  "CtrlBreakTransport": "Unsupported",
+  "OrdinaryUserProfiles": "NotRun",
+  "H4AcceptanceCarriedForward": true,
+  "Step12Accepted": false,
+  "Milestone1Complete": false,
+  "Windows7NewMatrix": "Pending",
+  "SharedArchive": "K:\\VT7_work\\VT7Pty-input-0.5.1-dev-rc1.zip",
+  "PrecommitExperiments": "The prototype binaries embed the earlier HEAD while the working tree was modified; these remain development observations. The issued clean source pins the new harness exactly.",
+  "ReviewerPrerequisiteRejectedControls": 4
+}

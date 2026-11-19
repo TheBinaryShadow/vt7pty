@@ -216,6 +216,20 @@ if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')){
         $manifest.Runtime.ManifestSha256 -ceq '43a767650d720b1f9dc1bf5d8a17420d0ead7991461df65d088dcab206956a98' -and
         @($report.PreflightErrors).Count -eq 0 -and -not $report.Step12Accepted -and -not $report.MilestoneAccepted -and
         $report.CtrlBreakTransport -ceq 'Unsupported' -and $report.NativeBreakIsReferenceOnly) 'matched unchanged H4 candidate and explicit gaps'
+    Need-I ($report.Tier -in @('DevelopmentHost','NonESU','ESU','Legacy') -and $report.ExpectedTrials -eq 6 -and
+        $manifest.Input.Cases -eq 33 -and $manifest.Input.Repetitions -eq 3) 'declared tier and repetition contract'
+    if($report.Tier -ne 'DevelopmentHost'){
+        Need-I ($report.OS.Version.StartsWith('6.1.') -and $report.OS.ServicePackMajorVersion -eq 1 -and $report.OS.ProductType -eq 1) 'actual Windows 7 SP1 tier'
+    }
+    if($report.Tier -eq 'Legacy'){
+        Need-I ($report.PowerShellVersion -ceq '2.0' -and $report.CLRVersion.StartsWith('2.0.') -and
+            @($report.Updates | Where-Object {$_.Id -ceq 'KB3191566'}).Count -eq 0 -and
+            -not $report.PowerShell7.Required -and -not $report.PowerShell7.Applicable) 'legacy PowerShell 2.0/CLR2/no-KB3191566 prerequisites'
+    }else{
+        Need-I ($report.PowerShell7.Required -and $report.PowerShell7.Applicable -and $report.PowerShell7.Version -ceq '7.2.24' -and
+            $report.PowerShell7.Sha256 -cmatch '^[0-9a-f]{64}$' -and
+            $report.PowerShell7.ModuleManifestSha256 -cmatch '^[0-9a-f]{64}$') 'required pinned PowerShell 7 inventory'
+    }
     Files-I $PackageRoot $manifest.Files
     $files=(Read-I (Join-Path $Directory 'evidence-files.json')).Files
     Files-I $Directory $files

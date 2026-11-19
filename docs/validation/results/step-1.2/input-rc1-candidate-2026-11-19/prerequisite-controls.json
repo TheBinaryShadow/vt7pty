@@ -1,0 +1,27 @@
+{
+  "Rejected": 4,
+  "Controls": [
+    {
+      "Rejected": true,
+      "Reason": "Input evidence: declared tier and repetition contract",
+      "Case": "wrong-tier"
+    },
+    {
+      "Rejected": true,
+      "Reason": "Input evidence: actual Windows 7 SP1 tier",
+      "Case": "wrong-os"
+    },
+    {
+      "Rejected": true,
+      "Reason": "Input evidence: legacy PowerShell 2.0/CLR2/no-KB3191566 prerequisites",
+      "Case": "false-legacy"
+    },
+    {
+      "Rejected": true,
+      "Reason": "Input evidence: required pinned PowerShell 7 inventory",
+      "Case": "wrong-engine"
+    }
+  ],
+  "Kind": "InputPrerequisiteControls",
+  "Status": "Pass"
+}
