@@ -43,11 +43,12 @@ completed tests. The [baseline runner](FIDELITY_BASELINE.md) lists implemented
 recipes and PendingCoverage; the [validation index](validation/README.md)
 links their results.
 
-The current baseline retains six cancellation failures per Windows 7 machine.
-Applicable active-child tests pass. I keep the original 30-case regression
-suite as a separate requirement, and use the
-[cancellation investigation](INPUT_CANCELLATION.md) for the proposed fix.
-Broader coverage keeps Step 1.1 open.
+The 0.5.0 baseline retains six cancellation failures per Windows 7 machine.
+The accepted [H4 opt-in path](H4_RUNTIME.md) resolves its qualified cancellation
+workflows. The next [input test candidate](INPUT_FIDELITY.md) expands editing, fragmentation
+and mouse records while preserving H4 binaries. Its measured input failures,
+missing Ctrl+Break transport and ordinary-profile coverage remain explicit.
+I keep the original 30-case regression suite and broader corpus requirements.
 
 | ID | Scenario | Required observable result |
 | --- | --- | --- |

@@ -10,6 +10,9 @@
 #include "HostFreezeClient.h"
 #endif
 #include "VtState.h"
+#ifdef VT7PTY_H4_RUNTIME
+#include "InputFidelityFixture.h"
+#endif
 #include "../../src/include/vt7pty.h"
 #include <algorithm>
 #include <array>
@@ -294,6 +297,12 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
             }
             if(command=='J'){check(thread.value==INVALID_HANDLE_VALUE && shell.value==INVALID_HANDLE_VALUE,"idle event-only child");guardEventArmed=true;command='I';}
 #endif
+#ifdef VT7PTY_H4_RUNTIME
+            if(command=='V'){
+                check(thread.value==INVALID_HANDLE_VALUE && shell.value==INVALID_HANDLE_VALUE,"idle input capture fixture");
+                inputfidelity::serve(pipe.value);continue;
+            }
+#endif
             if(command=='Q') {
 #ifdef VT7PTY_H3_FREEZE
                 activity.finish();
@@ -535,7 +544,11 @@ public:
     }
     ~Session() { cleanup(); }
 #ifdef VT7PTY_H4_RUNTIME
+    bool inputReplyRecording=false;
+    std::vector<std::string> inputTerminalReplies;
     vt7pty_t *runtimeHandle() const { return pty_; }
+    void inputCaptureTransfer(void *data,DWORD bytes,bool write){transfer(pipe_.value,data,bytes,write);}
+
 #endif
     IdentityPacket observe(char command='I') {
         transfer(pipe_.value,&command,1,true);
@@ -598,7 +611,15 @@ public:
             if(frames.size()<512) frames.push_back({h3trace::qpc(),raw.size(),lineFeeds,state.x(),state.y(),promptEpoch,std::move(row)});
             else frameOverflow=true;
 #endif
-            for(const auto &reply:state.takeReplies()) input(reply);
+            for(const auto &reply:state.takeReplies()){
+#ifdef VT7PTY_H4_RUNTIME
+                if(inputReplyRecording){
+                    check(inputTerminalReplies.size()<1024,"bounded terminal replies");
+                    inputTerminalReplies.push_back(reply);
+                }
+#endif
+                input(reply);
+            }
         }
     }
     bool until(const std::function<bool()> &condition,DWORD timeout=5000) {

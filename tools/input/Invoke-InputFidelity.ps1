@@ -1,0 +1,104 @@
+[CmdletBinding()]
+param(
+    [ValidateSet('DevelopmentHost','NonESU','ESU','Legacy')][string]$Tier='DevelopmentHost',
+    [string]$PowerShell7Path='C:\Program Files\PowerShell\7\pwsh.exe',
+    [string]$PackageRoot=''
+)
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+if(-not $PackageRoot){$PackageRoot=Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) '..\..'}
+$PackageRoot=[IO.Path]::GetFullPath($PackageRoot).TrimEnd('\')
+. (Join-Path $PackageRoot 'tools\platform\Windows7Compat.ps1')
+. (Join-Path $PackageRoot 'tools\platform\NativeCapture.ps1')
+$taskManifest=Read-VT7Json (Join-Path $PackageRoot 'manifest.json')
+if($taskManifest.Kind -cne 'VT7PtyInputCandidate' -or $taskManifest.SchemaVersion -ne 1 -or
+    -not $taskManifest.Runtime.UnchangedFromH4 -or $taskManifest.Runtime.SourceCommit -cne '54b0d23146dfde7528c9e4db1aa92d12e662f883'){
+    throw 'Use the complete issued input candidate.'
+}
+foreach($taskFile in $taskManifest.Files){
+    $taskPath=[IO.Path]::GetFullPath((Join-Path $PackageRoot $taskFile.Path))
+    if(-not $taskPath.StartsWith($PackageRoot+'\',[StringComparison]::OrdinalIgnoreCase) -or
+        (Get-Item -LiteralPath $taskPath).Length -ne $taskFile.Bytes -or
+        (Get-VT7Sha256 $taskPath) -cne $taskFile.Sha256){throw ('Changed candidate file: '+$taskFile.Path)}
+}
+$taskRunId=$Tier.ToLowerInvariant()+'-input-'+[DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss')+'-'+[Guid]::NewGuid().ToString('N').Substring(0,8)
+$taskOutput=Join-Path $PackageRoot ('results\'+$taskRunId)
+[void][IO.Directory]::CreateDirectory($taskOutput)
+$taskOs=Get-WmiObject Win32_OperatingSystem
+$taskComputer=Get-WmiObject Win32_ComputerSystem
+$taskUpdates=@(Get-WmiObject Win32_QuickFixEngineering | Sort-Object HotFixID | ForEach-Object {@{Id=$_.HotFixID}})
+$taskPreflight=@()
+if($env:PROCESSOR_ARCHITECTURE -ne 'AMD64'){$taskPreflight+='Use x64 Windows PowerShell.'}
+if($Tier -ne 'DevelopmentHost' -and (-not $taskOs.Version.StartsWith('6.1.') -or $taskOs.ServicePackMajorVersion -ne 1 -or $taskOs.ProductType -ne 1)){$taskPreflight+='This tier requires Windows 7 SP1.'}
+if($Tier -eq 'Legacy' -and $PSVersionTable.PSVersion.Major -ne 2){$taskPreflight+='Legacy requires installed PowerShell 2.0.'}
+if($Tier -eq 'Legacy' -and @($taskUpdates | Where-Object {$_.Id -eq 'KB3191566'}).Count){$taskPreflight+='Legacy excludes KB3191566.'}
+$taskPs7=@{Required=($Tier -ne 'Legacy');Applicable=($Tier -ne 'Legacy');Path='';Version='';Sha256='';ModuleManifestSha256='';Reason=''}
+if($taskPs7.Required){
+    try{
+        $PowerShell7Path=[IO.Path]::GetFullPath($PowerShell7Path)
+        $taskVersion=(& $PowerShell7Path -NoLogo -NoProfile -NonInteractive -Command '$PSVersionTable.PSVersion.ToString()' 2>&1 | Out-String).Trim()
+        if($LASTEXITCODE -ne 0 -or $taskVersion -cne '7.2.24'){throw 'PowerShell 7.2.24 is required for the frozen H4 guards.'}
+        $taskPs7.Path=$PowerShell7Path;$taskPs7.Version=$taskVersion;$taskPs7.Sha256=Get-VT7Sha256 $PowerShell7Path
+        $taskPs7.ModuleManifestSha256=Get-VT7Sha256 (Join-Path (Split-Path -Parent $PowerShell7Path) 'Modules\PSReadLine\PSReadLine.psd1')
+    }catch{$taskPreflight+=$_.Exception.Message}
+}else{$taskPs7.Reason='NotApplicable on the legacy tier; installed Windows PowerShell 2.0 remains required.'}
+$taskTrials=@()
+function Save-InputReport {
+    Write-VT7Json (Join-Path $taskOutput 'report.json') @{
+        Kind='VT7PtyInputResults';SchemaVersion=1;RunId=$taskRunId;ComputerName=$env:COMPUTERNAME;Tier=$Tier
+        RecordedUtc=[DateTime]::UtcNow.ToString('o');OS=@{Caption=$taskOs.Caption;Version=$taskOs.Version;ServicePackMajorVersion=$taskOs.ServicePackMajorVersion;ProductType=$taskOs.ProductType}
+        Machine=@{Manufacturer=$taskComputer.Manufacturer;Model=$taskComputer.Model};Updates=$taskUpdates
+        PowerShellVersion=$PSVersionTable.PSVersion.ToString();CLRVersion=$PSVersionTable.CLRVersion.ToString();PowerShell7=$taskPs7
+        ManifestSha256=Get-VT7Sha256 (Join-Path $PackageRoot 'manifest.json');Harness=$taskManifest.Harness;Runtime=$taskManifest.Runtime
+        PreflightErrors=$taskPreflight;ExpectedTrials=6;Trials=$taskTrials
+        CtrlBreakTransport='Unsupported';NativeBreakIsReferenceOnly=$true
+        KnownDevelopmentFailures=$taskManifest.KnownDevelopmentFailures
+        PendingCoverage=$taskManifest.PendingCoverage;Step12Accepted=$false;MilestoneAccepted=$false
+    }
+}
+Save-InputReport
+Write-Host 'I keep the accepted H4 product binaries unchanged in this input candidate.'
+Write-Host 'I run three input repetitions interleaved with the frozen H4 guards.'
+Write-Host 'Keep Windows unlocked. Physical keyboard, lock/unlock and soak repeats are not requested.'
+Write-Host 'Fragmented-input failures are retained from development. A test failure does not stop the remaining collection.'
+foreach($taskOrder in 1..6){
+    $taskRole=if($taskOrder%2 -eq 1){'Guard'}else{'Input'}
+    $taskName=$taskOrder.ToString('00')+'-'+$taskRole.ToLowerInvariant()
+    $taskTrial=Join-Path $taskOutput $taskName
+    [void][IO.Directory]::CreateDirectory($taskTrial)
+    $taskRecord=@{Order=$taskOrder;Role=$taskRole;Directory=$taskName;Outcome='NotRun';CollectionStatus='NotRun';ExitCode=$null;TimedOut=$false;Error=''}
+    try{
+        if($taskPreflight.Count){throw 'Prerequisite checks failed; keep this report.'}
+        $taskBin=Join-Path $PackageRoot ($taskRole.ToLowerInvariant()+'\bin')
+        $taskNative=Join-Path $taskTrial 'native'
+        $taskArgs=$(if($taskRole -eq 'Guard'){'--run'}else{'--input-run'})+' "'+$taskNative+'"'
+        $taskEnv=@{VT7PTY_DEBUG='trace';VT7PTY_H4_RUNTIME_SOURCE=$taskManifest.Runtime.SourceCommit;VT7PTY_H3_PWSH=$taskPs7.Path;VT7PTY_H4_LEGACY=$(if($taskPs7.Required){''}else{'1'})}
+        Write-Host ('Starting '+$taskName)
+        $taskNativeRun=Invoke-InputProcess (Join-Path $taskBin 'RuntimeCancellationTest.exe') $taskArgs $taskBin 900000 $taskEnv
+        foreach($taskField in $taskNativeRun.Keys){$taskRecord[$taskField]=$taskNativeRun[$taskField]}
+        [IO.File]::WriteAllText((Join-Path $taskTrial 'stdout.txt'),$taskRecord.StandardOutput,$script:vt7Utf8)
+        [IO.File]::WriteAllText((Join-Path $taskTrial 'stderr.txt'),$taskRecord.StandardError,$script:vt7Utf8)
+        if($taskRecord.TimedOut){throw 'Controller deadline; keep all partial files.'}
+        $taskProbe=Read-VT7Json (Join-Path $taskNative 'probe.json')
+        $taskCases=(Read-VT7Json (Join-Path $taskNative 'cases.json')).Cases
+        $taskExpected=if($taskRole -eq 'Guard'){$taskManifest.Guard.CasesByTier[$Tier]}else{$taskManifest.Input.Cases}
+        $taskKind=if($taskRole -eq 'Guard'){'H4RuntimeProbe'}else{'InputFidelityProbe'}
+        $taskSource=if($taskRole -eq 'Guard'){$taskManifest.Runtime.SourceCommit}else{$taskManifest.Harness.SourceCommit}
+        if($taskProbe.Kind -cne $taskKind -or $taskProbe.SourceCommit -cne $taskSource -or
+            $taskProbe.Total -ne $taskExpected -or @($taskCases).Count -ne $taskExpected){throw 'Wrong native source or case inventory.'}
+        if($taskRole -eq 'Input' -and ($taskProbe.RuntimeSourceCommit -cne $taskManifest.Runtime.SourceCommit -or -not $taskProbe.FullInventory)){throw 'Wrong input runtime or partial selection.'}
+        if(($taskProbe.Status -ceq 'Pass') -ne ($taskRecord.ExitCode -eq 0)){throw 'Native outcome and exit code disagree.'}
+        $taskRecord.Outcome=$taskProbe.Status;$taskRecord.Passed=$taskProbe.Passed;$taskRecord.Total=$taskProbe.Total
+        $taskRecord.CollectionStatus='Completed'
+    }catch{$taskRecord.Outcome='Incomplete';$taskRecord.CollectionStatus='Partial';$taskRecord.Error=$_.Exception.Message}
+    $taskTrials+=@($taskRecord);Save-InputReport
+    Write-Host ($taskName+': '+$taskRecord.Outcome+' '+$taskRecord.Error)
+}
+$taskFiles=@([IO.Directory]::GetFiles($taskOutput,'*',[IO.SearchOption]::AllDirectories) | Sort-Object | ForEach-Object {
+    @{Path=$_.Substring($taskOutput.Length+1).Replace('\','/');Bytes=(Get-Item -LiteralPath $_).Length;Sha256=(Get-VT7Sha256 $_)}
+})
+Write-VT7Json (Join-Path $taskOutput 'evidence-files.json') @{SchemaVersion=1;Files=$taskFiles}
+Write-Host ('Keep the complete results: '+$taskOutput)
+if(@($taskTrials | Where-Object {$_.CollectionStatus -ne 'Completed'}).Count){exit 2}
+if(@($taskTrials | Where-Object {$_.Outcome -ne 'Pass'}).Count){exit 1}
+exit 0

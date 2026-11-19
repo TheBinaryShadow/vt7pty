@@ -15,6 +15,7 @@ replace release acceptance. The [roadmap](../ROADMAP.md) records what is complet
 
 | Task | Entry point | Guide |
 | --- | --- | --- |
+| Collect the next input candidate | RUN-INPUT-NONESU.cmd, RUN-INPUT-ESU.cmd or RUN-INPUT-LEGACY.cmd | [Input tests](INPUT_FIDELITY.md) |
 | Verify a local build | Verify-VT7Pty.ps1 | Commands below |
 | Test a release candidate | The candidate's -tests.zip | [Windows 7 acceptance](WINDOWS7_ACCEPTANCE.md) |
 | Measure shell and console fidelity | Fidelity baseline package | [Runner guide](FIDELITY_BASELINE.md) |

@@ -46,6 +46,7 @@ The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |
 | --- | --- |
+| [Step 1.2 input tests](INPUT_FIDELITY.md) | Editing, stream fragmentation, mouse records and native Break reference |
 | [H4 runtime qualification](H4_RUNTIME.md) | Accepted opt-in contract, three-machine runner and test scope |
 | [H4 manual checks](H4_MANUAL_CHECKS.md) | Physical US/Croatian input, lock/unlock and elevated-caller refusal |
 | [Fidelity plan](FIDELITY.md) | Required applications, measurements and remaining coverage |

@@ -318,6 +318,7 @@ void agentDeath(Context &c)
 }
 #include "H4RuntimeCases.h"
 #include "H4QualificationCases.h"
+#include "InputFidelityCases.h"
 void runtimeOracle()
 {
     using namespace vt7pty::internal::cancel;
@@ -559,6 +560,12 @@ int wmain(int argc, wchar_t **argv)
 {
     try
     {
+        if(argc==5 && std::wstring(argv[1])==L"--input-break-child")
+            return inputfidelity::breakChild(argv[2],static_cast<DWORD>(_wcstoui64(argv[3],nullptr,10)),std::wstring(argv[4])==L"1");
+        if(argc==2 && std::wstring(argv[1])==L"--input-self-test"){inputcases::oracle();return 0;}
+        if(argc==2 && std::wstring(argv[1])==L"--input-list"){printf("%s\n",inputcases::listJson().c_str());return 0;}
+        if(argc==3 && std::wstring(argv[1])==L"--input-run")return inputcases::run(argv[2]);
+        if(argc==4 && std::wstring(argv[1])==L"--input-case")return inputcases::run(argv[3],utf8(argv[2]));
         if (argc == 2 && std::wstring(argv[1]) == L"--manual-self-test") {
             manualDisplayOracle();return 0;
         }

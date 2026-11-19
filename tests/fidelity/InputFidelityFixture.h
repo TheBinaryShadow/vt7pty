@@ -1,0 +1,196 @@
+// Copyright (c) 2026 VT7Pty contributors
+// SPDX-License-Identifier: MIT
+#pragma once
+#include "WinTest.h"
+#include <algorithm>
+#include <thread>
+
+namespace inputfidelity {
+using namespace fidelity;
+enum Mode : uint32_t { Raw=0, Cooked=1, Processed=2, Mouse=3 };
+struct Record {
+    DWORD type=0,down=0,repeat=0,vk=0,scan=0,character=0,modifiers=0;
+    int32_t x=0,y=0;
+    DWORD buttons=0,flags=0;
+};
+struct BreakPacket {
+    DWORD magic=0x31425249,schema=1,pid=0,inputMode=0,c=0,brk=0;
+};
+struct Packet {
+    DWORD magic=0x31464e49,schema=1,pid=0,mode=0,inputMode=0,recordCount=0,overflow=0;
+    DWORD readStarted=0,readReturned=0,readSucceeded=0,readError=0,textCount=0;
+    DWORD c=0,brk=0,stopCanceledRead=0;
+    DWORD windowLeft=0,windowTop=0,columns=0,rows=0;
+    DWORD referenceGroup=0,referenceExit=0,referenceChildExited=0;
+    BreakPacket reference;
+    Record records[1024]={};
+    wchar_t text[2048]={};
+};
+static_assert(sizeof(Packet)<65536);
+inline volatile LONG controlC=0,controlBreak=0;
+inline BOOL WINAPI handler(DWORD event) {
+    if(event==CTRL_C_EVENT){InterlockedIncrement(&controlC);return TRUE;}
+    if(event==CTRL_BREAK_EVENT){InterlockedIncrement(&controlBreak);return TRUE;}
+    return FALSE;
+}
+inline BreakPacket breakSnapshot() {
+    BreakPacket p;p.pid=GetCurrentProcessId();
+    check(GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),&p.inputMode),"native break child mode");
+    p.c=static_cast<uint32_t>(InterlockedCompareExchange(&controlC,0,0));
+    p.brk=static_cast<uint32_t>(InterlockedCompareExchange(&controlBreak,0,0));
+    return p;
+}
+inline int breakChild(const std::wstring &name,DWORD parent,bool processed) {
+    Handle pipe(CreateFileW(name.c_str(),GENERIC_READ|GENERIC_WRITE,0,nullptr,OPEN_EXISTING,FILE_FLAG_OVERLAPPED,nullptr));
+    check(pipe.value!=INVALID_HANDLE_VALUE,"native break child channel");
+    ULONG server=0;check(GetNamedPipeServerProcessId(pipe.value,&server) && server==parent,"native break server identity");
+    check(SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),ENABLE_EXTENDED_FLAGS|(processed?ENABLE_PROCESSED_INPUT:0)),"native break child input mode");
+    check(SetConsoleCtrlHandler(nullptr,TRUE),"native reference ignores Ctrl+C");
+    check(SetConsoleCtrlHandler(handler,TRUE),"native reference handles Ctrl+Break");
+    auto p=breakSnapshot();transfer(pipe.value,&p,sizeof(p),true);
+    const auto deadline=GetTickCount64()+15000;
+    while(GetTickCount64()<deadline) {
+        char command=0;transfer(pipe.value,&command,1,false);
+        if(command=='Q')return 37;
+        check(command=='S',"native reference snapshot command");
+        p=breakSnapshot();transfer(pipe.value,&p,sizeof(p),true);
+    }
+    return 124;
+}
+inline void nativeBreak(Packet &p,bool processed) {
+    DWORD savedMode=0;check(GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),&savedMode),"native reference parent mode");
+    const auto name=L"\\\\.\\pipe\\VT7Pty.InputBreak."+std::to_wstring(GetCurrentProcessId())+L"."+std::to_wstring(GetTickCount64());
+    Handle pipe(privateServer(name)),job(CreateJobObjectW(nullptr,nullptr));
+    check(job.value!=nullptr,"native break cleanup job");
+    JOBOBJECT_EXTENDED_LIMIT_INFORMATION limit={};
+    limit.BasicLimitInformation.LimitFlags=JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+    check(SetInformationJobObject(job.value,JobObjectExtendedLimitInformation,&limit,sizeof(limit)),"native break owned lifetime");
+    const auto exe=directory()+L"\\RuntimeCancellationTest.exe";
+    const auto command=quote(exe)+L" --input-break-child "+quote(name)+L" "+std::to_wstring(GetCurrentProcessId())+L" "+(processed?L"1":L"0");
+    std::vector<wchar_t> line(command.begin(),command.end());line.push_back(0);
+    STARTUPINFOW si={};si.cb=sizeof(si);PROCESS_INFORMATION pi={};
+    check(CreateProcessW(exe.c_str(),line.data(),nullptr,nullptr,FALSE,CREATE_NEW_PROCESS_GROUP|CREATE_SUSPENDED,nullptr,nullptr,&si,&pi),"native reference child");
+    Handle child(pi.hProcess),thread(pi.hThread);
+    if(!AssignProcessToJobObject(job.value,child.value)){
+        TerminateProcess(child.value,125);WaitForSingleObject(child.value,5000);
+        throw std::runtime_error("native reference job assignment");
+    }
+    check(ResumeThread(thread.value)!=static_cast<DWORD>(-1),"native reference resume");
+    connect(pipe.value);
+    ULONG peer=0;check(GetNamedPipeClientProcessId(pipe.value,&peer) && peer==pi.dwProcessId,"native reference client identity");
+    BreakPacket r;transfer(pipe.value,&r,sizeof(r),false);
+    check(r.magic==0x31425249 && r.schema==1 && r.pid==pi.dwProcessId && !r.c && !r.brk,"native reference ready");
+    check(GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT,pi.dwProcessId),"target only owned reference process group");
+    const auto deadline=GetTickCount64()+5000;
+    do {
+        char status='S';transfer(pipe.value,&status,1,true);transfer(pipe.value,&r,sizeof(r),false);
+        if(r.brk)break;Sleep(5);
+    }while(GetTickCount64()<deadline);
+    check(r.brk==1 && r.c==0,"native Break is distinct from Ctrl+C");
+    p.reference=r;p.referenceGroup=pi.dwProcessId;
+    char quit='Q';transfer(pipe.value,&quit,1,true);
+    check(WaitForSingleObject(child.value,5000)==WAIT_OBJECT_0,"native reference exits naturally");
+    check(GetExitCodeProcess(child.value,&p.referenceExit) && p.referenceExit==37,"native reference exit status");
+    p.referenceChildExited=1;
+    check(SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),savedMode),"restore reference parent input mode");
+}
+struct Reader {
+    volatile LONG started=0,returned=0;
+    BOOL succeeded=FALSE;
+    DWORD error=0,count=0;
+    wchar_t text[2048]={};
+    Handle thread;
+    static DWORD WINAPI run(void *arg) {
+        auto &r=*static_cast<Reader *>(arg);
+        InterlockedExchange(&r.started,1);
+        SetLastError(0);
+        r.succeeded=ReadConsoleW(GetStdHandle(STD_INPUT_HANDLE),r.text,2047,&r.count,nullptr);
+        r.error=GetLastError();InterlockedExchange(&r.returned,1);return 0;
+    }
+    void start() {
+        if(thread.value!=INVALID_HANDLE_VALUE){
+            check(WaitForSingleObject(thread.value,0)==WAIT_OBJECT_0,"previous capture read completed");
+            thread.reset();
+        }
+        started=returned=0;succeeded=FALSE;error=count=0;
+        thread.reset(CreateThread(nullptr,0,run,this,0,nullptr));check(thread.value!=nullptr,"capture read worker");
+    }
+    bool stop() {
+        if(thread.value==INVALID_HANDLE_VALUE)return false;
+        const bool pending=InterlockedCompareExchange(&returned,0,0)==0;
+        if(pending)check(CancelSynchronousIo(thread.value)!=FALSE || GetLastError()==ERROR_NOT_FOUND,"cancel only fixture reader");
+        if(WaitForSingleObject(thread.value,5000)!=WAIT_OBJECT_0)ExitProcess(124);
+        thread.reset();return pending;
+    }
+    ~Reader(){try{stop();}catch(...){ExitProcess(124);}}
+};
+inline void drain(Packet &p) {
+    for(unsigned batch=0;batch<64;++batch) {
+        DWORD count=0;check(GetNumberOfConsoleInputEvents(GetStdHandle(STD_INPUT_HANDLE),&count),"capture queue count");
+        if(!count)return;
+        INPUT_RECORD records[32]={};DWORD got=0;
+        check(ReadConsoleInputW(GetStdHandle(STD_INPUT_HANDLE),records,std::min<DWORD>(count,32),&got),"capture input records");
+        for(DWORD i=0;i<got;++i){
+            if(p.recordCount==1024){p.overflow=1;continue;}
+            const auto &r=records[i];auto &v=p.records[p.recordCount++];v.type=r.EventType;
+            if(r.EventType==KEY_EVENT){const auto &k=r.Event.KeyEvent;
+                v.down=k.bKeyDown?1u:0u;v.repeat=k.wRepeatCount;v.vk=k.wVirtualKeyCode;
+                v.scan=k.wVirtualScanCode;v.character=k.uChar.UnicodeChar;v.modifiers=k.dwControlKeyState;
+            }else if(r.EventType==MOUSE_EVENT){const auto &m=r.Event.MouseEvent;
+                v.x=m.dwMousePosition.X;v.y=m.dwMousePosition.Y;v.buttons=m.dwButtonState;v.flags=m.dwEventFlags;v.modifiers=m.dwControlKeyState;
+            }
+        }
+    }
+    p.overflow=1;
+}
+inline void serve(HANDLE pipe) {
+    DWORD mode=0;transfer(pipe,&mode,sizeof(mode),false);check(mode<=Mouse,"capture mode");
+    DWORD original=0;check(GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),&original),"capture original mode");
+    check(FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE)),"capture starts with empty queue");
+    const DWORD flags=ENABLE_EXTENDED_FLAGS|ENABLE_INSERT_MODE|
+        (mode==Cooked?ENABLE_PROCESSED_INPUT|ENABLE_LINE_INPUT|ENABLE_ECHO_INPUT:0)|
+        (mode==Processed?ENABLE_PROCESSED_INPUT:0)|(mode==Mouse?ENABLE_MOUSE_INPUT:0);
+    check(SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),flags),"capture requested mode");
+    InterlockedExchange(&controlC,0);InterlockedExchange(&controlBreak,0);
+    check(SetConsoleCtrlHandler(handler,TRUE),"capture control handler");
+    Reader reader;auto p=std::make_unique<Packet>();p->pid=GetCurrentProcessId();p->mode=mode;
+    if(mode==Cooked)reader.start();
+    auto snapshot=[&]{
+        if(mode!=Cooked)drain(*p);
+        check(GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),&p->inputMode),"capture observed mode");
+        CONSOLE_SCREEN_BUFFER_INFO screen={};
+        check(GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),&screen),"capture viewport");
+        p->windowLeft=static_cast<DWORD>(screen.srWindow.Left);p->windowTop=static_cast<DWORD>(screen.srWindow.Top);
+        p->columns=static_cast<DWORD>(screen.srWindow.Right-screen.srWindow.Left+1);
+        p->rows=static_cast<DWORD>(screen.srWindow.Bottom-screen.srWindow.Top+1);
+        p->c=static_cast<uint32_t>(InterlockedCompareExchange(&controlC,0,0));
+        p->brk=static_cast<uint32_t>(InterlockedCompareExchange(&controlBreak,0,0));
+        p->readStarted=static_cast<uint32_t>(InterlockedCompareExchange(&reader.started,0,0));
+        p->readReturned=static_cast<uint32_t>(InterlockedCompareExchange(&reader.returned,0,0));
+        if(p->readReturned){
+            p->readSucceeded=reader.succeeded?1u:0u;p->readError=reader.error;p->textCount=reader.count;
+            check(reader.count<=2047,"capture cooked text bound");std::copy_n(reader.text,reader.count,p->text);
+        }
+        transfer(pipe,p.get(),sizeof(*p),true);
+    };
+    try {
+        snapshot();
+        const auto deadline=GetTickCount64()+120000;
+        while(GetTickCount64()<deadline){
+            char command=0;transfer(pipe,&command,1,false,30000);
+            if(command=='Q'){
+                p->stopCanceledRead=reader.stop()?1u:0u;snapshot();
+                check(SetConsoleCtrlHandler(handler,FALSE),"remove capture handler");
+                check(SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),original),"restore fixture mode");return;
+            }
+            if(command=='R'){check(mode==Cooked,"next cooked capture");reader.start();p->textCount=p->readReturned=p->readError=0;}
+            else if(command=='B')nativeBreak(*p,mode==Processed);
+            else check(command=='S',"capture status command");
+            snapshot();
+        }
+        throw std::runtime_error("input capture protocol deadline");
+    }catch(...){
+        reader.stop();SetConsoleCtrlHandler(handler,FALSE);SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),original);throw;
+    }
+}
+}
