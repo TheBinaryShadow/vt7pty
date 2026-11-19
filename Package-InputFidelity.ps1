@@ -28,10 +28,15 @@ foreach($path in @($stage,$zip,($zip+'.sha256'))){if(Test-Path -LiteralPath $pat
 $runtimeBin=Join-Path $stage 'runtime\bin';$referenceBin=Join-Path $stage 'reference\bin'
 foreach($path in @($runtimeBin,$referenceBin)){[void][IO.Directory]::CreateDirectory($path)}
 Add-Type -AssemblyName System.IO.Compression.FileSystem
+function Entry-I($Archive,[string]$Name){
+    $entries=@($Archive.Entries | Where-Object {$_.FullName.Replace('\','/') -ceq $Name.Replace('\','/')})
+    if($entries.Count -ne 1){throw ('Missing or duplicate frozen ZIP entry: '+$Name)}
+    return $entries[0]
+}
 $archive=[IO.Compression.ZipFile]::OpenRead([IO.Path]::GetFullPath($Rc1Archive))
 try{
     $originalManifest=Join-Path $stage 'reference\manifest.json'
-    [IO.Compression.ZipFileExtensions]::ExtractToFile($archive.GetEntry('manifest.json'),$originalManifest)
+    [IO.Compression.ZipFileExtensions]::ExtractToFile((Entry-I $archive 'manifest.json'),$originalManifest)
     if((Hash-I $originalManifest) -cne $manifestHash){throw 'Wrong frozen rc1 manifest.'}
     $original=[IO.File]::ReadAllText($originalManifest) | ConvertFrom-Json
     if($original.Runtime.SourceCommit -cne $parentSource -or -not $original.Runtime.UnchangedFromH4 -or
@@ -39,12 +44,12 @@ try{
     $referenceFiles=@()
     foreach($record in @($original.Files | Where-Object {$_.Path.StartsWith('input/bin/')})){
         $name=[IO.Path]::GetFileName($record.Path);$destination=Join-Path $referenceBin $name
-        [IO.Compression.ZipFileExtensions]::ExtractToFile($archive.GetEntry($record.Path),$destination)
+        [IO.Compression.ZipFileExtensions]::ExtractToFile((Entry-I $archive $record.Path),$destination)
         if((Get-Item -LiteralPath $destination).Length -ne $record.Bytes -or (Hash-I $destination) -cne $record.Sha256){throw ('Changed frozen artifact '+$name)}
         $referenceFiles+=@([ordered]@{Name=$name;Bytes=$record.Bytes;Sha256=$record.Sha256})
     }
     $referenceRecipes=Join-Path $stage 'reference\cases.json'
-    [IO.Compression.ZipFileExtensions]::ExtractToFile($archive.GetEntry('tools/input/cases.json'),$referenceRecipes)
+    [IO.Compression.ZipFileExtensions]::ExtractToFile((Entry-I $archive 'tools/input/cases.json'),$referenceRecipes)
     if((Hash-I $referenceRecipes) -cne $original.Input.RecipeSha256 -or
         (Hash-I $referenceRecipes) -cne (Hash-I (Join-Path $root 'tools\input\cases.json'))){throw 'Changed frozen rc1 recipes.'}
 }finally{$archive.Dispose()}

@@ -29,12 +29,16 @@ Need-C ($m.Kind -ceq 'VT7PtyInputCandidate' -and $m.SchemaVersion -eq 2 -and $r.
     $source -cmatch '^[0-9a-f]{40}$' -and $source -cne $parent -and $m.Runtime.SourceTreeClean -and
     -not $m.Runtime.UnchangedFromH4 -and $m.Runtime.ParentSourceCommit -ceq $parent -and $m.Runtime.ApiVersion -ceq '1.1' -and
     $m.Runtime.ProtocolVersion -eq 2 -and $r.Runtime.SourceCommit -ceq $source -and -not $r.Runtime.UnchangedFromH4 -and
+    $r.Runtime.SourceTreeClean -and $r.Runtime.ParentSourceCommit -ceq $parent -and $r.Runtime.ApiVersion -ceq '1.1' -and
+    $r.Runtime.ProtocolVersion -eq 2 -and $r.Runtime.Architecture -ceq 'x64' -and
     $m.Harness.SourceCommit -ceq $source -and $r.Harness.SourceCommit -ceq $source -and $m.Harness.SourceTreeClean -and
+    $r.Harness.SourceTreeClean -and
     $m.Guard.SourceCommit -ceq $source -and $m.Guard.OracleUnchangedFromH4) 'matched changed runtime and harness identity'
 Need-C ($m.Reference.Unchanged -and $m.Reference.RuntimeSourceCommit -ceq $parent -and $m.Reference.HarnessSourceCommit -ceq $frozenHarness -and
     $m.Reference.ArchiveSha256 -ceq '84f1bd227af856ec624c88d77c504417dea312bf0e4b3e1df03f28b73c4ab8ac' -and
     $m.Reference.ManifestSha256 -ceq '4edbdacedd8faa1ad888a3dd6ca61d1badd805eef0959d62f4f7b737c1165041' -and
-    $r.Reference.ArchiveSha256 -ceq $m.Reference.ArchiveSha256 -and
+    $r.Reference.ArchiveSha256 -ceq $m.Reference.ArchiveSha256 -and $r.Reference.Unchanged -and
+    $r.Reference.RuntimeSourceCommit -ceq $parent -and $r.Reference.HarnessSourceCommit -ceq $frozenHarness -and
     (Hash-C (Join-Path $PackageRoot 'reference\manifest.json')) -ceq $m.Reference.ManifestSha256) 'unchanged rc1 reference identity'
 Need-C (-not $m.Step12Accepted -and -not $r.Step12Accepted -and -not $r.MilestoneAccepted -and $m.ControlFailuresRetained -and
     $r.CtrlBreakTransport -ceq 'Unsupported' -and $r.NativeBreakIsReferenceOnly -and @($m.KnownDevelopmentFailures).Count -eq 0) 'explicit transport and acceptance limits'

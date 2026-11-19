@@ -94,6 +94,7 @@ private:
     DsrSender &m_dsrSender;
     CursorReportFilter m_cursorReports;
     bool m_dsrRequestedForToken = false;
+    bool m_escapeTimeoutFlushed = false;
     ULONGLONG m_lastReplyTick = 0;
     std::string m_byteQueue;
     InputMap m_inputMap;

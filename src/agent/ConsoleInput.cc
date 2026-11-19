@@ -256,6 +256,7 @@ void ConsoleInput::writeInput(const std::string &input)
         trace("Received a DSR reply");
     }
     if (!keys.empty()) {
+        m_escapeTimeoutFlushed = false;
         m_byteQueue.append(keys);
         m_lastWriteTick = now;
         doWrite(false);
@@ -275,11 +276,14 @@ void ConsoleInput::flushIncompleteEscapeCode()
     const auto now = GetTickCount64();
     if (m_cursorReports.pending() && now - m_lastReplyTick > kIncompleteEscapeTimeoutMs) {
         m_byteQueue.append(m_cursorReports.expire());
+        m_escapeTimeoutFlushed = false;
     }
-    if (!m_byteQueue.empty() && now - m_lastWriteTick > kIncompleteEscapeTimeoutMs) {
+    if (!m_byteQueue.empty() && !m_escapeTimeoutFlushed &&
+            now - m_lastWriteTick > kIncompleteEscapeTimeoutMs) {
         // This is an escape ambiguity timeout, not UTF-8 end-of-stream.
         // doWrite leaves a valid unfinished scalar queued for the next read.
         doWrite(true);
+        m_escapeTimeoutFlushed = true;
         if (m_byteQueue.empty()) m_dsrRequestedForToken = false;
     }
 }
