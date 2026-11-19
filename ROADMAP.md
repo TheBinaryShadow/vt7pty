@@ -1,11 +1,13 @@
 # VT7Pty roadmap
 
-Updated: 2026-11-16.
+Updated: 2026-11-19.
 
-I've completed Milestone 0 and published 0.5.0. I'm now improving console
-behavior in Milestone 1. **Next: finish H4 production qualification.** The [H3 Windows 7 review](docs/validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
-accepts all 282 guard cases on NESSY, TURTLE and LEOPARD. H3 is complete within
-the controlled research boundary; production qualification and VT7 integration remain open.
+I've completed Milestone 0 and published 0.5.0. H3 and the opt-in H4 runtime
+are accepted within their recorded boundaries. **Next: qualify the input decoder
+and cursor-reply fixes on Windows 7.** Input rc1 confirmed the same three stream
+failures on all three tiers. I have implemented corrections and expanded the
+[automated input suite](docs/INPUT_FIDELITY.md); the changed runtime still needs
+its Windows 7 results. Step 1.2 and VT7 integration remain open.
 
 I check an item only when its stated work and required tests are complete.
 Partial implementations stay unchecked. A local pass does not replace a required
@@ -115,7 +117,8 @@ public-API experiments failed. I'm now following the
   The [input rc1 review](docs/validation/2026-11-19-step-1.2-input-rc1-windows7.md)
   verifies 345/345 frozen H4 guards and 270/297 new input observations across
   all three Windows 7 tiers. Three fragmented-input failures recur in every
-  repetition; I need to correct the decoder/framing path. All 18 native Break
+  repetition. The [input rc2 candidate](docs/INPUT_FIDELITY.md) corrects those
+  paths and adds 10 regressions; its Windows 7 matrix is pending. All 18 native Break
   references pass, while public Ctrl+Break transport stays unsupported by
   explicit decision. Step 1.2 remains open.
 

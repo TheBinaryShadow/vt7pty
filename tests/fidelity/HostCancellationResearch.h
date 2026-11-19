@@ -545,6 +545,8 @@ public:
     ~Session() { cleanup(); }
 #ifdef VT7PTY_H4_RUNTIME
     bool inputReplyRecording=false;
+    size_t inputReplyChunkBytes=0;
+    std::vector<std::string> inputReplyWrites;
     std::vector<std::string> inputTerminalReplies;
     vt7pty_t *runtimeHandle() const { return pty_; }
     void inputCaptureTransfer(void *data,DWORD bytes,bool write){transfer(pipe_.value,data,bytes,write);}
@@ -618,7 +620,16 @@ public:
                     inputTerminalReplies.push_back(reply);
                 }
 #endif
+#ifdef VT7PTY_H4_RUNTIME
+                if(inputReplyChunkBytes) {
+                    for(size_t at=0;at<reply.size();at+=inputReplyChunkBytes) {
+                        const auto part=reply.substr(at,inputReplyChunkBytes);
+                        inputReplyWrites.push_back(part);input(part);Sleep(5);
+                    }
+                } else {if(inputReplyRecording)inputReplyWrites.push_back(reply);input(reply);}
+#else
                 input(reply);
+#endif
             }
         }
     }

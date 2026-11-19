@@ -19,7 +19,9 @@ elevated-caller checks on every machine. The
 completes all nine physical workflows and accepts H4 within the approved opt-in
 contract. The [input rc1 review](2026-11-19-step-1.2-input-rc1-windows7.md)
 confirms three stream failures across all nine input repetitions, with 345/345
-frozen guards passing. Milestone 1 and VT7 integration stay open.
+frozen guards passing. The [input rc2 workflow](../INPUT_FIDELITY.md) covers
+the implemented decoder/framing corrections and pending Windows 7 matrix.
+Milestone 1 and VT7 integration stay open.
 
 ## Current fidelity work
 

@@ -3,13 +3,23 @@ param(
     [Parameter(Mandatory=$true)][string]$Directory,
     [string]$PackageRoot='',
     [string]$ExpectedHarnessSource='',
+    [string]$ExpectedRuntimeSource='54b0d23146dfde7528c9e4db1aa92d12e662f883',
+    [string]$CaseDefinitionsPath='',
     [string]$OutputPath=''
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version 2.0
 $Directory=[IO.Path]::GetFullPath($Directory).TrimEnd('\')
-$runtimeSource='54b0d23146dfde7528c9e4db1aa92d12e662f883'
-$definitions=([IO.File]::ReadAllText((Join-Path $PSScriptRoot 'cases.json')) | ConvertFrom-Json).Cases
+if(-not (Test-Path -LiteralPath (Join-Path $Directory 'probe.json')) -and $PackageRoot){
+    $dispatchReport=[IO.File]::ReadAllText((Join-Path $Directory 'report.json')) | ConvertFrom-Json
+    if($dispatchReport.SchemaVersion -eq 2){
+        & (Join-Path $PSScriptRoot 'Test-InputCandidateEvidence.ps1') -Directory $Directory -PackageRoot $PackageRoot -OutputPath $OutputPath
+        return
+    }
+}
+$runtimeSource=$ExpectedRuntimeSource
+if(-not $CaseDefinitionsPath){$CaseDefinitionsPath=Join-Path $PSScriptRoot 'cases.json'}
+$definitions=([IO.File]::ReadAllText($CaseDefinitionsPath) | ConvertFrom-Json).Cases
 function Need-I([bool]$Okay,[string]$Message){if(-not $Okay){throw ('Input evidence: '+$Message)}}
 function Read-I([string]$Path){[IO.File]::ReadAllText($Path) | ConvertFrom-Json}
 function Hash-I([string]$Path){(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()}
@@ -31,12 +41,18 @@ function Observe-I([string]$Root,$definition){
     foreach($f in @('Case','Kind','Mode','InputHex','ExpectedText','SecondText','ChunkBytes','GapMilliseconds','LiveReplies')){
         Need-I ($recipe.$f -ceq $definition.$f) ('unaltered golden recipe '+$definition.Case+' '+$f)
     }
+    foreach($f in @('IdleMilliseconds','ReplyChunkBytes')){
+        if($null -ne $definition.PSObject.Properties[$f]){Need-I ($recipe.$f -eq $definition.$f) ('unaltered golden recipe '+$definition.Case+' '+$f)}
+    }
     $writes=Read-I (Join-Path $Root 'writes.json')
     Need-I (($writes.ChunkHex -join '') -ceq $definition.InputHex -and $writes.GapMilliseconds -eq $definition.GapMilliseconds) 'complete recorded input writes'
     $bytes=$definition.InputHex.Length/2
     $chunk=if($definition.ChunkBytes){$definition.ChunkBytes}else{[Math]::Max(1,$bytes)}
     Need-I (@($writes.ChunkHex).Count -eq [Math]::Ceiling($bytes/$chunk)) 'declared fragmentation'
     foreach($h in $writes.ChunkHex){Need-I ($h -cmatch '^(?:[0-9a-f]{2})+$' -and $h.Length -le 2*$chunk) 'bounded hex chunk'}
+    if($null -ne $definition.PSObject.Properties['IdleMilliseconds']){
+        Need-I ($writes.IdleMilliseconds -eq $definition.IdleMilliseconds) 'declared idle interval'
+    }
     $p=Read-I (Join-Path $Root 'input-observed.json')
     $ready=Read-I (Join-Path $Root 'capture-ready.json')
     $stopped=Read-I (Join-Path $Root 'capture-stopped.json')
@@ -70,6 +86,11 @@ function Observe-I([string]$Root,$definition){
             @($p.Records | Where-Object {$_.Type -eq 1 -and $_.Character -eq 57344 -and -not $_.Down}).Count -ne 1){$pass=$false;$why+='completion fence'}
         $replies=Read-I (Join-Path $Root 'terminal-replies.json')
         foreach($hex in $replies.ReplyHex){Need-I ($hex -cmatch '^(?:[0-9a-f]{2})+$') 'actual terminal reply encoding'}
+        if($null -ne $definition.PSObject.Properties['ReplyChunkBytes']){
+            Need-I (($replies.WriteHex -join '') -ceq ($replies.ReplyHex -join '')) 'complete terminal reply writes'
+            if($definition.ReplyChunkBytes){foreach($hex in $replies.WriteHex){Need-I ($hex.Length -eq 2*$definition.ReplyChunkBytes) 'declared reply fragmentation'}}
+            if($definition.LiveReplies){Need-I (@($replies.ReplyHex).Count -gt 0) 'live cursor reply exercised'}
+        }
         if($p.CtrlBreak -ne 0 -or $p.CtrlC -ne $(if($definition.Kind -ceq 'processed'){1}else{0})){$pass=$false;$why+='unexpected control event'}
         if($definition.Kind -ceq 'navigation'){
             $want=@(37,39,38,40,36,35,46,45,33,34,90)
@@ -87,6 +108,13 @@ function Observe-I([string]$Root,$definition){
         }elseif($definition.Kind -ceq 'alt'){
             if($keys.Count -ne 2 -or $keys[0].Character -ne 97 -or -not ($keys[0].Modifiers -band 2) -or
                 $keys[1].Character -ne 122 -or ($keys[1].Modifiers -band 31)){$pass=$false;$why+='Alt text or released next key'}
+        }elseif($definition.Kind -ceq 'alt-unicode'){
+            $text=New-Object Text.StringBuilder
+            foreach($k in $keys){[void]$text.Append([char]$k.Character)}
+            if($keys.Count -ne 2 -or $text.ToString() -cne $definition.ExpectedText -or
+                -not ($keys[0].Modifiers -band 2) -or $keys[1].Character -ne 122 -or ($keys[1].Modifiers -band 31)){
+                $pass=$false;$why+='Alt Unicode or released next key'
+            }
         }elseif($definition.Kind -in @('mouse','x10')){
             $negotiation=Read-I (Join-Path $Root 'mouse-ready.json')
             $stream=[Text.Encoding]::GetEncoding(28591).GetString([IO.File]::ReadAllBytes((Join-Path $Root 'stream.bin')))
@@ -176,7 +204,7 @@ function Trace-I([string]$Root,[string]$Harness){
             -not $retained.ContainsKey($key) -and -not $seen.ContainsKey($d.BackingDesktop)) 'unique live host identity matches readiness'
         $retained[$key]=$true;$seen[$d.BackingDesktop]=$true;$count++
     }
-    Need-I ($count -eq 33 -and $ready.Count -eq $count -and $operations.Count -eq 1) 'complete case lifetimes and cooked callback count'
+    Need-I ($count -eq $definitions.Count -and $ready.Count -eq $count -and $operations.Count -eq 1) 'complete case lifetimes and cooked callback count'
     return @{HostLifetimes=$count;KeyboardOperations=$operations.Count}
 }
 function Native-I([string]$Root,[string]$Harness){
@@ -186,7 +214,7 @@ function Native-I([string]$Root,[string]$Harness){
         $probe.SourceCommit -ceq $Harness -and $probe.RuntimeSourceCommit -ceq $runtimeSource -and
         $probe.CtrlBreakTransport -ceq 'Unsupported' -and $probe.NativeBreakReferenceOnly -and -not $probe.Step12Accepted) 'explicit native source and transport limits'
     $reported=(Read-I (Join-Path $Root 'cases.json')).Cases
-    Need-I (($reported.Case -join '|') -ceq ($definitions.Case -join '|') -and $probe.Total -eq 33) 'complete case inventory'
+    Need-I (($reported.Case -join '|') -ceq ($definitions.Case -join '|') -and $probe.Total -eq $definitions.Count) 'complete case inventory'
     $cases=@()
     for($n=0;$n -lt $definitions.Count;$n++){
         $d=$definitions[$n];$c=$reported[$n]
@@ -196,10 +224,10 @@ function Native-I([string]$Root,[string]$Harness){
         $cases+=@($measured)
     }
     $passed=@($cases | Where-Object {$_.Passed}).Count
-    Need-I ($probe.Passed -eq $passed -and $probe.Status -ceq $(if($passed -eq 33){'Pass'}else{'Fail'})) 'recomputed suite outcome'
+    Need-I ($probe.Passed -eq $passed -and $probe.Status -ceq $(if($passed -eq $definitions.Count){'Pass'}else{'Fail'})) 'recomputed suite outcome'
     $trace=Trace-I $Root $Harness
     return [ordered]@{Kind='InputNativeReview';CollectionStatus='Completed';Outcome=$probe.Status;SourceCommit=$Harness;RuntimeSourceCommit=$runtimeSource
-        Passed=$passed;Total=33;FailedCases=@($cases | Where-Object {-not $_.Passed} | ForEach-Object {$_.Case})
+        Passed=$passed;Total=$definitions.Count;FailedCases=@($cases | Where-Object {-not $_.Passed} | ForEach-Object {$_.Case})
         Cases=$cases;HostLifetimes=$trace.HostLifetimes;KeyboardOperations=$trace.KeyboardOperations;CtrlBreakTransport='Unsupported';Step12Accepted=$false}
 }
 if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')){
@@ -217,7 +245,7 @@ if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')){
         @($report.PreflightErrors).Count -eq 0 -and -not $report.Step12Accepted -and -not $report.MilestoneAccepted -and
         $report.CtrlBreakTransport -ceq 'Unsupported' -and $report.NativeBreakIsReferenceOnly) 'matched unchanged H4 candidate and explicit gaps'
     Need-I ($report.Tier -in @('DevelopmentHost','NonESU','ESU','Legacy') -and $report.ExpectedTrials -eq 6 -and
-        $manifest.Input.Cases -eq 33 -and $manifest.Input.Repetitions -eq 3) 'declared tier and repetition contract'
+        $manifest.Input.Cases -eq $definitions.Count -and $manifest.Input.Repetitions -eq 3) 'declared tier and repetition contract'
     if($report.Tier -ne 'DevelopmentHost'){
         Need-I ($report.OS.Version.StartsWith('6.1.') -and $report.OS.ServicePackMajorVersion -eq 1 -and $report.OS.ProductType -eq 1) 'actual Windows 7 SP1 tier'
     }
@@ -242,7 +270,7 @@ if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')){
         $native=Join-Path $Directory ($t.Directory+'\native')
         if($t.Role -ceq 'Input'){
             $review=Native-I $native $manifest.Harness.SourceCommit
-            Need-I ($t.Outcome -ceq $review.Outcome -and $t.Passed -eq $review.Passed -and $t.Total -eq 33 -and
+            Need-I ($t.Outcome -ceq $review.Outcome -and $t.Passed -eq $review.Passed -and $t.Total -eq $definitions.Count -and
                 (($t.ExitCode -eq 0) -eq ($review.Outcome -ceq 'Pass'))) 'matching input collection outcome'
             $inputFailures+=33-$review.Passed
         }else{

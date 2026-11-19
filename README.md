@@ -35,7 +35,9 @@ on each machine, and the elevated-caller checks. The
 completes all nine keyboard and lock/unlock workflows. I accept H4 within its
 opt-in contract. The [input rc1 review](docs/validation/2026-11-19-step-1.2-input-rc1-windows7.md)
 confirms three stream-fragmentation failures across all three Windows 7 tiers,
-with the H4 guards still passing. Broader Milestone 1 fidelity work remains open.
+with the H4 guards still passing. The [input decoder candidate](docs/INPUT_FIDELITY.md)
+corrects those paths and expands coverage to 43 cases; Windows 7 qualification
+is pending. Broader Milestone 1 fidelity work remains open.
 VT7 integration comes after the backend and its API are ready. VT7Pty does not
 yet replace ConPTY for unmodified applications. I am not planning a kernel driver.
 

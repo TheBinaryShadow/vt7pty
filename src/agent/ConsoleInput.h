@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "Coord.h"
+#include "CursorReportFilter.h"
 #include "InputMap.h"
 #include "SmallRect.h"
 
@@ -91,7 +92,9 @@ private:
     HostCancellation *m_hostCancellation = nullptr;
     int m_mouseMode = 0;
     DsrSender &m_dsrSender;
-    bool m_dsrSent = false;
+    CursorReportFilter m_cursorReports;
+    bool m_dsrRequestedForToken = false;
+    ULONGLONG m_lastReplyTick = 0;
     std::string m_byteQueue;
     InputMap m_inputMap;
     ULONGLONG m_lastWriteTick = 0;

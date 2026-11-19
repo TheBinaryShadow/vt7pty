@@ -1,20 +1,14 @@
 # Step 1.2 input tests
 
-I use this automated candidate to measure the remaining input behavior on
-NESSY, TURTLE and LEOPARD. The DLL, agent, host module and collector are copied
-unchanged from accepted H4 rc4. I preserve its
-[acceptance](validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md).
-
-The [Windows 7 review](validation/2026-11-19-step-1.2-input-rc1-windows7.md)
-confirms the same three failures across all nine input repetitions: a delayed
-UTF-8 character is lost, and cursor-position replies disrupt fragmented UTF-8
-or escape input. The other 270/297 input observations and all 345 frozen H4
-guards pass. These remain real failures; Step 1.2 stays open for the decoder
-and framing work. All three collections are complete and need no rerun.
+I use input rc2 to qualify the UTF-8 decoder and cursor-reply framing fixes
+against the [rc1 Windows 7 failures](validation/2026-11-19-step-1.2-input-rc1-windows7.md).
+The candidate rebuilds the runtime. API 1.1, protocol 2 and the accepted H4
+cancellation contract stay the same; the changed runtime needs its own
+Windows 7 results. Step 1.2 remains open.
 
 ## Run on the Windows 7 machines
 
-Extract VT7Pty-input-0.5.1-dev-rc1.zip into a fresh local folder. Run as the
+Extract **VT7Pty-input-0.5.1-dev-rc2.zip** into a fresh local folder. Run as the
 ordinary user, with Windows unlocked and other VT7Pty debug collectors closed.
 
 | Machine | Launcher |
@@ -23,110 +17,99 @@ ordinary user, with Windows unlocked and other VT7Pty debug collectors closed.
 | TURTLE, ESU | RUN-INPUT-ESU.cmd |
 | LEOPARD, legacy PowerShell 2.0 | RUN-INPUT-LEGACY.cmd |
 
-The launcher performs three input repetitions, interleaved with three unchanged
-H4 guard runs. It continues collecting after a semantic test failure. Keep
-every file under results, including failed or partial attempts, and return
-the complete machine directories to K:\\VT7_work\\results.
+I collect one complete input run from the unchanged rc1 reference, followed
+by three pairs of candidate H4 guards and candidate input tests. The reference
+keeps its original failures. Candidate failures stay failures, and collection
+continues so I can review every case.
 
+The launcher then runs seven focused H4 lifetime/fault guards and 14 unit,
+protocol, backend and flagless session regressions. Keep every file under
+results and return the complete machine directories to K:\VT7_work\results.
 No physical typing, lock/unlock, elevation or two-hour soak repeat is requested.
 Keep the machines unlocked until the launcher finishes.
 
-NESSY and TURTLE use the existing PowerShell 7.2.24 x64 installation at
-C:\\Program Files\\PowerShell\\7\\pwsh.exe for their frozen H4 shell guards.
-A different path can be supplied with -PowerShell7Path. LEOPARD runs the
-33-case legacy guard inventory under installed Windows PowerShell 2.0 and
-CLR 2.0, without KB3191566 or PowerShell 7.
+NESSY and TURTLE use PowerShell 7.2.24 x64 at
+C:\Program Files\PowerShell\7\pwsh.exe for their H4 shell guards. A different
+path can be supplied with -PowerShell7Path. LEOPARD uses installed Windows
+PowerShell 2.0 and CLR 2.0, without KB3191566 or PowerShell 7. The native
+runtime does not depend on PowerShell 7.
 
-Exit code 0 means the collected native suites pass. Code 1 means collection
-finished with actual test failures; keep those results for review. Code 2
-means prerequisite or collection work is incomplete. The result report never
-accepts Step 1.2 automatically.
+Exit code 0 means the candidate phases pass and the reference retains its
+three known failures. Code 1 means a candidate failure or changed reference
+outcome needs review. Code 2 means collection or prerequisites are incomplete.
+No report accepts Step 1.2 automatically.
 
 ## What I measure
 
-| Area | New coverage and retained guards |
-| --- | --- |
-| F01 prompt cancellation | Frozen H4 empty/partial CMD and PowerShell prompt cases, clean PSReadLine where applicable, next command and live shell |
-| F02 events and children | Frozen H4 active-child guards; new processed/unprocessed Ctrl+C capture and a distinct native Windows Ctrl+Break reference |
-| F03 key records | Text, Enter, Tab, Backspace, Delete, Insert, arrows, Home/End, Page Up/Down, explicit Shift/Ctrl/Alt chords and released modifier state |
-| F03 editing | Cooked Unicode lines, insertion/deletion, Home/End, Tab, repeated input, multiline committed text and cancellation of a Unicode line |
-| F03 stream handling | Repeated text, two/three/four-byte UTF-8, supplementary UTF-16 pairs, combined and bytewise writes, delayed fragments and live cursor replies |
-| F03 mouse records | Negotiated SGR and X10 buttons, movement, vertical wheel, modifiers, coordinates and disabled-mode gating |
+Each candidate input run has 43 cases. The original 33 recipes remain intact;
+10 additions cover delayed three/four-byte characters, malformed UTF-8
+recovery in combined and bytewise writes, standalone Escape with/without a
+reply, bytewise replies inside fragmented keys, and fragmented Alt+Unicode.
+I require an actual reply in each live-reply case and retain its write chunks.
 
-The new suite has 33 cases on every tier. Each frozen H4 guard run has 41 cases
-on NESSY and TURTLE, and 33 on LEOPARD. I keep the two harness source identities
-separate. The guard executable and all product files retain their original
-rc4 hashes; only the input test executable is rebuilt.
+The suite also covers cooked editing, queued lines, Unicode cancellation,
+key-down/up order, modifiers, repeat counts, supplementary UTF-16 pairs,
+committed text, negotiated SGR/X10 mouse records and disabled-mode gating.
+Every passing case requires an exact ordinary read afterward. I retain modes,
+raw records, output, process identities, desktop placement and cleanup.
 
-I capture complete key-down/up records, scan codes, repeat counts, modifiers,
-mouse records, input modes and actual cooked readbacks. Raw cases include a
-distinct private-use completion character, then a bounded observation interval
-for trailing records. I require balanced generated key state and an exact
-ordinary read after each passing case. This interval is not a latency benchmark.
+Each candidate H4 run has 41 cases on NESSY/TURTLE or 33 on LEOPARD. Its
+existing behavioral checks remain in place. The separate frozen rc1 harness
+and product binaries retain their exact hashes and source identities.
+The [H4 acceptance](validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
+continues to describe that earlier runtime, not automatic acceptance of rc2.
 
-Mouse input starts after the agent's terminal-mode enable sequence has actually
-been observed. An early prototype sent mouse frames before negotiation and lost
-them; I preserve that harness failure separately. The corrected cases exercise
-both burst and fragmented frames after the same readiness proof.
+## Input and reply contract
 
-## Fragmented-input findings
+I keep the UTF-8 key stream separate from solicited cursor-position replies
+before converting input to Windows records:
 
-The normal fragmented cases hold terminal replies until the logical input has
-been written. Two additional cases service the terminal while each token is
-still arriving. I retain the actual cursor replies, application input records
-and emitted VT for comparison.
+- A valid unfinished UTF-8 scalar, including Alt+Unicode, survives idle periods.
+  The escape timer does not clear its bytes.
+- Invalid lead, continuation, overlong, surrogate and out-of-range encodings
+  are discarded without consuming the next valid character or control byte.
+- One internal cursor request can be outstanding. Its ESC[row;columnR reply
+  is consumed as a frame, even between bytes of an unfinished key token.
+  Receiving a reply does not finish that token or refresh its input timer.
+- A terminal host must serialize each complete reply relative to other input.
+  Its bytes may span pipe writes, with less than one second between pieces.
+  Interleaving a key inside a reply itself is ambiguous and unsupported.
+- I retain the one-second escape ambiguity fallback. A standalone Escape now
+  waits for that fallback rather than being flushed by a reply. Polling adds
+  scheduling delay; this is a correctness bound, not a latency claim.
+- A malformed or expired reply prefix is replayed through normal key decoding.
+  Prefix storage is bounded. Unsolicited or duplicate reports also follow
+  normal key decoding. While a request is outstanding, the standard reply
+  syntax is reserved; identical modified-F3 encodings remain ambiguous on this
+  byte-only interface.
 
-On WOLF and all three Windows 7 tiers, a 1,200 ms gap between UTF-8 bytes
-loses the incomplete character.
-The agent's general incomplete-input timer clears the byte queue. Shorter
-fragmented Unicode arrives correctly when no reply interrupts its token.
+The UTF-8 validation follows [RFC 3629](https://www.rfc-editor.org/info/rfc3629/).
+Microsoft documents the [cursor report syntax](https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#query-state).
+The framing and timeout rules above are VT7Pty's current contract. Escape
+latency and the reply/key ambiguity remain considerations for the later VT7 API.
 
-With live replies, the cursor-position response can land inside the incomplete
-token. I observe missing Unicode or literal escape/coordinate text in the
-application's queue. These cases expose an input framing issue that needs an
-explicit contract and a tested fix. The earlier H4 cancellation gate remains
-accepted within its recorded scope.
+## Remaining limits
 
-## Ctrl+Break and remaining limits
+I preserve the approved Ctrl+Break decision. API 1.1 has no distinct Break
+operation. Byte 0x1C remains a text/control-byte test. Two native Windows
+references target retained child process groups and require exactly one Break,
+zero Ctrl+C, no parent notification and natural child exit. They establish
+Windows behavior, not a VT7Pty transport.
 
-I preserve API 1.1 and protocol 2 for this candidate, as approved. The public
-byte input stream has no distinct Ctrl+Break operation. Byte 0x1C is tested as
-a text/control-byte input; it is not relabeled as Break.
+Ordinary-user-profile coverage remains NotRun. These packages use controlled
+clean shells and PSReadLine; they do not execute personal profile scripts.
+Clipboard, held physical keys and IME UI remain outside committed-text tests.
 
-The separate native reference creates a retained owned child with
-CREATE_NEW_PROCESS_GROUP inside the test's private backing console.
-GenerateConsoleCtrlEvent targets that child's group. I require exactly one
-CTRL_BREAK_EVENT, zero Ctrl+C events, no notification of the parent fixture,
-the expected input mode and natural child exit. Both processed and unprocessed
-modes are tested while the child is configured to ignore Ctrl+C. Microsoft
-documents [group targeting](https://learn.microsoft.com/en-us/windows/console/generateconsolectrlevent)
-and [control-handler semantics](https://learn.microsoft.com/en-us/windows/console/handlerroutine).
+## Build and independent review
 
-A passing native reference does not establish a VT7Pty Break transport. That
-capability remains explicitly unsupported in the manifest and reports.
-I also retain the ordinary-user-profile matrix as NotRun. This package uses
-the controlled clean-shell and PSReadLine guards and does not execute personal
-profile scripts. Clipboard UI, physical held-key behavior and IME UI remain
-separate from the committed text and record delivery tested here.
+Package-InputFidelity.ps1 requires clean committed source, matching Release
+verification and the exact rc1 ZIP. It checks every frozen artifact and compares
+the rebuilt harness recipes against tools/input/decoder-cases.json. Symbols,
+credits, provenance and PowerShell 2.0-compatible collection helpers are included.
 
-## Build and review
-
-Package-InputFidelity.ps1 requires clean committed source and the exact
-accepted H4 rc4 ZIP. It verifies frozen hashes, builds the new harness, checks
-its oracle and compares the compiled recipes with tools/input/cases.json.
-The package includes symbols, provenance, credits and PowerShell 2.0-compatible
-collection helpers. It adds no CI or target-side build requirement.
-
-Test-InputEvidence.ps1 independently recomputes each outcome from the golden
-recipes, raw records, actual reads and retained lifetimes. It checks modes,
-repeat expansion, modifier release, mouse negotiation, UTF-16 order, native
-Break identity, control counts and all 256 restored host keyboard bytes.
-A complete failed collection is reviewed as failed, with its collection status
-kept separate. Test-InputReviewer.ps1 proves that altered records and false
-acceptance or capability claims are rejected.
-
-The Windows 7 results confirm the stream failures and the PowerShell 2.0
-collector. I can now correct the measured decoder behavior and define the
-input/reply framing contract, then qualify the affected runtime and its H4
-regressions. The missing public Break operation and ordinary-profile coverage
-remain explicit before closing Step 1.2.
+Test-InputEvidence.ps1 recomputes each native input outcome from the golden
+recipes, records, readbacks and lifetimes. Test-InputCandidateEvidence.ps1 checks
+the complete rc2 collection, reference failures, H4 regressions, prerequisites
+and inventories. Test-InputReviewer.ps1 rejects altered evidence and false
+capability or acceptance claims. Local validation and the final archive identity
+are recorded in the validation index before I send the package for Windows 7.

@@ -1,6 +1,8 @@
 // Copyright (c) 2026 VT7Pty contributors
 // SPDX-License-Identifier: MIT
 
+#include "InputDecoderTests.h"
+
 #include <cassert>
 #include <cstdint>
 #include <format>
@@ -14,6 +16,7 @@ using vt7pty::internal::checkedNarrow;
 using vt7pty::internal::isNarrowable;
 
 int main() {
+    inputDecoderTests();
     static_assert(isNarrowable<uint32_t>(uint64_t { 42 }));
     static_assert(!isNarrowable<uint32_t>(
         uint64_t { std::numeric_limits<uint32_t>::max() } + 1));

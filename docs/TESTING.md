@@ -8,7 +8,9 @@ combines the automated matrix, sustained opt-in workloads, elevated-caller
 refusal and physical keyboard/lock checks. The
 [input rc1 review](validation/2026-11-19-step-1.2-input-rc1-windows7.md)
 confirms three stream failures across all three Windows 7 tiers; its collections
-are complete. Broader Milestone 1 work remains open.
+are complete. The [input rc2 guide](INPUT_FIDELITY.md) describes the rebuilt
+decoder candidate, frozen rc1 reference and focused regressions. Its Windows 7
+qualification is pending. Broader Milestone 1 work remains open.
 
 I use local native tests, portable Windows 7 packages and focused research
 probes. They answer different questions, so a passing research probe does not

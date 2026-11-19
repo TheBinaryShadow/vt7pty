@@ -43,7 +43,9 @@ verifies all automated and elevated-caller checks. The
 passes all nine physical workflows on those machines and completes H4 within
 its approved opt-in scope. The [input rc1 review](validation/2026-11-19-step-1.2-input-rc1-windows7.md)
 now confirms three fragmented-input failures on all three Windows 7 tiers;
-its frozen H4 guards pass. Broader Milestone 1 fidelity work remains open.
+its frozen H4 guards pass. The [input rc2 workflow](INPUT_FIDELITY.md) now
+qualifies the decoder/framing corrections against those controls. Windows 7
+results for the rebuilt runtime are pending. Broader Milestone 1 stays open.
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |

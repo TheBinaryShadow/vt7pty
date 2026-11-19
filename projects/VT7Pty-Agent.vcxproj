@@ -50,6 +50,8 @@
     <ClCompile Include="..\src\shared\Version.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\agent\CursorReportFilter.h" />
+    <ClInclude Include="..\src\agent\UnicodeEncoding.h" />
     <ClInclude Include="..\src\agent\Agent.h" />
     <ClInclude Include="..\src\agent\ConsoleFont.h" />
     <ClInclude Include="..\src\agent\ConsoleInput.h" />
@@ -67,7 +69,6 @@
     <ClInclude Include="..\src\agent\SimplePool.h" />
     <ClInclude Include="..\src\agent\SmallRect.h" />
     <ClInclude Include="..\src\agent\Terminal.h" />
-    <ClInclude Include="..\src\agent\UnicodeEncoding.h" />
     <ClInclude Include="..\src\agent\Win32Console.h" />
     <ClInclude Include="..\src\agent\Win32ConsoleBuffer.h" />
     <ClInclude Include="..\src\shared\Protocol.h" />

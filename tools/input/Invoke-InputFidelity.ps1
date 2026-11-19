@@ -11,8 +11,10 @@ $PackageRoot=[IO.Path]::GetFullPath($PackageRoot).TrimEnd('\')
 . (Join-Path $PackageRoot 'tools\platform\Windows7Compat.ps1')
 . (Join-Path $PackageRoot 'tools\platform\NativeCapture.ps1')
 $taskManifest=Read-VT7Json (Join-Path $PackageRoot 'manifest.json')
-if($taskManifest.Kind -cne 'VT7PtyInputCandidate' -or $taskManifest.SchemaVersion -ne 1 -or
-    -not $taskManifest.Runtime.UnchangedFromH4 -or $taskManifest.Runtime.SourceCommit -cne '54b0d23146dfde7528c9e4db1aa92d12e662f883'){
+if($taskManifest.Kind -cne 'VT7PtyInputCandidate' -or $taskManifest.SchemaVersion -ne 2 -or
+    $taskManifest.Runtime.UnchangedFromH4 -or -not $taskManifest.Runtime.SourceTreeClean -or
+    $taskManifest.Runtime.ApiVersion -cne '1.1' -or $taskManifest.Runtime.ProtocolVersion -ne 2 -or
+    -not $taskManifest.Reference.Unchanged -or $taskManifest.Reference.ArchiveSha256 -cne '84f1bd227af856ec624c88d77c504417dea312bf0e4b3e1df03f28b73c4ab8ac'){
     throw 'Use the complete issued input candidate.'
 }
 foreach($taskFile in $taskManifest.Files){
@@ -43,36 +45,40 @@ if($taskPs7.Required){
     }catch{$taskPreflight+=$_.Exception.Message}
 }else{$taskPs7.Reason='NotApplicable on the legacy tier; installed Windows PowerShell 2.0 remains required.'}
 $taskTrials=@()
+$taskQualification=@{Status='NotRun';ExitCode=$null;Directory='qualification';Error=''}
+$taskRegression=@{Status='NotRun';Cases=@();Error=''}
 function Save-InputReport {
     Write-VT7Json (Join-Path $taskOutput 'report.json') @{
-        Kind='VT7PtyInputResults';SchemaVersion=1;RunId=$taskRunId;ComputerName=$env:COMPUTERNAME;Tier=$Tier
+        Kind='VT7PtyInputResults';SchemaVersion=2;RunId=$taskRunId;ComputerName=$env:COMPUTERNAME;Tier=$Tier
         RecordedUtc=[DateTime]::UtcNow.ToString('o');OS=@{Caption=$taskOs.Caption;Version=$taskOs.Version;ServicePackMajorVersion=$taskOs.ServicePackMajorVersion;ProductType=$taskOs.ProductType}
         Machine=@{Manufacturer=$taskComputer.Manufacturer;Model=$taskComputer.Model};Updates=$taskUpdates
         PowerShellVersion=$PSVersionTable.PSVersion.ToString();CLRVersion=$PSVersionTable.CLRVersion.ToString();PowerShell7=$taskPs7
         ManifestSha256=Get-VT7Sha256 (Join-Path $PackageRoot 'manifest.json');Harness=$taskManifest.Harness;Runtime=$taskManifest.Runtime
-        PreflightErrors=$taskPreflight;ExpectedTrials=6;Trials=$taskTrials
+        PreflightErrors=$taskPreflight;ExpectedTrials=7;Trials=$taskTrials
+        Reference=$taskManifest.Reference;Qualification=$taskQualification;Regression=$taskRegression
         CtrlBreakTransport='Unsupported';NativeBreakIsReferenceOnly=$true
         KnownDevelopmentFailures=$taskManifest.KnownDevelopmentFailures
         PendingCoverage=$taskManifest.PendingCoverage;Step12Accepted=$false;MilestoneAccepted=$false
     }
 }
 Save-InputReport
-Write-Host 'I keep the accepted H4 product binaries unchanged in this input candidate.'
-Write-Host 'I run three input repetitions interleaved with the frozen H4 guards.'
+Write-Host 'I test the rebuilt decoder runtime, with API 1.1 and protocol 2.'
+Write-Host 'I first retain one unchanged rc1 input control, then run three pairs of H4 guards and 43 input cases.'
 Write-Host 'Keep Windows unlocked. Physical keyboard, lock/unlock and soak repeats are not requested.'
-Write-Host 'Fragmented-input failures are retained from development. A test failure does not stop the remaining collection.'
-foreach($taskOrder in 1..6){
-    $taskRole=if($taskOrder%2 -eq 1){'Guard'}else{'Input'}
+Write-Host 'The rc1 reference retains its three original failures. Candidate failures remain actual failures.'
+foreach($taskOrder in 1..7){
+    $taskRole=if($taskOrder -eq 1){'Reference'}elseif($taskOrder%2 -eq 0){'Guard'}else{'Input'}
     $taskName=$taskOrder.ToString('00')+'-'+$taskRole.ToLowerInvariant()
     $taskTrial=Join-Path $taskOutput $taskName
     [void][IO.Directory]::CreateDirectory($taskTrial)
     $taskRecord=@{Order=$taskOrder;Role=$taskRole;Directory=$taskName;Outcome='NotRun';CollectionStatus='NotRun';ExitCode=$null;TimedOut=$false;Error=''}
     try{
         if($taskPreflight.Count){throw 'Prerequisite checks failed; keep this report.'}
-        $taskBin=Join-Path $PackageRoot ($taskRole.ToLowerInvariant()+'\bin')
+        $taskBin=Join-Path $PackageRoot $(if($taskRole -eq 'Reference'){'reference\bin'}else{'runtime\bin'})
         $taskNative=Join-Path $taskTrial 'native'
         $taskArgs=$(if($taskRole -eq 'Guard'){'--run'}else{'--input-run'})+' "'+$taskNative+'"'
-        $taskEnv=@{VT7PTY_DEBUG='trace';VT7PTY_H4_RUNTIME_SOURCE=$taskManifest.Runtime.SourceCommit;VT7PTY_H3_PWSH=$taskPs7.Path;VT7PTY_H4_LEGACY=$(if($taskPs7.Required){''}else{'1'})}
+        $taskRuntimeSource=if($taskRole -eq 'Reference'){$taskManifest.Reference.RuntimeSourceCommit}else{$taskManifest.Runtime.SourceCommit}
+        $taskEnv=@{VT7PTY_DEBUG='trace';VT7PTY_H4_RUNTIME_SOURCE=$taskRuntimeSource;VT7PTY_H3_PWSH=$taskPs7.Path;VT7PTY_H4_LEGACY=$(if($taskPs7.Required){''}else{'1'})}
         Write-Host ('Starting '+$taskName)
         $taskNativeRun=Invoke-InputProcess (Join-Path $taskBin 'RuntimeCancellationTest.exe') $taskArgs $taskBin 900000 $taskEnv
         foreach($taskField in $taskNativeRun.Keys){$taskRecord[$taskField]=$taskNativeRun[$taskField]}
@@ -81,12 +87,12 @@ foreach($taskOrder in 1..6){
         if($taskRecord.TimedOut){throw 'Controller deadline; keep all partial files.'}
         $taskProbe=Read-VT7Json (Join-Path $taskNative 'probe.json')
         $taskCases=(Read-VT7Json (Join-Path $taskNative 'cases.json')).Cases
-        $taskExpected=if($taskRole -eq 'Guard'){$taskManifest.Guard.CasesByTier[$Tier]}else{$taskManifest.Input.Cases}
+        $taskExpected=if($taskRole -eq 'Guard'){$taskManifest.Guard.CasesByTier[$Tier]}elseif($taskRole -eq 'Reference'){$taskManifest.Reference.Cases}else{$taskManifest.Input.Cases}
         $taskKind=if($taskRole -eq 'Guard'){'H4RuntimeProbe'}else{'InputFidelityProbe'}
-        $taskSource=if($taskRole -eq 'Guard'){$taskManifest.Runtime.SourceCommit}else{$taskManifest.Harness.SourceCommit}
+        $taskSource=if($taskRole -eq 'Reference'){$taskManifest.Reference.HarnessSourceCommit}else{$taskManifest.Harness.SourceCommit}
         if($taskProbe.Kind -cne $taskKind -or $taskProbe.SourceCommit -cne $taskSource -or
             $taskProbe.Total -ne $taskExpected -or @($taskCases).Count -ne $taskExpected){throw 'Wrong native source or case inventory.'}
-        if($taskRole -eq 'Input' -and ($taskProbe.RuntimeSourceCommit -cne $taskManifest.Runtime.SourceCommit -or -not $taskProbe.FullInventory)){throw 'Wrong input runtime or partial selection.'}
+        if($taskRole -ne 'Guard' -and ($taskProbe.RuntimeSourceCommit -cne $taskRuntimeSource -or -not $taskProbe.FullInventory)){throw 'Wrong input runtime or partial selection.'}
         if(($taskProbe.Status -ceq 'Pass') -ne ($taskRecord.ExitCode -eq 0)){throw 'Native outcome and exit code disagree.'}
         $taskRecord.Outcome=$taskProbe.Status;$taskRecord.Passed=$taskProbe.Passed;$taskRecord.Total=$taskProbe.Total
         $taskRecord.CollectionStatus='Completed'
@@ -94,11 +100,55 @@ foreach($taskOrder in 1..6){
     $taskTrials+=@($taskRecord);Save-InputReport
     Write-Host ($taskName+': '+$taskRecord.Outcome+' '+$taskRecord.Error)
 }
+# These phases run on the candidate runtime, after the collectors have closed.
+if(-not $taskPreflight.Count){
+    try{
+        Write-Host 'Starting the seven focused H4 lifetime and fault guards.'
+        $taskBin=Join-Path $PackageRoot 'runtime\bin'
+        $taskNative=Join-Path $taskOutput 'qualification'
+        $taskRun=Invoke-InputProcess (Join-Path $taskBin 'RuntimeCancellationTest.exe') ('--qualify "'+$taskNative+'"') $taskBin 180000 @{
+            VT7PTY_DEBUG='trace';VT7PTY_H4_RUNTIME_SOURCE=$taskManifest.Runtime.SourceCommit
+        }
+        $taskQualification.ExitCode=$taskRun.ExitCode
+        [IO.File]::WriteAllText((Join-Path $taskOutput 'qualification-stdout.txt'),$taskRun.StandardOutput,$script:vt7Utf8)
+        [IO.File]::WriteAllText((Join-Path $taskOutput 'qualification-stderr.txt'),$taskRun.StandardError,$script:vt7Utf8)
+        $taskProbe=Read-VT7Json (Join-Path $taskNative 'probe.json')
+        if($taskRun.TimedOut -or $taskRun.ExitCode -ne 0 -or $taskProbe.Status -cne 'Pass' -or
+            $taskProbe.SourceCommit -cne $taskManifest.Runtime.SourceCommit -or $taskProbe.Total -ne 7){throw 'Focused qualification failed.'}
+        $taskQualification.Status='Pass'
+    }catch{$taskQualification.Status='Fail';$taskQualification.Error=$_.Exception.Message}
+    Save-InputReport
+    try{
+        Write-Host 'Starting 14 focused unit, protocol and flagless session regressions.'
+        $taskRecipes=(Read-VT7Json (Join-Path $PackageRoot 'tools\input\regression-cases.json')).Cases
+        $taskBin=Join-Path $PackageRoot 'runtime\bin'
+        foreach($taskRecipe in $taskRecipes){
+            $taskCase=@{Name=$taskRecipe.Name;Executable=$taskRecipe.Executable;Arguments=$taskRecipe.Arguments;Status='Fail';Error=''}
+            try{
+                $taskRun=Invoke-InputProcess (Join-Path $taskBin $taskRecipe.Executable) $taskRecipe.Arguments $taskBin $taskRecipe.TimeoutMilliseconds @{VT7PTY_DEBUG=''}
+                foreach($taskField in $taskRun.Keys){$taskCase[$taskField]=$taskRun[$taskField]}
+                if($taskRun.TimedOut -or $taskRun.ExitCode -ne 0 -or
+                    -not $taskRun.StandardOutput.Contains($taskRecipe.ExpectedOutput)){throw 'Regression failed or did not produce its expected completion.'}
+                $taskCase.Status='Pass'
+            }catch{$taskCase.Error=$_.Exception.Message}
+            $taskRegression.Cases+=@($taskCase);Save-InputReport
+            Write-Host ($taskCase.Name+': '+$taskCase.Status)
+        }
+        $taskRegression.Status=if(@($taskRegression.Cases | Where-Object {$_.Status -ne 'Pass'}).Count){'Fail'}else{'Pass'}
+    }catch{$taskRegression.Status='Fail';$taskRegression.Error=$_.Exception.Message}
+}
+Save-InputReport
 $taskFiles=@([IO.Directory]::GetFiles($taskOutput,'*',[IO.SearchOption]::AllDirectories) | Sort-Object | ForEach-Object {
     @{Path=$_.Substring($taskOutput.Length+1).Replace('\','/');Bytes=(Get-Item -LiteralPath $_).Length;Sha256=(Get-VT7Sha256 $_)}
 })
 Write-VT7Json (Join-Path $taskOutput 'evidence-files.json') @{SchemaVersion=1;Files=$taskFiles}
 Write-Host ('Keep the complete results: '+$taskOutput)
 if(@($taskTrials | Where-Object {$_.CollectionStatus -ne 'Completed'}).Count){exit 2}
-if(@($taskTrials | Where-Object {$_.Outcome -ne 'Pass'}).Count){exit 1}
+$taskReference=@($taskTrials | Where-Object {$_.Role -eq 'Reference'})[0]
+$taskReferenceCases=(Read-VT7Json (Join-Path $taskOutput '01-reference\native\cases.json')).Cases
+$taskReferenceFailures=@($taskReferenceCases | Where-Object {-not $_.Passed} | ForEach-Object {$_.Case})
+if($taskReference.Outcome -cne 'Fail' -or $taskReference.ExitCode -ne 1 -or
+    ($taskReferenceFailures -join '|') -cne ($taskManifest.Reference.KnownFailures -join '|')){exit 1}
+if(@($taskTrials | Where-Object {$_.Role -ne 'Reference' -and $_.Outcome -ne 'Pass'}).Count -or
+    $taskQualification.Status -ne 'Pass' -or $taskRegression.Status -ne 'Pass'){exit 1}
 exit 0

@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
-    [ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')][string]$Suffix='rc1',
-    [string]$Rc4Archive=''
+    [ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')][string]$Suffix='rc2',
+    [string]$Rc1Archive=''
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version 2.0
@@ -10,50 +10,60 @@ $source=(& git -C $root rev-parse --verify HEAD).Trim()
 if($LASTEXITCODE -ne 0 -or @(& git -C $root status --porcelain=v1).Count){throw 'Input packaging requires clean committed source.'}
 $version=[IO.File]::ReadAllText((Join-Path $root 'VERSION.txt')).Trim()
 if($version -cne '0.5.1-dev'){throw 'Wrong input candidate version.'}
-$runtimeSource='54b0d23146dfde7528c9e4db1aa92d12e662f883'
-$archiveHash='910a4920b06872c4756e814d5e5851fe2c3ed9b4c802854b59e2aaa0966d16ce'
-$manifestHash='43a767650d720b1f9dc1bf5d8a17420d0ead7991461df65d088dcab206956a98'
-if(-not $Rc4Archive){$Rc4Archive=Join-Path $root 'artifacts\fidelity\packages\VT7Pty-h4-runtime-0.5.1-dev-rc4.zip'}
+$parentSource='54b0d23146dfde7528c9e4db1aa92d12e662f883'
+$referenceSource='23254008e421080d762804938ecce1cd1c710106'
+$archiveHash='84f1bd227af856ec624c88d77c504417dea312bf0e4b3e1df03f28b73c4ab8ac'
+$manifestHash='4edbdacedd8faa1ad888a3dd6ca61d1badd805eef0959d62f4f7b737c1165041'
+if(-not $Rc1Archive){$Rc1Archive=Join-Path $root 'artifacts\fidelity\packages\VT7Pty-input-0.5.1-dev-rc1.zip'}
 function Hash-I([string]$Path){(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()}
-if((Hash-I $Rc4Archive) -cne $archiveHash){throw 'Use the exact accepted rc4 archive.'}
+if((Hash-I $Rc1Archive) -cne $archiveHash){throw 'Use the exact input rc1 archive.'}
+$verifyPath=Join-Path $root 'artifacts\verification\x64\Release\verification.json'
+$verification=[IO.File]::ReadAllText($verifyPath) | ConvertFrom-Json
+if(-not $verification.SourceTreeClean -or $verification.SourceCommit -cne $source -or
+    $verification.SourceVersion -cne $version -or $verification.ApiVersion -cne '1.1' -or $verification.ProtocolVersion -ne 2 -or
+    @($verification.Tests | Where-Object {$_.ExitCode -ne 0 -or $_.TimedOut}).Count){throw 'Build and verify the clean Release source before packaging.'}
 $stage=Join-Path $root ('artifacts\fidelity\packages\VT7Pty-input-'+$version+'-'+$Suffix)
 $zip=$stage+'.zip'
 foreach($path in @($stage,$zip,($zip+'.sha256'))){if(Test-Path -LiteralPath $path){throw 'Candidate exists; choose a fresh suffix.'}}
-$inputBin=Join-Path $stage 'input\bin';$guardBin=Join-Path $stage 'guard\bin'
-foreach($path in @($inputBin,$guardBin)){[void][IO.Directory]::CreateDirectory($path)}
+$runtimeBin=Join-Path $stage 'runtime\bin';$referenceBin=Join-Path $stage 'reference\bin'
+foreach($path in @($runtimeBin,$referenceBin)){[void][IO.Directory]::CreateDirectory($path)}
 Add-Type -AssemblyName System.IO.Compression.FileSystem
-$archive=[IO.Compression.ZipFile]::OpenRead([IO.Path]::GetFullPath($Rc4Archive))
+$archive=[IO.Compression.ZipFile]::OpenRead([IO.Path]::GetFullPath($Rc1Archive))
 try{
-    [IO.Compression.ZipFileExtensions]::ExtractToFile($archive.GetEntry('manifest.json'),(Join-Path $stage 'rc4-manifest.json'))
-    if((Hash-I (Join-Path $stage 'rc4-manifest.json')) -cne $manifestHash){throw 'Wrong rc4 manifest.'}
-    $original=[IO.File]::ReadAllText((Join-Path $stage 'rc4-manifest.json')) | ConvertFrom-Json
-    if($original.Runtime.SourceCommit -cne $runtimeSource -or -not $original.Runtime.SourceTreeClean){throw 'Wrong accepted runtime source.'}
-    $guardFiles=@()
-    foreach($record in @($original.Files | Where-Object {$_.Path.StartsWith('runtime/bin/')})){
-        $name=[IO.Path]::GetFileName($record.Path);$destination=Join-Path $guardBin $name
+    $originalManifest=Join-Path $stage 'reference\manifest.json'
+    [IO.Compression.ZipFileExtensions]::ExtractToFile($archive.GetEntry('manifest.json'),$originalManifest)
+    if((Hash-I $originalManifest) -cne $manifestHash){throw 'Wrong frozen rc1 manifest.'}
+    $original=[IO.File]::ReadAllText($originalManifest) | ConvertFrom-Json
+    if($original.Runtime.SourceCommit -cne $parentSource -or -not $original.Runtime.UnchangedFromH4 -or
+        $original.Harness.SourceCommit -cne $referenceSource){throw 'Wrong frozen input source.'}
+    $referenceFiles=@()
+    foreach($record in @($original.Files | Where-Object {$_.Path.StartsWith('input/bin/')})){
+        $name=[IO.Path]::GetFileName($record.Path);$destination=Join-Path $referenceBin $name
         [IO.Compression.ZipFileExtensions]::ExtractToFile($archive.GetEntry($record.Path),$destination)
         if((Get-Item -LiteralPath $destination).Length -ne $record.Bytes -or (Hash-I $destination) -cne $record.Sha256){throw ('Changed frozen artifact '+$name)}
-        $guardFiles+=@([ordered]@{Name=$name;Bytes=$record.Bytes;Sha256=$record.Sha256})
+        $referenceFiles+=@([ordered]@{Name=$name;Bytes=$record.Bytes;Sha256=$record.Sha256})
     }
-    foreach($name in @('VT7Pty.dll','VT7Pty-Agent.exe','VT7Pty-Host.dll','VT7Pty-DebugServer.exe','VT7Pty.pdb','VT7Pty-Agent.pdb','VT7Pty-Host.pdb','VT7Pty-DebugServer.pdb')){
-        Copy-Item -LiteralPath (Join-Path $guardBin $name) -Destination (Join-Path $inputBin $name)
-    }
+    $referenceRecipes=Join-Path $stage 'reference\cases.json'
+    [IO.Compression.ZipFileExtensions]::ExtractToFile($archive.GetEntry('tools/input/cases.json'),$referenceRecipes)
+    if((Hash-I $referenceRecipes) -cne $original.Input.RecipeSha256 -or
+        (Hash-I $referenceRecipes) -cne (Hash-I (Join-Path $root 'tools\input\cases.json'))){throw 'Changed frozen rc1 recipes.'}
 }finally{$archive.Dispose()}
-$vswhere=Join-Path ([Environment]::GetFolderPath('ProgramFilesX86')) 'Microsoft Visual Studio\Installer\vswhere.exe'
-$vs=(& $vswhere -latest -products * -version '[17.0,18.0)' -requires Microsoft.Component.MSBuild -property installationPath).Trim()
-if(-not $vs){throw 'Visual Studio 2022 is required on the build machine.'}
-& (Join-Path $vs 'MSBuild\Current\Bin\MSBuild.exe') (Join-Path $root 'projects\RuntimeCancellationTest.vcxproj') /nologo /m /t:Build /p:Configuration=Release /p:Platform=x64 /verbosity:minimal *> (Join-Path $stage 'harness-build.txt')
-if($LASTEXITCODE){throw 'Input harness build failed.'}
-$identity=[IO.File]::ReadAllLines((Join-Path $root 'build\obj\RuntimeCancellationTest\x64\Release\generated\SourceIdentity.txt'))
-if($identity[0] -cne $version -or $identity[1] -cne $source){throw 'Wrong generated input harness identity.'}
-foreach($name in @('RuntimeCancellationTest.exe','RuntimeCancellationTest.pdb')){
-    Copy-Item -LiteralPath (Join-Path $root ('artifacts\bin\x64\Release\'+$name)) -Destination (Join-Path $inputBin $name)
+$programs=@('VT7Pty.dll','VT7Pty-Agent.exe','VT7Pty-Host.dll','VT7Pty-DebugServer.exe','RuntimeCancellationTest.exe','H4TestGate.dll',
+    'ModernCppTest.exe','VtStateTest.exe','ProtocolTest.exe','ProtocolTestAgent.exe','BackendSmokeTest.exe','SessionContractTest.exe','SessionFixture.exe')
+foreach($name in $programs){
+    foreach($fileName in @($name,([IO.Path]::GetFileNameWithoutExtension($name)+'.pdb'))){
+        $built=Join-Path $root ('artifacts\bin\x64\Release\'+$fileName)
+        $record=@($verification.Artifacts | Where-Object {$_.Name -ceq $fileName})
+        if($record.Count -ne 1 -or (Get-Item -LiteralPath $built).Length -ne $record[0].Bytes -or
+            (Hash-I $built) -cne $record[0].Sha256){throw ('Artifact changed after verification: '+$fileName)}
+        Copy-Item -LiteralPath $built -Destination (Join-Path $runtimeBin $fileName)
+    }
 }
-$oracle=@(& (Join-Path $inputBin 'RuntimeCancellationTest.exe') --input-self-test)
+$oracle=@(& (Join-Path $runtimeBin 'RuntimeCancellationTest.exe') --input-self-test)
 if($LASTEXITCODE -ne 0 -or ($oracle -join '') -cne 'Input fidelity oracle: 5 checks passed.'){throw 'Input oracle failed.'}
 [IO.File]::WriteAllLines((Join-Path $stage 'harness-self-test.txt'),[string[]]$oracle,[Text.UTF8Encoding]::new($false))
 $start=New-Object Diagnostics.ProcessStartInfo
-$start.FileName=Join-Path $inputBin 'RuntimeCancellationTest.exe';$start.Arguments='--input-list'
+$start.FileName=Join-Path $runtimeBin 'RuntimeCancellationTest.exe';$start.Arguments='--input-list'
 $start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
 $start.StandardOutputEncoding=[Text.Encoding]::UTF8
 $process=New-Object Diagnostics.Process;$process.StartInfo=$start
@@ -62,17 +72,18 @@ try{
     $native=$process.StandardOutput.ReadToEnd() | ConvertFrom-Json
     if(-not $process.WaitForExit(30000) -or $process.ExitCode -ne 0){throw 'Cannot inspect native recipes.'}
 }finally{$process.Close()}
-$declared=[IO.File]::ReadAllText((Join-Path $root 'tools\input\cases.json')) | ConvertFrom-Json
-if($native.Cases.Count -ne 33 -or $declared.Cases.Count -ne 33){throw 'Wrong input recipe inventory.'}
+$declared=[IO.File]::ReadAllText((Join-Path $root 'tools\input\decoder-cases.json')) | ConvertFrom-Json
+if($native.Cases.Count -ne 43 -or $declared.Cases.Count -ne 43){throw 'Wrong decoder recipe inventory.'}
 for($i=0;$i -lt $native.Cases.Count;$i++){
-    foreach($field in @('Case','Kind','Mode','InputHex','ExpectedText','SecondText','ChunkBytes','GapMilliseconds','LiveReplies')){
-        if($native.Cases[$i].$field -cne $declared.Cases[$i].$field){throw ('Native recipe differs from declared contract: '+$field)}
+    foreach($field in @('Case','Kind','Mode','InputHex','ExpectedText','SecondText','ChunkBytes','GapMilliseconds','LiveReplies','IdleMilliseconds','ReplyChunkBytes')){
+        if($native.Cases[$i].$field -cne $declared.Cases[$i].$field){throw ('Native recipe differs from golden contract: '+$field)}
     }
 }
 $plan=[ordered]@{
     'README.md'='docs\INPUT_FIDELITY.md'
     'RUN-INPUT-NONESU.cmd'='RUN-INPUT-NONESU.cmd';'RUN-INPUT-ESU.cmd'='RUN-INPUT-ESU.cmd';'RUN-INPUT-LEGACY.cmd'='RUN-INPUT-LEGACY.cmd'
-    'tools\input\Invoke-InputFidelity.ps1'='tools\input\Invoke-InputFidelity.ps1';'tools\input\cases.json'='tools\input\cases.json'
+    'tools\input\Invoke-InputFidelity.ps1'='tools\input\Invoke-InputFidelity.ps1';'tools\input\decoder-cases.json'='tools\input\decoder-cases.json'
+    'tools\input\regression-cases.json'='tools\input\regression-cases.json'
     'tools\platform\Windows7Compat.ps1'='tools\platform\Windows7Compat.ps1';'tools\platform\NativeCapture.ps1'='tools\platform\NativeCapture.ps1'
     'LICENSE.txt'='LICENSE';'CREDITS.md'='CREDITS.md';'UPSTREAM.md'='UPSTREAM.md'
 }
@@ -80,6 +91,7 @@ foreach($name in $plan.Keys){
     $path=Join-Path $stage $name;[void][IO.Directory]::CreateDirectory((Split-Path -Parent $path))
     Copy-Item -LiteralPath (Join-Path $root $plan[$name]) -Destination $path
 }
+Copy-Item -LiteralPath $verifyPath -Destination (Join-Path $stage 'verification.json')
 $readme=Join-Path $stage 'README.md';$text=[IO.File]::ReadAllText($readme)
 $text=[regex]::Replace($text,'\]\(([^)]+)\)',{
     param($m)
@@ -95,16 +107,21 @@ $files=@(Get-ChildItem -LiteralPath $stage -Recurse -File | Sort-Object FullName
     [ordered]@{Path=$_.FullName.Substring($stage.Length+1).Replace('\','/');Bytes=$_.Length;Sha256=(Hash-I $_.FullName)}
 })
 $manifest=[ordered]@{
-    Kind='VT7PtyInputCandidate';SchemaVersion=1;Step12Accepted=$false
-    Runtime=[ordered]@{SourceCommit=$runtimeSource;SourceTreeClean=$true;PackageVersion=$version;ApiVersion='1.1';ProtocolVersion=2
-        UnchangedFromH4=$true;ArchiveSha256=$archiveHash;ManifestSha256=$manifestHash;Architecture='x64'}
+    Kind='VT7PtyInputCandidate';SchemaVersion=2;Step12Accepted=$false;ControlFailuresRetained=$true
+    Runtime=[ordered]@{SourceCommit=$source;SourceTreeClean=$true;PackageVersion=$version;ApiVersion='1.1';ProtocolVersion=2
+        UnchangedFromH4=$false;ParentSourceCommit=$parentSource;Architecture='x64';Configuration='Release';VerificationSha256=(Hash-I $verifyPath)}
     Harness=[ordered]@{SourceCommit=$source;SourceTreeClean=$true;Architecture='x64';Configuration='Release';FixtureSchema=1}
-    Guard=[ordered]@{SourceCommit=$runtimeSource;Frozen=$true;CasesByTier=@{DevelopmentHost=41;NonESU=41;ESU=41;Legacy=33};Files=$guardFiles}
-    Input=[ordered]@{Cases=33;RecipeSha256=(Hash-I (Join-Path $stage 'tools\input\cases.json'));Repetitions=3}
-    KnownDevelopmentFailures=@('utf8-timeout-fragment','utf8-live-replies','escape-live-replies')
+    Reference=[ordered]@{RuntimeSourceCommit=$parentSource;HarnessSourceCommit=$referenceSource;Unchanged=$true
+        ArchiveSha256=$archiveHash;ManifestSha256=$manifestHash;Cases=33;Repetitions=1;Files=$referenceFiles
+        KnownFailures=@('utf8-timeout-fragment','utf8-live-replies','escape-live-replies')}
+    Guard=[ordered]@{SourceCommit=$source;OracleUnchangedFromH4=$true;CasesByTier=@{DevelopmentHost=41;NonESU=41;ESU=41;Legacy=33};Repetitions=3}
+    Input=[ordered]@{Cases=43;RecipeSha256=(Hash-I (Join-Path $stage 'tools\input\decoder-cases.json'));Repetitions=3}
+    Qualification=[ordered]@{Cases=7;Repetitions=1;ExternalTestGate='H4TestGate.dll'}
+    Regression=[ordered]@{Cases=14;Repetitions=1;RecipeSha256=(Hash-I (Join-Path $stage 'tools\input\regression-cases.json'));FlaglessSessions=$true}
+    KnownDevelopmentFailures=@()
     PendingCoverage=@(
-        @{Capability='DistinctCtrlBreakTransport';Status='Unsupported';NativeWindowsReferenceOnly=$true;Reason='I preserve API 1.1 and protocol 2; the byte input stream has no distinct Break operation.'}
-        @{Capability='OrdinaryUserProfiles';Status='NotRun';Reason='This package retains the controlled clean-shell/PSReadLine guards. It does not execute personal profile scripts.'}
+        @{Capability='DistinctCtrlBreakTransport';Status='Unsupported';NativeWindowsReferenceOnly=$true;Reason='I preserve API 1.1 and protocol 2; byte input has no distinct Break operation.'}
+        @{Capability='OrdinaryUserProfiles';Status='NotRun';Reason='I retain controlled clean-shell/PSReadLine guards and do not execute personal profile scripts.'}
     )
     ManualRepeatRequired=$false;SoakRepeatRequired=$false;Files=$files
 }
@@ -113,5 +130,5 @@ if($source -cne (& git -C $root rev-parse HEAD).Trim() -or @(& git -C $root stat
 [IO.Compression.ZipFile]::CreateFromDirectory($stage,$zip,[IO.Compression.CompressionLevel]::Optimal,$false)
 $hash=Hash-I $zip
 [IO.File]::WriteAllText(($zip+'.sha256'),$hash+'  '+[IO.Path]::GetFileName($zip)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
-Write-Host ('Input test candidate: '+$zip)
+Write-Host ('Input decoder candidate: '+$zip)
 Write-Host ('SHA-256: '+$hash)

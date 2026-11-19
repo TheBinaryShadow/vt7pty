@@ -37,6 +37,8 @@ broader desktop resource behavior remain outside the tested contract.
 The [input rc1 review](validation/2026-11-19-step-1.2-input-rc1-windows7.md)
 confirms 270/297 input observations passing and three stream failures repeated
 on every tier. Its legacy runner completes under PowerShell 2.0 and CLR 2.0.
+The [input rc2 candidate](INPUT_FIDELITY.md) rebuilds the runtime with decoder and
+reply-framing fixes; its Windows 7 compatibility is pending the next matrix.
 
 ## My Windows 7 test machines
 

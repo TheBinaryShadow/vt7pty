@@ -7,6 +7,7 @@ struct Spec {
     std::string name,kind,input;
     std::wstring expected,second;
     uint32_t mode=0,chunk=0,gap=0;
+    uint32_t idle=0,replyChunk=0;
     bool liveReplies=false;
 };
 std::vector<Spec> specs() {
@@ -53,6 +54,17 @@ std::vector<Spec> specs() {
     add("utf8-timeout-fragment","text",0,utf8(L"\u010d")+std::string("z"),L"\u010dz",1,1200);
     add("utf8-live-replies","text",0,utf8(mixed),mixed,1,20);r.back().liveReplies=true;
     add("escape-live-replies","navigation",0,nav,L"",1,20);r.back().liveReplies=true;
+    add("utf8-timeout-three","text",0,utf8(L"\u20acz"),L"\u20acz",1,1200);
+    add("utf8-timeout-four","text",0,utf8(L"\U0001f642z"),L"\U0001f642z",1,1200);
+    const std::string malformed="\xc2z\xe2\x82z\xf0\x9f" "z\xc0\xaf" "z\xed\xa0\x80" "z\xf4\x90\x80\x80" "z\xf5\x80\x80\x80" "z\x80z";
+    add("utf8-malformed-recovery","text",0,malformed,L"zzzzzzzz");
+    add("utf8-malformed-bytewise","text",0,malformed,L"zzzzzzzz",1,5);
+    add("escape-alone-live","text",0,"\x1b",L"\x1b");r.back().idle=1200;r.back().liveReplies=true;
+    add("escape-alone-no-reply","text",0,"\x1b",L"\x1b");r.back().idle=1200;
+    add("utf8-fragmented-replies","text",0,utf8(mixed),mixed,1,20);r.back().liveReplies=true;r.back().replyChunk=1;
+    add("escape-fragmented-replies","navigation",0,nav,L"",1,20);r.back().liveReplies=true;r.back().replyChunk=1;
+    add("alt-unicode-timeout","alt-unicode",0,"\x1b"+utf8(L"\u010dz"),L"\u010dz",2,1200);
+    add("alt-unicode-live-replies","alt-unicode",0,"\x1b"+utf8(L"\u010dz"),L"\u010dz",1,20);r.back().liveReplies=true;
     return r;
 }
 std::string hex(std::string_view bytes) {
@@ -63,7 +75,8 @@ std::string specJson(const Spec &s) {
     return "{\"Case\":"+json(s.name)+",\"Kind\":"+json(s.kind)+",\"Mode\":"+std::to_string(s.mode)+
         ",\"InputHex\":"+json(hex(s.input))+",\"ExpectedText\":"+json(utf8(s.expected))+
         ",\"SecondText\":"+json(utf8(s.second))+",\"ChunkBytes\":"+std::to_string(s.chunk)+
-        ",\"GapMilliseconds\":"+std::to_string(s.gap)+",\"LiveReplies\":"+boolean(s.liveReplies)+"}";
+        ",\"GapMilliseconds\":"+std::to_string(s.gap)+",\"LiveReplies\":"+boolean(s.liveReplies)+",\"IdleMilliseconds\":"+std::to_string(s.idle)+
+        ",\"ReplyChunkBytes\":"+std::to_string(s.replyChunk)+"}";
 }
 std::string listJson() {
     std::string s="{\"SchemaVersion\":1,\"Cases\":[";bool first=true;
@@ -159,6 +172,9 @@ void rawOracle(const Spec &s,const Packet &p) {
             v[i].modifiers==(mods[i]+(i<3?ENHANCED_KEY:0u)),"exact chord and released next key");
     }else if(s.kind=="alt"){
         check(v.size()==2 && v[0].character=='a' && (v[0].modifiers&LEFT_ALT_PRESSED) && v[1].character=='z' && !(v[1].modifiers&31),"fragmented Alt text");
+    }else if(s.kind=="alt-unicode"){
+        check(v.size()==2 && text(p)==s.expected && (v[0].modifiers&LEFT_ALT_PRESSED) &&
+            v[1].character=='z' && !(v[1].modifiers&31),"fragmented Alt Unicode and released next key");
     }else if(s.kind=="mouse" || s.kind=="x10"){
         std::vector<inputfidelity::Record> m;
         for(DWORD i=0;i<p.recordCount;++i)if(p.records[i].type==MOUSE_EVENT)m.push_back(p.records[i]);
@@ -191,10 +207,14 @@ void send(Session &s,const Spec &spec,const std::wstring &out) {
             do{if(spec.liveReplies)s.pump();Sleep(2);}while(GetTickCount64()<until);
         }
     }
-    writeFile(out+L"\\writes.json","{\"ChunkHex\":"+chunks+"],\"GapMilliseconds\":"+std::to_string(spec.gap)+"}");
+    if(spec.idle) {
+        const auto until=GetTickCount64()+spec.idle;
+        do{if(spec.liveReplies)s.pump();Sleep(2);}while(GetTickCount64()<until);
+    }
+    writeFile(out+L"\\writes.json","{\"ChunkHex\":"+chunks+"],\"GapMilliseconds\":"+std::to_string(spec.gap)+",\"IdleMilliseconds\":"+std::to_string(spec.idle)+"}");
 }
 void exercise(Context &c,const Spec &spec) {
-    auto &s=c.start();s.inputReplyRecording=true;
+    auto &s=c.start();s.inputReplyRecording=true;s.inputReplyChunkBytes=spec.replyChunk;
     {
         const auto modeOffset=s.raw.size();
         Capture capture(s,c.out,spec.mode);
@@ -233,7 +253,10 @@ void exercise(Context &c,const Spec &spec) {
             writeFile(c.out+L"\\input-observed.json",packet(*capture.p));
             std::string replies="[";
             for(size_t i=0;i<s.inputTerminalReplies.size();++i){if(i)replies+=',';replies+=json(hex(s.inputTerminalReplies[i]));}
-            writeFile(c.out+L"\\terminal-replies.json","{\"ReplyHex\":"+replies+"]}");
+            std::string replyWrites="[";
+            for(size_t i=0;i<s.inputReplyWrites.size();++i){if(i)replyWrites+=',';replyWrites+=json(hex(s.inputReplyWrites[i]));}
+            writeFile(c.out+L"\\terminal-replies.json","{\"ReplyHex\":"+replies+"],\"WriteHex\":"+replyWrites+"]}");
+            if(spec.liveReplies)check(!s.inputTerminalReplies.empty(),"live cursor reply was exercised");
             rawOracle(spec,*capture.p);observedRecords=capture.p->recordCount;
         }
         capture.close();
@@ -253,7 +276,7 @@ void oracle() {
     check(rejected,"unbalanced input rejected");
     p.overflow=1;rejected=false;try{validate(p);}catch(...){rejected=true;}
     check(rejected,"overflow rejected");
-    check(specs().size()==33,"complete input inventory");
+    check(specs().size()==43,"complete input inventory");
     printf("Input fidelity oracle: 5 checks passed.\n");
 }
 int run(const std::wstring &out,const std::string &only="") {

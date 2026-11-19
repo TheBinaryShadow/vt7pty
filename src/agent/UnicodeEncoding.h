@@ -150,6 +150,29 @@ static inline uint32_t decodeUtf8(const char *in) {
     }
 }
 
+// Classify an available UTF-8 prefix without consuming the next character.
+// -1: valid but unfinished; 0: malformed; 1..4: complete scalar length.
+// Invalid bytes are skipped one at a time by the input decoder. In particular,
+// an ASCII byte or a new valid lead after a broken prefix is not discarded.
+static inline int scanUtf8Prefix(const char *in, int size) {
+    if (size == 0) return -1;
+    const auto lead = static_cast<unsigned char>(in[0]);
+    if (lead < 0x80) return 1;
+    const int length = lead >= 0xc2 && lead <= 0xdf ? 2 :
+        lead >= 0xe0 && lead <= 0xef ? 3 :
+        lead >= 0xf0 && lead <= 0xf4 ? 4 : 0;
+    if (length == 0) return 0;
+    for (int i = 1; i < length && i < size; ++i) {
+        const auto byte = static_cast<unsigned char>(in[i]);
+        if (byte < 0x80 || byte > 0xbf) return 0;
+        if (i == 1 && ((lead == 0xe0 && byte < 0xa0) ||
+                      (lead == 0xed && byte > 0x9f) ||
+                      (lead == 0xf0 && byte < 0x90) ||
+                      (lead == 0xf4 && byte > 0x8f))) return 0;
+    }
+    return size < length ? -1 : length;
+}
+
 static inline uint32_t decodeSurrogatePair(wchar_t ch1, wchar_t ch2) {
     return ((ch1 - 0xD800) << 10) + (ch2 - 0xDC00) + 0x10000;
 }

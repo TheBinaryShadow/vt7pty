@@ -8,6 +8,17 @@ until implemented.
 
 ## Unreleased
 
+### Input decoder candidate (0.5.1-dev)
+
+- Preserve valid unfinished UTF-8 across idle periods and recover from malformed
+  bytes without losing following input.
+- Filter solicited cursor-position replies before key decoding, including
+  replies inside fragmented UTF-8 and escape tokens. Standalone Escape uses
+  the one-second fallback; a reply no longer terminates pending input.
+- Expand automated input coverage to 43 cases, with the unchanged rc1 reference,
+  H4 guards and focused lifetime, protocol and flagless session regressions.
+  Windows 7 qualification of this changed runtime is pending.
+
 ### H4 runtime candidate (0.5.1-dev)
 
 - Added opt-in backing-console isolation and verified host-thread cancellation
@@ -18,7 +29,7 @@ until implemented.
   client-agent protocol to 2 with accepted session flags in setup.
 - Added 41 integrated runtime cases, 25 protocol/keyboard oracles and a portable
   three-machine candidate retaining the original H3 controls and guard reference.
-  Windows 7 and remaining H4 qualification are pending.
+  H4 rc4 and its manual follow-up are accepted on all three Windows 7 tiers.
 
 ### Documentation
 

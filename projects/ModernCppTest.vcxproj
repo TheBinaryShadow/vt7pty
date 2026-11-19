@@ -17,6 +17,9 @@
   <ItemDefinitionGroup><Link><SubSystem>Console</SubSystem></Link></ItemDefinitionGroup>
   <ItemGroup><ClCompile Include="..\tests\unit\ModernCppTest.cc" /></ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\agent\CursorReportFilter.h" />
+    <ClInclude Include="..\src\agent\UnicodeEncoding.h" />
+    <ClInclude Include="..\tests\unit\InputDecoderTests.h" />
     <ClInclude Include="..\src\shared\Assert.h" />
     <ClInclude Include="..\src\shared\Narrow.h" />
   </ItemGroup>

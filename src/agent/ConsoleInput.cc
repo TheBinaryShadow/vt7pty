@@ -98,25 +98,6 @@ const unsigned int kIncompleteEscapeTimeoutMs = 1000u;
             }                                       \
         } while(0)
 
-// Match the Device Status Report console input:  ESC [ nn ; mm R
-// Returns:
-// 0   no match
-// >0  match, returns length of match
-// -1  incomplete match
-static int matchDsr(const char *input, int inputSize)
-{
-    int32_t dummy = 0;
-    const char *pch = input;
-    const char *stop = input + inputSize;
-    CHECK(*pch == '\x1B');  ADVANCE();
-    CHECK(*pch == '[');     ADVANCE();
-    SCAN_INT(dummy, 8);
-    CHECK(*pch == ';');     ADVANCE();
-    SCAN_INT(dummy, 8);
-    CHECK(*pch == 'R');
-    return vt7pty::internal::checkedNarrow<int>(pch - input + 1);
-}
-
 static int matchMouseDefault(const char *input, int inputSize,
                              MouseRecord &out)
 {
@@ -267,22 +248,39 @@ void ConsoleInput::writeInput(const std::string &input)
         }
     }
 
-    m_byteQueue.append(input);
-    doWrite(false);
-    if (!m_byteQueue.empty() && !m_dsrSent) {
-        trace("send DSR");
-        m_dsrSender.sendDsr();
-        m_dsrSent = true;
+    const bool awaitingReply = m_cursorReports.outstanding();
+    const auto keys = m_cursorReports.append(input);
+    const auto now = GetTickCount64();
+    if (m_cursorReports.pending()) m_lastReplyTick = now;
+    if (awaitingReply && !m_cursorReports.outstanding()) {
+        trace("Received a DSR reply");
     }
-    m_lastWriteTick = GetTickCount64();
+    if (!keys.empty()) {
+        m_byteQueue.append(keys);
+        m_lastWriteTick = now;
+        doWrite(false);
+    }
+    if (m_byteQueue.empty()) m_dsrRequestedForToken = false;
+    if (!m_byteQueue.empty() && !m_dsrRequestedForToken &&
+            !m_cursorReports.outstanding()) {
+        trace("send DSR");
+        m_cursorReports.request();
+        m_dsrRequestedForToken = true;
+        m_dsrSender.sendDsr();
+    }
 }
 
 void ConsoleInput::flushIncompleteEscapeCode()
 {
-    if (!m_byteQueue.empty() &&
-            (GetTickCount64() - m_lastWriteTick) > kIncompleteEscapeTimeoutMs) {
+    const auto now = GetTickCount64();
+    if (m_cursorReports.pending() && now - m_lastReplyTick > kIncompleteEscapeTimeoutMs) {
+        m_byteQueue.append(m_cursorReports.expire());
+    }
+    if (!m_byteQueue.empty() && now - m_lastWriteTick > kIncompleteEscapeTimeoutMs) {
+        // This is an escape ambiguity timeout, not UTF-8 end-of-stream.
+        // doWrite leaves a valid unfinished scalar queued for the next read.
         doWrite(true);
-        m_byteQueue.clear();
+        if (m_byteQueue.empty()) m_dsrRequestedForToken = false;
     }
 }
 
@@ -409,18 +407,6 @@ int ConsoleInput::scanInput(std::vector<INPUT_RECORD> &records,
     }
 
     if (input[0] == '\x1B') {
-        // Attempt to match the Device Status Report (DSR) reply.
-        int dsrLen = matchDsr(input, inputSize);
-        if (dsrLen > 0) {
-            trace("Received a DSR reply");
-            m_dsrSent = false;
-            return dsrLen;
-        } else if (!isEof && dsrLen == -1) {
-            // Incomplete DSR match.
-            trace("Incomplete DSR match");
-            return -1;
-        }
-
         int mouseLen = scanMouseInput(records, input, inputSize);
         if (mouseLen > 0 || (!isEof && mouseLen == -1)) {
             return mouseLen;
@@ -453,26 +439,23 @@ int ConsoleInput::scanInput(std::vector<INPUT_RECORD> &records,
 
     // Recognize Alt-<character>.
     //
-    // This code doesn't match Alt-ESC, which is encoded as `ESC ESC`, but
-    // maybe it should.  I was concerned that pressing ESC rapidly enough could
-    // accidentally trigger Alt-ESC.  (e.g. The user would have to be faster
-    // than the DSR flushing mechanism or use a decrepit terminal.  The user
-    // might be on a slow network connection.)
+    // Keep repeated ESC as separate keys rather than interpreting ESC ESC as
+    // Alt-ESC. Cursor replies do not terminate the pending token; an ambiguous
+    // standalone ESC uses the escape timeout.
     if (input[0] == '\x1B' && inputSize >= 2 && input[1] != '\x1B') {
-        const int len = utf8CharLength(input[1]);
+        const int len = scanUtf8Prefix(input + 1, inputSize - 1);
+        if (len == -1) {
+            trace("Incomplete UTF-8 character in Alt-<Char>");
+            return -1;
+        }
         if (len > 0) {
-            if (1 + len > inputSize) {
-                // Incomplete character.
-                trace("Incomplete UTF-8 character in Alt-<Char>");
-                return -1;
-            }
             appendUtf8Char(records, &input[1], len, true);
             return 1 + len;
         }
     }
 
     // A UTF-8 character.
-    const int len = utf8CharLength(input[0]);
+    const int len = scanUtf8Prefix(input, inputSize);
     if (len == 0) {
         static bool debugInput = isTracingEnabled() && hasDebugFlag("input");
         if (debugInput) {
@@ -481,7 +464,7 @@ int ConsoleInput::scanInput(std::vector<INPUT_RECORD> &records,
         }
         return 1;
     }
-    if (len > inputSize) {
+    if (len == -1) {
         // Incomplete character.
         trace("Incomplete UTF-8 character");
         return -1;
