@@ -303,6 +303,35 @@ inline int fixture(const std::wstring &name,DWORD expectedServer) {
                 inputfidelity::serve(pipe.value);continue;
             }
 #endif
+#ifdef VT7PTY_H4_RUNTIME
+            if(command=='Z') {
+                check(shell.value==INVALID_HANDLE_VALUE && thread.value==INVALID_HANDLE_VALUE,"idle profile shell fixture");
+                DWORD profileInputMode=0;check(GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),&profileInputMode),"profile initial console mode");
+                check(SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),profileInputMode|ENABLE_INSERT_MODE),"profile console insert mode");
+                DWORD exeCount=0,lineCount=0;
+                transfer(pipe.value,&exeCount,sizeof(exeCount),false);
+                transfer(pipe.value,&lineCount,sizeof(lineCount),false);
+                check(exeCount>0 && exeCount<32768 && lineCount>0 && lineCount<32768,"bounded profile shell launch");
+                std::wstring exe(exeCount,0),line(lineCount,0);
+                transfer(pipe.value,exe.data(),exeCount*sizeof(wchar_t),false);
+                transfer(pipe.value,line.data(),lineCount*sizeof(wchar_t),false);
+                const auto leaf=exe.substr(exe.find_last_of(L"\\/")+1);
+                check((_wcsicmp(leaf.c_str(),L"powershell.exe")==0 || _wcsicmp(leaf.c_str(),L"pwsh.exe")==0) &&
+                    exe.find(L'\0')==std::wstring::npos && line.find(L'\0')==std::wstring::npos &&
+                    line.starts_with(quote(exe)+L" "),"explicit PowerShell profile image");
+                std::vector<wchar_t> mutableLine(line.begin(),line.end());mutableLine.push_back(0);
+                STARTUPINFOW startup={};startup.cb=sizeof(startup);PROCESS_INFORMATION process={};
+                shellJob.reset(CreateJobObjectW(nullptr,nullptr));check(shellJob.value!=nullptr,"profile shell cleanup job");
+                JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits={};limits.BasicLimitInformation.LimitFlags=JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+                check(SetInformationJobObject(shellJob.value,JobObjectExtendedLimitInformation,&limits,sizeof(limits)),"profile shell job lifetime");
+                check(CreateProcessW(exe.c_str(),mutableLine.data(),nullptr,nullptr,FALSE,CREATE_SUSPENDED,nullptr,nullptr,&startup,&process),"profile shell creation");
+                shell.reset(process.hProcess);shellThread.reset(process.hThread);
+                check(AssignProcessToJobObject(shellJob.value,shell.value),"owned profile shell assignment");
+                check(ResumeThread(shellThread.value)!=static_cast<DWORD>(-1),"owned profile shell start");
+                h3trace::fixtureTimeline.append(h3trace::ShellStarted,readIndex,process.dwProcessId);
+                command='I';
+            }
+#endif
             if(command=='Q') {
 #ifdef VT7PTY_H3_FREEZE
                 activity.finish();
@@ -544,6 +573,7 @@ public:
     }
     ~Session() { cleanup(); }
 #ifdef VT7PTY_H4_RUNTIME
+    bool profilePrivateOutput=false;
     bool inputReplyRecording=false;
     size_t inputReplyChunkBytes=0;
     std::vector<std::string> inputReplyWrites;
@@ -551,6 +581,17 @@ public:
     vt7pty_t *runtimeHandle() const { return pty_; }
     void inputCaptureTransfer(void *data,DWORD bytes,bool write){transfer(pipe_.value,data,bytes,write);}
 
+    IdentityPacket launchProfile(const std::wstring &exe,const std::wstring &line) {
+        char command='Z';DWORD exeCount=static_cast<DWORD>(exe.size()),lineCount=static_cast<DWORD>(line.size());
+        check(exeCount && exeCount<32768 && lineCount && lineCount<32768,"profile launch size");
+        transfer(pipe_.value,&command,1,true);transfer(pipe_.value,&exeCount,sizeof(exeCount),true);
+        transfer(pipe_.value,&lineCount,sizeof(lineCount),true);
+        transfer(pipe_.value,const_cast<wchar_t *>(exe.data()),exeCount*sizeof(wchar_t),true);
+        transfer(pipe_.value,const_cast<wchar_t *>(line.data()),lineCount*sizeof(wchar_t),true);
+        IdentityPacket p;transfer(pipe_.value,&p,sizeof(p),false);
+        check(p.magic==0x33494856 && p.schema==7 && p.shellId && p.shellAlive,"profile shell launch reply");
+        return p;
+    }
 #endif
     IdentityPacket observe(char command='I') {
         transfer(pipe_.value,&command,1,true);
@@ -603,8 +644,18 @@ public:
             if(!available) return;
             char buffer[4096]; DWORD size=std::min<DWORD>(available,sizeof(buffer));
             transfer(output_.value,buffer,size,false);
-            check(raw.size()+size<=1024*1024,"output size"); raw.append(buffer,size); lineFeeds+=std::count(buffer,buffer+size,'\n'); state.feed({buffer,size});
+#ifdef VT7PTY_H4_RUNTIME
+            if(!profilePrivateOutput) {
+#endif
+                check(raw.size()+size<=1024*1024,"output size");raw.append(buffer,size);
+#ifdef VT7PTY_H4_RUNTIME
+            }
+#endif
+            lineFeeds+=std::count(buffer,buffer+size,'\n');state.feed({buffer,size});
 #ifdef VT7PTY_H3_DIAGNOSTIC
+#ifdef VT7PTY_H4_RUNTIME
+            if(!profilePrivateOutput) {
+#endif
             auto row=state.row(state.y()); while(!row.empty() && row.back()==U' ') row.pop_back();
             const bool prompt=row==U"H3_CMD>" || row==U"H3_PS>" ||
                 (row.starts_with(U"H3_PS[") && row.ends_with(U"]>")) || (row.starts_with(U"H3_CMD_") && row.ends_with(U">"));
@@ -612,6 +663,9 @@ public:
             if(prompt) lastPromptLineFeeds=lineFeeds; lastPrompt=prompt;
             if(frames.size()<512) frames.push_back({h3trace::qpc(),raw.size(),lineFeeds,state.x(),state.y(),promptEpoch,std::move(row)});
             else frameOverflow=true;
+#ifdef VT7PTY_H4_RUNTIME
+            }
+#endif
 #endif
             for(const auto &reply:state.takeReplies()){
 #ifdef VT7PTY_H4_RUNTIME

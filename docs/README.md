@@ -45,12 +45,14 @@ its approved opt-in scope. The [input rc1 review](validation/2026-11-19-step-1.2
 now confirms three fragmented-input failures on all three Windows 7 tiers;
 its frozen H4 guards pass. The [input rc2 review](validation/2026-11-19-step-1.2-input-rc2-windows7.md)
 qualifies the corrections on all three tiers: 387/387 input cases, 345/345 H4
-guards, 21 lifetime/fault guards and 42 regressions pass. Remaining Step 1.2
-coverage and broader Milestone 1 work stay open.
+guards, 21 lifetime/fault guards and 42 regressions pass. The next [profile package](PROFILE_TESTS.md) keeps that runtime frozen and adds
+controlled fixtures plus ordinary-profile checks. Its Windows 7 qualification
+and broader Milestone 1 work stay open.
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |
 | --- | --- |
+| [Step 1.2 profile tests](PROFILE_TESTS.md) | Controlled editors, ordinary profiles and physical input without private transcripts |
 | [Step 1.2 input tests](INPUT_FIDELITY.md) | Editing, stream fragmentation, mouse records and native Break reference |
 | [H4 runtime qualification](H4_RUNTIME.md) | Accepted opt-in contract, three-machine runner and test scope |
 | [H4 manual checks](H4_MANUAL_CHECKS.md) | Physical US/Croatian input, lock/unlock and elevated-caller refusal |

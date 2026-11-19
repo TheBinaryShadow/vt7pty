@@ -37,8 +37,9 @@ opt-in contract. The [input rc1 review](docs/validation/2026-11-19-step-1.2-inpu
 confirms three stream-fragmentation failures across all three Windows 7 tiers,
 with the H4 guards still passing. The [input rc2 review](docs/validation/2026-11-19-step-1.2-input-rc2-windows7.md)
 qualifies those fixes on all three tiers: 387/387 input cases, 345/345 H4 guards,
-21 lifetime/fault guards and 42 regressions pass. Remaining Step 1.2 coverage
-and broader Milestone 1 fidelity work stay open.
+21 lifetime/fault guards and 42 regressions pass. The next [profile test package](docs/PROFILE_TESTS.md) keeps that runtime frozen
+and adds controlled fixtures plus a separate ordinary-profile check. Its Windows 7
+qualification and broader Milestone 1 work stay open.
 VT7 integration comes after the backend and its API are ready. VT7Pty does not
 yet replace ConPTY for unmodified applications. I am not planning a kernel driver.
 

@@ -10,8 +10,9 @@ refusal and physical keyboard/lock checks. The
 confirms three stream failures across all three Windows 7 tiers; its collections
 are complete. The [input rc2 review](validation/2026-11-19-step-1.2-input-rc2-windows7.md)
 qualifies the fixes on all three tiers: 387 input cases, 345 H4 guards, 21
-lifetime/fault guards and 42 regressions pass. No rerun is needed. Remaining
-Step 1.2 coverage and broader Milestone 1 work stay open.
+lifetime/fault guards and 42 regressions pass. No rerun of that package is needed. The next [profile package](PROFILE_TESTS.md)
+keeps its runtime frozen and adds controlled fixtures plus a separate ordinary-
+profile phase. Its Windows 7 qualification and broader Milestone 1 work stay open.
 
 I use local native tests, portable Windows 7 packages and focused research
 probes. They answer different questions, so a passing research probe does not
@@ -21,7 +22,8 @@ replace release acceptance. The [roadmap](../ROADMAP.md) records what is complet
 
 | Task | Entry point | Guide |
 | --- | --- | --- |
-| Collect the next input candidate | RUN-INPUT-NONESU.cmd, RUN-INPUT-ESU.cmd or RUN-INPUT-LEGACY.cmd | [Input tests](INPUT_FIDELITY.md) |
+| Collect Step 1.2 profile coverage | RUN-PROFILES-NONESU.cmd, RUN-PROFILES-ESU.cmd or RUN-PROFILES-LEGACY.cmd, then the matching manual launcher | [Profile tests](PROFILE_TESTS.md) |
+| Reproduce accepted input rc2 | RUN-INPUT-NONESU.cmd, RUN-INPUT-ESU.cmd or RUN-INPUT-LEGACY.cmd | [Input tests](INPUT_FIDELITY.md) |
 | Verify a local build | Verify-VT7Pty.ps1 | Commands below |
 | Test a release candidate | The candidate's -tests.zip | [Windows 7 acceptance](WINDOWS7_ACCEPTANCE.md) |
 | Measure shell and console fidelity | Fidelity baseline package | [Runner guide](FIDELITY_BASELINE.md) |

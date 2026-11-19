@@ -1,0 +1,37 @@
+{
+  "SchemaVersion": 1,
+  "Cases": [
+    {
+      "Case": "wps-clean-native",
+      "Engine": "wps",
+      "Layered": false,
+      "Editor": "Native",
+      "EditMode": "Native",
+      "PredictionSource": "NotApplicable"
+    },
+    {
+      "Case": "wps-layered-native",
+      "Engine": "wps",
+      "Layered": true,
+      "Editor": "Native",
+      "EditMode": "Native",
+      "PredictionSource": "NotApplicable"
+    },
+    {
+      "Case": "pwsh-clean-readline",
+      "Engine": "pwsh",
+      "Layered": false,
+      "Editor": "PSReadLine",
+      "EditMode": "Windows",
+      "PredictionSource": "None"
+    },
+    {
+      "Case": "pwsh-layered-readline",
+      "Engine": "pwsh",
+      "Layered": true,
+      "Editor": "PSReadLine",
+      "EditMode": "Emacs",
+      "PredictionSource": "History"
+    }
+  ]
+}

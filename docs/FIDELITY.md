@@ -1,7 +1,7 @@
 # Milestone 1 Fidelity Plan
 
 Status: rc3 Step 1.1 corpus measured on the development host and all three Windows 7 tiers; broader coverage pending.
-Updated: 2026-10-13.
+Updated: 2026-11-19.
 
 I'm using these applications and measurements to improve the
 [published 0.5.0 baseline](validation/2026-10-02-0.5.0-publication.md).
@@ -33,7 +33,9 @@ and blocks that gate. Newer PowerShell versions do not qualify 7.2.24.
 The initial full-screen corpus uses native Win32 console fixtures. Additional
 applications need an exact version, distribution/license record, and reproducible
 scenario before becoming gates. Automated shell runs use clean profiles;
-ordinary profiles have a separately recorded manual check. Do not change global
+ordinary profiles have a separately recorded manual check. The
+[Step 1.2 profile package](PROFILE_TESTS.md) collects that matrix using the
+accepted input rc2 runtime; Windows 7 qualification is pending. Do not change global
 profiles, execution policy, console settings, or installed code pages.
 
 ## Measurement matrix

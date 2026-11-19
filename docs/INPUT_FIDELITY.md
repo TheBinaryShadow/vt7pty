@@ -102,8 +102,10 @@ references target retained child process groups and require exactly one Break,
 zero Ctrl+C, no parent notification and natural child exit. They establish
 Windows behavior, not a VT7Pty transport.
 
-Ordinary-user-profile coverage remains NotRun. These packages use controlled
-clean shells and PSReadLine; they do not execute personal profile scripts.
+Ordinary-user-profile coverage remains NotRun in these input packages. The next
+[profile package](PROFILE_TESTS.md) keeps the accepted rc2 runtime unchanged and
+adds controlled fixtures plus a separate ordinary-profile phase. Its Windows 7
+qualification is pending.
 Clipboard, held physical keys and IME UI remain outside committed-text tests.
 
 ## Build and independent review

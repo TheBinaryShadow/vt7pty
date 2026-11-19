@@ -168,7 +168,7 @@ struct Context
         cleaned = session->cleanupOkay;
         if (session->host.value && session->host.value != INVALID_HANDLE_VALUE)
             hostExited = WaitForSingleObject(session->host.value, 10000) == WAIT_OBJECT_0;
-        writeFile(out + L"\\stream.bin", session->raw);
+        if(!session->profilePrivateOutput)writeFile(out + L"\\stream.bin", session->raw);
         writeFile(out + L"\\lifetime.json",
                   "{\"Agent\":" + std::to_string(GetProcessId(session->agent.value)) +
                       ",\"Fixture\":" + std::to_string(GetProcessId(session->child.value)) +
@@ -319,6 +319,8 @@ void agentDeath(Context &c)
 #include "H4RuntimeCases.h"
 #include "H4QualificationCases.h"
 #include "InputFidelityCases.h"
+#include "ProfileCases.h"
+#include "ProfileManual.h"
 void runtimeOracle()
 {
     using namespace vt7pty::internal::cancel;
@@ -560,6 +562,13 @@ int wmain(int argc, wchar_t **argv)
 {
     try
     {
+        if(argc==4 && std::wstring(argv[1])==L"--profiles-manual")return profilecases::manual(argv[3],std::wstring(argv[2])==L"pwsh");
+        if(argc==4 && std::wstring(argv[1])==L"--profiles-manual-smoke")return profilecases::smoke(argv[3],std::wstring(argv[2])==L"pwsh");
+        if(argc==4 && std::wstring(argv[1])==L"--profiles-manual-smoke-worker")return profilecases::manual(argv[3],std::wstring(argv[2])==L"pwsh",true);
+        if(argc==4 && std::wstring(argv[1])==L"--profile-child")return profilecases::child(argv[2],utf8(argv[3]));
+        if(argc==2 && std::wstring(argv[1])==L"--profiles-list"){profilecases::list();return 0;}
+        if(argc==2 && std::wstring(argv[1])==L"--profiles-self-test"){profilecases::oracle();return 0;}
+        if(argc==3 && std::wstring(argv[1])==L"--profiles-run")return profilecases::run(argv[2]);
         if(argc==5 && std::wstring(argv[1])==L"--input-break-child")
             return inputfidelity::breakChild(argv[2],static_cast<DWORD>(_wcstoui64(argv[3],nullptr,10)),std::wstring(argv[4])==L"1");
         if(argc==2 && std::wstring(argv[1])==L"--input-self-test"){inputcases::oracle();return 0;}

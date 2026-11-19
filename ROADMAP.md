@@ -5,8 +5,8 @@ Updated: 2026-11-19.
 I've completed Milestone 0 and published 0.5.0. H3 and the opt-in H4 runtime
 are accepted within their recorded boundaries. The [input rc2 review](docs/validation/2026-11-19-step-1.2-input-rc2-windows7.md)
 qualifies the decoder/framing fixes on all three Windows 7 tiers, with 387/387
-input cases and 345/345 H4 guards passing. **Next: finish the remaining Step 1.2
-input coverage**, including the ordinary-profile matrix. The public Break gap
+input cases and 345/345 H4 guards passing. **Current: qualify the [Step 1.2 profile package](docs/PROFILE_TESTS.md)** on all
+three machines, including the separate ordinary-profile phase. The public Break gap
 and input/reply contract limits remain explicit. VT7 integration stays open.
 
 I check an item only when its stated work and required tests are complete.
@@ -28,7 +28,7 @@ The [foundation](docs/FOUNDATION.md) records the engineering decisions;
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Modern native VT7Pty 0.5.x foundation | Complete; 0.5.0 accepted and published |
-| 1 | Better console fidelity and reliability | In progress; Ctrl+C cancellation is the current focus |
+| 1 | Better console fidelity and reliability | In progress; Step 1.2 profile coverage is the current focus |
 | 2 | VT7-facing API and standalone integration host | Planned after backend validation |
 | 3 | Versioned handoff ready for VT7 integration | Planned after API and consumer tests |
 | Later | Other consumers and optional ConPTY compatibility | Deferred |
@@ -115,8 +115,10 @@ public-API experiments failed. I'm now following the
   [rc2 review](docs/validation/2026-11-19-step-1.2-input-rc2-windows7.md) verifies
   387/387 input cases, 345/345 H4 guards, 21 lifetime/fault guards and 42
   regressions. The unchanged rc1 reference retains its three failures per machine.
-- [ ] Complete the remaining F01-F03 input coverage, including ordinary-user
-  profiles, and record the final Step 1.2 scope. Public Ctrl+Break transport
+- [ ] Qualify the [controlled and ordinary-profile matrix](docs/PROFILE_TESTS.md)
+  on all three Windows 7 tiers. The new harness keeps the accepted input rc2
+  runtime and controls unchanged; target qualification is pending.
+- [ ] Record the final F01-F03 and Step 1.2 scope after reviewing that coverage. Public Ctrl+Break transport
   remains unsupported by explicit decision; all 24 native references in rc2
   pass. Escape latency and cursor-report/F3 ambiguity remain documented for
   the Milestone 2 input contract. Step 1.2 stays open.
