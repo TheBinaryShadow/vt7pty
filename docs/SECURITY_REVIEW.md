@@ -127,7 +127,10 @@ is scoped to the isolated host thread, checked byte-for-byte after restoration,
 and never retried on an ambiguous cancellation. Host-local code and monitor
 handles remain valid until the owned host exits.
 
-Missing/wrong modules, real impersonation denial, agent/caller death, concurrent
-close, neighbor sessions and enclosing-job inheritance have focused development
-tests. Windows 7 execution, forced callback timeout/rundown, larger resource
-budgets and broader job policy remain qualification work. H4 is not accepted.
+The [accepted H4 review](validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
+combines the Windows 7 automated and physical results. Missing/wrong modules,
+real impersonation denial, agent/caller death, concurrent close, neighbors,
+forced timeout/rundown, the defined resource budgets and enclosing-job
+inheritance pass within that contract. Elevated callers are refused as designed,
+and real lock/unlock recovery passes. Broader access policies, descendant/job
+containment and workloads beyond the measured resource bounds remain separate work.

@@ -1,11 +1,14 @@
 # Console-host cancellation design
 
-Status: H1, H2 and the controlled H3 prototype accepted on Windows 7; H4 runtime integration and production qualification next.
-Updated: 2026-11-14.
+Status: H1, H2, the controlled H3 prototype and the approved opt-in H4 runtime
+are accepted on all three Windows 7 tiers.
+Updated: 2026-11-19.
 
 I'm following the [cancellation investigation](INPUT_CANCELLATION.md) with
 four stages. I need correct line cancellation while preserving active-child
-and raw-input behavior. The production runtime remains 0.5.0.
+and raw-input behavior. The published runtime remains 0.5.0. The
+[H4 acceptance review](validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
+qualifies the 0.5.1-dev opt-in path; broader fidelity and VT7 integration remain open.
 
 ## Plan and acceptance
 

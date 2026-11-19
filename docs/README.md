@@ -38,14 +38,15 @@ verifies 345/345 runtime cases across all three tiers. The
 [rc4 candidate](validation/2026-11-17-step-1.2-h4-runtime-rc4-candidate.md) passes
 local qualification and its full opt-in soak. The
 [Windows 7 rc4 review](validation/2026-11-18-step-1.2-h4-runtime-rc4-windows7.md)
-verifies all automated and elevated-caller checks. Keyboard and lock/unlock
-qualification remain open. The corrected manual-only runner is ready for the
-remaining physical checks on all three machines.
+verifies all automated and elevated-caller checks. The
+[manual review](validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
+passes all nine physical workflows on those machines and completes H4 within
+its approved opt-in scope. Broader Milestone 1 fidelity work remains open.
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |
 | --- | --- |
-| [H4 runtime qualification](H4_RUNTIME.md) | Opt-in runtime contract, three-machine runner and remaining gates |
+| [H4 runtime qualification](H4_RUNTIME.md) | Accepted opt-in contract, three-machine runner and test scope |
 | [H4 manual checks](H4_MANUAL_CHECKS.md) | Physical US/Croatian input, lock/unlock and elevated-caller refusal |
 | [Fidelity plan](FIDELITY.md) | Required applications, measurements and remaining coverage |
 | [Fidelity test bundle](FIDELITY_BASELINE.md) | Run and interpret the shell and fixture tests |

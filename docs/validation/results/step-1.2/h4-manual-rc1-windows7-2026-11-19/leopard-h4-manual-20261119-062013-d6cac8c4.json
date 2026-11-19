@@ -1,0 +1,46 @@
+{
+  "Kind": "H4ManualBundleReview",
+  "Status": "Pass",
+  "ComputerName": "LEOPARD",
+  "Checks": [
+    "US",
+    "HR",
+    "Session"
+  ],
+  "Reviews": [
+    {
+      "Kind": "H4QualificationReview",
+      "Probe": "H4ManualKeyboard",
+      "Status": "Pass",
+      "SourceCommit": "4926916df1d12e0990717bc3e89a04256588dfd5",
+      "RuntimeSourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+      "SyntheticSmoke": false,
+      "H4Accepted": false,
+      "Layout": "US",
+      "KeyboardOperations": 1
+    },
+    {
+      "Kind": "H4QualificationReview",
+      "Probe": "H4ManualKeyboard",
+      "Status": "Pass",
+      "SourceCommit": "4926916df1d12e0990717bc3e89a04256588dfd5",
+      "RuntimeSourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+      "SyntheticSmoke": false,
+      "H4Accepted": false,
+      "Layout": "HR",
+      "KeyboardOperations": 1
+    },
+    {
+      "Kind": "H4QualificationReview",
+      "Probe": "H4ManualSession",
+      "Status": "Pass",
+      "SourceCommit": "4926916df1d12e0990717bc3e89a04256588dfd5",
+      "RuntimeSourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+      "SyntheticSmoke": false,
+      "H4Accepted": false,
+      "KeyboardOperations": 2,
+      "SessionTransition": "Observed"
+    }
+  ],
+  "H4Accepted": false
+}

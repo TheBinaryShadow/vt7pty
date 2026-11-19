@@ -1,7 +1,8 @@
 # H4 manual checks
 
-I use the manual-only follow-up to finish US/Croatian keyboard and lock/unlock
-qualification on NESSY, TURTLE and LEOPARD. The product binaries are unchanged
+The [Windows 7 manual review](validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
+accepts all nine keyboard and lock/unlock workflows on NESSY, TURTLE and LEOPARD.
+I retain these instructions for focused follow-up runs. The product binaries are unchanged
 from the qualified rc4 archive. I do not need another automated collection,
 four-hour soak pair or elevated-caller run. The
 [rc4 review](validation/2026-11-18-step-1.2-h4-runtime-rc4-windows7.md)
@@ -63,7 +64,8 @@ Keep every complete directory under results, including failed or partial
 attempts. Each contains report.json, key records, actual readbacks, UI text,
 runtime trace, retained session identities and a SHA-256 inventory. Copy the
 new directories from all three machines to K:\VT7_work\results for review.
-H4 stays open until I review all required physical results.
+I record acceptance separately after reviewing the underlying evidence.
+The completed three-machine manual matrix is accepted in the review above.
 
 For a focused repeat from this extracted folder, I can use:
 

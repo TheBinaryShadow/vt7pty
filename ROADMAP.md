@@ -98,22 +98,20 @@ public-API experiments failed. I'm now following the
   qualified protected dispatch and recording. Original failures remain in the
   [validation history](docs/validation/README.md). H3 accepts the controlled
   private-desktop prototype; ordinary-desktop and production lifetime work belong to H4.
-- [ ] H4: Integrate the proven mechanism into the runtime and pass regression tests.
-  The [H4 candidate](docs/H4_RUNTIME.md) uses approved opt-in backing-desktop
-  isolation and API 1.1 two-phase close. The [completed rc2 matrix](docs/validation/2026-11-16-step-1.2-h4-runtime-rc2-turtle-rerun.md)
-  verifies 345/345 runtime cases across NESSY, TURTLE and LEOPARD, with all three
-  baseline regression suites and 120-minute soaks passing. The
-  [rc4 candidate](docs/validation/2026-11-17-step-1.2-h4-runtime-rc4-candidate.md)
-  passes its [automated Windows 7 matrix](docs/validation/2026-11-18-step-1.2-h4-runtime-rc4-windows7.md):
-  345 runtime, 21 qualification and 90 regression cases, with both full soaks
-  on every machine. Elevated-caller checks also pass. The corrected
-  [manual-only runner](docs/H4_MANUAL_CHECKS.md) is ready; I still need physical
-  US/Croatian input and lock/unlock results before accepting H4.
-  Broader descendant/job policy remains in Step 1.5.
+- [x] H4: Integrate the proven mechanism into the runtime and pass regression tests.
+  I accept the [opt-in H4 contract](docs/H4_RUNTIME.md), including private backing
+  desktops and API 1.1 two-phase close, on all three Windows 7 tiers. The
+  [rc4 automated review](docs/validation/2026-11-18-step-1.2-h4-runtime-rc4-windows7.md)
+  verifies 345 runtime, 21 qualification and 90 regression cases, both full
+  soak phases per machine and the elevated-caller checks. The
+  [manual review](docs/validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
+  completes all nine physical keyboard and lock/unlock workflows, with 12
+  restored keyboard operations and 12 cleaned session lifetimes. Broader input
+  fidelity remains below; descendant/job policy remains in Step 1.5.
 - [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
   processed/unprocessed input, editing, modifiers, text and paste.
-- [ ] Add focused regressions and verify US/Croatian keyboard behavior where
-  automated records cannot establish the result.
+- [ ] Extend focused regressions for the remaining input workflows, carrying
+  forward the qualified US-language and Croatian keyboard results.
 
 I'll complete this step when the defined input workflows pass without duplicate
 or lost input, incorrect child interruption, or a broken shell after cancellation.

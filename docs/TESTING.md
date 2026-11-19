@@ -3,7 +3,9 @@
 The [H4 runner](H4_RUNTIME.md) tests the opt-in development runtime on all three
 Windows 7 tiers. It retains frozen H3 controls/reference, runs the integrated
 runtime cases, then the existing regression suite and 120-minute baseline soak.
-H4 keyboard and sustained opt-in workload qualification remain separate gates. VT7Pty
+The [accepted H4 review](validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
+combines the automated matrix, sustained opt-in workloads, elevated-caller
+refusal and physical keyboard/lock checks. Broader Milestone 1 work remains open.
 
 I use local native tests, portable Windows 7 packages and focused research
 probes. They answer different questions, so a passing research probe does not
@@ -144,12 +146,14 @@ timing limits and remaining coverage. The
 PowerShell versions and how to interpret expected fault-control results.
 Marker output alone does not establish complete screen, cursor or attribute fidelity.
 
-Ctrl+C cancellation remains unresolved in CMD and native Windows PowerShell.
+The published 0.5.0 runtime retains the CMD and native Windows PowerShell
+cancellation defect. The qualified H4 opt-in development path fixes the tested
+workflows.
 The [investigation](INPUT_CANCELLATION.md) records failed public-API approaches.
 The [console-host design](HOST_CANCELLATION_DESIGN.md) separates identity (H1),
 dispatch (H2), cancellation (H3) and production integration (H4).
-H1, H2 and the controlled H3 prototype are accepted. H4 still needs the integrated
-runtime and its wider regression qualification.
+H1, H2, the controlled H3 prototype and the opt-in H4 runtime are accepted
+on all three Windows 7 tiers. The H4 review records the precise contract.
 
 The [scraper coordination experiment](HOST_FREEZE_DIAGNOSTICS.md) uses a separate
 research agent and retains both earlier packages unchanged. Its nine trials
@@ -162,8 +166,9 @@ on all three Windows 7 tiers, with no prototype recorder loss. The original
 controls and unprotected contrasts retain failures. The
 [H3 guard review](validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
 now accepts all 282 guard cases on the three Windows 7 machines, with no prototype
-coverage gaps or neighbor trace loss. Ordinary-desktop behavior, keyboard layouts,
-API lifetime, cleanup and runtime regression tests remain H4 requirements.
+coverage gaps or neighbor trace loss. The subsequent H4 qualification covers
+ordinary-desktop behavior, the recorded keyboard layouts, API lifetime, cleanup
+and runtime regression within its approved scope.
 
 Each research package has its own instructions and evidence. I keep the
 released 0.5.0 regression suite and full Windows 7 soak as separate requirements.

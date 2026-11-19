@@ -1,0 +1,34 @@
+{
+  "Kind": "H4AcceptanceDecision",
+  "RecordedDate": "2026-11-19",
+  "TimeZone": "Europe/Zagreb",
+  "Status": "AcceptedWithinOptInScope",
+  "H4Accepted": true,
+  "Milestone1Complete": false,
+  "VT7Integrated": false,
+  "PublishedVersion": "0.5.0",
+  "QualifiedRuntimeVersion": "0.5.1-dev",
+  "RuntimeSourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+  "HarnessSourceCommit": "4926916df1d12e0990717bc3e89a04256588dfd5",
+  "RuntimeUnchangedFromAcceptedRc4": true,
+  "ManualQualificationAccepted": true,
+  "PhysicalWorkflows": 9,
+  "ManualKeyboardOperations": 12,
+  "ManualHostLifetimes": 12,
+  "OriginalFilesPreserved": 186,
+  "Machines": [
+    "NESSY",
+    "TURTLE",
+    "LEOPARD"
+  ],
+  "AutomatedAndElevatedEvidence": "../h4-runtime-rc4-windows7-2026-11-18/",
+  "USLayouts": {
+    "NESSY": "00020409",
+    "TURTLE": "00000409",
+    "LEOPARD": "00020409"
+  },
+  "CroatianLayout": "0000041A",
+  "Scope": "Explicit host-cancellation opt-in, API 1.1, protocol 2, medium-integrity ordinary-desktop caller, qualified Windows 7 tiers. Broader fidelity, jobs/descendants, final API and VT7 integration remain separate work.",
+  "ReviewerSourceCommit": "e76bc7771646e89c330f771d86f687a50a6e19fa",
+  "ForwardedBytesRecomputedFromKeys": true
+}

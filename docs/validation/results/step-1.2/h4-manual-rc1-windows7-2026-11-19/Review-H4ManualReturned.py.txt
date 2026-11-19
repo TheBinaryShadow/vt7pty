@@ -1,0 +1,117 @@
+from pathlib import Path
+import json, re, hashlib
+root=Path(__file__).parent/'h4-manual-rc1-windows7-returned-2026-11-19'
+output=root.parent/'h4-manual-rc1-windows7-audit-2026-11-19'
+harness='4926916df1d12e0990717bc3e89a04256588dfd5'
+runtime='54b0d23146dfde7528c9e4db1aa92d12e662f883'
+manifest='7abf9a978084574b3ebe9fbe099d0f05eb1a39125b7d82c0216b142cae79c8bb'
+def load(path): return json.loads(path.read_bytes())
+def need(value,what):
+    if not value: raise AssertionError(what)
+def line(raw):
+    text=''
+    for ch in raw:
+        if ch=='\r':break
+        if ch=='\b':text=text[:-1]
+        else:text+=ch
+    return text
+# The strings above use ordinary control characters in the issued audit script.
+def canceled(p):
+    need(p['ReadReturned']==1 and p['ReadError']==995 and p['Text']=='' and p['ControlCount']==1 and p['ControlType']==0,'canceled read')
+    need(p['Trace']['ReadEntered']==1 and p['Trace']['Overflow']==0,'canceled trace')
+    need(sum(e['Kind']==5 and e['Detail']==1 for e in p['Trace']['Events'])==1,'single completed control handler')
+def next_read(p,text,events):
+    need(p['ReadReturned']==1 and p['ReadSucceeded']==1 and p['ReadError']==0 and p['Text']==text+'\r\n' and p['ControlCount']==events,'exact readback')
+rows=[]
+for d in sorted(root.iterdir()):
+    if not d.is_dir():continue
+    report=load(d/'report.json');machine=report['ComputerName']
+    need(report['RequestedChecks']==['US','HR','Session'] and report['SourceCommit']==harness and report['RuntimeSourceCommit']==runtime and report['ManifestSha256']==manifest,'collection identity')
+    need(all(s['Status']=='Pass' and s['ExitCode']==0 and s['CollectionStatus']=='Completed' and not s['Error'] for s in report['Steps']),'three completed steps')
+    inv=load(d/'evidence-files.json')['Files']
+    for f in inv:
+        data=(d/f['Path']).read_bytes();need(len(data)==f['Bytes'] and hashlib.sha256(data).hexdigest()==f['Sha256'],'raw inventory')
+    need(sum(p.is_file() for p in d.rglob('*'))==len(inv)+1,'complete inventory')
+    row={'Machine':machine,'RunId':d.name,'Files':len(inv)+1,'PowerShell':report['PowerShellVersion'],'CLR':report['CLRVersion'],'Layouts':{},'Backspaces':{},'KeyboardOperations':0,'HostLifetimes':0,'PhysicalWorkflows':3}
+    host_ids=set()
+    for profile in ['us','hr','session']:
+        n=d/profile;probe=load(n/'probe.json')
+        need(probe['Status']=='Pass' and not probe['SyntheticInputUsed'] and probe['ManualRevision']==2 and probe['SourceCommit']==harness and probe['RuntimeSourceCommit']==runtime,'native physical identity')
+        if profile in ['us','hr']:
+            expected='AZaz09[]{}\\|' if profile=='us' else '\u010d\u0107\u0111\u0161\u017e \u010c\u0106\u0110\u0160\u017d @[]{}\\|'
+            lang=1033 if profile=='us' else 1050
+            ready=load(n/'layout-ready.json');need(ready['Confirmed'] and ready['LayoutLanguage']==lang,'layout confirmed')
+            keys=load(n/'text-keys.json');need(line(keys['ForwardedUtf8'])==expected,'edited text sequence')
+            need(keys['ShiftObserved'] and (profile=='us' or keys['AltGrObserved']),'Shift and AltGr')
+            next_read(load(n/'text-read.json'),expected,0)
+            steps=['text','cancel','next','raw']+(['dead'] if profile=='hr' else [])
+            for step in steps:
+                k=load(n/(step+'-keys.json'))
+                need(k['Source']=='PhysicalConsoleInput' and not k['SyntheticInputUsed'] and k['Complete'] and k['AllTextUsedRequiredLayout'] and k['LayoutLanguage']==lang,'complete physical keys')
+                need(all((int(x['LayoutId'],16)&65535)==lang for x in k['Keys']),'recorded layout remains correct')
+                encoded=''
+                navigation={37:'\x1b[D',39:'\x1b[C',38:'\x1b[A',40:'\x1b[B',36:'\x1b[H',35:'\x1b[F',46:'\x1b[3~'}
+                for event in k['Keys']:
+                    if event['Down']:
+                        encoded+=(chr(event['Character']) if event['Character'] else navigation.get(event['VirtualKey'],''))*event['Repeat']
+                need(encoded==k['ForwardedUtf8'],'forwarded bytes match original key events and repeats')
+            row['Layouts'][profile]=sorted({x['LayoutId'] for x in keys['Keys']})
+            row['Backspaces'][profile]=keys['ForwardedUtf8'].count('\b')
+            if profile=='hr':
+                dead=load(n/'dead-keys.json')
+                need(any(x['Down'] and x['VirtualKey']==57 and x['Character']==0 and x['Modifiers']&1 and x['Modifiers']&12 for x in dead['Keys']),'actual AltGr+9 dead prefix')
+                need(any(x['Down'] and x['VirtualKey']==65 and x['Character']==225 for x in dead['Keys']),'actual composed a acute')
+                need(dead['ForwardedUtf8']=='\u00e1\r','one composed character')
+                next_read(load(n/'dead-read.json'),'\u00e1',0)
+            canceled(load(n/'canceled-read.json'))
+            need(load(n/'cancel-keys.json')['ForwardedUtf8']=='OLD\x03','physical cooked ETX')
+            next_read(load(n/'next-read.json'),'NEXT',1)
+            raw=load(n/'raw-read.json')
+            need(raw['ReadError']==0 and raw['ReadSucceeded']==1 and raw['ControlCount']==1 and raw['KeyCount']==3,'raw routing')
+            need([x['VirtualKey'] for x in raw['Keys']]==[17,67,90] and [x['Character'] for x in raw['Keys']]==[0,3,122],'raw Ctrl/C/z')
+            next_read(load(n/'session/next-read.json'),'NEXT_PROBE',1)
+            ui=(n/'ui-transcript.txt').read_text(encoding='utf-8')
+            need('Typed input (local preview): ' in ui and 'Backend returned: '+expected+'<CR><LF>' in ui,'preview and actual backend feedback')
+        else:
+            states=load(n/'transitions.json')['States'];need(len(states)==3 and states[0]['Eligible'] and not states[1]['Eligible'] and states[2]['Eligible'],'real three-stage transition')
+            need(all(x['CallerDesktop']=='Default' and x['WindowStation']=='WinSta0' and x['IntegrityRid']==8192 and x['SourceCommit']==harness for x in states),'ordinary caller retained')
+            need(states[1]['InputDesktopError']==5 and states[1]['InputDesktop']=='' and states[2]['InputDesktop']=='Default','input desktop inaccessible then returns')
+            need(not probe['DesktopSwitchedByTest'] and not probe['CallerThreadDesktopChangedBySmoke'],'no synthetic desktop change')
+            denial=load(n/'inactive-open.json');need(denial['Denied'] and denial['ErrorCode']==5,'startup refusal while locked')
+            pending=load(n/'pending-after-unlock.json');need(pending['ReadReturned']==0 and pending['ControlCount']==0,'pending line retained')
+            canceled(load(n/'cancel-after-unlock.json'));next_read(load(n/'existing/next-read.json'),'NEXT_PROBE',1)
+            canceled(load(n/'reopened/cancel-1.json'));next_read(load(n/'reopened/next-read.json'),'NEXT_PROBE',1)
+            row['ObservedInactiveMilliseconds']=int(states[2]['Tick'])-int(states[1]['Tick'])
+        active={};keys={}
+        need((n/'collector-errors.txt').stat().st_size==0,'collector errors')
+        for s in (n/'runtime-trace.jsonl').read_text(encoding='utf-8').splitlines():
+            r=json.loads(s);msg=r['message'];pid=r['pid']
+            need(r['api']=='1.1' and r['protocol']==2 and (r['commit']==runtime or r['commit']==harness and r['process']=='RuntimeCancellationTest.exe'),'trace source/API/protocol')
+            m=re.fullmatch(r'host-cancel ready host=(\d+) thread=(\d+) desktop=(VT7Pty-Console-[0-9a-f]{32})',msg)
+            if m:active[pid]=m.groups()
+            m=re.fullmatch(r'host-cancel (before|during|after) sequence=(\d+) keys=([0-9a-f]{512})',msg)
+            if m:keys.setdefault((pid,m[2]),{})[m[1]]=m[3]
+            need('outcome=unknown' not in msg,'no ambiguous delivery')
+        for k in keys.values():
+            need(set(k)=={'before','during','after'} and k['before']==k['after'],'complete 256-byte restoration')
+            b=bytearray.fromhex(k['before'])
+            for vk in [16,160,161,17,162,163,18,164,165,91,92]:b[vk]&=1
+            b[17]|=128;b[162]|=128
+            need(b.hex()==k['during'],'temporary Ctrl-only state')
+        need(len(keys)==(2 if profile=='session' else 1),'exact callback operation count')
+        row['KeyboardOperations']+=len(keys)
+        for f in n.rglob('lifetime.json'):
+            life=load(f);ident=load(f.parent/'identity.json');desk=load(f.parent/'desktop.json')
+            need(life['OwnedProcessesCleaned'] and life['HostExited'] and not life['Error'],'owned cleanup')
+            need(life['Host']==ident['HostProcessId'] and life['Agent']==ident['Fixture']['ParentId'] and life['Fixture']==ident['Fixture']['ProcessId'],'retained process association')
+            need(desk['ApplicationGuiOrdinary'] and desk['HostWindowPrivate'],'desktop isolation')
+            context=active[life['Agent']]
+            need(int(context[0])==life['Host'] and context[2]==desk['BackingDesktop'],'trace readiness association')
+            identity=(ident['HostProcessId'],ident['HostCreationTime']);need(identity not in host_ids,'distinct retained host lifetime');host_ids.add(identity)
+            row['HostLifetimes']+=1
+    need(row['HostLifetimes']==4 and row['KeyboardOperations']==4,'complete machine boundaries')
+    rows.append(row)
+need({r['Machine'] for r in rows}=={'NESSY','TURTLE','LEOPARD'},'complete three-machine matrix')
+result={'Kind':'H4ManualRawAudit','Status':'Pass','HarnessSourceCommit':harness,'RuntimeSourceCommit':runtime,'ManifestSha256':manifest,'PhysicalWorkflows':sum(r['PhysicalWorkflows'] for r in rows),'KeyboardOperations':sum(r['KeyboardOperations'] for r in rows),'HostLifetimes':sum(r['HostLifetimes'] for r in rows),'ForwardedBytesRecomputedFromKeys':True,'OriginalFiles':sum(r['Files'] for r in rows),'Rows':rows}
+(output/'raw-audit.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(result,ensure_ascii=True))

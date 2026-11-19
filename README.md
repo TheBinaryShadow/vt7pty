@@ -30,9 +30,10 @@ checks pass within the controlled research boundary. The opt-in
 close, with ordinary-desktop applications. The
 [rc4 Windows 7 review](docs/validation/2026-11-18-step-1.2-h4-runtime-rc4-windows7.md)
 verifies 345 runtime, 21 qualification and 90 regression cases, both full soaks
-on each machine, and the elevated-caller checks. Physical keyboard and lock/unlock
-checks remain open. The corrected [manual-only runner](docs/H4_MANUAL_CHECKS.md)
-is ready for those remaining checks on all three machines.
+on each machine, and the elevated-caller checks. The
+[manual Windows 7 review](docs/validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
+completes all nine keyboard and lock/unlock workflows. I accept H4 within its
+opt-in contract; the broader Milestone 1 fidelity work remains open.
 VT7 integration comes after the backend and its API are ready. VT7Pty does not
 yet replace ConPTY for unmodified applications. I am not planning a kernel driver.
 
