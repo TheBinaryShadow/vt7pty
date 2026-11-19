@@ -2,6 +2,111 @@
   "SchemaVersion": 1,
   "Files": [
     {
+      "Path": "ConsoleInput.cc.txt",
+      "Bytes": 32454,
+      "Sha256": "aaa36876ad1434d5bf5ac6117b93ec4740c989dee62d85bfeb8fa42d341462ee"
+    },
+    {
+      "Path": "ConsoleInput.h.txt",
+      "Bytes": 4397,
+      "Sha256": "6edaff2dca1411c98dc2be54f138ad2dc8d7319630a360de5d988e2bb810ffae"
+    },
+    {
+      "Path": "CursorReportFilter.h.txt",
+      "Bytes": 2608,
+      "Sha256": "fbba95c662ee505e7223ea30a5fdf543dbd96f8a503a5d67c3f6cdf0a0b92764"
+    },
+    {
+      "Path": "H4Cases.ps1.txt",
+      "Bytes": 1144,
+      "Sha256": "872f7de2ab9a2f4efee5b23532563a664fadac9ee64fac6783083b74ae3f2178"
+    },
+    {
+      "Path": "HostCancellationResearch.h.txt",
+      "Bytes": 46839,
+      "Sha256": "66a2bae7acfc22ae3c0a52634183441819bd2a433c23a48b9d2ef3b41e54b9bb"
+    },
+    {
+      "Path": "InputDecoderTests.h.txt",
+      "Bytes": 3463,
+      "Sha256": "35db47789dce689721920aa068864f944036bcfd922f80189b73f27b69cb4c0e"
+    },
+    {
+      "Path": "InputFidelityCases.h.txt",
+      "Bytes": 20687,
+      "Sha256": "a7891328904dcbea68a841bf7e09ce344ec46ff362be5e625060bf78564cdfee"
+    },
+    {
+      "Path": "InputFidelityFixture.h.txt",
+      "Bytes": 11364,
+      "Sha256": "af1b69be4a59569d645261529759bd30942bf05b7ef3b2c4cc0de48d73987977"
+    },
+    {
+      "Path": "Invoke-InputFidelity.ps1.txt",
+      "Bytes": 12501,
+      "Sha256": "fbde787bad167aede0c525e5924333eb8bb6145ceb0305195148f9703e29ec4c"
+    },
+    {
+      "Path": "NativeCapture.ps1.txt",
+      "Bytes": 3925,
+      "Sha256": "48d8f24ea254558afb96f1ded929613149ede96269c9c2e9286c5be6bcca4d20"
+    },
+    {
+      "Path": "Package-InputFidelity.ps1.txt",
+      "Bytes": 10926,
+      "Sha256": "ed526425357cd5e412880ef086131c45391aea56fe8d922e88b519eb8dfacb9f"
+    },
+    {
+      "Path": "Preserve-InputRc2Evidence.py.txt",
+      "Bytes": 5333,
+      "Sha256": "40a8482b6cdef68a671458ee89b0d26887862ab0f9b9d01ab00f2cc4ab177e92"
+    },
+    {
+      "Path": "Review-InputRc2Evidence.py.txt",
+      "Bytes": 5429,
+      "Sha256": "987961cd7e417b10b02500232ffc07320f4fdcfaa2a54c1bae79dfd3489d073c"
+    },
+    {
+      "Path": "Test-H4QualificationEvidence.ps1.txt",
+      "Bytes": 23191,
+      "Sha256": "717018d24dd86bdd952bd22b403bff1f60bd520263d42756e51aaad576c39cba"
+    },
+    {
+      "Path": "Test-H4RuntimeEvidence.ps1.txt",
+      "Bytes": 21522,
+      "Sha256": "70044aa6e843ca87c34a1f08638cfc32ad7316f5c508c1200734427a193ed594"
+    },
+    {
+      "Path": "Test-InputCandidateEvidence.ps1.txt",
+      "Bytes": 11542,
+      "Sha256": "794bc657cede35cc22c595f8d60e500622dc2aac50231962dcdc171c1ad16981"
+    },
+    {
+      "Path": "Test-InputEvidence.ps1.txt",
+      "Bytes": 22844,
+      "Sha256": "185ea264396426ae16afbc8164852fcb47f13e21d310c4457055e83730f51845"
+    },
+    {
+      "Path": "Test-InputRc2BundleControls.ps1.txt",
+      "Bytes": 4314,
+      "Sha256": "afaabc3d1d8683a157c38f1c7a6baf337f65f9a22da615200116f80e8e776ff5"
+    },
+    {
+      "Path": "Test-InputReviewer.ps1.txt",
+      "Bytes": 6384,
+      "Sha256": "3f55b344faa70366bb9c31ac026685bf1ae56f8b435ae28a1a7fc5ee76b00485"
+    },
+    {
+      "Path": "UnicodeEncoding.h.txt",
+      "Bytes": 6838,
+      "Sha256": "b9fb6fa746fa86ce25ddf79420a6e4e395a712131bc6b103f4d2de9f57d36d85"
+    },
+    {
+      "Path": "Windows7Compat.ps1.txt",
+      "Bytes": 3716,
+      "Sha256": "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+    },
+    {
       "Path": "build-and-pe-verification.zip",
       "Bytes": 9747801,
       "Sha256": "de5b8bc12c1c25a7f4d7ea571646407b08e42f1d574d9a799067694203cd9abf"
@@ -20,21 +125,6 @@
       "Path": "cases.json.txt",
       "Bytes": 11236,
       "Sha256": "874b647f79ab73e1fb5677dd536428fe3a293e51c2a6a868863e516c58798788"
-    },
-    {
-      "Path": "ConsoleInput.cc.txt",
-      "Bytes": 32454,
-      "Sha256": "aaa36876ad1434d5bf5ac6117b93ec4740c989dee62d85bfeb8fa42d341462ee"
-    },
-    {
-      "Path": "ConsoleInput.h.txt",
-      "Bytes": 4397,
-      "Sha256": "6edaff2dca1411c98dc2be54f138ad2dc8d7319630a360de5d988e2bb810ffae"
-    },
-    {
-      "Path": "CursorReportFilter.h.txt",
-      "Bytes": 2608,
-      "Sha256": "fbba95c662ee505e7223ea30a5fdf543dbd96f8a503a5d67c3f6cdf0a0b92764"
     },
     {
       "Path": "debug-native-reviewer-controls.json",
@@ -67,19 +157,14 @@
       "Sha256": "e875c2839b3389f210c3221d6c8ac3c62780366b23032435f059fd4f15aae9f4"
     },
     {
-      "Path": "H4Cases.ps1.txt",
-      "Bytes": 1144,
-      "Sha256": "872f7de2ab9a2f4efee5b23532563a664fadac9ee64fac6783083b74ae3f2178"
-    },
-    {
-      "Path": "HostCancellationResearch.h.txt",
-      "Bytes": 46839,
-      "Sha256": "66a2bae7acfc22ae3c0a52634183441819bd2a433c23a48b9d2ef3b41e54b9bb"
-    },
-    {
       "Path": "input-rc2-debug-reviewer-controls-extended.txt",
       "Bytes": 475,
       "Sha256": "d3aa86f94487ce4a8d22512daa6978f79ad667225895e597e8f3ce917f966170"
+    },
+    {
+      "Path": "input-rc2-delivery-verified.json",
+      "Bytes": 888,
+      "Sha256": "e2bf417e9a01d5c9d23442994578bf7a7b0c7302cf163edfd53a6c77a4440643"
     },
     {
       "Path": "input-rc2-exact-audit.json",
@@ -157,36 +242,6 @@
       "Sha256": "2defb3c1643e31cb5a8a9e0b3924e2d9031c4ddd6fec10d9737f51abf5633766"
     },
     {
-      "Path": "InputDecoderTests.h.txt",
-      "Bytes": 3463,
-      "Sha256": "35db47789dce689721920aa068864f944036bcfd922f80189b73f27b69cb4c0e"
-    },
-    {
-      "Path": "InputFidelityCases.h.txt",
-      "Bytes": 20687,
-      "Sha256": "a7891328904dcbea68a841bf7e09ce344ec46ff362be5e625060bf78564cdfee"
-    },
-    {
-      "Path": "InputFidelityFixture.h.txt",
-      "Bytes": 11364,
-      "Sha256": "af1b69be4a59569d645261529759bd30942bf05b7ef3b2c4cc0de48d73987977"
-    },
-    {
-      "Path": "Invoke-InputFidelity.ps1.txt",
-      "Bytes": 12501,
-      "Sha256": "fbde787bad167aede0c525e5924333eb8bb6145ceb0305195148f9703e29ec4c"
-    },
-    {
-      "Path": "NativeCapture.ps1.txt",
-      "Bytes": 3925,
-      "Sha256": "48d8f24ea254558afb96f1ded929613149ede96269c9c2e9286c5be6bcca4d20"
-    },
-    {
-      "Path": "Package-InputFidelity.ps1.txt",
-      "Bytes": 10926,
-      "Sha256": "ed526425357cd5e412880ef086131c45391aea56fe8d922e88b519eb8dfacb9f"
-    },
-    {
       "Path": "package-manifest.json",
       "Bytes": 13163,
       "Sha256": "e66b761b06c4c99fb885dcfe1862537cd9fb3dd577365569668639ccd09f7517"
@@ -207,11 +262,6 @@
       "Sha256": "374ed98190741137cf2b2708845d5ba847102ddcfac6a510c25333223d8cd065"
     },
     {
-      "Path": "Preserve-InputRc2Evidence.py.txt",
-      "Bytes": 5333,
-      "Sha256": "40a8482b6cdef68a671458ee89b0d26887862ab0f9b9d01ab00f2cc4ab177e92"
-    },
-    {
       "Path": "reference-manifest.json",
       "Bytes": 15431,
       "Sha256": "4edbdacedd8faa1ad888a3dd6ca61d1badd805eef0959d62f4f7b737c1165041"
@@ -225,51 +275,6 @@
       "Path": "review-decision.json",
       "Bytes": 1269,
       "Sha256": "a616f9062b78d9ae2fed6211038ee8f774297a0ef8400eb7e5edce810c4c43b4"
-    },
-    {
-      "Path": "Review-InputRc2Evidence.py.txt",
-      "Bytes": 5429,
-      "Sha256": "987961cd7e417b10b02500232ffc07320f4fdcfaa2a54c1bae79dfd3489d073c"
-    },
-    {
-      "Path": "Test-H4QualificationEvidence.ps1.txt",
-      "Bytes": 23191,
-      "Sha256": "717018d24dd86bdd952bd22b403bff1f60bd520263d42756e51aaad576c39cba"
-    },
-    {
-      "Path": "Test-H4RuntimeEvidence.ps1.txt",
-      "Bytes": 21522,
-      "Sha256": "70044aa6e843ca87c34a1f08638cfc32ad7316f5c508c1200734427a193ed594"
-    },
-    {
-      "Path": "Test-InputCandidateEvidence.ps1.txt",
-      "Bytes": 11542,
-      "Sha256": "794bc657cede35cc22c595f8d60e500622dc2aac50231962dcdc171c1ad16981"
-    },
-    {
-      "Path": "Test-InputEvidence.ps1.txt",
-      "Bytes": 22844,
-      "Sha256": "185ea264396426ae16afbc8164852fcb47f13e21d310c4457055e83730f51845"
-    },
-    {
-      "Path": "Test-InputRc2BundleControls.ps1.txt",
-      "Bytes": 4314,
-      "Sha256": "afaabc3d1d8683a157c38f1c7a6baf337f65f9a22da615200116f80e8e776ff5"
-    },
-    {
-      "Path": "Test-InputReviewer.ps1.txt",
-      "Bytes": 6384,
-      "Sha256": "3f55b344faa70366bb9c31ac026685bf1ae56f8b435ae28a1a7fc5ee76b00485"
-    },
-    {
-      "Path": "UnicodeEncoding.h.txt",
-      "Bytes": 6838,
-      "Sha256": "b9fb6fa746fa86ce25ddf79420a6e4e395a712131bc6b103f4d2de9f57d36d85"
-    },
-    {
-      "Path": "Windows7Compat.ps1.txt",
-      "Bytes": 3716,
-      "Sha256": "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
     }
   ]
 }
