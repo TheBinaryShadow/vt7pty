@@ -74,9 +74,12 @@ std::string physicalBytes(const KEY_EVENT_RECORD &key){
     switch(key.wVirtualKeyCode){case VK_INSERT:return "\x1b[2~";case VK_PRIOR:return "\x1b[5~";case VK_NEXT:return "\x1b[6~";default:return keyBytes(key);}
 }
 void sendOwnConsoleKey(HANDLE input,WORD vk,wchar_t ch=0){
-    INPUT_RECORD record={};record.EventType=KEY_EVENT;record.Event.KeyEvent.bKeyDown=TRUE;record.Event.KeyEvent.wRepeatCount=1;
-    record.Event.KeyEvent.wVirtualKeyCode=vk;record.Event.KeyEvent.uChar.UnicodeChar=ch;DWORD count=0;
-    check(WriteConsoleInputW(input,&record,1,&count)&&count==1,"owned synthetic console input");
+    INPUT_RECORD records[2]={};records[0].EventType=KEY_EVENT;auto &key=records[0].Event.KeyEvent;
+    key.bKeyDown=TRUE;key.wRepeatCount=1;key.wVirtualKeyCode=vk;key.uChar.UnicodeChar=ch;
+    key.wVirtualScanCode=static_cast<WORD>(MapVirtualKeyW(vk,MAPVK_VK_TO_VSC));
+    if(vk==VK_LEFT||vk==VK_RIGHT||vk==VK_UP||vk==VK_DOWN||vk==VK_END)key.dwControlKeyState=ENHANCED_KEY;
+    records[1]=records[0];records[1].Event.KeyEvent.bKeyDown=FALSE;DWORD count=0;
+    check(WriteConsoleInputW(input,records,2,&count)&&count==2,"owned synthetic console input");
 }
 int manual(const std::wstring &out,bool pwsh,bool synthetic=false){
     outRoot=out;check(CreateDirectoryW(out.c_str(),nullptr),"new ordinary profile result");rootEvidenceCreated=true;
@@ -87,7 +90,7 @@ int manual(const std::wstring &out,bool pwsh,bool synthetic=false){
     std::string resizeRows="[",stageRows="[";
     try{
         auto &s=context.start();Shell shell(context,{pwsh?"ordinary-pwsh":"ordinary-wps",pwsh,false},true,synthetic);
-        View view;std::pair<int,int> previous={80,25};bool helpers=false;
+        View view;std::pair<int,int> previous={80,25};bool helpers=false,smokeCheckpointQueued=false;
         auto verify=[&]{
             check(stage<8,"all profile checkpoints already recorded");
             if(!helpers){const auto code=flattened(probeSource(context.out,shell.nonce,false));check(code.size()<7900,"bounded interactive helper definition");s.input(utf8(code+L"\r"));helpers=true;}
@@ -106,9 +109,9 @@ int manual(const std::wstring &out,bool pwsh,bool synthetic=false){
             if(stage==0)check(number(snapshot,"StartupErrorCount")==0,"ordinary startup errors need review");
             if(stageRows.size()>1)stageRows+=',';
             stageRows+="{\"Stage\":"+std::to_string(stage)+",\"Confirmed\":true,\"Source\":"+json(synthetic?"OwnedConsoleSyntheticSmoke":"PhysicalConsoleInput")+"}";
-            checkpoints.push_back(physical);physical={};++stage;
+            checkpoints.push_back(physical);physical={};smokeCheckpointQueued=false;++stage;
         };
-        const auto deadline=GetTickCount64()+1500000;unsigned smokePhase=0;ULONGLONG smokeNext=0;
+        const auto deadline=GetTickCount64()+1500000;unsigned smokePhase=0;ULONGLONG smokeNext=0;bool smokeChildInterrupted=false;
         while(GetTickCount64()<deadline && WaitForSingleObject(s.descendant.value,0)==WAIT_TIMEOUT){
             s.pump();const auto dimensions=view.size();const auto backend=std::pair<int,int>{std::clamp(dimensions.first,20,160),std::clamp(dimensions.second-6,10,54)};
             if(backend!=previous){
@@ -120,17 +123,36 @@ int manual(const std::wstring &out,bool pwsh,bool synthetic=false){
             if(synthetic && GetTickCount64()>=smokeNext){
                 // Smoke uses the same renderer, probe, key loop and checks. It
                 // never loads user profiles and cannot qualify a manual run.
-                if(stage==0){if(!s.state.contains(U"SMOKE[")){Sleep(10);continue;}sendOwnConsoleKey(view.input,VK_F8);smokeNext=GetTickCount64()+150;}
-                else if(stage==1 && smokePhase<1){s.input(utf8(shell.checkName()+L" Editing 'EDIT \u010d\u0107\u0111\u0161\u017e'\r"));physical[VK_BACK]=physical[VK_LEFT]=physical[VK_END]=1;smokePhase=1;smokeNext=GetTickCount64()+300;}
-                else if(stage==2 && smokePhase<2){s.input(utf8(shell.checkName()+L" History 'HISTORY_OK'\r"+shell.checkName()+L" History 'HISTORY_OK'\r"));physical[VK_UP]=1;smokePhase=2;smokeNext=GetTickCount64()+300;}
-                else if(stage==3 && smokePhase<3){s.input(utf8(L"VT7PtyProfileComplete_"+wide(shell.nonce)+L"\r"));physical[VK_TAB]=1;smokePhase=3;smokeNext=GetTickCount64()+300;}
-                else if(stage==4 && smokePhase<4){s.input(utf8(shell.checkName()+L" Multiline @'\rfirst\u010d\rsecond\u017e\r'@\r\r"));smokePhase=4;smokeNext=GetTickCount64()+500;}
-                else if(stage==5 && smokePhase<5){s.input(utf8(starter(shell,stage)));s.pump();Sleep(100);s.input("\x03");smokePhase=5;smokeNext=GetTickCount64()+300;}
-                else if(stage==6 && smokePhase<6){s.input(utf8(starter(shell,stage)+L"\r"));smokePhase=6;smokeNext=GetTickCount64()+300;}
-                else if(stage==6 && shell.nativeChild.value!=INVALID_HANDLE_VALUE && WaitForSingleObject(shell.nativeChild.value,0)==WAIT_TIMEOUT){s.input("\x03");smokeNext=GetTickCount64()+300;}
-                else if(stage==7 && smokePhase<7){SMALL_RECT window={0,0,95,32};check(SetConsoleWindowInfo(view.output.value,TRUE,&window),"owned smoke resize");s.input(utf8(starter(shell,stage)+L"\r"));smokePhase=7;smokeNext=GetTickCount64()+300;}
+                if(stage==0){if(!s.state.contains(U"SMOKE[")){Sleep(10);continue;}if(!smokeCheckpointQueued){sendOwnConsoleKey(view.input,VK_F8);smokeCheckpointQueued=true;}smokeNext=GetTickCount64()+150;}
+                else if(stage==1 && smokePhase<1){
+                    sendOwnConsoleKey(view.input,VK_F2);for(int n=0;n<8;++n)sendOwnConsoleKey(view.input,VK_LEFT);
+                    sendOwnConsoleKey(view.input,VK_BACK,L'\b');sendOwnConsoleKey(view.input,'I',L'I');sendOwnConsoleKey(view.input,VK_END);sendOwnConsoleKey(view.input,VK_RETURN,L'\r');
+                    smokePhase=1;smokeNext=GetTickCount64()+500;
+                }
+                else if(stage==2 && smokePhase<2){
+                    sendOwnConsoleKey(view.input,VK_F2);sendOwnConsoleKey(view.input,VK_RETURN,L'\r');sendOwnConsoleKey(view.input,VK_UP);sendOwnConsoleKey(view.input,VK_RETURN,L'\r');
+                    smokePhase=2;smokeNext=GetTickCount64()+500;
+                }
+                else if(stage==3 && smokePhase<3){
+                    sendOwnConsoleKey(view.input,VK_F2);sendOwnConsoleKey(view.input,VK_TAB,L'\t');sendOwnConsoleKey(view.input,VK_RETURN,L'\r');smokePhase=3;smokeNext=GetTickCount64()+500;
+                }
+                else if(stage==4 && smokePhase<4){
+                    sendOwnConsoleKey(view.input,VK_F2);sendOwnConsoleKey(view.input,VK_RETURN,L'\r');
+                    for(const auto ch:std::wstring(L"first\u010d\rsecond\u017e\r'@\r\r"))sendOwnConsoleKey(view.input,ch==L'\r'?VK_RETURN:0,ch);
+                    smokePhase=4;smokeNext=GetTickCount64()+700;
+                }
+                else if(stage==5 && smokePhase<5){sendOwnConsoleKey(view.input,VK_F2);smokePhase=5;smokeNext=GetTickCount64()+150;}
+                else if(stage==5 && !physical['C']){sendOwnConsoleKey(view.input,'C',3);smokeNext=GetTickCount64()+500;}
+                else if(stage==6 && smokePhase<6){sendOwnConsoleKey(view.input,VK_F2);sendOwnConsoleKey(view.input,VK_RETURN,L'\r');smokePhase=6;smokeNext=GetTickCount64()+300;}
+                else if(stage==6 && shell.nativeChild.value==INVALID_HANDLE_VALUE){smokeNext=GetTickCount64()+50;}
+                else if(stage==6 && !smokeChildInterrupted){sendOwnConsoleKey(view.input,'C',3);smokeChildInterrupted=true;smokeNext=GetTickCount64()+300;}
+                else if(stage==6 && WaitForSingleObject(shell.nativeChild.value,0)==WAIT_TIMEOUT){smokeNext=GetTickCount64()+50;}
+                else if(stage==7 && smokePhase<7){
+                    SMALL_RECT window={0,0,95,32};check(SetConsoleWindowInfo(view.output.value,TRUE,&window),"owned smoke resize");
+                    sendOwnConsoleKey(view.input,VK_F2);sendOwnConsoleKey(view.input,VK_RETURN,L'\r');smokePhase=7;smokeNext=GetTickCount64()+500;
+                }
                 else if(stage==8){s.input("exit 37\r");smokeNext=GetTickCount64()+1000;}
-                else{sendOwnConsoleKey(view.input,VK_F8);smokeNext=GetTickCount64()+150;}
+                else{if(!smokeCheckpointQueued){sendOwnConsoleKey(view.input,VK_F8);smokeCheckpointQueued=true;}smokeNext=GetTickCount64()+150;}
             }
             if(WaitForSingleObject(view.input,25)!=WAIT_OBJECT_0)continue;
             INPUT_RECORD record={};DWORD read=0;check(ReadConsoleInputW(view.input,&record,1,&read)&&read==1,"ordinary profile physical input");

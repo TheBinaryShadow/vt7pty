@@ -42,7 +42,7 @@ std::wstring engine(bool pwsh) {
     wchar_t system[MAX_PATH]={};check(GetSystemDirectoryW(system,MAX_PATH)>0,"profile system directory");
     return std::wstring(system)+L"\\WindowsPowerShell\\v1.0\\powershell.exe";
 }
-std::wstring currentExe(){wchar_t path[32768]={};check(GetModuleFileNameW(nullptr,path,32768)>0,"profile harness path");return path;}
+std::wstring currentExe(){std::wstring path(32768,0);const auto length=GetModuleFileNameW(nullptr,path.data(),static_cast<DWORD>(path.size()));check(length>0&&length<path.size(),"profile harness path");path.resize(length);return path;}
 std::wstring probeSource(const std::wstring &out,const std::string &nonce,bool controlled=true) {
     auto result=wide(fileText(guardEnvironment(L"VT7PTY_PROFILE_PROBE_SOURCE")));
     for(const auto &pair:std::vector<std::pair<std::wstring,std::wstring>>{{L"__CONTROLLED__",controlled?L"$true":L"$false"},{L"__ROOT__",psLiteral(out)},{L"__NONCE__",psLiteral(wide(nonce))},{L"__EXE__",psLiteral(currentExe())},
@@ -110,6 +110,7 @@ struct Shell {
             std::wstring boot=L"";
             if(spec.pwsh){const auto module=exe.substr(0,exe.find_last_of(L'\\'))+L"\\Modules\\PSReadLine\\PSReadLine.psd1";
                 boot=L"Import-Module "+psLiteral(module)+L";Set-PSReadLineOption -HistorySaveStyle SaveNothing -HistorySavePath "+psLiteral(c.out+L"\\smoke-history.txt")+L" -PredictionSource None;";}
+            if(!spec.pwsh)boot+=L"if(Get-Module -ListAvailable PSReadLine){Import-Module PSReadLine -ErrorAction Stop;Set-PSReadLineOption -HistorySaveStyle SaveNothing -HistorySavePath "+psLiteral(c.out+L"\\smoke-history.txt")+L" -EditMode Windows};";
             boot+=L"$global:VT7PtyProfileSerial=0;function global:prompt { $global:VT7PtyProfileSerial++; 'SMOKE['+$global:VT7PtyProfileSerial.ToString()+']>' }";
             line+=L" -NoProfile -NoExit -EncodedCommand "+encoded(boot);
         }
