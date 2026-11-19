@@ -1,12 +1,16 @@
 # Step 1.2 input tests
 
-I use input rc2 to qualify the UTF-8 decoder and cursor-reply framing fixes
-against the [rc1 Windows 7 failures](validation/2026-11-19-step-1.2-input-rc1-windows7.md).
-The candidate rebuilds the runtime. API 1.1, protocol 2 and the accepted H4
-cancellation contract stay the same; the changed runtime needs its own
-Windows 7 results. Step 1.2 remains open. The [exact rc2 review](validation/2026-11-19-step-1.2-input-rc2-candidate.md)
-records 129/129 input and 123/123 H4 guards passing locally, with focused
-qualification and regression checks.
+I qualified the UTF-8 decoder and cursor-reply framing fixes in input rc2 on
+all three Windows 7 tiers. The [Windows 7 review](validation/2026-11-19-step-1.2-input-rc2-windows7.md)
+verifies 387/387 input cases, 345/345 H4 guards, 21 lifetime/fault guards and
+42 regressions. All three collections are complete; no rerun is needed.
+The frozen rc1 reference retains its original three failures on each machine.
+
+API 1.1, protocol 2 and the H4 cancellation contract stay the same. The
+[issuance review](validation/2026-11-19-step-1.2-input-rc2-candidate.md) records
+local qualification and the exact archive. Step 1.2 remains open for its
+remaining coverage and recorded limitations. The commands below reproduce
+this accepted decoder matrix; they are not a request for another run.
 
 ## Run on the Windows 7 machines
 
@@ -113,5 +117,5 @@ Test-InputEvidence.ps1 recomputes each native input outcome from the golden
 recipes, records, readbacks and lifetimes. Test-InputCandidateEvidence.ps1 checks
 the complete rc2 collection, reference failures, H4 regressions, prerequisites
 and inventories. Test-InputReviewer.ps1 rejects altered evidence and false
-capability or acceptance claims. Local validation and the final archive identity
-are recorded in the validation index before I send the package for Windows 7.
+capability or acceptance claims. Local qualification, the exact archive and the completed Windows 7 review
+are recorded in the validation index.

@@ -1,0 +1,57 @@
+{
+  "Kind": "InputRc2Windows7Decision",
+  "SchemaVersion": 1,
+  "Status": "Windows7InputDecoderQualified",
+  "RuntimeSourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "HarnessSourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "ReviewerSourceCommit": "7f92b00a1d50bec71a7493e9e8aac0931c8b1cbd",
+  "ArchiveSha256": "93d1a1b290d796124b143d490181a861d6224bc61f36ca1cbe46113585a57fb5",
+  "ManifestSha256": "e66b761b06c4c99fb885dcfe1862537cd9fb3dd577365569668639ccd09f7517",
+  "Runtime": "0.5.1-dev",
+  "Api": "1.1",
+  "Protocol": 2,
+  "CandidateInputPassed": 387,
+  "CandidateH4Passed": 345,
+  "QualificationPassed": 21,
+  "RegressionPassed": 42,
+  "ReferenceOutcome": "Fail",
+  "ReferencePassed": 90,
+  "ReferenceTotal": 99,
+  "ReferenceFailedCasesRetained": 9,
+  "HostLifetimes": 900,
+  "KeyboardOperations": 372,
+  "OriginalFiles": 9120,
+  "Archives": [
+    {
+      "Archive": "esu-input-20261119-171316-c9275859.zip",
+      "Files": 3126,
+      "Bytes": 1880387,
+      "Sha256": "8aeee95ca91824223871b5824bd235fef5175a13c81069fa30185a85c58d5906"
+    },
+    {
+      "Archive": "legacy-input-20261119-171238-e4ee4ccb.zip",
+      "Files": 2868,
+      "Bytes": 1735425,
+      "Sha256": "2f6d6b992c6322bbc4bb08c36e4efac3eff0046646f2bb73cc4f7da2d5756712"
+    },
+    {
+      "Archive": "nonesu-input-20261119-171212-f8578f4c.zip",
+      "Files": 3126,
+      "Bytes": 1906521,
+      "Sha256": "a2f6a8f1504ad14d324fc157c7b421846727561655a8049584f662ef789d61de"
+    }
+  ],
+  "InputDecoderMatrixQualified": true,
+  "H4RegressionGatePassed": true,
+  "Step12Accepted": false,
+  "MilestoneAccepted": false,
+  "CtrlBreakTransport": "Unsupported",
+  "NativeBreakReferenceOnly": true,
+  "NativeBreakReferencesPassed": 24,
+  "OrdinaryUserProfiles": "NotRun",
+  "NoRerunRequired": true,
+  "RemainingInputContractLimits": [
+    "Standalone Escape uses the one-second fallback",
+    "Cursor report and modified-F3 ambiguity remains in the byte input interface"
+  ]
+}

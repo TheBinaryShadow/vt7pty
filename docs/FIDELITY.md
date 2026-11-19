@@ -48,8 +48,9 @@ The accepted [H4 opt-in path](H4_RUNTIME.md) resolves its qualified cancellation
 workflows. The [input rc1 review](validation/2026-11-19-step-1.2-input-rc1-windows7.md)
 verifies 345 frozen guards and 270/297 new input observations on Windows 7,
 including editing, fragmentation and mouse records. Three stream failures
-are confirmed. The [input rc2 candidate](INPUT_FIDELITY.md) corrects those paths
-and adds 10 regressions, pending Windows 7 qualification. The missing public
+are confirmed. The [input rc2 review](validation/2026-11-19-step-1.2-input-rc2-windows7.md)
+qualifies the corrections and 10 added cases: all 387 input observations, 345
+H4 guards, 21 lifetime/fault guards and 42 regressions pass. The missing public
 Break transport and ordinary-profile matrix retain their explicit status.
 I keep the original 30-case regression suite and broader corpus requirements.
 

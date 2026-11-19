@@ -3,11 +3,11 @@
 Updated: 2026-11-19.
 
 I've completed Milestone 0 and published 0.5.0. H3 and the opt-in H4 runtime
-are accepted within their recorded boundaries. **Next: qualify the input decoder
-and cursor-reply fixes on Windows 7.** Input rc1 confirmed the same three stream
-failures on all three tiers. I have implemented corrections and expanded the
-[automated input suite](docs/INPUT_FIDELITY.md); the changed runtime still needs
-its Windows 7 results. Step 1.2 and VT7 integration remain open.
+are accepted within their recorded boundaries. The [input rc2 review](docs/validation/2026-11-19-step-1.2-input-rc2-windows7.md)
+qualifies the decoder/framing fixes on all three Windows 7 tiers, with 387/387
+input cases and 345/345 H4 guards passing. **Next: finish the remaining Step 1.2
+input coverage**, including the ordinary-profile matrix. The public Break gap
+and input/reply contract limits remain explicit. VT7 integration stays open.
 
 I check an item only when its stated work and required tests are complete.
 Partial implementations stay unchecked. A local pass does not replace a required
@@ -110,17 +110,16 @@ public-API experiments failed. I'm now following the
   completes all nine physical keyboard and lock/unlock workflows, with 12
   restored keyboard operations and 12 cleaned session lifetimes. Broader input
   fidelity remains below; descendant/job policy remains in Step 1.5.
-- [ ] Resolve measured F01-F03 failures in prompt cancellation, child interrupts,
-  processed/unprocessed input, editing, modifiers, text and paste.
-- [ ] Extend focused regressions for the remaining input workflows, carrying
-  forward the qualified US-language and Croatian keyboard results.
-  The [input rc1 review](docs/validation/2026-11-19-step-1.2-input-rc1-windows7.md)
-  verifies 345/345 frozen H4 guards and 270/297 new input observations across
-  all three Windows 7 tiers. Three fragmented-input failures recur in every
-  repetition. The [input rc2 candidate](docs/INPUT_FIDELITY.md) corrects those
-  paths and adds 10 regressions; its Windows 7 matrix is pending. All 18 native Break
-  references pass, while public Ctrl+Break transport stays unsupported by
-  explicit decision. Step 1.2 remains open.
+- [x] Correct the measured UTF-8 and cursor-reply fragmentation failures and
+  qualify the fixes on all three Windows 7 tiers. The
+  [rc2 review](docs/validation/2026-11-19-step-1.2-input-rc2-windows7.md) verifies
+  387/387 input cases, 345/345 H4 guards, 21 lifetime/fault guards and 42
+  regressions. The unchanged rc1 reference retains its three failures per machine.
+- [ ] Complete the remaining F01-F03 input coverage, including ordinary-user
+  profiles, and record the final Step 1.2 scope. Public Ctrl+Break transport
+  remains unsupported by explicit decision; all 24 native references in rc2
+  pass. Escape latency and cursor-report/F3 ambiguity remain documented for
+  the Milestone 2 input contract. Step 1.2 stays open.
 
 I'll complete this step when the defined input workflows pass without duplicate
 or lost input, incorrect child interruption, or a broken shell after cancellation.

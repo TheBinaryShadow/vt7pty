@@ -1,0 +1,95 @@
+from pathlib import Path
+import json,collections,hashlib,subprocess
+root=Path(__file__).resolve().parents[2]
+snapshot=root/'artifacts/fidelity/input-rc2-windows7-returned-2026-11-19'
+audit=root/'artifacts/fidelity/input-rc2-windows7-audit-2026-11-19'
+source='0ca6e3fa78481cd4df35820b9fe3988f46e0bff4'
+def read(p):return json.loads(p.read_bytes())
+def keys(p):
+ out=[]
+ for k in p['Records']:
+  if k['Type']==1 and k['Down'] and k['VirtualKey'] not in (16,17,18) and k['Character']!=57344:out.extend([k]*k['Repeat'])
+ return out
+def text(p):return ''.join(chr(k['Character']) for k in keys(p)).encode('utf-16-le','surrogatepass').decode('utf-16-le')
+expected_text={'utf8-timeout-fragment':'\u010dz','utf8-live-replies':'A\u010d\u20ac\U0001f642Z',
+ 'utf8-timeout-three':'\u20acz','utf8-timeout-four':'\U0001f642z','utf8-malformed-recovery':'z'*8,
+ 'utf8-malformed-bytewise':'z'*8,'escape-alone-live':'\x1b','escape-alone-no-reply':'\x1b',
+ 'alt-unicode-timeout':'\u010dz','alt-unicode-live-replies':'\u010dz','utf8-fragmented-replies':'A\u010d\u20ac\U0001f642Z'}
+totals=collections.Counter();machines=[]
+for run in sorted(snapshot.iterdir()):
+ r=read(run/'report.json');review=read(audit/(run.name+'.json'))
+ assert r['Runtime']['SourceCommit']==source and review['CandidateOutcome']=='Pass' and review['ReferenceOutcome']=='Fail'
+ assert review['CollectionStatus']=='Completed' and review['InputFailures']==0
+ h4=sum(x['Review']['Cases'] for x in review['Reviews'] if x['Role']=='Guard')
+ hosts=sum(x['Review'].get('HostLifetimes',x['Review'].get('Sessions',0)) for x in review['Reviews'])+review['Qualification']['Sessions']
+ keyboards=sum(x['Review']['KeyboardOperations'] for x in review['Reviews'])+review['Qualification']['KeyboardOperations']
+ totals.update(InputPassed=129,H4Passed=h4,QualificationPassed=7,RegressionPassed=14,ReferencePassed=30,ReferenceTotal=33,
+  HostLifetimes=hosts,KeyboardOperations=keyboards,Files=len(list(p for p in run.rglob('*') if p.is_file())))
+ repetitions=[];reference={}
+ for t in r['Trials']:
+  assert t['CollectionStatus']=='Completed' and not t['TimedOut'] and not t['Error']
+  native=run/t['Directory']/'native'
+  if t['Role']=='Guard':continue
+  cases=read(native/'cases.json')['Cases']
+  if t['Role']=='Reference':
+   failed=[c['Case'] for c in cases if not c['Passed']]
+   assert failed==['utf8-timeout-fragment','utf8-live-replies','escape-live-replies']
+   assert text(read(native/'utf8-timeout-fragment/input-observed.json'))=='z'
+   assert text(read(native/'utf8-live-replies/input-observed.json'))=='A[1;1R\u20ac\U0001f642Z'
+   nav=text(read(native/'escape-live-replies/input-observed.json'))
+   assert nav=='\x1b[D\x1b[C\x1b[A\x1b[B\x1b[H\x1b[F\x1b[3~\x1b[2~\x1b[5~\x1b[6~z'
+   assert len(keys(read(native/'escape-live-replies/input-observed.json')))==35
+   reference=dict(FailedCases=failed,Delayed='z',Live='A[1;1R\u20ac\U0001f642Z',NavigationRecords=35)
+   totals['NativeBreakReferencesPassed']+=2
+   continue
+  assert len(cases)==43 and all(c['Passed'] and c['OwnedProcessesCleaned'] and c['HostExited'] and not c['Error'] for c in cases)
+  identities={c['Case']:read(native/c['Case']/'identity.json') for c in cases}
+  agents=collections.Counter(x['Fixture']['ParentId'] for x in identities.values())
+  trace=[json.loads(line) for line in (native/'runtime-trace.jsonl').read_bytes().splitlines()]
+  assert (native/'collector-errors.txt').stat().st_size==0
+  focused=[]
+  for name,want in expected_text.items():
+   packet=read(native/name/'input-observed.json');assert text(packet)==want,(run.name,t['Order'],name,text(packet))
+   replies=read(native/name/'terminal-replies.json')
+   assert ''.join(replies['ReplyHex'])==''.join(replies['WriteHex'])
+   if name=='escape-alone-live':assert len(replies['ReplyHex'])==1
+   if 'fragmented-replies' in name:assert replies['ReplyHex'] and all(len(x)==2 for x in replies['WriteHex'])
+   pid=identities[name]['Fixture']['ParentId']
+   count=sum(x['pid']==pid and x['process']=='VT7Pty-Agent.exe' and 'Incomplete UTF-8 character' in x['message'] for x in trace)
+   focused.append(dict(Case=name,Text=want,ReplyCount=len(replies['ReplyHex']),ReplyWriteCount=len(replies['WriteHex']),
+    IncompleteUtf8TraceCount=count,AgentPidReused=(agents[pid]!=1)))
+  for name in ['escape-live-replies','escape-fragmented-replies']:
+   actual=keys(read(native/name/'input-observed.json'))
+   assert [k['VirtualKey'] for k in actual]==[37,39,38,40,36,35,46,45,33,34,90]
+   assert all(k['Character']==0 and k['Modifiers']==256 for k in actual[:10])
+   assert actual[-1]['Character']==122 and actual[-1]['Modifiers']==0
+   replies=read(native/name/'terminal-replies.json');assert replies['ReplyHex']
+   assert ''.join(replies['ReplyHex'])==''.join(replies['WriteHex'])
+   if 'fragmented-replies' in name:assert all(len(x)==2 for x in replies['WriteHex'])
+   focused.append(dict(Case=name,SignificantKeys=len(actual),ReplyCount=len(replies['ReplyHex']),ReplyWriteCount=len(replies['WriteHex'])))
+  for name in ['native-break-processed','native-break-unprocessed']:
+   b=read(native/name/'input-observed.json');br=b['Reference']
+   assert b['CtrlC']==0 and b['CtrlBreak']==0 and br['CtrlBreak']==1 and br['CtrlC']==0
+   assert br['ProcessId']==br['ProcessGroupId'] and br['ChildExited'] and br['ExitCode']==37
+   totals['NativeBreakReferencesPassed']+=1
+  repetitions.append(dict(Order=t['Order'],Passed=43,Total=43,Focused=focused))
+ assert len(repetitions)==3
+ # The returned recipe, raw records and exact ordinary read are separately
+ # recomputed by the pinned native reviewer for every one of the 43 cases.
+ machines.append(dict(Machine=r['ComputerName'],Tier=r['Tier'],RunId=run.name,OS=r['OS'],Hardware=r['Machine'],
+  PowerShell=r['PowerShellVersion'],CLR=r['CLRVersion'],KB3191566Present=any(x['Id']=='KB3191566' for x in r['Updates']),
+  PowerShell7=r['PowerShell7'],CandidateInputPassed=129,H4Passed=h4,QualificationPassed=7,RegressionPassed=14,
+  HostLifetimes=hosts,KeyboardOperations=keyboards,Reference=reference,Repetitions=repetitions))
+assert len(machines)==3 and totals['InputPassed']==387 and totals['H4Passed']==345 and totals['QualificationPassed']==21 and totals['RegressionPassed']==42
+assert totals['ReferencePassed']==90 and totals['ReferenceTotal']==99 and totals['NativeBreakReferencesPassed']==24
+assert totals['Files']==9120
+parent='54b0d23146dfde7528c9e4db1aa92d12e662f883'
+contracts=['src/include/vt7pty.h','src/include/vt7pty_version.h','src/shared/Protocol.h','tests/fidelity/H4RuntimeCases.h',
+ 'tests/fidelity/H4QualificationCases.h','tools/research/H4Cases.ps1']
+for p in contracts:assert not subprocess.check_output(['git','diff',parent,source,'--',p],cwd=root)
+result=dict(Kind='InputRc2Windows7RawReview',Status='Pass',RuntimeSourceCommit=source,ApiVersion='1.1',ProtocolVersion=2,
+ Totals=dict(totals),Machines=machines,NoRerunRequired=True,InputDecoderMatrixQualified=True,Step12Accepted=False,
+ CtrlBreakTransport='Unsupported',OrdinaryUserProfiles='NotRun',UnchangedPublicAndH4Contracts=contracts)
+(audit/'raw-audit.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
+print(json.dumps(dict(Status=result['Status'],Totals=result['Totals'],Machines=[dict(Machine=m['Machine'],Input=m['CandidateInputPassed'],H4=m['H4Passed'],
+ Qualification=m['QualificationPassed'],Regression=m['RegressionPassed'],HostLifetimes=m['HostLifetimes'],KeyboardOperations=m['KeyboardOperations']) for m in machines]),indent=2))

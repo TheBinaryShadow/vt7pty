@@ -35,7 +35,8 @@ incremental UTF-8 validation and a separate solicited cursor-report filter.
 A reply can arrive between key fragments without finishing the key token.
 Valid unfinished UTF-8 survives idle periods; ambiguous Escape uses the
 one-second fallback. The guide records reply serialization and remaining
-byte-stream ambiguity. Windows 7 qualification of this changed runtime is pending.
+byte-stream ambiguity. The [Windows 7 review](validation/2026-11-19-step-1.2-input-rc2-windows7.md)
+qualifies the changed runtime's decoder matrix and H4 regressions on all three tiers.
 
 ## Released components
 
