@@ -5,11 +5,12 @@ NESSY, TURTLE and LEOPARD. The DLL, agent, host module and collector are copied
 unchanged from accepted H4 rc4. I preserve its
 [acceptance](validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md).
 
-This is a characterization candidate. It retains three development failures:
-a delayed UTF-8 character can be lost, and cursor-position replies can disrupt
-fragmented UTF-8 or escape input. These remain failed tests. They are not
-intentional fault controls or expected passes. I need the Windows 7 observations
-before deciding on the decoder/transport changes. Step 1.2 remains open.
+The [Windows 7 review](validation/2026-11-19-step-1.2-input-rc1-windows7.md)
+confirms the same three failures across all nine input repetitions: a delayed
+UTF-8 character is lost, and cursor-position replies disrupt fragmented UTF-8
+or escape input. The other 270/297 input observations and all 345 frozen H4
+guards pass. These remain real failures; Step 1.2 stays open for the decoder
+and framing work. All three collections are complete and need no rerun.
 
 ## Run on the Windows 7 machines
 
@@ -75,7 +76,8 @@ been written. Two additional cases service the terminal while each token is
 still arriving. I retain the actual cursor replies, application input records
 and emitted VT for comparison.
 
-In development, a 1,200 ms gap between UTF-8 bytes loses the incomplete character.
+On WOLF and all three Windows 7 tiers, a 1,200 ms gap between UTF-8 bytes
+loses the incomplete character.
 The agent's general incomplete-input timer clears the byte queue. Shorter
 fragmented Unicode arrives correctly when no reply interrupts its token.
 
@@ -123,6 +125,8 @@ A complete failed collection is reviewed as failed, with its collection status
 kept separate. Test-InputReviewer.ps1 proves that altered records and false
 acceptance or capability claims are rejected.
 
-The next decision follows the Windows 7 results: fix the measured stream
-behavior, define the remaining control/profile contract, then qualify the
-affected runtime and its H4 regressions before closing Step 1.2.
+The Windows 7 results confirm the stream failures and the PowerShell 2.0
+collector. I can now correct the measured decoder behavior and define the
+input/reply framing contract, then qualify the affected runtime and its H4
+regressions. The missing public Break operation and ordinary-profile coverage
+remain explicit before closing Step 1.2.

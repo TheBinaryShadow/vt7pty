@@ -34,6 +34,9 @@ The [H4 review](validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
 qualifies real lock/unlock recovery and carries forward the elevated-caller
 refusal checks. Service and cross-user support, elevated opt-in sessions and
 broader desktop resource behavior remain outside the tested contract.
+The [input rc1 review](validation/2026-11-19-step-1.2-input-rc1-windows7.md)
+confirms 270/297 input observations passing and three stream failures repeated
+on every tier. Its legacy runner completes under PowerShell 2.0 and CLR 2.0.
 
 ## My Windows 7 test machines
 

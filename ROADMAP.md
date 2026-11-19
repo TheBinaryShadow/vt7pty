@@ -112,10 +112,12 @@ public-API experiments failed. I'm now following the
   processed/unprocessed input, editing, modifiers, text and paste.
 - [ ] Extend focused regressions for the remaining input workflows, carrying
   forward the qualified US-language and Croatian keyboard results.
-  The [next automated candidate](docs/INPUT_FIDELITY.md) adds 33 focused cases
-  and interleaves the unchanged H4 guards. Development retains three fragmented-
-  input failures. Ctrl+Break transport remains unsupported by explicit decision;
-  its native Windows reference is separate. Step 1.2 remains open.
+  The [input rc1 review](docs/validation/2026-11-19-step-1.2-input-rc1-windows7.md)
+  verifies 345/345 frozen H4 guards and 270/297 new input observations across
+  all three Windows 7 tiers. Three fragmented-input failures recur in every
+  repetition; I need to correct the decoder/framing path. All 18 native Break
+  references pass, while public Ctrl+Break transport stays unsupported by
+  explicit decision. Step 1.2 remains open.
 
 I'll complete this step when the defined input workflows pass without duplicate
 or lost input, incorrect child interruption, or a broken shell after cancellation.

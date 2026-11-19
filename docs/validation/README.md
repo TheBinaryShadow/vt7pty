@@ -17,13 +17,15 @@ three Windows 7 tiers, with 345/345 runtime cases. The
 elevated-caller checks on every machine. The
 [manual review](2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
 completes all nine physical workflows and accepts H4 within the approved opt-in
-contract. Milestone 1 and VT7 integration stay open.
+contract. The [input rc1 review](2026-11-19-step-1.2-input-rc1-windows7.md)
+confirms three stream failures across all nine input repetitions, with 345/345
+frozen guards passing. Milestone 1 and VT7 integration stay open.
 
 ## Current fidelity work
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| Step 1.2 input coverage | [rc1 characterization, 33 new cases and frozen guards](2026-11-19-step-1.2-input-rc1-candidate.md) | Pending: three measured development failures retained |
+| Step 1.2 input coverage | [rc1 characterization, 33 new cases and frozen guards](2026-11-19-step-1.2-input-rc1-candidate.md) | [Reviewed: 345 guards pass; three input failures confirmed](2026-11-19-step-1.2-input-rc1-windows7.md) |
 | H4 manual follow-up | [Corrected runner and exact-package verification](2026-11-19-step-1.2-h4-manual-rc1-candidate.md) | [Accepted: 9/9 physical workflows; H4 complete](2026-11-19-step-1.2-h4-manual-rc1-windows7.md) |
 | H4 runtime integration | [rc4 full local qualification and issuance](2026-11-17-step-1.2-h4-runtime-rc4-candidate.md) | [Automated matrix passed](2026-11-18-step-1.2-h4-runtime-rc4-windows7.md); [manual completion](2026-11-19-step-1.2-h4-manual-rc1-windows7.md) |
 | H3 guard qualification | [rc1 candidate and exact-package verification](2026-11-13-step-1.2-host-guards-rc1-candidate.md) | [Accepted: 282/282 guard cases; H4 remains](2026-11-14-step-1.2-host-guards-rc1-windows7.md) |

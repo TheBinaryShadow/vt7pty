@@ -27,7 +27,7 @@ what I've learned from testing it.
 
 ## Follow current development
 
-I'm working on input cancellation within Milestone 1. H1, H2 and the controlled
+I'm working on input fidelity within Milestone 1. H1, H2 and the controlled
 H3 prototype are accepted on all three Windows 7 tiers. The
 [guard review](validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
 verifies 282/282 cases, including races, actual access denial, native children
@@ -41,7 +41,9 @@ local qualification and its full opt-in soak. The
 verifies all automated and elevated-caller checks. The
 [manual review](validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
 passes all nine physical workflows on those machines and completes H4 within
-its approved opt-in scope. Broader Milestone 1 fidelity work remains open.
+its approved opt-in scope. The [input rc1 review](validation/2026-11-19-step-1.2-input-rc1-windows7.md)
+now confirms three fragmented-input failures on all three Windows 7 tiers;
+its frozen H4 guards pass. Broader Milestone 1 fidelity work remains open.
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |

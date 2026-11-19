@@ -45,9 +45,10 @@ links their results.
 
 The 0.5.0 baseline retains six cancellation failures per Windows 7 machine.
 The accepted [H4 opt-in path](H4_RUNTIME.md) resolves its qualified cancellation
-workflows. The next [input test candidate](INPUT_FIDELITY.md) expands editing, fragmentation
-and mouse records while preserving H4 binaries. Its measured input failures,
-missing Ctrl+Break transport and ordinary-profile coverage remain explicit.
+workflows. The [input rc1 review](validation/2026-11-19-step-1.2-input-rc1-windows7.md)
+verifies 345 frozen guards and 270/297 new input observations on Windows 7,
+including editing, fragmentation and mouse records. Three stream failures
+remain, alongside the missing public Break transport and ordinary-profile matrix.
 I keep the original 30-case regression suite and broader corpus requirements.
 
 | ID | Scenario | Required observable result |

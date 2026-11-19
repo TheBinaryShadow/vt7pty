@@ -1,0 +1,42 @@
+{
+  "Kind": "InputWindows7ReviewDecision",
+  "RecordedDate": "2026-11-19",
+  "TimeZone": "Europe/Zagreb",
+  "Status": "CharacterizationCompleteWithConfirmedFailures",
+  "HarnessSourceCommit": "23254008e421080d762804938ecce1cd1c710106",
+  "RuntimeSourceCommit": "54b0d23146dfde7528c9e4db1aa92d12e662f883",
+  "ReviewerSourceCommit": "c14c3740b430b133f3d57c74adc1ad71a279e2ce",
+  "ArchiveSha256": "84f1bd227af856ec624c88d77c504417dea312bf0e4b3e1df03f28b73c4ab8ac",
+  "ManifestSha256": "4edbdacedd8faa1ad888a3dd6ca61d1badd805eef0959d62f4f7b737c1165041",
+  "Totals": {
+    "GuardPassed": 345,
+    "GuardTotal": 345,
+    "GuardKeyboardOperations": 333,
+    "GuardHostLifetimes": 372,
+    "GuardCanceledReads": 174,
+    "GuardExactNextReads": 237,
+    "InputPassed": 270,
+    "InputTotal": 297,
+    "InputHostLifetimes": 297,
+    "InputKeyboardOperations": 9,
+    "NativeBreakReferences": 18,
+    "Files": 6543
+  },
+  "ConfirmedFailureCases": [
+    "utf8-timeout-fragment",
+    "utf8-live-replies",
+    "escape-live-replies"
+  ],
+  "FailureObservations": 27,
+  "Windows7MachineCount": 3,
+  "InputRepetitions": 9,
+  "ControllersCompleted": 18,
+  "CollectionErrors": 0,
+  "ControllerTimeouts": 0,
+  "H4AcceptanceCarriedForward": true,
+  "Step12Accepted": false,
+  "CtrlBreakTransport": "Unsupported",
+  "OrdinaryUserProfiles": "NotRun",
+  "RerunRequired": false,
+  "NextWork": "Resolve incomplete UTF-8 timeout loss and define/fix cursor-reply/input-token framing, then qualify the changed runtime against these cases and the accepted H4 guards."
+}

@@ -1,0 +1,60 @@
+from pathlib import Path
+import json
+base=Path(__file__).parent/'input-rc1-windows7-returned-2026-11-19'
+audits=base.parent/'input-rc1-windows7-audit-2026-11-19'
+def load(p):return json.loads(p.read_bytes())
+def significant(p):
+    return [k for k in p['Records'] if k['Type']==1 and k['Down'] and k['VirtualKey'] not in [16,17,18] and k['Character']!=0xe000 for _ in range(k['Repeat'])]
+known=['utf8-timeout-fragment','utf8-live-replies','escape-live-replies']
+rows=[]
+for d in sorted(base.iterdir()):
+    if not d.is_dir():continue
+    report=load(d/'report.json');review=load(audits/(d.name+'.json'))
+    row={'Machine':report['ComputerName'],'Tier':report['Tier'],'RunId':d.name,
+         'GuardPassed':0,'GuardTotal':0,'GuardKeyboardOperations':0,'GuardHostLifetimes':0,'GuardCanceledReads':0,'GuardExactNextReads':0,
+         'InputPassed':0,'InputTotal':0,'InputHostLifetimes':0,'InputKeyboardOperations':0,'NativeBreakReferences':0,
+         'Files':sum(f.is_file() for f in d.rglob('*')),'PowerShell':report['PowerShellVersion'],'CLR':report['CLRVersion'],
+         'KB3191566Present':any(x['Id']=='KB3191566' for x in report['Updates']),'Failures':[]}
+    assert review['CollectionStatus']=='Completed' and review['InputFailures']==9
+    for result in review['Reviews']:
+        r=result['Review'];order=result['Order']
+        if result['Role']=='Guard':
+            assert r['Status']=='Pass'
+            row['GuardPassed']+=r['Cases'];row['GuardTotal']+=r['Cases']
+            for a,b in [('KeyboardOperations','GuardKeyboardOperations'),('Sessions','GuardHostLifetimes'),('CanceledReadObservations','GuardCanceledReads'),('ExactNextReads','GuardExactNextReads')]:
+                row[b]+=r[a]
+            continue
+        assert r['Passed']==30 and r['Total']==33 and r['FailedCases']==known
+        row['InputPassed']+=r['Passed'];row['InputTotal']+=r['Total'];row['InputHostLifetimes']+=r['HostLifetimes'];row['InputKeyboardOperations']+=r['KeyboardOperations']
+        trial=d/(str(order).zfill(2)+'-input')/'native'
+        for name in known:
+            folder=trial/name;p=load(folder/'input-observed.json');recipe=load(folder/'recipe.json')
+            k=significant(p)
+            text=''.join(chr(v['Character']) for v in k).encode('utf-16-le','surrogatepass').decode('utf-16-le')
+            replies=load(folder/'terminal-replies.json')['ReplyHex'];writes=load(folder/'writes.json')
+            assert ''.join(writes['ChunkHex'])==recipe['InputHex']
+            failure={'Trial':order,'Case':name,'ExpectedText':recipe['ExpectedText'],'ObservedCharacters':[v['Character'] for v in k],
+                     'ObservedText':text,'TerminalRepliesHex':replies,'RequestedGapMilliseconds':recipe['GapMilliseconds'],
+                     'LiveReplies':recipe['LiveReplies'],'InputMode':p['InputMode'],'CtrlC':p['CtrlC'],'CtrlBreak':p['CtrlBreak']}
+            assert p['CtrlC']==0 and p['CtrlBreak']==0
+            if name=='utf8-timeout-fragment':
+                assert text=='z' and recipe['ExpectedText']=='\u010dz' and not recipe['LiveReplies'] and recipe['GapMilliseconds']==1200
+                failure['ReplyTiming']='Replies are serviced after the chunk loop, not during its gaps.'
+            if name=='utf8-live-replies':
+                assert text=='A[1;1R\u20ac\U0001f642Z' and replies==['1b5b313b3152'] and recipe['LiveReplies']
+            if name=='escape-live-replies':
+                assert text=='\x1b[D\x1b[C\x1b[A\x1b[B\x1b[H\x1b[F\x1b[3~\x1b[2~\x1b[5~\x1b[6~z'
+                assert len(k)==35 and replies==['1b5b313b3152']*10 and recipe['LiveReplies']
+                failure['VirtualKeys']=[v['VirtualKey'] for v in k]
+            row['Failures'].append(failure)
+        for name,processed in [('native-break-processed',True),('native-break-unprocessed',False)]:
+            p=load(trial/name/'input-observed.json');r=p['Reference']
+            assert r['CtrlBreak']==1 and r['CtrlC']==0 and r['ProcessId']==r['ProcessGroupId'] and r['ChildExited']==1 and r['ExitCode']==37
+            assert bool(r['InputMode']&1)==processed and p['CtrlC']==0 and p['CtrlBreak']==0
+            row['NativeBreakReferences']+=1
+    rows.append(row)
+totals={f:sum(r[f] for r in rows) for f in ['GuardPassed','GuardTotal','GuardKeyboardOperations','GuardHostLifetimes','GuardCanceledReads','GuardExactNextReads','InputPassed','InputTotal','InputHostLifetimes','InputKeyboardOperations','NativeBreakReferences','Files']}
+assert totals['GuardPassed']==345 and totals['InputPassed']==270 and totals['InputTotal']==297 and totals['Files']==6543
+result={'Kind':'InputWindows7RawAudit','Status':'ReviewedWithFailures','RecordedDate':'2026-11-19','Rows':rows,'Totals':totals,'FailedCases':known,'Step12Accepted':False}
+(audits/'raw-audit.json').write_bytes((json.dumps(result,ensure_ascii=True,indent=2)+'\n').encode('utf-8'))
+print(json.dumps({'Totals':totals,'Rows':[{k:v for k,v in row.items() if k!='Failures'} for row in rows]},ensure_ascii=True),flush=True)

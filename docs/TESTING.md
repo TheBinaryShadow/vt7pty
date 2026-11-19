@@ -5,7 +5,10 @@ Windows 7 tiers. It retains frozen H3 controls/reference, runs the integrated
 runtime cases, then the existing regression suite and 120-minute baseline soak.
 The [accepted H4 review](validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
 combines the automated matrix, sustained opt-in workloads, elevated-caller
-refusal and physical keyboard/lock checks. Broader Milestone 1 work remains open.
+refusal and physical keyboard/lock checks. The
+[input rc1 review](validation/2026-11-19-step-1.2-input-rc1-windows7.md)
+confirms three stream failures across all three Windows 7 tiers; its collections
+are complete. Broader Milestone 1 work remains open.
 
 I use local native tests, portable Windows 7 packages and focused research
 probes. They answer different questions, so a passing research probe does not
