@@ -84,7 +84,7 @@ $manifest=[ordered]@{Kind='VT7PtyProfileCandidate';SchemaVersion=1;Step12Accepte
     Runtime=[ordered]@{SourceCommit=$runtimeSource;UnchangedFromInputRc2=$true;ArchiveSha256=$archiveHash;ManifestSha256=$manifestHash;Version=$version;ApiVersion='1.1';ProtocolVersion=2;Architecture='x64'}
     Harness=[ordered]@{SourceCommit=$source;SourceTreeClean=$true;Architecture='x64';Configuration='Release'}
     Reference=[ordered]@{SourceCommit=$runtimeSource;Files=$frozen;GuardCasesByTier=@{DevelopmentHost=41;NonESU=41;ESU=41;Legacy=33};InputCases=43}
-    Profiles=[ordered]@{CasesByTier=@{DevelopmentHost=4;NonESU=4;ESU=4;Legacy=2};Repetitions=3;Source='ControlledInlineFixtures';OrdinaryUserProfiles='NotRun'}
+    Profiles=[ordered]@{CasesByTier=@{DevelopmentHost=4;NonESU=4;ESU=4;Legacy=2};Repetitions=3;PublicationChecks=3;Source='ControlledInlineFixtures';OrdinaryUserProfiles='NotRun'}
     Manual=[ordered]@{Required=$true;EnginesByTier=@{DevelopmentHost=@('wps','pwsh');NonESU=@('wps','pwsh');ESU=@('wps','pwsh');Legacy=@('wps')};Stages=8
         Source='PhysicalConsoleInput';LoadsRealProfiles=$true;SavesShellOutput=$false;ChangesGlobalProfiles=$false;OverridesExecutionPolicy=$false}
     CtrlBreakTransport='Unsupported';ApiFramingLimitsUnchanged=$true;Files=$files}

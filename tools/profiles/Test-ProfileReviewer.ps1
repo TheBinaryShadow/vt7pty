@@ -39,6 +39,10 @@ $controls=@(
     @{Name='manual-no-edit-key';Root=$manual;File='physical-checks.json';Expected='physical editing/history';Edit={param($v)$v.KeyCountsByStage[1].'37'=0}},
     @{Name='manual-changed-editor';Root=$manual;File='session\snapshot-1.json';Expected='editor options preserved';Edit={param($v)$v.Options.EditMode='Unknown'}}
 )
+if($baseline.PublicationChecks -eq 3){$controls+=@(
+    @{Name='replacement-while-held-failed';Root=$fixture;File='publication\result.json';Expected='held-reader publication';Edit={param($v)$v.SharedReaderReplacement=$false}},
+    @{Name='stale-published-proof';Root=$fixture;File='publication\proof.json';Expected='replaced publication proofs';Edit={param($v)$v.Invocation=1}}
+)}
 $results=@()
 foreach($control in $controls){
     $path=Join-Path $control.Root $control.File;$original=[IO.File]::ReadAllBytes($path)

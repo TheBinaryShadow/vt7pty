@@ -120,6 +120,15 @@ function Native-P([string]$Root,[string]$Harness){
     Need-P ($p.Kind -ceq 'ProfileFixtureProbe' -and $p.SchemaVersion -eq 1 -and $p.Status -ceq 'Pass' -and
         $p.SourceCommit -ceq $Harness -and $p.RuntimeSourceCommit -ceq $runtimeSource -and $p.ControlledInlineFixtures -and
         $p.OrdinaryUserProfiles -ceq 'NotRun' -and -not $p.Step12Accepted) 'native profile identity and explicit fixture scope'
+    $publicationChecks=0
+    if($p.PSObject.Properties['PublicationChecks']){
+        $publication=Read-P (Join-Path $Root 'publication\result.json')
+        Need-P ($p.PublicationChecks -eq 3 -and $publication.Kind -ceq 'ProfilePublicationOracle' -and $publication.SchemaVersion -eq 1 -and
+            $publication.Status -ceq 'Pass' -and $publication.SourceCommit -ceq $Harness -and $publication.OriginalReaderReplaceError -ne 0 -and
+            $publication.SharedReaderReplacement -and $publication.PreviousHandleStable -and $publication.NextReadCurrent -and $publication.Checks -eq 3) 'held-reader publication checks'
+        Need-P ((Read-P (Join-Path $Root 'publication\proof.json')).Invocation -eq 2 -and (Read-P (Join-Path $Root 'publication\proof.previous')).Invocation -eq 1) 'original and replaced publication proofs'
+        $publicationChecks=3
+    }
     $reported=(Read-P (Join-Path $Root 'cases.json')).Cases
     $definitions=(Read-P (Join-Path $PSScriptRoot 'cases.json')).Cases
     Need-P ($p.Total -in @(2,4) -and $p.Passed -eq $p.Total) 'profile fixture total'
@@ -154,7 +163,7 @@ function Native-P([string]$Root,[string]$Harness){
     }
     $trace=Trace-P $Root $Harness $definitions.Count
     return [ordered]@{Kind='ProfileFixtureReview';Status='Pass';SourceCommit=$Harness;RuntimeSourceCommit=$runtimeSource;Cases=$cases
-        HostLifetimes=$trace.HostLifetimes;KeyboardOperations=$trace.KeyboardOperations;OrdinaryUserProfiles='NotRun';Step12Accepted=$false}
+        HostLifetimes=$trace.HostLifetimes;KeyboardOperations=$trace.KeyboardOperations;PublicationChecks=$publicationChecks;OrdinaryUserProfiles='NotRun';Step12Accepted=$false}
 }
 function Manual-P([string]$Root,[string]$Harness){
     $p=Read-P (Join-Path $Root 'probe.json');if(-not $Harness){$Harness=$p.SourceCommit}
@@ -242,6 +251,7 @@ if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')){
         }else{
             $review=Native-P $native $m.Harness.SourceCommit
             Need-P (@($review.Cases).Count -eq $m.Profiles.CasesByTier.($r.Tier)) 'tier-specific fixture inventory'
+            if($m.Profiles.PSObject.Properties['PublicationChecks']){Need-P ($m.Profiles.PublicationChecks -eq 3 -and $review.PublicationChecks -eq 3) 'required publication checks in each profile trial'}
             $snap=Read-P (Join-Path $native 'wps-clean-native\snapshot-0.json')
         }
         if($r.Mode -ceq 'Manual' -or $t.Role -ceq 'Profiles'){

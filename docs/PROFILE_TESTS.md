@@ -40,7 +40,9 @@ H4 guards, profile fixtures, input controls, profile fixtures, profile fixtures.
 The guards have 41 cases on NESSY/TURTLE and 33 on LEOPARD; the input controls
 have all 43 accepted recipes. These controls are expected to pass.
 
-The new controlled cases run three times:
+Each profile trial also runs three deterministic file-publication checks,
+including replacement while a reader remains open. The new controlled cases
+run three times:
 
 | Case | Editor | Configuration |
 | --- | --- | --- |

@@ -220,6 +220,7 @@ void exercise(Context &c,const Spec &spec){
 int run(const std::wstring &out){
     outRoot=out;check(CreateDirectoryW(out.c_str(),nullptr),"new profile collection");rootEvidenceCreated=true;
     applicationDesktop=nameOf(GetThreadDesktop(GetCurrentThreadId()));if(!desktopPreflight(out+L"\\preflight.json"))return 2;
+    publicationOracle(out+L"\\publication");
     check(SetEnvironmentVariableW(L"VT7PTY_DEBUG",L"trace"),"controlled profile trace");Collector collector(out);
     std::string rows="[";size_t total=0,passed=0;
     for(const auto &spec:specs()){
@@ -234,7 +235,7 @@ int run(const std::wstring &out){
     collector.stop();writeFile(out+L"\\cases.json","{\"SchemaVersion\":1,\"Cases\":"+rows+"]}");
     writeFile(out+L"\\probe.json","{\"Kind\":\"ProfileFixtureProbe\",\"SchemaVersion\":1,\"Status\":"+json(passed==total?"Pass":"Fail")+
         ",\"SourceCommit\":"+json(GenVersion_Commit)+",\"RuntimeSourceCommit\":"+json(manualRuntimeSource())+",\"Passed\":"+std::to_string(passed)+",\"Total\":"+std::to_string(total)+
-        ",\"OrdinaryUserProfiles\":\"NotRun\",\"ControlledInlineFixtures\":true,\"Step12Accepted\":false}");return passed==total?0:1;
+        ",\"OrdinaryUserProfiles\":\"NotRun\",\"ControlledInlineFixtures\":true,\"PublicationChecks\":3,\"Step12Accepted\":false}");return passed==total?0:1;
 }
 void list(){
     std::string rows="[";for(const auto &spec:specs()){if(rows.size()>1)rows+=',';
