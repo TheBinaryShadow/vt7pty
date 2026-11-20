@@ -1,13 +1,14 @@
 # VT7Pty roadmap
 
-Updated: 2026-11-19.
+Updated: 2026-11-20.
 
 I've completed Milestone 0 and published 0.5.0. H3 and the opt-in H4 runtime
 are accepted within their recorded boundaries. The [input rc2 review](docs/validation/2026-11-19-step-1.2-input-rc2-windows7.md)
 qualifies the decoder/framing fixes on all three Windows 7 tiers, with 387/387
 input cases and 345/345 H4 guards passing. **Current: qualify the [Step 1.2 profile package](docs/PROFILE_TESTS.md)** on all
 three machines, including the separate ordinary-profile phase. The public Break gap
-and input/reply contract limits remain explicit. VT7 integration stays open.
+and input/reply contract limits remain explicit. The [profile rc2 archive](docs/validation/2026-11-20-step-1.2-profiles-rc2-candidate.md)
+is qualified locally and delivered; Windows 7 results are pending. VT7 integration stays open.
 
 I check an item only when its stated work and required tests are complete.
 Partial implementations stay unchecked. A local pass does not replace a required

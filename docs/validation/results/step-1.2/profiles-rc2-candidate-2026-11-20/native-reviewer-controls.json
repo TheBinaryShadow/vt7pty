@@ -1,0 +1,145 @@
+{
+  "Kind": "ProfileReviewerControls",
+  "Status": "Pass",
+  "Rejected": 27,
+  "FixtureCases": 4,
+  "ManualStages": 8,
+  "Controls": [
+    {
+      "Reason": "Profile evidence: native profile identity and explicit fixture scope",
+      "Rejected": true,
+      "Case": "wrong-runtime"
+    },
+    {
+      "Reason": "Profile evidence: native profile identity and explicit fixture scope",
+      "Rejected": true,
+      "Case": "false-ordinary-fixture"
+    },
+    {
+      "Reason": "Profile evidence: native profile identity and explicit fixture scope",
+      "Rejected": true,
+      "Case": "false-step-acceptance"
+    },
+    {
+      "Reason": "Profile evidence: complete fixture case inventory",
+      "Rejected": true,
+      "Case": "missing-case"
+    },
+    {
+      "Reason": "Profile evidence: controlled launch arguments",
+      "Rejected": true,
+      "Case": "changed-launch"
+    },
+    {
+      "Reason": "Profile evidence: shell and retained session identity/cleanup",
+      "Rejected": true,
+      "Case": "wrong-shell-parent"
+    },
+    {
+      "Reason": "Profile evidence: profile files preserved",
+      "Rejected": true,
+      "Case": "changed-profile"
+    },
+    {
+      "Reason": "Profile evidence: execution policy preserved",
+      "Rejected": true,
+      "Case": "changed-policy"
+    },
+    {
+      "Reason": "Profile evidence: stable profile session identity",
+      "Rejected": true,
+      "Case": "wrong-precedence"
+    },
+    {
+      "Reason": "Profile evidence: controlled startup and workflow errors",
+      "Rejected": true,
+      "Case": "startup-errors"
+    },
+    {
+      "Reason": "Profile evidence: command proof Editing",
+      "Rejected": true,
+      "Case": "wrong-backend-text"
+    },
+    {
+      "Reason": "Profile evidence: exact controlled invocation count",
+      "Rejected": true,
+      "Case": "history-not-recalled"
+    },
+    {
+      "Reason": "Profile evidence: native child identity/event/exit",
+      "Rejected": true,
+      "Case": "wrong-child-event"
+    },
+    {
+      "Reason": "Profile evidence: actual profile resize readback",
+      "Rejected": true,
+      "Case": "wrong-resize"
+    },
+    {
+      "Reason": "Profile evidence: shell and retained session identity/cleanup",
+      "Rejected": true,
+      "Case": "host-not-cleaned"
+    },
+    {
+      "Reason": "Profile evidence: physical ordinary source, never synthetic acceptance",
+      "Rejected": true,
+      "Case": "manual-false-profiles"
+    },
+    {
+      "Reason": "Profile evidence: ordinary profile completion/privacy",
+      "Rejected": true,
+      "Case": "manual-private-content"
+    },
+    {
+      "Reason": "Profile evidence: complete manual checkpoint and resize inventory",
+      "Rejected": true,
+      "Case": "manual-no-resize"
+    },
+    {
+      "Reason": "Profile evidence: manual checkpoint source",
+      "Rejected": true,
+      "Case": "manual-wrong-input-source"
+    },
+    {
+      "Reason": "Profile evidence: physical editing/history/completion key",
+      "Rejected": true,
+      "Case": "manual-no-edit-key"
+    },
+    {
+      "Reason": "Profile evidence: editor options preserved",
+      "Rejected": true,
+      "Case": "manual-changed-editor"
+    },
+    {
+      "Reason": "Profile evidence: held-reader publication checks",
+      "Rejected": true,
+      "Case": "replacement-while-held-failed"
+    },
+    {
+      "Reason": "Profile evidence: original and replaced publication proofs",
+      "Rejected": true,
+      "Case": "stale-published-proof"
+    },
+    {
+      "Reason": "Profile evidence: physical ordinary source, never synthetic acceptance",
+      "Rejected": true,
+      "Case": "synthetic-is-not-physical"
+    },
+    {
+      "Reason": "Profile evidence: canceled profile line never executes",
+      "Rejected": true,
+      "Case": "canceled-line-executed"
+    },
+    {
+      "Reason": "Profile evidence: no ordinary output/transcript collection",
+      "Rejected": true,
+      "Case": "ordinary-output-collected"
+    },
+    {
+      "Reason": "Profile evidence: trace runtime/harness/API/protocol",
+      "Rejected": true,
+      "Case": "wrong-trace-runtime"
+    }
+  ],
+  "Step12Accepted": false
+}

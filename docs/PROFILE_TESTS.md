@@ -8,6 +8,9 @@ rc1's failed local qualification: its history command ran, but a result-file
 reader blocked publication of the updated proof. Rc2 changes only the harness
 reader's file sharing and adds a held-reader publication check.
 
+The [local rc2 review](validation/2026-11-20-step-1.2-profiles-rc2-candidate.md)
+records the exact archive, completed checks and verified delivery to K:\VT7_work.
+
 ## Run on all three machines
 
 I extract the complete VT7Pty-profiles-0.5.1-dev-rc2.zip into a new local folder

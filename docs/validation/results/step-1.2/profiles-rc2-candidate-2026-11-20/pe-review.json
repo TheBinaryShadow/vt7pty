@@ -1,0 +1,38 @@
+{
+  "Kind": "ProfileBinaryReview",
+  "Status": "Pass",
+  "HarnessSource": "cc564026447b95d458270c3a671ea37efb009f93",
+  "RuntimeSource": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "ProhibitedApiRules": 19,
+  "Binaries": [
+    {
+      "Role": "reference",
+      "Sha256": "23a0b24914658eab304c7aaad40afea7fc81f2961ef49716e0022503ce69dfb2",
+      "Imports": [
+        "advapi32.dll",
+        "kernel32.dll",
+        "user32.dll",
+        "vt7pty.dll"
+      ],
+      "X64": true,
+      "Subsystem": "6.01",
+      "PostWindows7Imports": 0,
+      "DelayImports": 0
+    },
+    {
+      "Role": "profiles",
+      "Sha256": "aa3c7dc3392621587da3329204837b66f1209dded40ff7219388ccc5107c043f",
+      "Imports": [
+        "advapi32.dll",
+        "kernel32.dll",
+        "user32.dll",
+        "vt7pty.dll"
+      ],
+      "X64": true,
+      "Subsystem": "6.01",
+      "PostWindows7Imports": 0,
+      "DelayImports": 0
+    }
+  ],
+  "Windows7RuntimeQualification": false
+}

@@ -1,0 +1,28 @@
+[
+  {
+    "Arguments": "--profiles-self-test",
+    "ExitCode": 0,
+    "Output": "Profile oracle: 3 checks passed."
+  },
+  {
+    "Arguments": "--input-self-test",
+    "ExitCode": 0,
+    "Output": "Input fidelity oracle: 5 checks passed."
+  },
+  {
+    "Arguments": "--manual-self-test",
+    "ExitCode": 0,
+    "Output": "Manual runner oracle: 11 checks passed."
+  },
+  {
+    "Arguments": "--self-test",
+    "ExitCode": 0,
+    "Output": "Runtime cancellation oracle: 27 checks passed, plus four keyboard-bridge checks"
+  },
+  {
+    "Arguments": "--profiles-publication-self-test",
+    "ExitCode": 0,
+    "Output": "Profile publication oracle: 3 checks passed.",
+    "ResultSha256": "211222aed92e27cf5b9adb014e6d769def1ac93cb09debdaca19d903c538582e"
+  }
+]

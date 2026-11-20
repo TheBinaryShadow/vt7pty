@@ -1,0 +1,81 @@
+# This file is read as reviewed test source by the native harness. It is not
+# installed as a profile. All exported names receive a per-session nonce.
+# Tokens are substituted as PowerShell single-quoted literals by the harness.
+$script:VT7PtyProfileRoot=__ROOT__
+$script:VT7PtyProfileNonce=__NONCE__
+$script:VT7PtyProfileExe=__EXE__
+$script:VT7PtyProfileCounter=0
+$script:VT7PtyProfileCounts=@{}
+$script:VT7PtyProfileControlled=__CONTROLLED__
+$script:VT7PtyProfileStartupErrors=@($global:Error).Count
+function global:__HASH__([string]$VT7PtyPath) {
+    $VT7PtyStream=[IO.File]::OpenRead($VT7PtyPath)
+    $VT7PtyHash=[Security.Cryptography.SHA256]::Create()
+    try {return [BitConverter]::ToString($VT7PtyHash.ComputeHash($VT7PtyStream)).Replace('-','').ToLowerInvariant()}
+    finally {$VT7PtyStream.Close();$VT7PtyHash.Clear()}
+}
+function global:__JSON__([string]$VT7PtyName,$VT7PtyValue) {
+    if($PSVersionTable.PSVersion.Major -ge 3){$VT7PtyJson=Microsoft.PowerShell.Utility\ConvertTo-Json -InputObject $VT7PtyValue -Depth 9 -Compress}
+    else {
+        Add-Type -AssemblyName System.Web.Extensions
+        $VT7PtySerializer=New-Object System.Web.Script.Serialization.JavaScriptSerializer
+        $VT7PtyJson=$VT7PtySerializer.Serialize($VT7PtyValue)
+    }
+    $VT7PtyTarget=$script:VT7PtyProfileRoot+'\'+$VT7PtyName
+    $VT7PtyPending=$VT7PtyTarget+'.pending'
+    [IO.File]::WriteAllText($VT7PtyPending,$VT7PtyJson,(New-Object Text.UTF8Encoding($false)))
+    if([IO.File]::Exists($VT7PtyTarget)){[IO.File]::Replace($VT7PtyPending,$VT7PtyTarget,($VT7PtyTarget+'.previous'));[IO.File]::Delete(($VT7PtyTarget+'.previous'))}
+    else {[IO.File]::Move($VT7PtyPending,$VT7PtyTarget)}
+}
+function global:__SNAPSHOT__([int]$VT7PtyStage) {
+    $VT7PtyErrorCount=@($global:Error).Count
+    $VT7PtyFiles=@()
+    foreach($VT7PtyScope in @('AllUsersAllHosts','AllUsersCurrentHost','CurrentUserAllHosts','CurrentUserCurrentHost')){
+        $VT7PtyPath=[string]$PROFILE.$VT7PtyScope
+        $VT7PtyPresent=[IO.File]::Exists($VT7PtyPath)
+        $VT7PtyBytes=0;$VT7PtyDigest='';$VT7PtyReadError=''
+        if($VT7PtyPresent){
+            try {$VT7PtyBytes=(New-Object IO.FileInfo($VT7PtyPath)).Length;$VT7PtyDigest=__HASH__ $VT7PtyPath}
+            catch {$VT7PtyReadError=$_.Exception.GetType().FullName}
+        }
+        $VT7PtyFiles+=@(@{Scope=$VT7PtyScope;Present=$VT7PtyPresent;Bytes=$VT7PtyBytes;Sha256=$VT7PtyDigest;ReadErrorType=$VT7PtyReadError})
+    }
+    $VT7PtyEditors=@()
+    foreach($VT7PtyModule in @(Microsoft.PowerShell.Core\Get-Module PSReadLine)){
+        $VT7PtyEditors+=@(@{Name=$VT7PtyModule.Name;Version=$VT7PtyModule.Version.ToString();Sha256=(__HASH__ $VT7PtyModule.Path)})
+    }
+    $VT7PtyOptions=@{EditMode='Native';HistorySaveStyle='Native';PredictionSource='NotApplicable'}
+    if($VT7PtyEditors.Count){
+        $VT7PtyOption=PSReadLine\Get-PSReadLineOption
+        $VT7PtyOptions.EditMode=$VT7PtyOption.EditMode.ToString();$VT7PtyOptions.HistorySaveStyle=$VT7PtyOption.HistorySaveStyle.ToString()
+        if($null -ne $VT7PtyOption.PSObject.Properties['PredictionSource']){$VT7PtyOptions.PredictionSource=$VT7PtyOption.PredictionSource.ToString()}
+    }
+    $VT7PtyPolicy=@{}
+    $VT7PtyPolicyCommand=Microsoft.PowerShell.Core\Get-Command Get-ExecutionPolicy -CommandType Cmdlet -ErrorAction Stop
+    foreach($VT7PtyScope in @('MachinePolicy','UserPolicy','Process','CurrentUser','LocalMachine')){
+        $VT7PtyPolicy[$VT7PtyScope]=(& $VT7PtyPolicyCommand -Scope $VT7PtyScope).ToString()
+    }
+    $VT7PtyLanguage='NotExposed'
+    if($null -ne $ExecutionContext.SessionState.PSObject.Properties['LanguageMode']){$VT7PtyLanguage=$ExecutionContext.SessionState.LanguageMode.ToString()}
+    $VT7PtyOrderText='';$VT7PtyWinnerText=''
+    if($script:VT7PtyProfileControlled){$VT7PtyOrderText=@($global:VT7PtyFixtureOrder) -join ',';$VT7PtyWinnerText=[string]$global:VT7PtyFixtureWinner}
+    $VT7PtyState=@{Kind='ProfileShellSnapshot';SchemaVersion=1;Nonce=$script:VT7PtyProfileNonce;Stage=$VT7PtyStage;ProcessId=$PID
+        Engine=$PSVersionTable.PSVersion.ToString();HostName=$Host.Name;Profiles=$VT7PtyFiles;Editors=$VT7PtyEditors;Options=$VT7PtyOptions
+        Policy=$VT7PtyPolicy;LanguageMode=$VT7PtyLanguage
+        StartupErrorCount=$script:VT7PtyProfileStartupErrors;ErrorCount=$VT7PtyErrorCount
+        ProfileContentCollected=$false;ShellOutputCollected=$false;HistoryContentCollected=$false
+        FixtureOrder=$VT7PtyOrderText;FixtureWinner=$VT7PtyWinnerText;WindowWidth=[Console]::WindowWidth;WindowHeight=[Console]::WindowHeight}
+    __JSON__ ('snapshot-'+$VT7PtyStage.ToString()+'.json') $VT7PtyState
+}
+function global:__CHECK__([string]$VT7PtyCheck,[string]$VT7PtyValue) {
+    $VT7PtyExpected=@{Editing='EDIT čćđšž';History='HISTORY_OK';Completion='COMPLETE_OK';Multiline="firstč`nsecondž";Continue='CONTINUE_OK';Resize='RESIZE_OK';Binding='BINDING_OK'}
+    $VT7PtyMatched=$VT7PtyExpected.ContainsKey($VT7PtyCheck) -and $VT7PtyValue.Replace([string][char]13,'') -ceq $VT7PtyExpected[$VT7PtyCheck]
+    $script:VT7PtyProfileCounter++
+    if(-not $script:VT7PtyProfileCounts.ContainsKey($VT7PtyCheck)){$script:VT7PtyProfileCounts[$VT7PtyCheck]=0}
+    $script:VT7PtyProfileCounts[$VT7PtyCheck]++
+    __JSON__ ($VT7PtyCheck+'.json') @{Kind='ProfileCommandProof';SchemaVersion=1;Nonce=$script:VT7PtyProfileNonce;ProcessId=$PID
+        Check=$VT7PtyCheck;Matched=$VT7PtyMatched;Invocation=$script:VT7PtyProfileCounter;CheckInvocation=$script:VT7PtyProfileCounts[$VT7PtyCheck]}
+    if($VT7PtyMatched){[Console]::WriteLine('PROFILE_CHECK_OK')}else{[Console]::WriteLine('PROFILE_CHECK_FAILED')}
+}
+function global:__COMPLETE__ {__CHECK__ 'Completion' 'COMPLETE_OK'}
+function global:__CHILD__ {& $script:VT7PtyProfileExe --profile-child $script:VT7PtyProfileRoot $script:VT7PtyProfileNonce}

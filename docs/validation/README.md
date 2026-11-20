@@ -28,7 +28,7 @@ coverage, Milestone 1 and VT7 integration stay open.
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| Step 1.2 profiles | [rc1 prepared; exact-path qualification awaits a fresh WOLF session](2026-11-19-step-1.2-profiles-rc1-candidate.md) | Pending controlled and ordinary-profile runs |
+| Step 1.2 profiles | [rc2 qualified locally and delivered; runtime unchanged](2026-11-20-step-1.2-profiles-rc2-candidate.md) | Pending controlled and ordinary-profile runs |
 | Step 1.2 input decoder | [rc2: exact archive, 129 input and 123 H4 guards pass locally](2026-11-19-step-1.2-input-rc2-candidate.md) | [Qualified: 387 input, 345 H4 guards, 21 lifetime/fault guards and 42 regressions pass](2026-11-19-step-1.2-input-rc2-windows7.md) |
 | Step 1.2 input coverage | [rc1 characterization, 33 new cases and frozen guards](2026-11-19-step-1.2-input-rc1-candidate.md) | [Reviewed: 345 guards pass; three input failures confirmed](2026-11-19-step-1.2-input-rc1-windows7.md) |
 | H4 manual follow-up | [Corrected runner and exact-package verification](2026-11-19-step-1.2-h4-manual-rc1-candidate.md) | [Accepted: 9/9 physical workflows; H4 complete](2026-11-19-step-1.2-h4-manual-rc1-windows7.md) |

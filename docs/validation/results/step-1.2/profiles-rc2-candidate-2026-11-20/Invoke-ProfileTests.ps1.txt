@@ -1,0 +1,120 @@
+[CmdletBinding()]
+param([ValidateSet('DevelopmentHost','NonESU','ESU','Legacy')][string]$Tier='DevelopmentHost',
+    [string]$PowerShell7Path='C:\Program Files\PowerShell\7\pwsh.exe',[string]$PackageRoot='',[switch]$Manual)
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+if(-not $PackageRoot){$PackageRoot=Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) '..\..'}
+$PackageRoot=[IO.Path]::GetFullPath($PackageRoot).TrimEnd('\')
+. (Join-Path $PackageRoot 'tools\platform\Windows7Compat.ps1')
+. (Join-Path $PackageRoot 'tools\platform\NativeCapture.ps1')
+$m=Read-VT7Json (Join-Path $PackageRoot 'manifest.json')
+if($m.Kind -cne 'VT7PtyProfileCandidate' -or $m.SchemaVersion -ne 1 -or
+    -not $m.Runtime.UnchangedFromInputRc2 -or $m.Runtime.SourceCommit -cne '0ca6e3fa78481cd4df35820b9fe3988f46e0bff4' -or
+    $m.Runtime.ArchiveSha256 -cne '93d1a1b290d796124b143d490181a861d6224bc61f36ca1cbe46113585a57fb5'){
+    throw 'Use the complete issued profile candidate.'
+}
+foreach($file in $m.Files){
+    $path=[IO.Path]::GetFullPath((Join-Path $PackageRoot $file.Path))
+    if(-not $path.StartsWith($PackageRoot+'\',[StringComparison]::OrdinalIgnoreCase) -or
+        (Get-Item -LiteralPath $path).Length -ne $file.Bytes -or (Get-VT7Sha256 $path) -cne $file.Sha256){throw ('Changed candidate file: '+$file.Path)}
+}
+$os=Get-WmiObject Win32_OperatingSystem;$machine=Get-WmiObject Win32_ComputerSystem
+$updates=@(Get-WmiObject Win32_QuickFixEngineering | Sort-Object HotFixID | ForEach-Object {@{Id=$_.HotFixID}})
+$errors=@()
+if($env:PROCESSOR_ARCHITECTURE -ne 'AMD64'){$errors+='Use x64 Windows PowerShell.'}
+if($Tier -ne 'DevelopmentHost' -and (-not $os.Version.StartsWith('6.1.') -or $os.ServicePackMajorVersion -ne 1 -or $os.ProductType -ne 1)){$errors+='Windows 7 SP1 is required for this tier.'}
+if($Tier -eq 'Legacy' -and ($PSVersionTable.PSVersion.Major -ne 2 -or @($updates | Where-Object {$_.Id -eq 'KB3191566'}).Count)){$errors+='Legacy requires installed PowerShell 2.0 without KB3191566.'}
+$policyPresent=$env:VT7PTY_PROFILE_ORIGINAL_POLICY_PRESENT -eq '1'
+$policyValue=if($policyPresent){$env:VT7PTY_PROFILE_ORIGINAL_POLICY_VALUE}else{''}
+if($policyPresent -and @('Undefined','Restricted','AllSigned','RemoteSigned','Unrestricted','Bypass','Default') -notcontains $policyValue){throw 'Unrecognized inherited process execution policy.'}
+$ps7=@{Required=($Tier -ne 'Legacy');Path='';Version='';Sha256='';ModuleManifestSha256=''}
+if($ps7.Required){try{
+    $PowerShell7Path=[IO.Path]::GetFullPath($PowerShell7Path)
+    $v=(& $PowerShell7Path -NoLogo -NoProfile -NonInteractive -Command '$PSVersionTable.PSVersion.ToString()' 2>&1 | Out-String).Trim()
+    if($LASTEXITCODE -ne 0 -or $v -cne '7.2.24'){throw 'PowerShell 7.2.24 x64 is required.'}
+    $ps7.Path=$PowerShell7Path;$ps7.Version=$v;$ps7.Sha256=Get-VT7Sha256 $PowerShell7Path
+    $ps7.ModuleManifestSha256=Get-VT7Sha256 (Join-Path (Split-Path -Parent $PowerShell7Path) 'Modules\PSReadLine\PSReadLine.psd1')
+}catch{$errors+=$_.Exception.Message}}
+$mode=if($Manual){'Manual'}else{'Automated'}
+$id=$Tier.ToLowerInvariant()+'-profiles-'+$mode.ToLowerInvariant()+'-'+[DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss')+'-'+[Guid]::NewGuid().ToString('N').Substring(0,8)
+$out=Join-Path $PackageRoot ('results\'+$id);[void][IO.Directory]::CreateDirectory($out)
+$trials=@();$linked=''
+function Save-ProfileReport {
+    Write-VT7Json (Join-Path $out 'report.json') @{
+        Kind='VT7PtyProfileResults';SchemaVersion=1;RunId=$id;Mode=$mode;ComputerName=$env:COMPUTERNAME;Tier=$Tier;RecordedUtc=[DateTime]::UtcNow.ToString('o')
+        ManifestSha256=(Get-VT7Sha256 (Join-Path $PackageRoot 'manifest.json'));Runtime=$m.Runtime;Harness=$m.Harness;Trials=$trials
+        OS=@{Caption=$os.Caption;Version=$os.Version;ServicePackMajorVersion=$os.ServicePackMajorVersion;ProductType=$os.ProductType}
+        Machine=@{Model=$machine.Model;Manufacturer=$machine.Manufacturer};Updates=$updates
+        PowerShellVersion=$PSVersionTable.PSVersion.ToString();CLRVersion=$PSVersionTable.CLRVersion.ToString();PowerShell7=$ps7;PreflightErrors=$errors
+        OriginalProcessPolicy=@{Present=$policyPresent;Value=$policyValue};PolicyOverrideInherited=$false
+        AutomatedRunId=$linked;OrdinaryUserProfiles=$(if($Manual){'PendingReview'}else{'NotRun'})
+        ProfileContentCollected=$false;HistoryContentCollected=$false;ShellOutputCollectedInManual=$false;Step12Accepted=$false;MilestoneAccepted=$false
+    }
+}
+$nativeEnv=@{VT7PTY_H4_RUNTIME_SOURCE=$m.Runtime.SourceCommit;VT7PTY_H3_PWSH=$ps7.Path
+    VT7PTY_PROFILE_PROBE_SOURCE=(Join-Path $PackageRoot 'tools\profiles\ProfileProbe.ps1');VT7PTY_H4_LEGACY=$(if($Tier -eq 'Legacy'){'1'}else{''})
+    PSExecutionPolicyPreference=$policyValue;VT7PTY_DEBUG='trace'}
+if($Manual){
+    $found=@()
+    foreach($directory in [IO.Directory]::GetDirectories((Join-Path $PackageRoot 'results'))){
+        $p=Join-Path $directory 'report.json'
+        if(Test-Path -LiteralPath $p){$r=Read-VT7Json $p
+            if($r.Kind -eq 'VT7PtyProfileResults' -and $r.Mode -eq 'Automated' -and $r.ComputerName -eq $env:COMPUTERNAME -and $r.Tier -eq $Tier -and
+                $r.ManifestSha256 -eq (Get-VT7Sha256 (Join-Path $PackageRoot 'manifest.json')) -and @($r.Trials).Count -eq 5 -and
+                @($r.PreflightErrors).Count -eq 0 -and @($r.Trials | Where-Object {$_.Outcome -ne 'Pass' -or $_.CollectionStatus -ne 'Completed'}).Count -eq 0){$found+=@($r.RunId)}
+        }
+    }
+    if(-not $found.Count){$errors+='Run the matching automated launcher successfully before the ordinary-profile phase.'}
+    else{$linked=@($found | Sort-Object)[-1]}
+}
+Save-ProfileReport
+Write-Host ('Profile candidate '+$mode+': '+$Tier)
+Write-Host 'Keep Windows unlocked. Existing profiles and settings are not rewritten.'
+$plan=@('Guard','Profiles','Input','Profiles','Profiles')
+if($Manual){$plan=@('wps');if($ps7.Required){$plan+=@('pwsh')};Write-Host 'This explicit launcher loads the real profiles using normal startup policy. Test commands may enter normal shell history.'}
+$order=0
+foreach($role in $plan){
+    $order++;$name=$order.ToString('00')+'-'+$role.ToLowerInvariant();$directory=Join-Path $out $name
+    [void][IO.Directory]::CreateDirectory($directory)
+    $record=@{Order=$order;Role=$role;Directory=$name;Outcome='NotRun';CollectionStatus='NotRun';ExitCode=$null;TimedOut=$false;Error=''}
+    try{
+        if($errors.Count){throw 'Preflight is incomplete; keep this report.'}
+        $bin=Join-Path $PackageRoot $(if($role -eq 'Guard' -or $role -eq 'Input'){'reference\bin'}else{'profiles\bin'})
+        $native=Join-Path $directory 'native'
+        if($Manual){
+            $start=New-Object Diagnostics.ProcessStartInfo
+            $start.FileName=Join-Path $bin 'RuntimeCancellationTest.exe';$start.WorkingDirectory=$bin
+            $start.Arguments='--profiles-manual '+$role+' "'+$native+'"';$start.UseShellExecute=$false;$start.CreateNoWindow=$false
+            $nativeEnv.VT7PTY_DEBUG=''
+            foreach($key in $nativeEnv.Keys){if([string]$nativeEnv[$key] -eq ''){$start.EnvironmentVariables.Remove($key)}else{$start.EnvironmentVariables[$key]=[string]$nativeEnv[$key]}}
+            $process=New-Object Diagnostics.Process;$process.StartInfo=$start
+            try{
+                if(-not $process.Start()){throw 'Cannot start the owned profile UI.'}
+                if(-not $process.WaitForExit(1560000)){$process.Kill();[void]$process.WaitForExit(10000);throw 'Ordinary profile deadline.'}
+                $record.ExitCode=$process.ExitCode
+            }finally{$process.Close()}
+        }else{
+            $nativeArguments=$(if($role -eq 'Guard'){'--run'}elseif($role -eq 'Input'){'--input-run'}else{'--profiles-run'})+' "'+$native+'"'
+            $run=Invoke-InputProcess (Join-Path $bin 'RuntimeCancellationTest.exe') $nativeArguments $bin 900000 $nativeEnv
+            foreach($key in $run.Keys){$record[$key]=$run[$key]}
+            [IO.File]::WriteAllText((Join-Path $directory 'stdout.txt'),$record.StandardOutput,$script:vt7Utf8)
+            [IO.File]::WriteAllText((Join-Path $directory 'stderr.txt'),$record.StandardError,$script:vt7Utf8)
+            if($record.TimedOut){throw 'Native profile controller deadline.'}
+        }
+        $probe=Read-VT7Json (Join-Path $native 'probe.json')
+        $expectedSource=if($role -eq 'Guard' -or $role -eq 'Input'){$m.Runtime.SourceCommit}else{$m.Harness.SourceCommit}
+        $expectedKind=if($Manual){'OrdinaryProfileProbe'}elseif($role -eq 'Guard'){'H4RuntimeProbe'}elseif($role -eq 'Input'){'InputFidelityProbe'}else{'ProfileFixtureProbe'}
+        if($probe.Kind -cne $expectedKind -or $probe.SourceCommit -cne $expectedSource -or (($probe.Status -ceq 'Pass') -ne ($record.ExitCode -eq 0))){throw 'Wrong native profile identity or outcome.'}
+        if($Manual -and ($probe.SyntheticInputUsed -or -not $probe.OrdinaryProfilesLoaded -or $probe.ShellOutputCollected -or $probe.ProfileContentCollected -or $probe.HistoryContentCollected)){throw 'Manual source or privacy contract differs.'}
+        $record.Outcome=$probe.Status;$record.CollectionStatus='Completed'
+    }catch{$record.Outcome='Incomplete';$record.CollectionStatus='Partial';$record.Error=$_.Exception.Message}
+    $trials+=@($record);Save-ProfileReport;Write-Host ($name+': '+$record.Outcome+' '+$record.Error)
+}
+$files=@([IO.Directory]::GetFiles($out,'*',[IO.SearchOption]::AllDirectories) | Sort-Object | ForEach-Object {
+    @{Path=$_.Substring($out.Length+1).Replace('\','/');Bytes=(Get-Item -LiteralPath $_).Length;Sha256=(Get-VT7Sha256 $_)}
+})
+Write-VT7Json (Join-Path $out 'evidence-files.json') @{SchemaVersion=1;Files=$files}
+Write-Host ('Keep the complete result directory: '+$out)
+if(@($trials | Where-Object {$_.CollectionStatus -ne 'Completed'}).Count){exit 2}
+if(@($trials | Where-Object {$_.Outcome -ne 'Pass'}).Count){exit 1}
+exit 0

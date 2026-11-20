@@ -10,9 +10,10 @@ refusal and physical keyboard/lock checks. The
 confirms three stream failures across all three Windows 7 tiers; its collections
 are complete. The [input rc2 review](validation/2026-11-19-step-1.2-input-rc2-windows7.md)
 qualifies the fixes on all three tiers: 387 input cases, 345 H4 guards, 21
-lifetime/fault guards and 42 regressions pass. No rerun of that package is needed. The next [profile package](PROFILE_TESTS.md)
-keeps its runtime frozen and adds controlled fixtures plus a separate ordinary-
-profile phase. Its Windows 7 qualification and broader Milestone 1 work stay open.
+lifetime/fault guards and 42 regressions pass. No rerun of that package is needed. The [profile rc2 package](PROFILE_TESTS.md)
+is [qualified locally and delivered](validation/2026-11-20-step-1.2-profiles-rc2-candidate.md),
+with its runtime frozen. The controlled and ordinary-profile phases still need
+Windows 7 results; broader Milestone 1 work stays open.
 
 I use local native tests, portable Windows 7 packages and focused research
 probes. They answer different questions, so a passing research probe does not

@@ -1,0 +1,29 @@
+{
+  "Kind": "ProfileFixtureReview",
+  "Status": "Pass",
+  "SourceCommit": "cc564026447b95d458270c3a671ea37efb009f93",
+  "RuntimeSourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "Cases": [
+    {
+      "Status": "Pass",
+      "Editor": "Native",
+      "Layered": false,
+      "Engine": "5.1.19041.7844",
+      "Case": "wps-clean-native",
+      "Shell": 28744
+    },
+    {
+      "Status": "Pass",
+      "Editor": "Native",
+      "Layered": true,
+      "Engine": "5.1.19041.7844",
+      "Case": "wps-layered-native",
+      "Shell": 42792
+    }
+  ],
+  "HostLifetimes": 2,
+  "KeyboardOperations": 2,
+  "PublicationChecks": 3,
+  "OrdinaryUserProfiles": "NotRun",
+  "Step12Accepted": false
+}

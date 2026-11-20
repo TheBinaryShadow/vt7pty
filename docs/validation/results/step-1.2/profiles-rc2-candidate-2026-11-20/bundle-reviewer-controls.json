@@ -1,0 +1,74 @@
+{
+  "Kind": "ProfileBundleReviewerControls",
+  "Status": "Pass",
+  "Rejected": 13,
+  "BaselineStatus": "Pass",
+  "Controls": [
+    {
+      "Reason": "Profile evidence: matched profile candidate and unchanged runtime",
+      "Rejected": true,
+      "Case": "wrong-manifest"
+    },
+    {
+      "Reason": "Profile evidence: matched profile candidate and unchanged runtime",
+      "Rejected": true,
+      "Case": "wrong-runtime"
+    },
+    {
+      "Reason": "Profile evidence: matched profile candidate and unchanged runtime",
+      "Rejected": true,
+      "Case": "wrong-harness"
+    },
+    {
+      "Reason": "Profile evidence: matched profile candidate and unchanged runtime",
+      "Rejected": true,
+      "Case": "false-acceptance"
+    },
+    {
+      "Reason": "Profile evidence: profile report prerequisites/privacy",
+      "Rejected": true,
+      "Case": "inherited-bypass"
+    },
+    {
+      "Reason": "Profile evidence: ordinary profiles remain explicitly unqualified before review",
+      "Rejected": true,
+      "Case": "false-ordinary-coverage"
+    },
+    {
+      "Reason": "Profile evidence: complete ordered profile trial inventory",
+      "Rejected": true,
+      "Case": "missing-trial"
+    },
+    {
+      "Reason": "Profile evidence: complete ordered profile trial inventory",
+      "Rejected": true,
+      "Case": "wrong-role"
+    },
+    {
+      "Reason": "Profile evidence: completed profile controller",
+      "Rejected": true,
+      "Case": "partial-trial"
+    },
+    {
+      "Reason": "Profile evidence: original process policy restored before shell startup",
+      "Rejected": true,
+      "Case": "wrong-original-policy"
+    },
+    {
+      "Reason": "Profile evidence: command proof Editing",
+      "Rejected": true,
+      "Case": "failed-profile-proof"
+    },
+    {
+      "Reason": "Profile evidence: complete fixture case inventory",
+      "Rejected": true,
+      "Case": "missing-profile-case"
+    },
+    {
+      "Reason": "Profile evidence: complete profile evidence inventory",
+      "Rejected": true,
+      "Case": "missing-inventory-entry"
+    }
+  ],
+  "Step12Accepted": false
+}
