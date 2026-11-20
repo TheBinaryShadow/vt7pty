@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')][string]$Suffix='rc1',[string]$InputRc2Archive='')
+param([ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')][string]$Suffix='rc2',[string]$InputRc2Archive='')
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version 2.0
 $root=$PSScriptRoot;$source=(& git -C $root rev-parse HEAD).Trim()
@@ -59,6 +59,11 @@ foreach($option in @('--profiles-self-test','--input-self-test','--manual-self-t
     if($LASTEXITCODE){throw ('Failed harness oracle '+$option)}
     $checks+=@([ordered]@{Arguments=$option;ExitCode=0;Output=($output -join [Environment]::NewLine)})
 }
+$publicationOut=Join-Path $root ('artifacts\fidelity\profiles-'+$Suffix+'-publication-oracle')
+$output=@(& (Join-Path $bin 'RuntimeCancellationTest.exe') --profiles-publication-self-test $publicationOut)
+if($LASTEXITCODE){throw 'Failed profile publication oracle.'}
+Copy-Item -LiteralPath (Join-Path $publicationOut 'result.json') -Destination (Join-Path $stage 'publication-oracle.json')
+$checks+=@([ordered]@{Arguments='--profiles-publication-self-test';ExitCode=0;Output=($output -join [Environment]::NewLine);ResultSha256=(Hash-P (Join-Path $publicationOut 'result.json'))})
 [IO.File]::WriteAllText((Join-Path $stage 'harness-oracles.json'),($checks | ConvertTo-Json -Depth 6),[Text.UTF8Encoding]::new($false))
 $plan=[ordered]@{'README.md'='docs\PROFILE_TESTS.md';'tools\profiles\Invoke-ProfileTests.ps1'='tools\profiles\Invoke-ProfileTests.ps1'
     'tools\profiles\ProfileProbe.ps1'='tools\profiles\ProfileProbe.ps1';'tools\profiles\cases.json'='tools\profiles\cases.json';'tools\platform\NativeCapture.ps1'='tools\platform\NativeCapture.ps1'

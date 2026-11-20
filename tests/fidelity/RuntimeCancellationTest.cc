@@ -567,6 +567,7 @@ int wmain(int argc, wchar_t **argv)
         if(argc==4 && std::wstring(argv[1])==L"--profiles-manual-smoke-worker")return profilecases::manual(argv[3],std::wstring(argv[2])==L"pwsh",true);
         if(argc==4 && std::wstring(argv[1])==L"--profile-child")return profilecases::child(argv[2],utf8(argv[3]));
         if(argc==2 && std::wstring(argv[1])==L"--profiles-list"){profilecases::list();return 0;}
+        if(argc==3 && std::wstring(argv[1])==L"--profiles-publication-self-test")return profilecases::publicationOracle(argv[2]);
         if(argc==2 && std::wstring(argv[1])==L"--profiles-self-test"){profilecases::oracle();return 0;}
         if(argc==3 && std::wstring(argv[1])==L"--profiles-run")return profilecases::run(argv[2]);
         if(argc==5 && std::wstring(argv[1])==L"--input-break-child")

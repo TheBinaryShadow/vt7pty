@@ -3,11 +3,14 @@
 I use this Step 1.2 package to check shell input with controlled configurations
 and ordinary PowerShell profiles. The accepted input rc2 runtime stays unchanged:
 0.5.1-dev, API 1.1, protocol 2, source 0ca6e3fa. Only the test harness is new.
-Windows 7 qualification is pending until I review the returned runs.
+Windows 7 qualification is pending until I review the returned runs. I retain
+rc1's failed local qualification: its history command ran, but a result-file
+reader blocked publication of the updated proof. Rc2 changes only the harness
+reader's file sharing and adds a held-reader publication check.
 
 ## Run on all three machines
 
-I extract the complete VT7Pty-profiles-0.5.1-dev-rc1.zip into a new local folder
+I extract the complete VT7Pty-profiles-0.5.1-dev-rc2.zip into a new local folder
 on each machine. I keep Windows unlocked and use a normal, unelevated console.
 I run the automated launcher first, then its matching manual launcher after
 all five automated phases pass.

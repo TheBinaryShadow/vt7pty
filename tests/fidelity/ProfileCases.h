@@ -37,6 +37,38 @@ bool truth(const std::string &value,const std::string &name) {
     auto at=value.find('"'+name+'"');if(at==std::string::npos)return false;at=value.find(':',at);if(at==std::string::npos)return false;
     do{++at;}while(at<value.size() && isspace(static_cast<unsigned char>(value[at])));return value.compare(at,4,"true")==0;
 }
+// A held reader must allow the shell to publish its next immutable JSON file.
+// The shared H4 text reader deliberately keeps its original behavior.
+HANDLE profileReadHandle(const std::wstring &path) {
+    const auto file=CreateFileW(path.c_str(),GENERIC_READ,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+        nullptr,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,nullptr);
+    check(file!=INVALID_HANDLE_VALUE,"profile result read handle");return file;
+}
+std::string profileText(HANDLE file) {
+    LARGE_INTEGER size={};check(GetFileSizeEx(file,&size)&&size.QuadPart>=0&&size.QuadPart<=65536,"bounded profile result size");
+    std::string result(static_cast<size_t>(size.QuadPart),0);DWORD read=0;
+    check(result.empty()||(ReadFile(file,result.data(),static_cast<DWORD>(result.size()),&read,nullptr)&&read==result.size()),"complete profile result read");
+    return result;
+}
+std::string profileText(const std::wstring &path){Handle file(profileReadHandle(path));return profileText(file.value);}
+int publicationOracle(const std::wstring &out){
+    check(CreateDirectoryW(out.c_str(),nullptr),"fresh profile publication oracle directory");
+    const auto target=out+L"\\proof.json",pending=out+L"\\proof.pending",backup=out+L"\\proof.previous";
+    const std::string before="{\"Invocation\":1}",after="{\"Invocation\":2}";
+    writeFile(target,before);writeFile(pending,after);
+    DWORD denied=0;
+    {
+        std::ifstream oldReader{std::filesystem::path(target)};check(oldReader.is_open(),"original profile reader control");
+        SetLastError(ERROR_SUCCESS);const auto replaced=ReplaceFileW(target.c_str(),pending.c_str(),backup.c_str(),0,nullptr,nullptr);denied=GetLastError();
+        check(!replaced&&denied!=ERROR_SUCCESS,"original reader prevents atomic publication");
+    }
+    Handle held(profileReadHandle(target));
+    check(ReplaceFileW(target.c_str(),pending.c_str(),backup.c_str(),0,nullptr,nullptr),"atomic publication while shared reader remains open");
+    check(profileText(held.value)==before&&profileText(target)==after,"held reader sees prior proof and next reader sees new proof");
+    writeFile(out+L"\\result.json","{\"Kind\":\"ProfilePublicationOracle\",\"SchemaVersion\":1,\"Status\":\"Pass\",\"SourceCommit\":"+json(GenVersion_Commit)+
+        ",\"OriginalReaderReplaceError\":"+std::to_string(denied)+",\"SharedReaderReplacement\":true,\"PreviousHandleStable\":true,\"NextReadCurrent\":true,\"Checks\":3}");
+    puts("Profile publication oracle: 3 checks passed.");return 0;
+}
 std::wstring engine(bool pwsh) {
     if(pwsh)return guardEnvironment(L"VT7PTY_H3_PWSH");
     wchar_t system[MAX_PATH]={};check(GetSystemDirectoryW(system,MAX_PATH)>0,"profile system directory");
@@ -44,7 +76,7 @@ std::wstring engine(bool pwsh) {
 }
 std::wstring currentExe(){std::wstring path(32768,0);const auto length=GetModuleFileNameW(nullptr,path.data(),static_cast<DWORD>(path.size()));check(length>0&&length<path.size(),"profile harness path");path.resize(length);return path;}
 std::wstring probeSource(const std::wstring &out,const std::string &nonce,bool controlled=true) {
-    auto result=wide(fileText(guardEnvironment(L"VT7PTY_PROFILE_PROBE_SOURCE")));
+    auto result=wide(profileText(guardEnvironment(L"VT7PTY_PROFILE_PROBE_SOURCE")));
     for(const auto &pair:std::vector<std::pair<std::wstring,std::wstring>>{{L"__CONTROLLED__",controlled?L"$true":L"$false"},{L"__ROOT__",psLiteral(out)},{L"__NONCE__",psLiteral(wide(nonce))},{L"__EXE__",psLiteral(currentExe())},
         {L"__HASH__",L"VT7PtyHash_"+wide(nonce)},{L"__JSON__",L"VT7PtyJson_"+wide(nonce)},{L"__SNAPSHOT__",L"VT7PtySnapshot_"+wide(nonce)},
         {L"__CHECK__",L"VT7PtyCheck_"+wide(nonce)},{L"__COMPLETE__",L"VT7PtyProfileComplete_"+wide(nonce)},{L"__CHILD__",L"VT7PtyProfileChild_"+wide(nonce)}})result=replace(result,pair.first,pair.second);
@@ -135,25 +167,25 @@ struct Shell {
     std::string snapshot(int stage,bool ordinary=false) {
         const auto path=c.out+L"\\snapshot-"+std::to_wstring(stage)+L".json";
         if(ordinary)s.input(utf8(snapshotName()+L" "+std::to_wstring(stage)+L"\r"));else command(snapshotName()+L" "+std::to_wstring(stage));
-        check(s.until([&]{try{const auto data=fileText(path);return valid(data)&&number(data,"Stage")==static_cast<uint64_t>(stage);}catch(...){return false;}},15000),"profile snapshot completion");
-        const auto data=fileText(path);check(valid(data) && number(data,"Stage")==stage,"profile snapshot identity");return data;
+        check(s.until([&]{try{const auto data=profileText(path);return valid(data)&&number(data,"Stage")==static_cast<uint64_t>(stage);}catch(...){return false;}},15000),"profile snapshot completion");
+        const auto data=profileText(path);check(valid(data) && number(data,"Stage")==stage,"profile snapshot identity");return data;
     }
     std::string proof(const std::wstring &name){
         std::string data;const auto path=c.out+L"\\"+name+L".json";
-        check(s.until([&]{try{data=fileText(path);return !data.empty()&&data.back()=='}'&&valid(data)&&truth(data,"Matched");}catch(...){return false;}},5000),
+        check(s.until([&]{try{data=profileText(path);return !data.empty()&&data.back()=='}'&&valid(data)&&truth(data,"Matched");}catch(...){return false;}},5000),
             ("exact profile command result: "+utf8(name)).c_str());return data;
     }
     void retainChild(){
         if(nativeChild.value!=INVALID_HANDLE_VALUE)return;
         const auto path=c.out+L"\\child-ready.json";
-        check(s.until([&]{try{const auto value=fileText(path);return !value.empty()&&value.back()=='}'&&validChild(value)&&number(value,"ProcessId")>0;}catch(...){return false;}}),"profile child readiness identity");
-        const auto value=fileText(path);
+        check(s.until([&]{try{const auto value=profileText(path);return !value.empty()&&value.back()=='}'&&validChild(value)&&number(value,"ProcessId")>0;}catch(...){return false;}}),"profile child readiness identity");
+        const auto value=profileText(path);
         const auto childPid=static_cast<DWORD>(number(value,"ProcessId"));nativeChild.reset(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION|SYNCHRONIZE,FALSE,childPid));
         check(nativeChild.value && parentProcessId(childPid)==pid && agrees(hostQuery(nativeChild.value),hostQuery(s.agent.value)),"retained native child association");
     }
     bool validChild(const std::string &value){return value.find("\"Nonce\":"+json(nonce))!=std::string::npos && number(value,"ParentId")==pid;}
     void childProof(){
-        const auto value=fileText(c.out+L"\\child-result.json");DWORD exit=0;
+        const auto value=profileText(c.out+L"\\child-result.json");DWORD exit=0;
         check(validChild(value) && number(value,"CtrlC")==1 && WaitForSingleObject(nativeChild.value,5000)==WAIT_OBJECT_0 && GetExitCodeProcess(nativeChild.value,&exit)&&exit==37,"native child single event and natural exit");
     }
     void quit(){s.input("exit 37\r");check(s.until([&]{return WaitForSingleObject(s.descendant.value,0)==WAIT_OBJECT_0;},10000),"profile natural shell exit");DWORD code=0;check(GetExitCodeProcess(s.descendant.value,&code)&&code==37,"profile shell exit 37");}
@@ -166,7 +198,7 @@ void exercise(Context &c,const Spec &spec){
     for(int n=0;n<8;++n)s.input("\x1b[D");s.input("\x7fI\x1b[F\r");
     check(s.until([&]{return shell.atPrompt() && GetFileAttributesW((c.out+L"\\Editing.json").c_str())!=INVALID_FILE_ATTRIBUTES;}),"profile editing result");keep(L"Editing");
     shell.command(name+L" History 'HISTORY_OK'");const auto first=number(shell.proof(L"History"),"Invocation");
-    s.input("\x1b[A\r");check(s.until([&]{try{return shell.atPrompt() && number(fileText(c.out+L"\\History.json"),"Invocation")>first;}catch(...){return false;}}),"profile in-memory history recall");keep(L"History");
+    s.input("\x1b[A\r");check(s.until([&]{try{return shell.atPrompt() && number(profileText(c.out+L"\\History.json"),"Invocation")>first;}catch(...){return false;}}),"profile in-memory history recall");keep(L"History");
     shell.command(L"VT7PtyProfileComple\t");keep(L"Completion");
     s.input(utf8(name+L" Multiline @'\rfirst\u010d\rsecond\u017e\r'@\r\r"));
     check(s.until([&]{return GetFileAttributesW((c.out+L"\\Multiline.json").c_str())!=INVALID_FILE_ATTRIBUTES && shell.atPrompt();},15000),"profile multiline result");keep(L"Multiline");
