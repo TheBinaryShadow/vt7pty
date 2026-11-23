@@ -1,0 +1,64 @@
+[CmdletBinding()]
+param([Parameter(Mandatory=$true)][string]$Directory,[Parameter(Mandatory=$true)][string]$PackageRoot,
+    [Parameter(Mandatory=$true)][string]$OutputDirectory)
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+$OutputDirectory=[IO.Path]::GetFullPath($OutputDirectory)
+$artifactRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\artifacts')).TrimEnd('\')
+if(-not $OutputDirectory.StartsWith($artifactRoot+'\',[StringComparison]::OrdinalIgnoreCase) -or (Test-Path -LiteralPath $OutputDirectory)){throw 'Use a fresh control directory under repository artifacts.'}
+[void][IO.Directory]::CreateDirectory($OutputDirectory)
+$copy=Join-Path $OutputDirectory 'collection';Copy-Item -LiteralPath $Directory -Destination $copy -Recurse
+$reviewer=Join-Path $PSScriptRoot 'Test-ProfileEvidence.ps1'
+$baseline=& $reviewer -Directory $copy -PackageRoot $PackageRoot
+if($baseline.Mode -cne 'Automated'){throw 'Use a complete automated collection for bundle controls.'}
+function Save-B([string]$Path,$Value){[IO.File]::WriteAllText($Path,($Value | ConvertTo-Json -Depth 50),[Text.UTF8Encoding]::new($false))}
+function Inventory-B {
+    $files=@(Get-ChildItem -LiteralPath $copy -File -Recurse | Where-Object {$_.Name -cne 'evidence-files.json'} | Sort-Object FullName | ForEach-Object {
+        @{Path=$_.FullName.Substring($copy.Length+1).Replace('\','/');Bytes=$_.Length;Sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()}
+    })
+    Save-B (Join-Path $copy 'evidence-files.json') @{SchemaVersion=1;Files=$files}
+}
+$controls=@(
+    @{Name='wrong-manifest';File='report.json';Expected='matched profile candidate';Edit={param($v)$v.ManifestSha256=('0'*64)}},
+    @{Name='wrong-runtime';File='report.json';Expected='matched profile candidate';Edit={param($v)$v.Runtime.SourceCommit=('0'*40)}},
+    @{Name='wrong-harness';File='report.json';Expected='matched profile candidate';Edit={param($v)$v.Harness.SourceCommit=('0'*40)}},
+    @{Name='false-acceptance';File='report.json';Expected='matched profile candidate';Edit={param($v)$v.Step12Accepted=$true}},
+    @{Name='inherited-bypass';File='report.json';Expected='prerequisites/privacy';Edit={param($v)$v.PolicyOverrideInherited=$true}},
+    @{Name='false-ordinary-coverage';File='report.json';Expected='explicitly unqualified';Edit={param($v)$v.OrdinaryUserProfiles='Pass'}},
+    @{Name='missing-trial';File='report.json';Expected='ordered profile trial';Edit={param($v)$v.Trials=@($v.Trials | Select-Object -Skip 1)}},
+    @{Name='wrong-role';File='report.json';Expected='ordered profile trial';Edit={param($v)$v.Trials[1].Role='Guard'}},
+    @{Name='partial-trial';File='report.json';Expected='completed profile controller';Edit={param($v)$v.Trials[0].CollectionStatus='Partial'}},
+    @{Name='wrong-original-policy';File='report.json';Expected='original process policy';Edit={param($v)$v.OriginalProcessPolicy.Present=$true;$v.OriginalProcessPolicy.Value='AllSigned'}},
+    @{Name='failed-profile-proof';File='02-profiles\native\wps-clean-native\Editing.json';Expected='command proof Editing';Edit={param($v)$v.Matched=$false}},
+    @{Name='missing-profile-case';File='02-profiles\native\cases.json';Expected='case inventory';Edit={param($v)$v.Cases=@($v.Cases | Select-Object -Skip 1)}}
+)
+$profile=Join-Path $copy '02-profiles\native\probe.json'
+if((Get-Content -Raw -LiteralPath $profile | ConvertFrom-Json).PSObject.Properties['ConfigurationChecks']){
+    $controls+=@(
+        @{Name='configuration-proof-omitted';File='02-profiles\native\probe.json';Expected='required controlled profile configuration';Edit={
+            param($v)$v.PSObject.Properties.Remove('ConfigurationChecks')
+        }}
+    )
+}
+$results=@()
+foreach($control in $controls){
+    $path=Join-Path $copy $control.File;$bytes=[IO.File]::ReadAllBytes($path)
+    try{
+        $value=[Text.Encoding]::UTF8.GetString($bytes) | ConvertFrom-Json;& $control.Edit $value;Save-B $path $value;Inventory-B
+        $reason='';try{$null=& $reviewer -Directory $copy -PackageRoot $PackageRoot}catch{$reason=$_.Exception.Message}
+        if(-not $reason.Contains($control.Expected)){throw ('Missed '+$control.Name+': '+$reason)}
+        $results+=@(@{Case=$control.Name;Rejected=$true;Reason=$reason})
+    }finally{[IO.File]::WriteAllBytes($path,$bytes);Inventory-B}
+}
+$path=Join-Path $copy 'evidence-files.json';$bytes=[IO.File]::ReadAllBytes($path)
+try{
+    $value=[Text.Encoding]::UTF8.GetString($bytes) | ConvertFrom-Json;$value.Files=@($value.Files | Select-Object -Skip 1);Save-B $path $value
+    $reason='';try{$null=& $reviewer -Directory $copy -PackageRoot $PackageRoot}catch{$reason=$_.Exception.Message}
+    if(-not $reason.Contains('complete profile evidence inventory')){throw 'An omitted evidence file was accepted.'}
+    $results+=@(@{Case='missing-inventory-entry';Rejected=$true;Reason=$reason})
+}finally{[IO.File]::WriteAllBytes($path,$bytes)}
+$again=& $reviewer -Directory $copy -PackageRoot $PackageRoot
+if($again.Status -cne 'Pass' -or $again.Reviews.Count -ne $baseline.Reviews.Count){throw 'Restored bundle did not pass.'}
+$result=[ordered]@{Kind='ProfileBundleReviewerControls';Status='Pass';Rejected=$results.Count;BaselineStatus=$baseline.Status;Controls=$results;Step12Accepted=$false}
+Save-B (Join-Path $OutputDirectory 'review.json') $result
+$result

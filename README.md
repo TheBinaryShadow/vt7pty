@@ -39,8 +39,8 @@ with the H4 guards still passing. The [input rc2 review](docs/validation/2026-11
 qualifies those fixes on all three tiers: 387/387 input cases, 345/345 H4 guards,
 21 lifetime/fault guards and 42 regressions pass. The
 [profile rc2 Windows 7 review](docs/validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
-verifies all frozen controls. I still need to resolve the fixture and manual
-startup failures before completing the profile matrix.
+verifies all frozen controls. I prepared [profile rc3](docs/validation/2026-11-23-step-1.2-profiles-rc3-candidate.md)
+to finish the controlled and ordinary-profile matrix on Windows 7.
 VT7 integration comes after the backend and its API are ready. VT7Pty does not
 yet replace ConPTY for unmodified applications. I am not planning a kernel driver.
 

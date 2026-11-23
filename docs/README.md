@@ -47,8 +47,9 @@ its frozen H4 guards pass. The [input rc2 review](validation/2026-11-19-step-1.2
 qualifies the corrections on all three tiers: 387/387 input cases, 345/345 H4
 guards, 21 lifetime/fault guards and 42 regressions pass. The
 [profile rc2 Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
-verifies all frozen controls and records the remaining fixture and
-ordinary-profile blockers.
+verifies all frozen controls and records the fixture and ordinary-profile
+failures addressed in [rc3](validation/2026-11-23-step-1.2-profiles-rc3-candidate.md).
+I still need the Windows 7 rc3 results.
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |

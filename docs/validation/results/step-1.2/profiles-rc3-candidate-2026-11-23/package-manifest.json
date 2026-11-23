@@ -1,0 +1,497 @@
+{
+  "Kind": "VT7PtyProfileCandidate",
+  "SchemaVersion": 1,
+  "Step12Accepted": false,
+  "Runtime": {
+    "SourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+    "UnchangedFromInputRc2": true,
+    "ArchiveSha256": "93d1a1b290d796124b143d490181a861d6224bc61f36ca1cbe46113585a57fb5",
+    "ManifestSha256": "e66b761b06c4c99fb885dcfe1862537cd9fb3dd577365569668639ccd09f7517",
+    "Version": "0.5.1-dev",
+    "ApiVersion": "1.1",
+    "ProtocolVersion": 2,
+    "Architecture": "x64"
+  },
+  "Harness": {
+    "SourceCommit": "e231efe8e7e6ea1b793f63c38a2505839b92201f",
+    "SourceTreeClean": true,
+    "Architecture": "x64",
+    "Configuration": "Release"
+  },
+  "Reference": {
+    "SourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+    "Files": [
+      {
+        "Name": "BackendSmokeTest.exe",
+        "Bytes": 202752,
+        "Sha256": "e0a9943402829403cba638c15eb516dff265f5ee43459fe943d2ab51e4ce6c3e"
+      },
+      {
+        "Name": "BackendSmokeTest.pdb",
+        "Bytes": 4829184,
+        "Sha256": "094b23e13f3f8d336ff32f93359d2e3db744aff10241237754bda25f258f8ac0"
+      },
+      {
+        "Name": "H4TestGate.dll",
+        "Bytes": 129024,
+        "Sha256": "1c1e9feae43fb55cf41bbdeeb0a19113831d6181e8dde921b7fff9489ebd29f0"
+      },
+      {
+        "Name": "H4TestGate.pdb",
+        "Bytes": 4034560,
+        "Sha256": "655f78cce024bd99ed2829059c13b3787699212549a522846b1beb46d0498bc8"
+      },
+      {
+        "Name": "ModernCppTest.exe",
+        "Bytes": 497664,
+        "Sha256": "4ccc1b1cc631e54114659772c78303b12b7481874f7416ee8c31f5853e566004"
+      },
+      {
+        "Name": "ModernCppTest.pdb",
+        "Bytes": 6754304,
+        "Sha256": "0a08fc57413ee7fd439b9d9fb3061b77017e8ac5290296fe9f0dd8b7012e9fbc"
+      },
+      {
+        "Name": "ProtocolTest.exe",
+        "Bytes": 214016,
+        "Sha256": "66e82361433156e63742eeb879cde744c7e6b130cdd1222a5b3a65a7a6ddef0b"
+      },
+      {
+        "Name": "ProtocolTest.pdb",
+        "Bytes": 4976640,
+        "Sha256": "82cb4c1ceba2eafb38927bdbb75e50e420ff170cda14fd21f29075560daa1f52"
+      },
+      {
+        "Name": "ProtocolTestAgent.exe",
+        "Bytes": 197632,
+        "Sha256": "0cfea9d0572a9c9be11b7ef3fbb6f8be7dc5fea2b11ca1f50a82a30d4cce87a3"
+      },
+      {
+        "Name": "ProtocolTestAgent.pdb",
+        "Bytes": 4886528,
+        "Sha256": "6022c988f6e7fbd0c403ae73155d00710785aebe08f1b34e46ce24c4d8b57419"
+      },
+      {
+        "Name": "RuntimeCancellationTest.exe",
+        "Bytes": 988160,
+        "Sha256": "23a0b24914658eab304c7aaad40afea7fc81f2961ef49716e0022503ce69dfb2"
+      },
+      {
+        "Name": "RuntimeCancellationTest.pdb",
+        "Bytes": 10752000,
+        "Sha256": "a3eec97629b096a1feda43d13b832eca6b3b4c416b659ab3846afbee2513f214"
+      },
+      {
+        "Name": "SessionContractTest.exe",
+        "Bytes": 194048,
+        "Sha256": "cb47f57bf61608f8d922ff826070a540d47e7ecd85581a3eee904f2289ec8b7c"
+      },
+      {
+        "Name": "SessionContractTest.pdb",
+        "Bytes": 4714496,
+        "Sha256": "04f01e61ed09f42b3e1ff36c3cb93cb6db19e329f756fe79235acf0f92fa3a05"
+      },
+      {
+        "Name": "SessionFixture.exe",
+        "Bytes": 146432,
+        "Sha256": "50183a7f902e1f50c25462038cacfefe5bc264a6dbd40a4fc2384a375368d8f6"
+      },
+      {
+        "Name": "SessionFixture.pdb",
+        "Bytes": 3878912,
+        "Sha256": "48f51bbf9949fa2a45f6aeb282b02c4e787f285c7cd8938aafa2d7d6821252b8"
+      },
+      {
+        "Name": "VT7Pty-Agent.exe",
+        "Bytes": 668160,
+        "Sha256": "845d57a34fdaa5c49973fdc658fa53f0d97e461c2b33abdd1141ccdaa3a815f6"
+      },
+      {
+        "Name": "VT7Pty-Agent.pdb",
+        "Bytes": 8589312,
+        "Sha256": "b76be7d4dc688622b28fde6534c7a96b4bf15650afcc1593375fb6287c103569"
+      },
+      {
+        "Name": "VT7Pty-DebugServer.exe",
+        "Bytes": 460288,
+        "Sha256": "22f291eda38598bbd1cfd38ac9f6ea29d26af2fd9e7e6d320d8012a4bb6ed22a"
+      },
+      {
+        "Name": "VT7Pty-DebugServer.pdb",
+        "Bytes": 6656000,
+        "Sha256": "22f7c868d7b3a9c94439a0cd62728479e344c60cca4fe71869330f22bf41ae0b"
+      },
+      {
+        "Name": "VT7Pty-Host.dll",
+        "Bytes": 438784,
+        "Sha256": "b9fe9407a7d370baa7c31d58214ebfcb578a614200720bd4f05071eb2858a35b"
+      },
+      {
+        "Name": "VT7Pty-Host.pdb",
+        "Bytes": 6451200,
+        "Sha256": "e3dc82b656d4c80a3651c3aa0806b63745c10eb4ad81f1bc68a212e9db3c5ba3"
+      },
+      {
+        "Name": "VT7Pty.dll",
+        "Bytes": 521216,
+        "Sha256": "4a967e8faf254528652d4e62853bb7029f544171930aec7db2e092121eb8ecde"
+      },
+      {
+        "Name": "VT7Pty.pdb",
+        "Bytes": 7262208,
+        "Sha256": "31325170c7df00c71cc05d1e0c4b67c55ccb1a9febf4fd82fff12603f5fdb09a"
+      },
+      {
+        "Name": "VtStateTest.exe",
+        "Bytes": 209920,
+        "Sha256": "f6389ee4727dd0c423a87449ec23a059f4ea4f37db703bb291477a7839fbd8a8"
+      },
+      {
+        "Name": "VtStateTest.pdb",
+        "Bytes": 4673536,
+        "Sha256": "84235440b4fd0f29749b3bfdb52513a964192d70a53b819a981c44057447237c"
+      }
+    ],
+    "GuardCasesByTier": {
+      "Legacy": 33,
+      "DevelopmentHost": 41,
+      "NonESU": 41,
+      "ESU": 41
+    },
+    "InputCases": 43
+  },
+  "Profiles": {
+    "CasesByTier": {
+      "Legacy": 2,
+      "DevelopmentHost": 4,
+      "NonESU": 4,
+      "ESU": 4
+    },
+    "Repetitions": 3,
+    "PublicationChecks": 3,
+    "ConfigurationChecks": 1,
+    "Source": "ControlledInlineFixtures",
+    "OrdinaryUserProfiles": "NotRun"
+  },
+  "Manual": {
+    "Required": true,
+    "EnginesByTier": {
+      "Legacy": [
+        "wps"
+      ],
+      "DevelopmentHost": [
+        "wps",
+        "pwsh"
+      ],
+      "NonESU": [
+        "wps",
+        "pwsh"
+      ],
+      "ESU": [
+        "wps",
+        "pwsh"
+      ]
+    },
+    "Stages": 8,
+    "StartupHandshake": 1,
+    "Source": "PhysicalConsoleInput",
+    "LoadsRealProfiles": true,
+    "SavesShellOutput": false,
+    "ChangesGlobalProfiles": false,
+    "OverridesExecutionPolicy": false
+  },
+  "CtrlBreakTransport": "Unsupported",
+  "ApiFramingLimitsUnchanged": true,
+  "Files": [
+    {
+      "Path": "compiled-profile-cases.json",
+      "Bytes": 557,
+      "Sha256": "d86d2f136a9c5324646da6626fb1414a015efa2bcec023e6481538586203c0e1"
+    },
+    {
+      "Path": "CREDITS.md",
+      "Bytes": 2612,
+      "Sha256": "b09fa585b37eeb95c6fa37c99c921afb2c47d7d3fa9ac07c5328bf8cc1b9172f"
+    },
+    {
+      "Path": "harness-build.txt",
+      "Bytes": 2121,
+      "Sha256": "6b2a189ee2702798d38299c47416c768b9dfbcac3effcb6a1aa2a57a7a83979e"
+    },
+    {
+      "Path": "harness-oracles.json",
+      "Bytes": 778,
+      "Sha256": "f5471da9211bebb5d1907d1fb0cc5be540655c67289a8788f6ce403be6466fc4"
+    },
+    {
+      "Path": "LICENSE.txt",
+      "Bytes": 1144,
+      "Sha256": "40fbb045b2176d0b68fb915d8731034ad1bdf863b588a2bb7a15c1d3b4611488"
+    },
+    {
+      "Path": "profiles/bin/RuntimeCancellationTest.exe",
+      "Bytes": 1193472,
+      "Sha256": "94bcc39f09200dec74e07fbb6d16780a1775427950aad18903d74a29935363e6"
+    },
+    {
+      "Path": "profiles/bin/RuntimeCancellationTest.pdb",
+      "Bytes": 12038144,
+      "Sha256": "7da0fc4d163830f880e641aa944bebbf4b843df6a66282eadaead64e2a1bc834"
+    },
+    {
+      "Path": "profiles/bin/VT7Pty-Agent.exe",
+      "Bytes": 668160,
+      "Sha256": "845d57a34fdaa5c49973fdc658fa53f0d97e461c2b33abdd1141ccdaa3a815f6"
+    },
+    {
+      "Path": "profiles/bin/VT7Pty-Agent.pdb",
+      "Bytes": 8589312,
+      "Sha256": "b76be7d4dc688622b28fde6534c7a96b4bf15650afcc1593375fb6287c103569"
+    },
+    {
+      "Path": "profiles/bin/VT7Pty-DebugServer.exe",
+      "Bytes": 460288,
+      "Sha256": "22f291eda38598bbd1cfd38ac9f6ea29d26af2fd9e7e6d320d8012a4bb6ed22a"
+    },
+    {
+      "Path": "profiles/bin/VT7Pty-DebugServer.pdb",
+      "Bytes": 6656000,
+      "Sha256": "22f7c868d7b3a9c94439a0cd62728479e344c60cca4fe71869330f22bf41ae0b"
+    },
+    {
+      "Path": "profiles/bin/VT7Pty-Host.dll",
+      "Bytes": 438784,
+      "Sha256": "b9fe9407a7d370baa7c31d58214ebfcb578a614200720bd4f05071eb2858a35b"
+    },
+    {
+      "Path": "profiles/bin/VT7Pty-Host.pdb",
+      "Bytes": 6451200,
+      "Sha256": "e3dc82b656d4c80a3651c3aa0806b63745c10eb4ad81f1bc68a212e9db3c5ba3"
+    },
+    {
+      "Path": "profiles/bin/VT7Pty.dll",
+      "Bytes": 521216,
+      "Sha256": "4a967e8faf254528652d4e62853bb7029f544171930aec7db2e092121eb8ecde"
+    },
+    {
+      "Path": "profiles/bin/VT7Pty.pdb",
+      "Bytes": 7262208,
+      "Sha256": "31325170c7df00c71cc05d1e0c4b67c55ccb1a9febf4fd82fff12603f5fdb09a"
+    },
+    {
+      "Path": "publication-oracle.json",
+      "Bytes": 252,
+      "Sha256": "d133b1bc3b8586000f1fa1e47fe1faf588304aafc6857316fd42592be7311e31"
+    },
+    {
+      "Path": "README.md",
+      "Bytes": 9734,
+      "Sha256": "27c8449c3fcb2a838940444a7741c9295134d027dbad178338bc4c39ad6106de"
+    },
+    {
+      "Path": "reference/bin/BackendSmokeTest.exe",
+      "Bytes": 202752,
+      "Sha256": "e0a9943402829403cba638c15eb516dff265f5ee43459fe943d2ab51e4ce6c3e"
+    },
+    {
+      "Path": "reference/bin/BackendSmokeTest.pdb",
+      "Bytes": 4829184,
+      "Sha256": "094b23e13f3f8d336ff32f93359d2e3db744aff10241237754bda25f258f8ac0"
+    },
+    {
+      "Path": "reference/bin/H4TestGate.dll",
+      "Bytes": 129024,
+      "Sha256": "1c1e9feae43fb55cf41bbdeeb0a19113831d6181e8dde921b7fff9489ebd29f0"
+    },
+    {
+      "Path": "reference/bin/H4TestGate.pdb",
+      "Bytes": 4034560,
+      "Sha256": "655f78cce024bd99ed2829059c13b3787699212549a522846b1beb46d0498bc8"
+    },
+    {
+      "Path": "reference/bin/ModernCppTest.exe",
+      "Bytes": 497664,
+      "Sha256": "4ccc1b1cc631e54114659772c78303b12b7481874f7416ee8c31f5853e566004"
+    },
+    {
+      "Path": "reference/bin/ModernCppTest.pdb",
+      "Bytes": 6754304,
+      "Sha256": "0a08fc57413ee7fd439b9d9fb3061b77017e8ac5290296fe9f0dd8b7012e9fbc"
+    },
+    {
+      "Path": "reference/bin/ProtocolTest.exe",
+      "Bytes": 214016,
+      "Sha256": "66e82361433156e63742eeb879cde744c7e6b130cdd1222a5b3a65a7a6ddef0b"
+    },
+    {
+      "Path": "reference/bin/ProtocolTest.pdb",
+      "Bytes": 4976640,
+      "Sha256": "82cb4c1ceba2eafb38927bdbb75e50e420ff170cda14fd21f29075560daa1f52"
+    },
+    {
+      "Path": "reference/bin/ProtocolTestAgent.exe",
+      "Bytes": 197632,
+      "Sha256": "0cfea9d0572a9c9be11b7ef3fbb6f8be7dc5fea2b11ca1f50a82a30d4cce87a3"
+    },
+    {
+      "Path": "reference/bin/ProtocolTestAgent.pdb",
+      "Bytes": 4886528,
+      "Sha256": "6022c988f6e7fbd0c403ae73155d00710785aebe08f1b34e46ce24c4d8b57419"
+    },
+    {
+      "Path": "reference/bin/RuntimeCancellationTest.exe",
+      "Bytes": 988160,
+      "Sha256": "23a0b24914658eab304c7aaad40afea7fc81f2961ef49716e0022503ce69dfb2"
+    },
+    {
+      "Path": "reference/bin/RuntimeCancellationTest.pdb",
+      "Bytes": 10752000,
+      "Sha256": "a3eec97629b096a1feda43d13b832eca6b3b4c416b659ab3846afbee2513f214"
+    },
+    {
+      "Path": "reference/bin/SessionContractTest.exe",
+      "Bytes": 194048,
+      "Sha256": "cb47f57bf61608f8d922ff826070a540d47e7ecd85581a3eee904f2289ec8b7c"
+    },
+    {
+      "Path": "reference/bin/SessionContractTest.pdb",
+      "Bytes": 4714496,
+      "Sha256": "04f01e61ed09f42b3e1ff36c3cb93cb6db19e329f756fe79235acf0f92fa3a05"
+    },
+    {
+      "Path": "reference/bin/SessionFixture.exe",
+      "Bytes": 146432,
+      "Sha256": "50183a7f902e1f50c25462038cacfefe5bc264a6dbd40a4fc2384a375368d8f6"
+    },
+    {
+      "Path": "reference/bin/SessionFixture.pdb",
+      "Bytes": 3878912,
+      "Sha256": "48f51bbf9949fa2a45f6aeb282b02c4e787f285c7cd8938aafa2d7d6821252b8"
+    },
+    {
+      "Path": "reference/bin/VT7Pty-Agent.exe",
+      "Bytes": 668160,
+      "Sha256": "845d57a34fdaa5c49973fdc658fa53f0d97e461c2b33abdd1141ccdaa3a815f6"
+    },
+    {
+      "Path": "reference/bin/VT7Pty-Agent.pdb",
+      "Bytes": 8589312,
+      "Sha256": "b76be7d4dc688622b28fde6534c7a96b4bf15650afcc1593375fb6287c103569"
+    },
+    {
+      "Path": "reference/bin/VT7Pty-DebugServer.exe",
+      "Bytes": 460288,
+      "Sha256": "22f291eda38598bbd1cfd38ac9f6ea29d26af2fd9e7e6d320d8012a4bb6ed22a"
+    },
+    {
+      "Path": "reference/bin/VT7Pty-DebugServer.pdb",
+      "Bytes": 6656000,
+      "Sha256": "22f7c868d7b3a9c94439a0cd62728479e344c60cca4fe71869330f22bf41ae0b"
+    },
+    {
+      "Path": "reference/bin/VT7Pty-Host.dll",
+      "Bytes": 438784,
+      "Sha256": "b9fe9407a7d370baa7c31d58214ebfcb578a614200720bd4f05071eb2858a35b"
+    },
+    {
+      "Path": "reference/bin/VT7Pty-Host.pdb",
+      "Bytes": 6451200,
+      "Sha256": "e3dc82b656d4c80a3651c3aa0806b63745c10eb4ad81f1bc68a212e9db3c5ba3"
+    },
+    {
+      "Path": "reference/bin/VT7Pty.dll",
+      "Bytes": 521216,
+      "Sha256": "4a967e8faf254528652d4e62853bb7029f544171930aec7db2e092121eb8ecde"
+    },
+    {
+      "Path": "reference/bin/VT7Pty.pdb",
+      "Bytes": 7262208,
+      "Sha256": "31325170c7df00c71cc05d1e0c4b67c55ccb1a9febf4fd82fff12603f5fdb09a"
+    },
+    {
+      "Path": "reference/bin/VtStateTest.exe",
+      "Bytes": 209920,
+      "Sha256": "f6389ee4727dd0c423a87449ec23a059f4ea4f37db703bb291477a7839fbd8a8"
+    },
+    {
+      "Path": "reference/bin/VtStateTest.pdb",
+      "Bytes": 4673536,
+      "Sha256": "84235440b4fd0f29749b3bfdb52513a964192d70a53b819a981c44057447237c"
+    },
+    {
+      "Path": "reference/input-cases.json",
+      "Bytes": 17021,
+      "Sha256": "a333b379337927d75a09bca0977429cefec881524fd41bc19bbe4c75ab31c3ce"
+    },
+    {
+      "Path": "reference/manifest.json",
+      "Bytes": 13163,
+      "Sha256": "e66b761b06c4c99fb885dcfe1862537cd9fb3dd577365569668639ccd09f7517"
+    },
+    {
+      "Path": "RUN-PROFILES-ESU.cmd",
+      "Bytes": 769,
+      "Sha256": "f9c62d62ef7a2998cd35bf6f29abe4efc3a126717728a70748729aaa81440fb5"
+    },
+    {
+      "Path": "RUN-PROFILES-LEGACY.cmd",
+      "Bytes": 772,
+      "Sha256": "3c6e9df54ebcca79e79ede1868064572bb16b7baea2e22ef9ee4a3498b1ed957"
+    },
+    {
+      "Path": "RUN-PROFILES-MANUAL-ESU.cmd",
+      "Bytes": 777,
+      "Sha256": "1c434f83a34096fea7dd0647c09f59a3139b97d6aeb379937dfe108995ef4c95"
+    },
+    {
+      "Path": "RUN-PROFILES-MANUAL-LEGACY.cmd",
+      "Bytes": 780,
+      "Sha256": "effc2f124d0660f5710833f112f0e2799ae8ef4c3a409582f0f58026d268afbf"
+    },
+    {
+      "Path": "RUN-PROFILES-MANUAL-NONESU.cmd",
+      "Bytes": 780,
+      "Sha256": "b857d3f25e0c5f75087a41e136d351dd4846c77944eddf939a47e3b70c576b7d"
+    },
+    {
+      "Path": "RUN-PROFILES-NONESU.cmd",
+      "Bytes": 772,
+      "Sha256": "ff8d031f87e78b8351cba0887deef9e261803b7fcb4d09639e43e18f7eb7c010"
+    },
+    {
+      "Path": "tools/platform/NativeCapture.ps1",
+      "Bytes": 3925,
+      "Sha256": "48d8f24ea254558afb96f1ded929613149ede96269c9c2e9286c5be6bcca4d20"
+    },
+    {
+      "Path": "tools/platform/Windows7Compat.ps1",
+      "Bytes": 3716,
+      "Sha256": "d9fa8fa15c9eb514b3c5be506340914c46458d41e95bc97a33bcdbc191b693e6"
+    },
+    {
+      "Path": "tools/profiles/cases.json",
+      "Bytes": 802,
+      "Sha256": "fb569e683651c167aff54270b22e00d827f360518ad651f580282336a4d84c70"
+    },
+    {
+      "Path": "tools/profiles/Invoke-ProfileTests.ps1",
+      "Bytes": 11065,
+      "Sha256": "96c3e86a2d942364c923d48c705d8ee9ac55cc49c21adf8b644ee6fd7f42cecf"
+    },
+    {
+      "Path": "tools/profiles/ProfileJsonWriter.ps1",
+      "Bytes": 2645,
+      "Sha256": "e86563bff3bbe0f0394a8a6ac34d61b60310812c601bc09947d423bd18ec29e7"
+    },
+    {
+      "Path": "tools/profiles/ProfileProbe.ps1",
+      "Bytes": 9937,
+      "Sha256": "f3894f188d10314a3ec5feca282002da43b1d2d1d6e02f31ef6929c83d5bc7c0"
+    },
+    {
+      "Path": "UPSTREAM.md",
+      "Bytes": 3236,
+      "Sha256": "62411e9234083f7dc35404f32e14992677adb9a8f761b65ba82589a8a3e9a060"
+    }
+  ]
+}

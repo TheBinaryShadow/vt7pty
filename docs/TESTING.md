@@ -13,7 +13,8 @@ qualifies the fixes on all three tiers: 387 input cases, 345 H4 guards, 21
 lifetime/fault guards and 42 regressions pass. The
 [profile rc2 Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
 verifies all frozen controls and finds profile fixture and startup failures.
-The profile matrix needs a corrected runner before its next qualification run.
+The [rc3 package](validation/2026-11-23-step-1.2-profiles-rc3-candidate.md)
+passes local qualification with those corrections.
 
 I use local native tests, portable Windows 7 packages and focused research
 probes. They answer different questions, so a passing research probe does not

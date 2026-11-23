@@ -1,0 +1,22 @@
+$ErrorActionPreference='Stop'
+$repo='D:\Git\vt7pty'
+$exact=Join-Path $repo 'artifacts\fidelity\profiles-rc3-exact'
+$dev=Join-Path $repo 'artifacts\fidelity\profiles-rc3-dev'
+$env:VT7PTY_H4_RUNTIME_SOURCE='0ca6e3fa78481cd4df35820b9fe3988f46e0bff4'
+$env:VT7PTY_H3_PWSH=Join-Path $repo 'artifacts\fidelity\applications\PowerShell-7.2.24-win-x64\pwsh.exe'
+$env:VT7PTY_PROFILE_PROBE_SOURCE=Join-Path $exact 'tools\profiles\ProfileProbe.ps1'
+$env:VT7PTY_PROFILE_JSON_WRITER_SOURCE=Join-Path $exact 'tools\profiles\ProfileJsonWriter.ps1'
+$exe=Join-Path $exact 'profiles\bin\RuntimeCancellationTest.exe'
+$env:VT7PTY_H4_LEGACY='1'
+& $exe --profiles-run (Join-Path $dev 'exact-legacy')
+if($LASTEXITCODE){exit $LASTEXITCODE}
+$env:VT7PTY_PROFILE_WIDE_SMOKE='1'
+& $exe --profiles-manual-smoke wps (Join-Path $dev 'exact-ps2-manual')
+if($LASTEXITCODE){exit $LASTEXITCODE}
+$env:VT7PTY_H4_LEGACY=''
+$env:VT7PTY_PROFILE_WIDE_SMOKE=''
+& $exe --profiles-manual-smoke wps (Join-Path $dev 'exact-wps-manual')
+if($LASTEXITCODE){exit $LASTEXITCODE}
+$env:VT7PTY_PROFILE_WIDE_SMOKE='1'
+& $exe --profiles-manual-smoke pwsh (Join-Path $dev 'exact-pwsh-manual')
+exit $LASTEXITCODE

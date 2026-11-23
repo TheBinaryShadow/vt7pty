@@ -1,0 +1,180 @@
+{
+  "Kind": "ProfileReviewerControls",
+  "Status": "Pass",
+  "Rejected": 34,
+  "FixtureCases": 4,
+  "ManualStages": 8,
+  "Controls": [
+    {
+      "Reason": "Profile evidence: native profile identity and explicit fixture scope",
+      "Case": "wrong-runtime",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: native profile identity and explicit fixture scope",
+      "Case": "false-ordinary-fixture",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: native profile identity and explicit fixture scope",
+      "Case": "false-step-acceptance",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: complete fixture case inventory",
+      "Case": "missing-case",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: controlled launch arguments",
+      "Case": "changed-launch",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: shell and retained session identity/cleanup",
+      "Case": "wrong-shell-parent",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: profile files preserved",
+      "Case": "changed-profile",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: execution policy preserved",
+      "Case": "changed-policy",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: stable profile session identity",
+      "Case": "wrong-precedence",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: typed startup and setup error evidence",
+      "Case": "startup-errors",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: command proof Editing",
+      "Case": "wrong-backend-text",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: exact controlled invocation count",
+      "Case": "history-not-recalled",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: native child identity/event/exit",
+      "Case": "wrong-child-event",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: actual profile resize readback",
+      "Case": "wrong-resize",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: shell and retained session identity/cleanup",
+      "Case": "host-not-cleaned",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: physical ordinary source, never synthetic acceptance",
+      "Case": "manual-false-profiles",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: ordinary profile completion/privacy",
+      "Case": "manual-private-content",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: complete manual checkpoint and resize inventory",
+      "Case": "manual-no-resize",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: manual checkpoint source",
+      "Case": "manual-wrong-input-source",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: physical editing/history/completion key",
+      "Case": "manual-no-edit-key",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: editor options preserved",
+      "Case": "manual-changed-editor",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: held-reader publication checks",
+      "Case": "replacement-while-held-failed",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: original and replaced publication proofs",
+      "Case": "stale-published-proof",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: startup errors match native clean shell",
+      "Case": "unmatched-startup-error",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: matching native clean-shell reference",
+      "Case": "native-reference-uses-profiles",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: classified prediction setting and restoration",
+      "Case": "prediction-ambiguous",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: classified prediction setting and restoration",
+      "Case": "prediction-not-restored",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: complete F8 startup handshake",
+      "Case": "manual-helpers-unconfirmed",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: complete F8 startup handshake",
+      "Case": "manual-startup-different-shell",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: display buffer contains inherited and active windows",
+      "Case": "manual-buffer-too-small",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: physical ordinary source, never synthetic acceptance",
+      "Case": "synthetic-is-not-physical",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: canceled profile line never executes",
+      "Case": "canceled-line-executed",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: no ordinary output/transcript collection",
+      "Case": "ordinary-output-collected",
+      "Rejected": true
+    },
+    {
+      "Reason": "Profile evidence: trace runtime/harness/API/protocol",
+      "Case": "wrong-trace-runtime",
+      "Rejected": true
+    }
+  ],
+  "Step12Accepted": false
+}

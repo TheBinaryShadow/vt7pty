@@ -7,8 +7,9 @@ are accepted within their recorded boundaries. The [input rc2 review](docs/valid
 qualifies the decoder/framing fixes on all three Windows 7 tiers, with 387/387
 input cases and 345/345 H4 guards passing. The
 [profile rc2 Windows 7 review](docs/validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
-verifies all frozen controls. Profile qualification remains open while I address
-fixture setup and manual startup failures. The public Break gap, input/reply
+verifies all frozen controls. I corrected the fixture and manual startup
+issues in [profile rc3](docs/validation/2026-11-23-step-1.2-profiles-rc3-candidate.md).
+Windows 7 profile qualification remains open. The public Break gap, input/reply
 contract limits and VT7 integration remain open.
 
 I check an item only when its stated work and required tests are complete.
@@ -119,8 +120,8 @@ public-API experiments failed. I'm now following the
   regressions. The unchanged rc1 reference retains its three failures per machine.
 - [ ] Qualify the [controlled and ordinary-profile matrix](docs/PROFILE_TESTS.md)
   on all three Windows 7 tiers. The [rc2 results](docs/validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
-  confirm passing frozen controls, with legacy serialization, fixture setup
-  and ordinary-profile startup still to resolve.
+  confirm passing frozen controls. The corrected rc3 package passes local
+  qualification and needs the controlled and ordinary-profile Windows 7 runs.
 - [ ] Record the final F01-F03 and Step 1.2 scope after reviewing that coverage. Public Ctrl+Break transport
   remains unsupported by explicit decision; all 24 native references in rc2
   pass. Escape latency and cursor-report/F3 ambiguity remain documented for

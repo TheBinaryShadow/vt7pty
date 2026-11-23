@@ -1,0 +1,79 @@
+{
+  "Kind": "ProfileBundleReviewerControls",
+  "Status": "Pass",
+  "Rejected": 14,
+  "BaselineStatus": "Pass",
+  "Controls": [
+    {
+      "Case": "wrong-manifest",
+      "Rejected": true,
+      "Reason": "Profile evidence: matched profile candidate and unchanged runtime"
+    },
+    {
+      "Case": "wrong-runtime",
+      "Rejected": true,
+      "Reason": "Profile evidence: matched profile candidate and unchanged runtime"
+    },
+    {
+      "Case": "wrong-harness",
+      "Rejected": true,
+      "Reason": "Profile evidence: matched profile candidate and unchanged runtime"
+    },
+    {
+      "Case": "false-acceptance",
+      "Rejected": true,
+      "Reason": "Profile evidence: matched profile candidate and unchanged runtime"
+    },
+    {
+      "Case": "inherited-bypass",
+      "Rejected": true,
+      "Reason": "Profile evidence: profile report prerequisites/privacy"
+    },
+    {
+      "Case": "false-ordinary-coverage",
+      "Rejected": true,
+      "Reason": "Profile evidence: ordinary profiles remain explicitly unqualified before review"
+    },
+    {
+      "Case": "missing-trial",
+      "Rejected": true,
+      "Reason": "Profile evidence: complete ordered profile trial inventory"
+    },
+    {
+      "Case": "wrong-role",
+      "Rejected": true,
+      "Reason": "Profile evidence: complete ordered profile trial inventory"
+    },
+    {
+      "Case": "partial-trial",
+      "Rejected": true,
+      "Reason": "Profile evidence: completed profile controller"
+    },
+    {
+      "Case": "wrong-original-policy",
+      "Rejected": true,
+      "Reason": "Profile evidence: original process policy restored before shell startup"
+    },
+    {
+      "Case": "failed-profile-proof",
+      "Rejected": true,
+      "Reason": "Profile evidence: command proof Editing"
+    },
+    {
+      "Case": "missing-profile-case",
+      "Rejected": true,
+      "Reason": "Profile evidence: complete fixture case inventory"
+    },
+    {
+      "Case": "configuration-proof-omitted",
+      "Rejected": true,
+      "Reason": "Profile evidence: required controlled profile configuration checks"
+    },
+    {
+      "Case": "missing-inventory-entry",
+      "Rejected": true,
+      "Reason": "Profile evidence: complete profile evidence inventory"
+    }
+  ],
+  "Step12Accepted": false
+}

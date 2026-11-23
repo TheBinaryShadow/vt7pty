@@ -8,6 +8,10 @@ I corrected the legacy snapshot writer, manual display setup, F8 startup and
 the automated verdict after the Windows 7 profile rc2 runs.
 [Profile rc2 Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
 
+The exact rc3 archive passes local qualification. The three Windows 7 runs
+will complete the controlled and ordinary-profile coverage.
+[Local rc3 review](validation/2026-11-23-step-1.2-profiles-rc3-candidate.md)
+
 ## Run on all three machines
 
 I extract the complete VT7Pty-profiles-0.5.1-dev-rc3.zip into a short local folder
