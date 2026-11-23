@@ -17,17 +17,31 @@ struct OutputCase {
     uint32_t codePage = 0;
     std::u32string_view text{};
     int width = 0;
+    bool widthProbe = false;
 
     bool isText() const {
         return action == OutputAction::WideText || action == OutputAction::ByteText;
     }
 };
 
+inline constexpr OutputCase combiningCase{
+    L"OUTPUT_COMBINING", OutputAction::WideText, L"e\u0301|", {}, 0, U"e\u0301|", 2, true
+};
+inline constexpr OutputCase ideographCase{
+    L"OUTPUT_WIDE", OutputAction::WideText, L"\u4e2d|", {}, 0, U"\u4e2d|", 3, true
+};
+
+inline constexpr OutputCase onOutputPage(OutputCase probe, std::wstring_view name, uint32_t page) {
+    probe.name = name;
+    probe.codePage = page;
+    return probe;
+}
+
 inline constexpr OutputCase outputCases[] = {
     {L"OUTPUT_LATIN", OutputAction::WideText, L"\u010d\u0107\u017e\u0161\u0111|",
         {}, 0, U"\u010d\u0107\u017e\u0161\u0111|", 6},
-    {L"OUTPUT_COMBINING", OutputAction::WideText, L"e\u0301|", {}, 0, U"e\u0301|", 2},
-    {L"OUTPUT_WIDE", OutputAction::WideText, L"\u4e2d|", {}, 0, U"\u4e2d|", 3},
+    combiningCase,
+    ideographCase,
     {L"OUTPUT_SUPPLEMENTARY", OutputAction::WideText, L"\U0001f642|", {}, 0, U"\U0001f642|", 3},
     {L"OUTPUT_CP437", OutputAction::ByteText, {}, "\x80\x82|", 437, U"\u00c7\u00e9|", 3},
     {L"OUTPUT_CP1250", OutputAction::ByteText, {}, "\xe8\xe6\x9e\x9a\xf0|", 1250,
@@ -40,6 +54,14 @@ inline constexpr OutputCase outputCases[] = {
     {L"OUTPUT_WRAP", OutputAction::Wrap},
     {L"OUTPUT_SCROLL", OutputAction::Scroll},
     {L"OUTPUT_RAW_VT", OutputAction::RawVT, L"\x1b[9;4H\x1b[31;44mV\x1b[0m"},
+    onOutputPage(combiningCase, L"OUTPUT_COMBINING_CP437", 437),
+    onOutputPage(ideographCase, L"OUTPUT_WIDE_CP437", 437),
+    onOutputPage(combiningCase, L"OUTPUT_COMBINING_CP852", 852),
+    onOutputPage(ideographCase, L"OUTPUT_WIDE_CP852", 852),
+    onOutputPage(combiningCase, L"OUTPUT_COMBINING_CP936", 936),
+    onOutputPage(ideographCase, L"OUTPUT_WIDE_CP936", 936),
+    onOutputPage(combiningCase, L"OUTPUT_COMBINING_CP65001", 65001),
+    onOutputPage(ideographCase, L"OUTPUT_WIDE_CP65001", 65001),
 };
 
 inline const OutputCase *findOutputCase(std::wstring_view name) {

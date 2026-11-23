@@ -37,6 +37,18 @@ int main() {
         require(unicode.at(0,0).text == U"\u0107" && unicode.at(1,0).text == U"e\u0301", "Unicode oracle");
         require(unicode.at(2,0).text == U"\u4e2d" && unicode.at(3,0).continuation &&
                 unicode.at(4,0).text == U"\U0001f642" && unicode.x() == 6, "wide corpus oracle");
+        VtState nativeSample(12,2,VtState::WidthPolicy::OneCellSamples);
+        nativeSample.feed("  e\xcc\x81|\r\n  \xe4\xb8\xad|");
+        nativeSample.finish();
+        require(nativeSample.at(2,0).text == U"e" && nativeSample.at(3,0).text == U"\u0301" &&
+            nativeSample.at(4,0).text == U"|" && nativeSample.at(2,1).text == U"\u4e2d" &&
+            nativeSample.at(3,1).text == U"|", "one-cell replay oracle");
+        VtState anchored(12,2);
+        anchored.feed("  e\xcc\x81\x1b[5G|\r\n  \xe4\xb8\xad\x1b[4G|");
+        anchored.finish();
+        require(anchored.at(2,0).text == U"e\u0301" && anchored.at(3,0).text == U" " &&
+            anchored.at(4,0).text == U"|" && anchored.at(2,1).text == U" " &&
+            anchored.at(3,1).text == U"|", "column anchoring collision oracle");
         VtState replacement(8,2); replacement.feed("\xe4\xb8\xad\x1b[2GX");
         require(replacement.at(0,0).text == U" " && replacement.at(1,0).text == U"X" &&
             !replacement.at(1,0).continuation,"wide overwrite oracle");

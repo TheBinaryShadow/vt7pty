@@ -7,10 +7,15 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
 $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 $root = [IO.Path]::GetFullPath((Join-Path $scriptDirectory '..\..')).TrimEnd('\')
-. (Join-Path $root 'tools\platform\Windows7Compat.ps1')
-. (Join-Path $root 'tools\platform\NativeCapture.ps1')
-. (Join-Path $scriptDirectory 'OutputEvidence.ps1')
-$manifest = Read-OutputPackage $root
+try {
+    . (Join-Path $root 'tools\platform\Windows7Compat.ps1')
+    . (Join-Path $root 'tools\platform\NativeCapture.ps1')
+    . (Join-Path $scriptDirectory 'OutputEvidence.ps1')
+    $manifest = Read-OutputPackage $root
+} catch {
+    Write-Host ('Output package startup failed: ' + $_.Exception.Message)
+    exit 2
+}
 
 $runId = $Tier.ToLowerInvariant() + '-output-' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') +
     '-' + [Guid]::NewGuid().ToString('N').Substring(0,8)

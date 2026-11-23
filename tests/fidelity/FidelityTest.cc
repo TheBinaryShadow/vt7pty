@@ -4,6 +4,7 @@
 #include "VtState.h"
 #include "OutputCorpus.h"
 #include "../../src/include/vt7pty.h"
+#include <cstring>
 #include <functional>
 #include <fstream>
 #include <filesystem>
@@ -328,6 +329,107 @@ bool consoleMatchesRecipe(const Packet &actual, const Packet &expected) {
 
 const char *boolean(bool value) { return value ? "true" : "false"; }
 
+int trailingBarColumn(const Packet &packet) {
+    int column = -1;
+    for (int x = 0; x < outputColumns; ++x) {
+        if (packet.cells[outputTextY * outputColumns + x].Char.UnicodeChar == L'|') column = x;
+    }
+    return column;
+}
+
+int trailingBarColumn(const VtState &state) {
+    int column = -1;
+    for (int x = 0; x < outputColumns; ++x) {
+        if (state.at(x, outputTextY).text == U"|") column = x;
+    }
+    return column;
+}
+
+std::string replayStatus(std::string_view status) {
+    return "{\"Status\":" + json(status) + "}";
+}
+
+std::string describeWidthReplay(const VtState &state, const Packet &packet, std::u32string native, int nativeBar) {
+    auto text = trimmed(state.row(outputTextY));
+    const int bar = trailingBarColumn(state);
+    const bool exact = text == native;
+    const auto points = pointList(text);
+    std::erase(text, U' ');
+    std::erase(native, U' ');
+    return "{\"Text\":" + points +
+        ",\"TextMatchesNative\":" + boolean(exact) +
+        ",\"NonblankTextMatchesNative\":" + boolean(text == native) +
+        ",\"BarColumn\":" + std::to_string(bar) +
+        ",\"BarMatchesNative\":" + boolean(bar == nativeBar) +
+        ",\"CursorMatchesNative\":" + boolean(state.x() == static_cast<int>(packet.cursorX) &&
+            state.y() == static_cast<int>(packet.cursorY) && state.visible() == (packet.cursorVisible != 0)) + "}";
+}
+
+std::string replayWidth(const OutputCase &scenario, const Packet &packet, std::string_view prefix, size_t actionStart) {
+    check(packet.columns == outputColumns && packet.rows == outputRows && actionStart <= prefix.size(),
+        "width replay geometry and stream boundary");
+    const auto native = snapshotText(packet, outputTextY);
+    std::u32string expected(outputTextX, U' ');
+    expected += scenario.text;
+    const int nativeBar = trailingBarColumn(packet);
+    if (native != expected || nativeBar < 0) return replayStatus("NativeSampleChanged");
+
+    const auto sample = utf8(scenario.wide);
+    const auto match = prefix.find(sample, actionStart);
+    if (match == std::string_view::npos || prefix.find(sample, match + sample.size()) != std::string_view::npos)
+        return replayStatus("PayloadUnavailable");
+    const auto offset = match + sample.size() - 1;
+    const auto anchor = "\x1b[" + std::to_string(nativeBar + 1) + "G";
+
+    VtState reference(outputColumns, outputRows);
+    reference.feed(prefix);
+    reference.finish();
+    VtState oneCell(outputColumns, outputRows, VtState::WidthPolicy::OneCellSamples);
+    oneCell.feed(prefix);
+    oneCell.finish();
+    VtState anchored(outputColumns, outputRows);
+    anchored.feed(prefix.substr(0, offset));
+    anchored.feed(anchor);
+    anchored.feed(prefix.substr(offset));
+    anchored.finish();
+    return "{\"Status\":\"ReplayComplete\",\"NativeBarColumn\":" + std::to_string(nativeBar) +
+        ",\"InsertionOffset\":" + std::to_string(offset) +
+        ",\"InsertedSequence\":" + json(anchor) +
+        ",\"Reference\":" + describeWidthReplay(reference, packet, native, nativeBar) +
+        ",\"OneCellSamples\":" + describeWidthReplay(oneCell, packet, native, nativeBar) +
+        ",\"Anchored\":" + describeWidthReplay(anchored, packet, native, nativeBar) + "}";
+}
+
+std::string readWidthArtifact(const std::wstring &path, size_t limit) {
+    std::ifstream file{std::filesystem::path(path), std::ios::binary | std::ios::ate};
+    check(file.is_open(), "width replay evidence file");
+    const auto size = file.tellg();
+    check(size > 0 && static_cast<uint64_t>(size) <= limit, "width replay evidence size");
+    std::string bytes(static_cast<size_t>(size), '\0');
+    file.seekg(0);
+    check(static_cast<bool>(file.read(bytes.data(), static_cast<std::streamsize>(bytes.size()))), "read width evidence");
+    return bytes;
+}
+
+int replayWidthFromFiles(wchar_t **argv) {
+    const auto *scenario = findOutputCase(argv[2]);
+    check(scenario && scenario->widthProbe, "width replay case");
+    const std::wstring folder = argv[3];
+    const auto snapshot = readWidthArtifact(folder + L"\\console-2.bin", sizeof(Packet));
+    check(snapshot.size() == sizeof(Packet), "width replay snapshot size");
+    auto packet = std::make_unique<Packet>();
+    std::memcpy(packet.get(), snapshot.data(), sizeof(Packet));
+    validate(*packet);
+    const auto stream = readWidthArtifact(folder + L"\\stream.bin", 1024 * 1024);
+    const auto start = std::stoull(argv[4]);
+    const auto end = std::stoull(argv[5]);
+    check(start < end && end <= stream.size(), "width replay checkpoint range");
+    const auto result = replayWidth(*scenario, *packet, std::string_view(stream).substr(0, static_cast<size_t>(end)),
+        static_cast<size_t>(start));
+    puts(result.c_str());
+    return 0;
+}
+
 struct OutputCheckpoint {
     bool nativeDifference = false;
     bool reconstructedDifference = false;
@@ -355,12 +457,8 @@ OutputCheckpoint compareOutput(const OutputCase &scenario, const OutputOperation
         std::u32string wanted(outputTextX, U' ');
         wanted += scenario.text;
         const bool nativeTextMatch = native == wanted;
-        int nativeBar = -1;
-        int renderedBar = -1;
-        for (int x = 0; x < outputColumns; ++x) {
-            if (packet.cells[outputTextY * outputColumns + x].Char.UnicodeChar == L'|') nativeBar = x;
-            if (state.at(x, outputTextY).text == U"|") renderedBar = x;
-        }
+        const int nativeBar = trailingBarColumn(packet);
+        const int renderedBar = trailingBarColumn(state);
         const int expectedBar = outputTextX + scenario.width - 1;
         const bool nativeWidthMatch = packet.cursorX == static_cast<uint32_t>(expectedBar + 1) &&
             packet.cursorY == outputTextY && nativeBar == expectedBar;
@@ -406,6 +504,9 @@ OutputCheckpoint compareOutput(const OutputCase &scenario, const OutputOperation
 void outputCase(const OutputCase &scenario, const std::wstring &resultDirectory, Observations &observations) {
     Session session(true);
     std::string checkpoints;
+    std::string widthReplay;
+    size_t actionStart = 0;
+    bool initialFrameReady = false;
     bool consoleDifference = false;
     bool reconstructionDifference = false;
     bool unavailable = false;
@@ -419,6 +520,8 @@ void outputCase(const OutputCase &scenario, const std::wstring &resultDirectory,
             ",\"OutputCheckpoints\":[" + checkpoints + "],\"BackingConsoleDiffers\":" + boolean(consoleDifference) +
             ",\"ReconstructionDiffers\":" + boolean(reconstructionDifference || !session.decodeError.empty()) +
             ",\"CapabilityUnavailable\":" + boolean(unavailable);
+        if (scenario.widthProbe)
+            observations.fields += ",\"WidthReplay\":" + (widthReplay.empty() ? replayStatus("FrameUnavailable") : widthReplay);
         return validUtf8;
     };
     try {
@@ -466,7 +569,20 @@ void outputCase(const OutputCase &scenario, const std::wstring &resultDirectory,
                 seen = trimmed(session.state.row(outputBarrierRow)) == marker;
                 return (seen || !session.decodeError.empty()) && now - changed >= 80;
             }, 4000);
-            auto checkpoint = compareOutput(scenario, op, *packet, session, seen, settled);
+            const auto checkpoint = compareOutput(scenario, op, *packet, session, seen, settled);
+            if (scenario.widthProbe) {
+                const bool frameReady = seen && settled && session.decodeError.empty();
+                if (phase == 1) {
+                    actionStart = session.raw.size();
+                    initialFrameReady = frameReady;
+                } else if (checkpoint.unavailable) {
+                    widthReplay = replayStatus("CapabilityUnavailable");
+                } else if (!initialFrameReady || !frameReady) {
+                    widthReplay = replayStatus("FrameUnavailable");
+                } else {
+                    widthReplay = replayWidth(scenario, *packet, session.raw, actionStart);
+                }
+            }
             consoleDifference = consoleDifference || checkpoint.nativeDifference;
             reconstructionDifference = reconstructionDifference || checkpoint.reconstructedDifference;
             unavailable = unavailable || checkpoint.unavailable;
@@ -895,13 +1011,21 @@ void shellCase(const std::wstring &name,const std::wstring &directoryPath,const 
 }
 }
 int wmain(int argc,wchar_t **argv) {
+    if (argc == 6 && std::wstring_view(argv[1]) == L"--replay-width") {
+        try {
+            return replayWidthFromFiles(argv);
+        } catch (const std::exception &error) {
+            fprintf(stderr, "Width replay: %s\n", error.what());
+            return 2;
+        }
+    }
     if (argc == 2 && std::wstring_view(argv[1]) == L"--output-cases") {
         std::string list = "{\"SchemaVersion\":1,\"SnapshotBytes\":" + std::to_string(sizeof(Packet)) + ",\"Cases\":[";
         for (const auto &scenario : outputCases) {
             if (&scenario != outputCases) list += ',';
             list += "{\"Name\":" + json(utf8(scenario.name)) + ",\"Area\":" +
                 (scenario.isText() ? "\"F04\"" : "\"F05\"") + ",\"RequestedOutputCP\":" +
-                std::to_string(scenario.codePage) + '}';
+                std::to_string(scenario.codePage) + ",\"WidthProbe\":" + (scenario.widthProbe ? "true" : "false") + '}';
         }
         puts((list + "]}").c_str());
         return 0;

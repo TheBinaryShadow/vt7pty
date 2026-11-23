@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')][string]$Suffix = 'rc2',
+    [ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')][string]$Suffix = 'rc3',
     [string]$ReleasedRuntimeArchive = '',
     [string]$AcceptedInputArchive = ''
 )
@@ -130,11 +130,13 @@ $files = @(Get-ChildItem -LiteralPath $stage -Recurse -File | Sort-Object FullNa
     @{Path = $_.FullName.Substring($stage.Length + 1).Replace('\','/'); Bytes = $_.Length; Sha256 = Get-VT7Sha256 $_.FullName}
 })
 $manifest = @{
-    SchemaVersion = 1; Kind = 'VT7PtyOutputCharacterization'; Step13Accepted = $false
+    SchemaVersion = 2; Kind = 'VT7PtyOutputCharacterization'; Step13Accepted = $false
     Runtimes = @{baseline = $baseline; accepted = $accepted}; SessionFlags = 0
     Harness = @{SourceCommit = $source; SourceTreeClean = $true; Configuration = 'Release'; Architecture = 'x64'
         SnapshotBytes = $compiled.SnapshotBytes; VerificationSha256 = Get-VT7Sha256 $verificationPath}
-    Cases = @($compiled.Cases | ForEach-Object { @{Name=$_.Name; Area=$_.Area; RequestedOutputCP=$_.RequestedOutputCP} })
+    Cases = @($compiled.Cases | ForEach-Object {
+        @{Name = $_.Name; Area = $_.Area; RequestedOutputCP = $_.RequestedOutputCP; WidthProbe = $_.WidthProbe}
+    })
     CheckpointsPerCase = 2; Files = $files
 }
 Write-VT7Json (Join-Path $stage 'manifest.json') $manifest

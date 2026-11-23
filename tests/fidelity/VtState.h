@@ -22,7 +22,11 @@ struct Cell {
 // Width rules cover the declared corpus, not arbitrary Unicode terminal policy.
 class VtState {
 public:
-    VtState(int columns, int rows) { resize(columns, rows); }
+    // OneCellSamples is a replay contrast for U+0301 and U+4E2D.
+    enum class WidthPolicy { Reference, OneCellSamples };
+    VtState(int columns, int rows, WidthPolicy policy = WidthPolicy::Reference) : widthPolicy_(policy) {
+        resize(columns, rows);
+    }
     void resize(int columns, int rows) {
         if (columns < 1 || columns > 160 || rows < 1 || rows > 60)
             throw std::runtime_error("oracle geometry outside bounds");
@@ -67,6 +71,7 @@ public:
 private:
     enum class State { Text, Escape, Csi, Osc, OscEscape };
     State state_ = State::Text;
+    WidthPolicy widthPolicy_;
     int width_ = 0, height_ = 0, x_ = 0, y_ = 0;
     int foreground_ = 7, background_ = 0;
     bool bold_ = false, inverse_ = false, underline_ = false, conceal_ = false;
@@ -103,13 +108,15 @@ private:
         std::fill(cells_.end() - width_, cells_.end(), blank());
     }
     void put(char32_t value) {
-        if (value >= 0x300 && value <= 0x36f) {
+        const bool oneCellSamples = widthPolicy_ == WidthPolicy::OneCellSamples;
+        if (value >= 0x300 && value <= 0x36f && !(oneCellSamples && value == 0x0301)) {
             int index = y_ * width_ + x_ - (wrap_ ? 0 : 1);
             while (index >= 0 && cells_[static_cast<size_t>(index)].continuation) --index;
             if (index < 0) throw std::runtime_error("combining mark without preceding cell");
             cells_[static_cast<size_t>(index)].text += value; return;
         }
-        const int width = ((value >= 0x4e00 && value <= 0x9fff) || value == 0x1f642) ? 2 : 1;
+        const bool ideograph = value >= 0x4e00 && value <= 0x9fff && !(oneCellSamples && value == 0x4e2d);
+        const int width = (ideograph || value == 0x1f642) ? 2 : 1;
         if (wrap_ || x_ + width > width_) { x_ = 0; lineFeed(); }
         if (width > width_) throw std::runtime_error("wide glyph outside oracle geometry");
         const size_t index=static_cast<size_t>(y_ * width_ + x_);

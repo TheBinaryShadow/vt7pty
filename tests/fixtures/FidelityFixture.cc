@@ -257,21 +257,25 @@ int outputFixture(const OutputCase &scenario, HANDLE output, HANDLE pipe) {
     transfer(pipe, &command, 1, false, 12000);
     check(command == 'A', "output action acknowledgment");
     if (scenario.isText()) cursor(outputTextX, outputTextY);
-    switch (scenario.action) {
-    case OutputAction::ByteText:
+    bool pageApplied = true;
+    if (scenario.codePage) {
         operation.requestedCP = scenario.codePage;
         operation.setupSucceeded = SetConsoleOutputCP(scenario.codePage) != FALSE ? 1u : 0u;
         if (!operation.setupSucceeded) operation.setupError = GetLastError();
-        if (operation.setupSucceeded && GetConsoleOutputCP() == scenario.codePage) {
-            operation.unitsRequested = static_cast<DWORD>(scenario.bytes.size());
-            operation.writeAttempted = 1;
-            DWORD written = 0;
-            const BOOL okay = WriteConsoleA(output, scenario.bytes.data(), operation.unitsRequested, &written, nullptr);
-            operation.writeError = okay ? 0 : GetLastError();
-            operation.writeSucceeded = okay ? 1u : 0u;
-            operation.unitsWritten = written;
-        }
+        pageApplied = operation.setupSucceeded && GetConsoleOutputCP() == scenario.codePage;
+    }
+    switch (scenario.action) {
+    case OutputAction::ByteText: {
+        if (!pageApplied) break;
+        operation.unitsRequested = static_cast<DWORD>(scenario.bytes.size());
+        operation.writeAttempted = 1;
+        DWORD written = 0;
+        const BOOL okay = WriteConsoleA(output, scenario.bytes.data(), operation.unitsRequested, &written, nullptr);
+        operation.writeError = okay ? 0 : GetLastError();
+        operation.writeSucceeded = okay ? 1u : 0u;
+        operation.unitsWritten = written;
         break;
+    }
     case OutputAction::RawVT: {
         operation.requestedMode = mode | rawOutputMode;
         operation.setupSucceeded = SetConsoleMode(output, operation.requestedMode) != FALSE ? 1u : 0u;
@@ -282,6 +286,7 @@ int outputFixture(const OutputCase &scenario, HANDLE output, HANDLE pipe) {
         [[fallthrough]];
     }
     case OutputAction::WideText: {
+        if (!pageApplied) break;
         operation.unitsRequested = static_cast<DWORD>(scenario.wide.size());
         operation.writeAttempted = 1;
         DWORD written = 0;

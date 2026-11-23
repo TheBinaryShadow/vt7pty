@@ -45,6 +45,7 @@ if ($run.Tier -ceq 'Legacy' -and ($run.PowerShellVersion -cne '2.0' -or $run.CLR
 
 $utf8 = New-Object Text.UTF8Encoding($false,$true)
 $observations = @{}
+$replayer = Join-Path $PackageRoot 'baseline\bin\FidelityTest.exe'
 foreach ($role in @('baseline','accepted')) {
     $original = $package.Runtimes[$role]
     $actual = $run.Runtimes[$role]
@@ -84,10 +85,39 @@ foreach ($role in @('baseline','accepted')) {
                 throw ('Snapshot output mode or code page differs: ' + $relative)
             }
         }
-        $observations[$relative] = @{
+        $observation = @{
             Outcome = $outcome; BackingConsoleDiffers = $native.BackingConsoleDiffers
             ReconstructionDiffers = $native.ReconstructionDiffers; CapabilityUnavailable = $native.CapabilityUnavailable
         }
+        if ($spec.ContainsKey('WidthProbe') -and $spec.WidthProbe) {
+            $receipt = $native.WidthReplay
+            $observation.WidthReplay = $receipt
+            if ($receipt.Status -ceq 'ReplayComplete' -or $receipt.Status -ceq 'PayloadUnavailable' -or
+                $receipt.Status -ceq 'NativeSampleChanged') {
+                $start = [string]$native.OutputCheckpoints[0].CapturedBytes
+                $end = [string]$native.OutputCheckpoints[1].CapturedBytes
+                $json = (& $replayer --replay-width $spec.Name $caseDirectory $start $end | Out-String).Trim()
+                if ($LASTEXITCODE -ne 0) { throw ('Archived width replay failed: ' + $relative) }
+                $replayed = $json | ConvertFrom-Json
+                if ($replayed.Status -cne $receipt.Status) { throw ('Width replay status differs: ' + $relative) }
+                if ($receipt.Status -ceq 'ReplayComplete') {
+                    foreach ($field in @('NativeBarColumn','InsertionOffset','InsertedSequence')) {
+                        if ($replayed.$field -cne $receipt[$field]) { throw ('Width replay command differs: ' + $relative) }
+                    }
+                    foreach ($key in @('Reference','OneCellSamples','Anchored')) {
+                        $observed = $receipt[$key]
+                        $actualReplay = $replayed.$key
+                        if (($actualReplay.Text -join ',') -cne ($observed.Text -join ',')) {
+                            throw ('Width replay text differs: ' + $relative)
+                        }
+                        foreach ($field in @('TextMatchesNative','NonblankTextMatchesNative','BarColumn','BarMatchesNative','CursorMatchesNative')) {
+                            if ($actualReplay.$field -cne $observed[$field]) { throw ('Width replay result differs: ' + $relative) }
+                        }
+                    }
+                }
+            }
+        }
+        $observations[$relative] = $observation
     }
 }
 $pairs = @($package.Cases | ForEach-Object {

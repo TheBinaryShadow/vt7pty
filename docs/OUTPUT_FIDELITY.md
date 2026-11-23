@@ -1,18 +1,18 @@
 # Step 1.3 output characterization
 
 I compare the released 0.5.0 DLL and agent with the accepted input rc2 runtime.
-Both use the same native fixture and session flags of zero. The 13 cases run
-once against each runtime. I use their differences to decide where to fix
-output reconstruction.
+Both use the same native fixture and session flags of zero. Rc3 runs the 13
+rc2 controls and eight new width cases against each runtime. I use the
+measurements to decide which placement differences the stream can preserve.
 
 I completed all three Windows 7 runs in rc2. The paired evidence reproduces
-column differences for a combining mark and a CJK ideograph. The procedure
-below reproduces that matrix.
+column differences for a combining mark and a CJK ideograph. Rc3 repeats
+those cases and adds the code-page and replay measurements below.
 [Windows 7 review](validation/2026-11-23-step-1.3-output-rc2-windows7.md)
 
 ## Run the candidate
 
-I extract the complete VT7Pty-output-0.5.1-dev-rc2.zip into a short local folder
+I extract the complete VT7Pty-output-0.5.1-dev-rc3.zip into a short local folder
 on each machine. I run the matching launcher from an ordinary Windows session.
 
 | Machine | Launcher |
@@ -52,11 +52,29 @@ and cursor with the fixture recipe and between the two views. The reader models
 the widths of the declared samples. I review host differences before deciding
 whether the console, the output stream or the reader explains them.
 
+## Width investigation
+
+I send the same two Unicode strings through WriteConsoleW at the default
+output code page and at requested pages 437, 852, 936 and 65001. I check the
+applied page before writing and keep the observed font and cell dimensions.
+A rejected request records the host error and leaves that sample unrun.
+
+I replay the two default width samples and the eight new cases from the
+captured stream. One replay gives just U+0301 and U+4E2D one cell each. The
+other uses the original reader and inserts a Cursor Horizontal Absolute
+command before the trailing bar at its native column. I compare the bar,
+cursor and complete row, plus the sequence of nonblank code points. The
+nonblank comparison reveals whether a glyph survived when the replay placed
+the bar correctly. I retain the original bytes and the tested insertion
+offset. Both runtime binaries come from the same archives used for rc2.
+[Cursor positioning](https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#cursor-positioning)
+
 ## Build and review
 
 I run Package-OutputFidelity.ps1 from committed source on the build machine.
 It verifies the source archives by SHA-256, builds the harness and copies the
 original runtime binaries beside identical copies of the harness. The paired
-run validates its file inventory and the independent VT state checks. I use
-tools/output/Test-OutputEvidence.ps1 with the complete result directory and
-exact extracted package to check the evidence before changing runtime code.
+run validates its file inventory and the independent VT state checks. I run
+tools/output/Test-OutputEvidence.ps1 from Windows PowerShell on the build host.
+It checks the complete result directory against the exact extracted package
+and repeats the width replays from the preserved bytes and snapshots.

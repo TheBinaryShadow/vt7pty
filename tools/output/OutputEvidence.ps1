@@ -1,7 +1,7 @@
 # Shared package and result checks. Keep this compatible with Windows PowerShell 2.0.
 function Read-OutputPackage([string]$Root) {
     $manifest = Read-VT7Json (Join-Path $Root 'manifest.json')
-    if ($manifest.Kind -cne 'VT7PtyOutputCharacterization' -or $manifest.SchemaVersion -ne 1 -or
+    if ($manifest.Kind -cne 'VT7PtyOutputCharacterization' -or @(1,2) -notcontains $manifest.SchemaVersion -or
         -not $manifest.Harness.SourceTreeClean -or $manifest.Harness.SourceCommit -cnotmatch '^[0-9a-f]{40}$' -or
         $manifest.Harness.SnapshotBytes -lt 8000 -or $manifest.Harness.SnapshotBytes -gt 65536 -or
         $manifest.SessionFlags -ne 0 -or $manifest.CheckpointsPerCase -ne 2 -or $manifest.Step13Accepted) {
@@ -20,12 +20,20 @@ function Read-OutputPackage([string]$Root) {
         $files[$entry.Path] = $entry
     }
     $seen = @{}
+    $widthCases = 0
     foreach ($entry in $manifest.Cases) {
         if ($entry.Name -cnotmatch '^OUTPUT_[A-Z0-9_]+$' -or @('F04','F05') -cnotcontains $entry.Area -or
             $seen.ContainsKey($entry.Name)) { throw 'Invalid or repeated output case.' }
         $seen[$entry.Name] = $true
+        if ($manifest.SchemaVersion -eq 2) {
+            if ($entry.WidthProbe -isnot [bool]) { throw 'Missing width probe recipe field.' }
+            if ($entry.WidthProbe) { $widthCases++ }
+        }
     }
-    if ($seen.Count -ne 13) { throw 'Wrong output case count.' }
+    $expectedCases = if ($manifest.SchemaVersion -eq 1) { 13 } else { 21 }
+    if ($seen.Count -ne $expectedCases -or ($manifest.SchemaVersion -eq 2 -and $widthCases -ne 10)) {
+        throw 'Wrong output case count.'
+    }
 
     foreach ($role in @('baseline','accepted')) {
         $runtime = $manifest.Runtimes[$role]
@@ -58,6 +66,50 @@ function Read-OutputPackage([string]$Root) {
         }
     }
     return $manifest
+}
+
+function Test-OutputWidthReplay($Record, [string]$StreamPath) {
+    $stages = @($Record.OutputCheckpoints)
+    $action = $stages[1]
+    $replay = $Record.WidthReplay
+    if ($action.CapabilityUnavailable) {
+        if ($replay.Status -cne 'CapabilityUnavailable') { throw 'Width replay ignored the applied code page.' }
+        return
+    }
+    if (@($stages | Where-Object { -not $_.BarrierSeen -or -not $_.Settled -or $_.ReaderError }).Count) {
+        if ($replay.Status -cne 'FrameUnavailable') { throw 'Width replay requires both settled frames.' }
+        return
+    }
+    if (-not $action.NativeTextMatchesIntent -or $action.NativeTrailingBarColumn -lt 0) {
+        if ($replay.Status -cne 'NativeSampleChanged') { throw 'Width replay requires the original native sample.' }
+        return
+    }
+    if ($replay.Status -ceq 'PayloadUnavailable') { return }
+    if ($replay.Status -cne 'ReplayComplete' -or $replay.NativeBarColumn -ne $action.NativeTrailingBarColumn -or
+        $replay.InsertionOffset -lt $stages[0].CapturedBytes -or $replay.InsertionOffset -ge $action.CapturedBytes) {
+        throw 'Width replay receipt or insertion offset differs.'
+    }
+    $stream = [IO.File]::ReadAllBytes($StreamPath)
+    $escape = [string][char]27 + '[' + ($replay.NativeBarColumn + 1) + 'G'
+    if ($stream[$replay.InsertionOffset] -ne 124 -or $replay.InsertedSequence -cne $escape) {
+        throw 'Unexpected width replay byte or column command.'
+    }
+    if (($replay.Reference.Text -join ',') -cne ($action.ReconstructedText -join ',') -or
+        $replay.Reference.BarColumn -ne $action.ReconstructedTrailingBarColumn -or
+        $replay.Reference.CursorMatchesNative -ne $action.ReconstructedCursorMatchesNative) {
+        throw 'Reference replay differs from the captured reconstruction.'
+    }
+    $nativeText = $action.NativeText -join ','
+    $nonblank = ($action.NativeText | Where-Object { $_ -ne 32 }) -join ','
+    foreach ($variant in @($replay.Reference,$replay.OneCellSamples,$replay.Anchored)) {
+        $points = $variant.Text -join ','
+        $visiblePoints = ($variant.Text | Where-Object { $_ -ne 32 }) -join ','
+        if ($variant.TextMatchesNative -ne ($points -ceq $nativeText) -or
+            $variant.NonblankTextMatchesNative -ne ($visiblePoints -ceq $nonblank) -or
+            $variant.BarMatchesNative -ne ($variant.BarColumn -eq $replay.NativeBarColumn)) {
+            throw 'Width replay verdict disagrees with its recorded row.'
+        }
+    }
 }
 
 function Read-OutputCase([string]$Directory, $Spec, [int]$ExitCode, [int]$SnapshotBytes) {
@@ -99,5 +151,8 @@ function Read-OutputCase([string]$Directory, $Spec, [int]$ExitCode, [int]$Snapsh
     }
     if ($ExitCode -eq 0 -and ($record.BackingConsoleDiffers -or $record.ReconstructionDiffers -or
         -not $record.CompleteStreamValidUtf8)) { throw 'Output pass conflicts with native evidence.' }
+    if ($Spec.ContainsKey('WidthProbe') -and $Spec.WidthProbe) {
+        Test-OutputWidthReplay $record $stream.FullName
+    }
     return $record
 }
