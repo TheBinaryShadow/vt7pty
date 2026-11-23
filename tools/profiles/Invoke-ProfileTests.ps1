@@ -23,6 +23,10 @@ $updates=@(Get-WmiObject Win32_QuickFixEngineering | Sort-Object HotFixID | ForE
 $errors=@()
 if($env:PROCESSOR_ARCHITECTURE -ne 'AMD64'){$errors+='Use x64 Windows PowerShell.'}
 if($Tier -ne 'DevelopmentHost' -and (-not $os.Version.StartsWith('6.1.') -or $os.ServicePackMajorVersion -ne 1 -or $os.ProductType -ne 1)){$errors+='Windows 7 SP1 is required for this tier.'}
+if(($Tier -eq 'NonESU' -or $Tier -eq 'ESU') -and
+    ($PSVersionTable.PSVersion.Major -ne 5 -or $PSVersionTable.PSVersion.Minor -ne 1)){
+    $errors+='This tier requires installed Windows PowerShell 5.1.'
+}
 if($Tier -eq 'Legacy' -and ($PSVersionTable.PSVersion.Major -ne 2 -or @($updates | Where-Object {$_.Id -eq 'KB3191566'}).Count)){$errors+='Legacy requires installed PowerShell 2.0 without KB3191566.'}
 $policyPresent=$env:VT7PTY_PROFILE_ORIGINAL_POLICY_PRESENT -eq '1'
 $policyValue=if($policyPresent){$env:VT7PTY_PROFILE_ORIGINAL_POLICY_VALUE}else{''}
@@ -52,7 +56,8 @@ function Save-ProfileReport {
     }
 }
 $nativeEnv=@{VT7PTY_H4_RUNTIME_SOURCE=$m.Runtime.SourceCommit;VT7PTY_H3_PWSH=$ps7.Path
-    VT7PTY_PROFILE_PROBE_SOURCE=(Join-Path $PackageRoot 'tools\profiles\ProfileProbe.ps1');VT7PTY_H4_LEGACY=$(if($Tier -eq 'Legacy'){'1'}else{''})
+    VT7PTY_PROFILE_PROBE_SOURCE=(Join-Path $PackageRoot 'tools\profiles\ProfileProbe.ps1')
+    VT7PTY_PROFILE_JSON_WRITER_SOURCE=(Join-Path $PackageRoot 'tools\profiles\ProfileJsonWriter.ps1');VT7PTY_H4_LEGACY=$(if($Tier -eq 'Legacy'){'1'}else{''})
     PSExecutionPolicyPreference=$policyValue;VT7PTY_DEBUG='trace'}
 if($Manual){
     $found=@()
@@ -105,8 +110,22 @@ foreach($role in $plan){
         $expectedSource=if($role -eq 'Guard' -or $role -eq 'Input'){$m.Runtime.SourceCommit}else{$m.Harness.SourceCommit}
         $expectedKind=if($Manual){'OrdinaryProfileProbe'}elseif($role -eq 'Guard'){'H4RuntimeProbe'}elseif($role -eq 'Input'){'InputFidelityProbe'}else{'ProfileFixtureProbe'}
         if($probe.Kind -cne $expectedKind -or $probe.SourceCommit -cne $expectedSource -or (($probe.Status -ceq 'Pass') -ne ($record.ExitCode -eq 0))){throw 'Wrong native profile identity or outcome.'}
-        if($Manual -and ($probe.SyntheticInputUsed -or -not $probe.OrdinaryProfilesLoaded -or $probe.ShellOutputCollected -or $probe.ProfileContentCollected -or $probe.HistoryContentCollected)){throw 'Manual source or privacy contract differs.'}
+        if($probe.Status -ceq 'Pass' -and $role -eq 'Profiles' -and
+            ($probe.ConfigurationChecks -ne $m.Profiles.ConfigurationChecks -or $probe.Passed -ne $m.Profiles.CasesByTier[$Tier])){
+            throw 'Profile configuration proofs are incomplete.'
+        }
+        if($probe.Status -ceq 'Pass' -and $Manual -and $probe.StartupHandshake -ne $m.Manual.StartupHandshake){
+            throw 'Ordinary profile startup proof is incomplete.'
+        }
+        if($Manual -and ($probe.SyntheticInputUsed -or ($probe.Status -ceq 'Pass' -and -not $probe.OrdinaryProfilesLoaded) -or
+            $probe.ShellOutputCollected -or $probe.ProfileContentCollected -or $probe.HistoryContentCollected)){throw 'Manual source or privacy contract differs.'}
         $record.Outcome=$probe.Status;$record.CollectionStatus='Completed'
+        if($Manual){
+            $diagnostic=Join-Path $native 'startup-progress.json'
+            if(Test-Path -LiteralPath $diagnostic){
+                $record.StartupStep=(Read-VT7Json $diagnostic).Step
+            }
+        }
     }catch{$record.Outcome='Incomplete';$record.CollectionStatus='Partial';$record.Error=$_.Exception.Message}
     $trials+=@($record);Save-ProfileReport;Write-Host ($name+': '+$record.Outcome+' '+$record.Error)
 }

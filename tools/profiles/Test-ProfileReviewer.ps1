@@ -26,7 +26,7 @@ $controls=@(
     @{Name='changed-profile';Root=$fixture;File='wps-clean-native\snapshot-1.json';Expected='profile files preserved';Edit={param($v)$v.Profiles[0].Present=-not $v.Profiles[0].Present;$v.Profiles[0].Sha256=('a'*64)}},
     @{Name='changed-policy';Root=$fixture;File='wps-clean-native\snapshot-1.json';Expected='execution policy preserved';Edit={param($v)$v.Policy.Process='Bypass'}},
     @{Name='wrong-precedence';Root=$fixture;File='wps-layered-native\snapshot-0.json';Expected='session identity';Edit={param($v)$v.FixtureWinner='AllUsersAllHosts'}},
-    @{Name='startup-errors';Root=$fixture;File='wps-clean-native\snapshot-0.json';Expected='workflow errors';Edit={param($v)$v.StartupErrorCount=1}},
+    @{Name='startup-errors';Root=$fixture;File='wps-clean-native\snapshot-0.json';Expected=$(if($baseline.ConfigurationChecks){'typed startup and setup error'}else{'workflow errors'});Edit={param($v)$v.StartupErrorCount=1}},
     @{Name='wrong-backend-text';Root=$fixture;File='wps-clean-native\Editing.json';Expected='command proof Editing';Edit={param($v)$v.Matched=$false}},
     @{Name='history-not-recalled';Root=$fixture;File='wps-clean-native\History.json';Expected='invocation count';Edit={param($v)$v.CheckInvocation=1}},
     @{Name='wrong-child-event';Root=$fixture;File='wps-clean-native\child-result.json';Expected='native child identity/event';Edit={param($v)$v.CtrlC=2}},
@@ -42,6 +42,21 @@ $controls=@(
 if($baseline.PublicationChecks -eq 3){$controls+=@(
     @{Name='replacement-while-held-failed';Root=$fixture;File='publication\result.json';Expected='held-reader publication';Edit={param($v)$v.SharedReaderReplacement=$false}},
     @{Name='stale-published-proof';Root=$fixture;File='publication\proof.json';Expected='replaced publication proofs';Edit={param($v)$v.Invocation=1}}
+)}
+if($baseline.ConfigurationChecks -eq 1){$controls+=@(
+    @{Name='unmatched-startup-error';Root=$fixture;File='wps-clean-native\snapshot-0.json';Expected='startup errors match native';Edit={
+        param($v)$v.StartupErrorCount=1;$v.ErrorCount=1;$v.StartupErrorDigest=('1'*64);$v.ErrorDigest=('1'*64)
+    }},
+    @{Name='native-reference-uses-profiles';Root=$fixture;File='wps-clean-native\startup-reference\reference.json';Expected='clean-shell reference';Edit={param($v)$v.NoProfile=$false}}
+)}
+if($baseline.ConfigurationChecks -eq 1 -and @($baseline.Cases | Where-Object {$_.Case -ceq 'pwsh-layered-readline'}).Count -eq 1){$controls+=@(
+    @{Name='prediction-ambiguous';Root=$fixture;File='pwsh-layered-readline\prediction-support.json';Expected='classified prediction';Edit={param($v)$v.Outcome='UnexpectedError'}},
+    @{Name='prediction-not-restored';Root=$fixture;File='pwsh-layered-readline\prediction-support.json';Expected='classified prediction';Edit={param($v)$v.Restored='History'}}
+)}
+if($smoke.StartupHandshake -eq 1){$controls+=@(
+    @{Name='manual-helpers-unconfirmed';Root=$manual;File='startup-progress.json';Expected='complete F8 startup';Edit={param($v)$v.HelpersLoaded=$false}},
+    @{Name='manual-startup-different-shell';Root=$manual;File='startup-progress.json';Expected='complete F8 startup';Edit={param($v)$v.ProcessId++}},
+    @{Name='manual-buffer-too-small';Root=$manual;File='startup-progress.json';Expected='display buffer contains';Edit={param($v)$v.RequestedBuffer.Columns=$v.InheritedWindow.Columns-1}}
 )}
 $results=@()
 foreach($control in $controls){

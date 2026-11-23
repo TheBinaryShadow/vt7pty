@@ -1,20 +1,16 @@
 # PowerShell profile tests
 
 I use this Step 1.2 package to check shell input with controlled configurations
-and ordinary PowerShell profiles. The accepted input rc2 runtime stays unchanged:
-0.5.1-dev, API 1.1, protocol 2, source 0ca6e3fa. Only the test harness is new.
-I retain rc1's failed local qualification, where a result-file reader blocked
-publication of the updated history proof. Rc2 corrects file sharing and adds
-a held-reader publication check. The [Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
-verifies those checks and the frozen controls. I need a follow-up candidate for
-the remaining profile fixture and manual startup failures.
+and ordinary PowerShell profiles. Profile rc3 uses the accepted input rc2
+runtime, version 0.5.1-dev, API 1.1, protocol 2, source 0ca6e3fa.
 
-The [local rc2 review](validation/2026-11-20-step-1.2-profiles-rc2-candidate.md)
-records the exact archive, completed checks and verified delivery to K:\VT7_work.
+I corrected the legacy snapshot writer, manual display setup, F8 startup and
+the automated verdict after the Windows 7 profile rc2 runs.
+[Profile rc2 Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
 
 ## Run on all three machines
 
-I extract the complete VT7Pty-profiles-0.5.1-dev-rc2.zip into a new local folder
+I extract the complete VT7Pty-profiles-0.5.1-dev-rc3.zip into a short local folder
 on each machine. I keep Windows unlocked and use a normal, unelevated console.
 I run the automated launcher first, then its matching manual launcher after
 all five automated phases pass.
@@ -53,13 +49,21 @@ run three times:
 | Windows PowerShell, clean | Native ConsoleHost | No personal profiles or PSReadLine |
 | Windows PowerShell, layered | Native ConsoleHost | Four ordered inline fixtures and a multiline prompt |
 | PowerShell 7, clean | Bundled PSReadLine | Windows bindings, predictions disabled |
-| PowerShell 7, layered | Bundled PSReadLine | Emacs bindings, history predictions and a custom F6 binding |
+| PowerShell 7, layered | Bundled PSReadLine | Emacs bindings, predictions disabled and a custom F6 binding |
 
 LEOPARD runs the two Windows PowerShell cases. Each case checks exact Unicode
 editing results, history recall, Tab completion, a multiline here-string,
 cancellation of an unexecuted line, the next command, a native child interrupted
 once by Ctrl+C, resize readback and natural exit 37. Layered fixtures also check
-precedence; the PowerShell 7 fixture checks its custom binding.
+precedence. The PowerShell 7 fixture checks its custom binding.
+
+I compare startup with an owned native clean PowerShell run of the same engine.
+I accept a nonzero startup error count only when the error identities match
+that reference. A new setup error or wrong editor setting fails the case.
+The layered PSReadLine fixture separately requests history prediction after
+the editing checks. I record whether the setting is accepted or the legacy
+console rejects it, then verify that the original setting is restored.
+[PSReadLine 2.1.0 console check](https://github.com/PowerShell/PSReadLine/blob/v2.1.0/PSReadLine/Options.cs#L133-L140)
 
 These fixtures use -NoProfile and controlled inline script blocks. I do not
 install them as global profile files or count them as ordinary-profile tests.
@@ -72,19 +76,24 @@ input setup. It does not change the normal runtime or the frozen controls.
 The separate manual launcher starts Windows PowerShell, followed by PowerShell
 7 on NESSY/TURTLE. LEOPARD starts only Windows PowerShell. Actual shells start
 with -NoLogo and their normal profiles, execution policy, prompt and editor
-configuration. I allow their usual startup actions to finish before testing.
+configuration. The legacy launcher explicitly selects the installed 2.0 engine. I allow their usual startup actions to finish before testing.
 This phase deliberately executes those existing profile scripts. It never
 creates or overwrites personal profiles or changes global policy or settings.
 Test commands may enter the shell's normal history.
 
 The live console displays the application and the current instruction. F2
-inserts a test command without executing it; F8 verifies the checkpoint;
-F12 stops the run. I press F8 only after the shell returns to a fresh prompt.
-A failed checkpoint ends that run and preserves the evidence.
+inserts a test command for editing. F8 verifies the checkpoint, and F12
+stops the run. I press F8 only after the shell returns to a fresh prompt.
+A failed checkpoint ends that run and preserves the evidence. The display
+uses the console window's existing size. The first F8 sends short commands
+and records separate acknowledgments for command input, helper startup and
+snapshot publication. I keep the acknowledgments and dimensions with the
+startup metadata.
+[Windows console buffer behavior](https://learn.microsoft.com/en-us/windows/console/createconsolescreenbuffer)
 
 | Checkpoint | What I do |
 | --- | --- |
-| Startup | Finish normal startup prompts, then F8. The runner defines its temporary, nonce-named helpers and records metadata. |
+| Startup | Finish normal startup prompts, then F8. The runner confirms input, loads its in-memory test helpers and records metadata. |
 | Editing | F2 inserts EDXT with Croatian text. I use Left, Backspace and I to change it to EDIT, then End, Enter and F8. |
 | History | F2, Enter, then Up and Enter to recall the same command, followed by F8. |
 | Completion | F2, Tab, Enter, then F8. The helper prefix is unique in this session. |
@@ -105,7 +114,7 @@ policy or reset the profile just to obtain a pass.
 
 ## What the result contains
 
-I record engine and editor versions, editor module hashes, the five execution
+I record engine, CLR and editor versions, editor module hashes, the five execution
 policy scopes, language mode when exposed, window dimensions and the presence,
 size and SHA-256 of each of the four profile scopes. The shell reports boolean
 matches for the fixed test strings. Native identities and retained process
@@ -128,7 +137,8 @@ Package-Profiles.ps1 requires clean committed source and the exact accepted
 input rc2 ZIP. It verifies every frozen file, builds the new harness, compares
 its compiled recipes with tools/profiles/cases.json and runs its logic checks.
 The package includes symbols, provenance and Windows PowerShell 2.0-compatible
-collectors. Test-ProfileEvidence.ps1 independently checks the returned inventory,
+collectors. The probe uses the same primitive JSON writer as the legacy
+collector. Test-ProfileEvidence.ps1 independently checks the returned inventory,
 source identities, profile metadata, command proofs, host traces and cleanup.
 
 Local synthetic manual smoke tests use -NoProfile and are explicitly marked.

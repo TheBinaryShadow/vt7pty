@@ -16,45 +16,204 @@ std::wstring instruction(unsigned stage) {
         L"All checks recorded. Type exit 37 and press Enter to finish naturally."};
     return text[std::min<size_t>(stage,8)];
 }
-struct View {
-    HANDLE input=GetStdHandle(STD_INPUT_HANDLE),previous=GetStdHandle(STD_OUTPUT_HANDLE);Handle output;
-    DWORD mode=0;
-    View(){
-        check(GetConsoleMode(input,&mode),"profile manual classic-console input");
-        output.reset(CreateConsoleScreenBuffer(GENERIC_READ|GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,nullptr,CONSOLE_TEXTMODE_BUFFER,nullptr));
-        check(output.value!=INVALID_HANDLE_VALUE,"private profile display buffer");
-        check(SetConsoleScreenBufferSize(output.value,{160,60}),"profile display capacity");
-        SMALL_RECT window={0,0,79,32};const auto maximum=GetLargestConsoleWindowSize(output.value);window.Bottom=static_cast<SHORT>(std::min<int>(32,maximum.Y-1));
-        check(window.Bottom>=19 && SetConsoleWindowInfo(output.value,TRUE,&window),"profile display geometry");
-        check(SetConsoleMode(input,ENABLE_EXTENDED_FLAGS|ENABLE_WINDOW_INPUT),"profile manual input mode");
-        if(!SetConsoleActiveScreenBuffer(output.value)){const auto failure=GetLastError();SetConsoleMode(input,mode);SetLastError(failure);check(false,"profile live display activation");}
+struct DisplaySetup
+{
+    COORD inheritedBuffer = {};
+    COORD inheritedWindow = {};
+    COORD requestedBuffer = {};
+    COORD activeWindow = {};
+    bool activated = false;
+};
+
+COORD dimensions(const SMALL_RECT &window)
+{
+    return {static_cast<SHORT>(window.Right - window.Left + 1), static_cast<SHORT>(window.Bottom - window.Top + 1)};
+}
+
+COORD displayCapacity(COORD buffer, const SMALL_RECT &window)
+{
+    return {
+        static_cast<SHORT>(std::max({160, static_cast<int>(buffer.X), window.Right + 1})),
+        static_cast<SHORT>(std::max({60, static_cast<int>(buffer.Y), window.Bottom + 1}))
+    };
+}
+
+CONSOLE_SCREEN_BUFFER_INFO screenInfo(HANDLE output)
+{
+    CONSOLE_SCREEN_BUFFER_INFO info = {};
+    check(GetConsoleScreenBufferInfo(output, &info), "profile display geometry read");
+    return info;
+}
+
+std::string coordinateJson(COORD value)
+{
+    return "{\"Columns\":" + std::to_string(value.X) + ",\"Rows\":" + std::to_string(value.Y) + "}";
+}
+
+struct View
+{
+    HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
+    HANDLE previous = GetStdHandle(STD_OUTPUT_HANDLE);
+    Handle output;
+    DWORD mode = 0;
+
+    explicit View(DisplaySetup &setup)
+    {
+        check(GetConsoleMode(input, &mode), "profile manual classic-console input");
+        output.reset(CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+            nullptr, CONSOLE_TEXTMODE_BUFFER, nullptr));
+        check(output.value != INVALID_HANDLE_VALUE, "private profile display buffer");
+
+        // A new buffer inherits the visible window. Grow it without trying
+        // to make it smaller than that window or moving the original buffer.
+        const auto initial = screenInfo(output.value);
+        setup.inheritedBuffer = initial.dwSize;
+        setup.inheritedWindow = dimensions(initial.srWindow);
+        setup.requestedBuffer = displayCapacity(initial.dwSize, initial.srWindow);
+        if (setup.requestedBuffer.X != initial.dwSize.X || setup.requestedBuffer.Y != initial.dwSize.Y)
+            check(SetConsoleScreenBufferSize(output.value, setup.requestedBuffer), "profile display capacity");
+
+        if (setup.inheritedWindow.X < 40 || setup.inheritedWindow.Y < 16)
+        {
+            const auto maximum = GetLargestConsoleWindowSize(output.value);
+            SMALL_RECT window = {0, 0, static_cast<SHORT>(std::min<int>(80, maximum.X) - 1),
+                static_cast<SHORT>(std::min<int>(33, maximum.Y) - 1)};
+            check(window.Right >= 39 && window.Bottom >= 15 &&
+                SetConsoleWindowInfo(output.value, TRUE, &window), "usable profile display geometry");
+        }
+        setup.activeWindow = dimensions(screenInfo(output.value).srWindow);
+        check(SetConsoleMode(input, ENABLE_EXTENDED_FLAGS | ENABLE_WINDOW_INPUT), "profile manual input mode");
+        if (!SetConsoleActiveScreenBuffer(output.value))
+        {
+            const auto error = GetLastError();
+            SetConsoleMode(input, mode);
+            SetLastError(error);
+            check(false, "profile live display activation");
+        }
+        setup.activated = true;
     }
-    ~View(){SetConsoleMode(input,mode);SetConsoleActiveScreenBuffer(previous);}
-    std::pair<int,int> size(){CONSOLE_SCREEN_BUFFER_INFO info={};check(GetConsoleScreenBufferInfo(output.value,&info),"profile display geometry read");return {info.srWindow.Right-info.srWindow.Left+1,info.srWindow.Bottom-info.srWindow.Top+1};}
-    void draw(const Session &s,unsigned stage,bool synthetic){
-        const auto [width,height]=size();std::vector<CHAR_INFO> cells(static_cast<size_t>(width*height));
-        for(auto &c:cells){c.Char.UnicodeChar=L' ';c.Attributes=7;}
-        auto line=[&](int y,const std::wstring &value,WORD attr=15){if(y<0||y>=height)return;for(size_t x=0;x<value.size()&&x<static_cast<size_t>(width);++x){auto &c=cells[static_cast<size_t>(y*width)+x];c.Char.UnicodeChar=value[x];c.Attributes=attr;}};
-        line(0,synthetic?L"PROFILE MANUAL RUNNER: SYNTHETIC SMOKE, NEVER QUALIFICATION":L"VT7Pty ordinary PowerShell profiles: private live display");
-        line(1,L"F2 inserts test input | F8 verifies and advances | F12 stops without accepting",11);
-        const int pane=height-6,top=std::max(0,s.state.y()-pane+1);
-        for(int y=0;y<pane && y+top<s.state.rows();++y)for(int x=0;x<width&&x<s.state.columns();++x){
-            const auto &v=s.state.at(x,y+top);auto &c=cells[static_cast<size_t>((y+3)*width+x)];c.Attributes=v.attributes;
-            c.Char.UnicodeChar=v.text.empty()?L' ':v.text[0]<=0xffff?static_cast<wchar_t>(v.text[0]):L'\ufffd';
+
+    ~View()
+    {
+        SetConsoleMode(input, mode);
+        SetConsoleActiveScreenBuffer(previous);
+    }
+
+    COORD size() const
+    {
+        return dimensions(screenInfo(output.value).srWindow);
+    }
+
+    void draw(const Session &s, unsigned stage, bool synthetic)
+    {
+        const auto viewport = screenInfo(output.value).srWindow;
+        const auto [width, height] = dimensions(viewport);
+        check(width > 0 && height > 0 && static_cast<int>(width) * height <= 1024 * 1024, "bounded live profile display");
+        std::vector<CHAR_INFO> cells(static_cast<size_t>(width) * height);
+        for (auto &cell : cells)
+        {
+            cell.Char.UnicodeChar = L' ';
+            cell.Attributes = 7;
         }
-        line(height-2,L"Step "+std::to_wstring(std::min(stage+1,8u))+L"/8: "+(stage<8?manualNames[stage]:L"Natural exit"),14);
-        auto guide=instruction(stage);line(height-1,guide.substr(0,static_cast<size_t>(width)),14);
-        if(guide.size()>static_cast<size_t>(width))line(2,guide.substr(static_cast<size_t>(width)),14);
-        SMALL_RECT rect={0,0,static_cast<SHORT>(width-1),static_cast<SHORT>(height-1)};
-        check(WriteConsoleOutputW(output.value,cells.data(),{static_cast<SHORT>(width),static_cast<SHORT>(height)},{0,0},&rect),"profile live display write");
-        if(synthetic){
-            std::vector<CHAR_INFO> observed(cells.size());rect={0,0,static_cast<SHORT>(width-1),static_cast<SHORT>(height-1)};
-            check(ReadConsoleOutputW(output.value,observed.data(),{static_cast<SHORT>(width),static_cast<SHORT>(height)},{0,0},&rect),"owned display readback");
-            for(size_t i=0;i<cells.size();++i)check(cells[i].Char.UnicodeChar==observed[i].Char.UnicodeChar&&cells[i].Attributes==observed[i].Attributes,"owned display cells match live rendering");
+        auto line = [&](int y, std::wstring_view value, WORD attributes = 15) {
+            if (y < 0 || y >= height)
+                return;
+            for (size_t x = 0; x < value.size() && x < static_cast<size_t>(width); ++x)
+            {
+                auto &cell = cells[static_cast<size_t>(y) * width + x];
+                cell.Char.UnicodeChar = value[x];
+                cell.Attributes = attributes;
+            }
+        };
+
+        const bool usable = width >= 40 && height >= 16;
+        const auto guide = instruction(stage);
+        const int guideRows = usable ? static_cast<int>((guide.size() + width - 1) / width) : 0;
+        const int paneRows = usable ? height - 4 - guideRows : 0;
+        const int top = std::max(0, s.state.y() - paneRows + 1);
+        if (usable)
+        {
+            line(0, synthetic ? L"PROFILE MANUAL RUNNER: SYNTHETIC SMOKE" : L"VT7Pty ordinary PowerShell profiles");
+            line(1, L"F2 inserts input | F8 checks progress | F12 stops", 11);
+            for (int y = 0; y < paneRows && y + top < s.state.rows(); ++y)
+                for (int x = 0; x < width && x < s.state.columns(); ++x)
+                {
+                    const auto &screen = s.state.at(x, y + top);
+                    auto &cell = cells[static_cast<size_t>((y + 2) * width + x)];
+                    cell.Attributes = screen.attributes;
+                    cell.Char.UnicodeChar = screen.text.empty() ? L' ' :
+                        screen.text[0] <= 0xffff ? static_cast<wchar_t>(screen.text[0]) : L'\ufffd';
+                }
+            line(height - guideRows - 1, L"Step " + std::to_wstring(std::min(stage + 1, 8u)) +
+                L"/8  " + (stage < 8 ? manualNames[stage] : L"Natural exit"), 14);
+            for (int row = 0; row < guideRows; ++row)
+                line(height - guideRows + row, std::wstring_view(guide).substr(static_cast<size_t>(row * width)), 14);
         }
-        const int y=s.state.y()-top+3;if(y<height-2)SetConsoleCursorPosition(output.value,{static_cast<SHORT>(s.state.x()),static_cast<SHORT>(y)});
+        else
+        {
+            line(0, L"Enlarge the console window to continue.", 14);
+        }
+
+        // Short row bands also keep each classic console transfer bounded
+        // when the original console is very wide or tall.
+        const int band = std::max(1, 8192 / width);
+        std::vector<CHAR_INFO> observed(synthetic ? cells.size() : 0);
+        for (int y = 0; y < height; y += band)
+        {
+            auto rect = viewport;
+            rect.Top = static_cast<SHORT>(viewport.Top + y);
+            rect.Bottom = static_cast<SHORT>(viewport.Top + std::min<int>(height, y + band) - 1);
+            const auto bandRect = rect;
+            const COORD start = {0, static_cast<SHORT>(y)};
+            check(WriteConsoleOutputW(output.value, cells.data(), {width, height}, start, &rect), "profile live display write");
+            if (synthetic)
+            {
+                rect = bandRect;
+                check(ReadConsoleOutputW(output.value, observed.data(), {width, height}, start, &rect), "owned display readback");
+            }
+        }
+        if (synthetic)
+            for (size_t i = 0; i < cells.size(); ++i)
+                check(cells[i].Char.UnicodeChar == observed[i].Char.UnicodeChar && cells[i].Attributes == observed[i].Attributes,
+                    "owned display cells match live rendering");
+
+        if (usable && s.state.x() < width && s.state.y() >= top && s.state.y() - top < paneRows)
+            SetConsoleCursorPosition(output.value, {static_cast<SHORT>(viewport.Left + s.state.x()),
+                static_cast<SHORT>(viewport.Top + s.state.y() - top + 2)});
     }
 };
+
+void widenSmokeConsole(HANDLE output)
+{
+    const auto maximum = GetLargestConsoleWindowSize(output);
+    const COORD wanted = {static_cast<SHORT>(std::min<int>(170, maximum.X)),
+        static_cast<SHORT>(std::min<int>(65, maximum.Y))};
+    check(wanted.X >= 40 && wanted.Y >= 16, "usable owned smoke console");
+    const auto info = screenInfo(output);
+    const COORD capacity = {std::max(info.dwSize.X, wanted.X), std::max(info.dwSize.Y, wanted.Y)};
+    check(SetConsoleScreenBufferSize(output, capacity), "owned smoke console capacity");
+    SMALL_RECT window = {0, 0, static_cast<SHORT>(wanted.X - 1), static_cast<SHORT>(wanted.Y - 1)};
+    check(SetConsoleWindowInfo(output, TRUE, &window), "owned smoke console window");
+}
+
+void resizeSmokeView(HANDLE output)
+{
+    const auto info = screenInfo(output);
+    const auto width = dimensions(info.srWindow).X;
+    auto window = info.srWindow;
+    const auto next = static_cast<SHORT>(width == 70 ? 64 : 70);
+    check(next <= GetLargestConsoleWindowSize(output).X, "owned smoke resize limit");
+    window.Left = 0;
+    window.Right = static_cast<SHORT>(next - 1);
+    check(SetConsoleWindowInfo(output, TRUE, &window), "owned smoke resize");
+}
+
+std::wstring manualMarkerCommand(const std::string &nonce, std::wstring_view marker)
+{
+    return L"[IO.File]::WriteAllText(($env:" + resultVariable(nonce) + L"+" +
+        psLiteral(L"\\" + std::wstring(marker) + L".txt") + L"),(" + psLiteral(wide(nonce) + L"|") + L"+$PID))";
+}
+
 std::wstring starter(const Shell &shell,unsigned stage){
     const auto fn=shell.checkName();
     switch(stage){
@@ -85,15 +244,56 @@ int manual(const std::wstring &out,bool pwsh,bool synthetic=false){
     outRoot=out;check(CreateDirectoryW(out.c_str(),nullptr),"new ordinary profile result");rootEvidenceCreated=true;
     applicationDesktop=nameOf(GetThreadDesktop(GetCurrentThreadId()));if(!desktopPreflight(out+L"\\preflight.json"))return 2;
     check(SetEnvironmentVariableW(L"VT7PTY_DEBUG",L""),"no ordinary profile trace capture");
-    Context context(out+L"\\session");bool okay=false;std::string failure;
-    unsigned stage=0,keysSeen=0,resizes=0;std::array<unsigned,256> physical={};std::vector<std::array<unsigned,256>> checkpoints;
+    Context context(out + L"\\session");
+    bool okay = false;
+    std::string failure;
+    const auto nonce = profileNonce();
+    std::string startupStep = "NativeReference";
+    DisplaySetup display;
+    DWORD shellPid = 0;
+    bool inputAccepted = false, helpersLoaded = false, snapshotEntered = false, snapshotPublished = false;
+    unsigned stage=0,keysSeen=0,resizes=0;
+    std::array<unsigned,256> physical={};
+    std::vector<std::array<unsigned,256>> checkpoints;
     std::string resizeRows="[",stageRows="[";
-    try{
-        auto &s=context.start();Shell shell(context,{pwsh?"ordinary-pwsh":"ordinary-wps",pwsh,false},true,synthetic);
-        View view;std::pair<int,int> previous={80,25};bool helpers=false,smokeCheckpointQueued=false;
-        auto verify=[&]{
-            check(stage<8,"all profile checkpoints already recorded");
-            if(!helpers){const auto code=flattened(probeSource(context.out,shell.nonce,false));check(code.size()<7900,"bounded interactive helper definition");s.input(utf8(code+L"\r"));helpers=true;}
+    try {
+        const auto reference = nativeStartupReference(out + L"\\startup-reference", pwsh);
+        startupStep = "DisplaySetup";
+        if (synthetic && GetEnvironmentVariableW(L"VT7PTY_PROFILE_WIDE_SMOKE", nullptr, 0))
+            widenSmokeConsole(GetStdHandle(STD_OUTPUT_HANDLE));
+        View view(display);
+
+        startupStep = "ShellLaunch";
+        const auto payload = probeSource(context.out, nonce, false) + L"\n" +
+            helperName(L"VT7PtyMark", nonce) + L" 'helpers-ready'\n";
+        const ProfileBootstrap environment(nonce, context.out, payload);
+        auto &s = context.start();
+        Shell shell(context, {pwsh ? "ordinary-pwsh" : "ordinary-wps", pwsh, false}, nonce, true, synthetic);
+        shellPid = shell.pid;
+        startupStep = "AwaitF8";
+        std::pair<int,int> previous = {80,25};
+        bool smokeCheckpointQueued = false;
+        auto verify = [&]{
+            check(stage < 8, "all profile checkpoints already recorded");
+            if (stage == 0)
+            {
+                startupStep = "InteractiveCommand";
+                s.input(utf8(manualMarkerCommand(nonce, L"f8-entered") + L"\r"));
+                check(s.until([&]{ return shell.marked(L"f8-entered"); }, 15000), "F8 command did not reach the shell");
+                inputAccepted = true;
+
+                startupStep = "HelperLoad";
+                const auto command = L"try { " + loadProbe(nonce) + L" } catch { " +
+                    manualMarkerCommand(nonce, L"helper-load-failed") + L" }";
+                check(command.size() < 512, "bounded F8 helper command");
+                s.input(utf8(command + L"\r"));
+                check(s.until([&]{
+                    check(!shell.marked(L"helper-load-failed"), "F8 helper evaluation failed");
+                    return shell.marked(L"helpers-ready");
+                }, 15000), "F8 helpers did not acknowledge loading");
+                helpersLoaded = true;
+                startupStep = "Snapshot";
+            }
             if(stage==1){shell.proof(L"Editing");check(physical[VK_BACK]&&physical[VK_LEFT]&&physical[VK_END],"physical editing keys observed");}
             if(stage==2){const auto data=shell.proof(L"History");check(number(data,"CheckInvocation")>=2&&physical[VK_UP],"physical history recall");}
             if(stage==3){shell.proof(L"Completion");check(physical[VK_TAB],"physical completion key");}
@@ -106,14 +306,22 @@ int manual(const std::wstring &out,bool pwsh,bool synthetic=false){
             if(stage==6){shell.childProof();check(physical['C']||synthetic,"physical child Ctrl+C");}
             if(stage==7){shell.proof(L"Resize");check(resizes>0,"physical console resize observed");}
             const auto snapshot=shell.snapshot(static_cast<int>(stage),true);
-            if(stage==0)check(number(snapshot,"StartupErrorCount")==0,"ordinary startup errors need review");
+            if (stage == 0)
+            {
+                snapshotEntered = shell.marked(L"snapshot-entered");
+                snapshotPublished = true;
+                startupStep = "StartupComparison";
+                check(snapshotEntered, "ordinary startup snapshot acknowledgment");
+                checkProfileStartup(snapshot, reference);
+                startupStep = "Ready";
+            }
             if(stageRows.size()>1)stageRows+=',';
             stageRows+="{\"Stage\":"+std::to_string(stage)+",\"Confirmed\":true,\"Source\":"+json(synthetic?"OwnedConsoleSyntheticSmoke":"PhysicalConsoleInput")+"}";
             checkpoints.push_back(physical);physical={};smokeCheckpointQueued=false;++stage;
         };
         const auto deadline=GetTickCount64()+1500000;unsigned smokePhase=0;ULONGLONG smokeNext=0;bool smokeChildInterrupted=false;
         while(GetTickCount64()<deadline && WaitForSingleObject(s.descendant.value,0)==WAIT_TIMEOUT){
-            s.pump();const auto dimensions=view.size();const auto backend=std::pair<int,int>{std::clamp(dimensions.first,20,160),std::clamp(dimensions.second-6,10,54)};
+            s.pump();const auto window=view.size();const auto backend=std::pair<int,int>{std::clamp<int>(window.X,20,160),std::clamp<int>(window.Y-6,10,54)};
             if(backend!=previous){
                 check(vt7pty_set_size(s.runtimeHandle(),backend.first,backend.second,nullptr),"ordinary profile resize");s.state.resize(backend.first,backend.second);previous=backend;
                 if(stage==7){++resizes;if(resizeRows.size()>1)resizeRows+=',';resizeRows+="{\"Columns\":"+std::to_string(backend.first)+",\"Rows\":"+std::to_string(backend.second)+"}";}
@@ -148,7 +356,7 @@ int manual(const std::wstring &out,bool pwsh,bool synthetic=false){
                 else if(stage==6 && !smokeChildInterrupted){sendOwnConsoleKey(view.input,'C',3);smokeChildInterrupted=true;smokeNext=GetTickCount64()+300;}
                 else if(stage==6 && WaitForSingleObject(shell.nativeChild.value,0)==WAIT_TIMEOUT){smokeNext=GetTickCount64()+50;}
                 else if(stage==7 && smokePhase<7){
-                    SMALL_RECT window={0,0,95,32};check(SetConsoleWindowInfo(view.output.value,TRUE,&window),"owned smoke resize");
+                    resizeSmokeView(view.output.value);
                     sendOwnConsoleKey(view.input,VK_F2);sendOwnConsoleKey(view.input,VK_RETURN,L'\r');smokePhase=7;smokeNext=GetTickCount64()+500;
                 }
                 else if(stage==8){s.input("exit 37\r");smokeNext=GetTickCount64()+1000;}
@@ -159,7 +367,12 @@ int manual(const std::wstring &out,bool pwsh,bool synthetic=false){
             if(record.EventType!=KEY_EVENT||!record.Event.KeyEvent.bKeyDown)continue;const auto &key=record.Event.KeyEvent;
             check(++keysSeen<20000,"bounded ordinary profile key count");
             if(key.wVirtualKeyCode==VK_F12)throw std::runtime_error("ordinary profile check stopped");
-            if(key.wVirtualKeyCode==VK_F8){verify();continue;}
+            if(key.wVirtualKeyCode==VK_F8){
+                const auto visible = view.size();
+                if (visible.X >= 40 && visible.Y >= 16)
+                    verify();
+                continue;
+            }
             if(key.wVirtualKeyCode==VK_F2){s.input(utf8(starter(shell,stage)));continue;}
             if(key.uChar.UnicodeChar==3)physical['C']+=key.wRepeatCount;
             else if(key.wVirtualKeyCode==VK_BACK||key.wVirtualKeyCode==VK_LEFT||key.wVirtualKeyCode==VK_RIGHT||key.wVirtualKeyCode==VK_HOME||
@@ -170,13 +383,39 @@ int manual(const std::wstring &out,bool pwsh,bool synthetic=false){
         writeFile(context.out+L"\\profile-result.json","{\"ShellId\":"+std::to_string(shell.pid)+",\"NaturalExit\":37,\"WorkflowsPassed\":true}");
         okay=true;
     }catch(const std::exception &e){failure=e.what();}
-    okay=context.finish()&&okay;if(failure.empty()&&!context.error.empty())failure=context.error;
+    if (startupStep == "Snapshot" && shellPid != 0)
+    {
+        const auto marker = nonce + "|" + std::to_string(shellPid);
+        auto marked = [&](const wchar_t *name) {
+            try { return profileText(context.out + L"\\" + name + L".txt") == marker; }
+            catch (...) { return false; }
+        };
+        snapshotEntered = marked(L"snapshot-entered");
+        if (marked(L"SnapshotMetadata"))
+            startupStep = "SnapshotMetadata";
+        else if (marked(L"SnapshotPublication"))
+            startupStep = "SnapshotPublication";
+        else
+            startupStep = snapshotEntered ? "SnapshotResultMissing" : "SnapshotCommand";
+    }
+    okay = context.finish(okay) && okay;
+    if (failure.empty() && !context.error.empty())
+        failure = context.error;
+    writeFile(out + L"\\startup-progress.json", schema(nonce, shellPid, "OrdinaryProfileStartup") +
+        ",\"Step\":" + json(startupStep) + ",\"InteractiveCommandAccepted\":" + boolean(inputAccepted) +
+        ",\"HelpersLoaded\":" + boolean(helpersLoaded) + ",\"SnapshotEntered\":" + boolean(snapshotEntered) +
+        ",\"SnapshotPublished\":" + boolean(snapshotPublished) + ",\"DisplayActivated\":" + boolean(display.activated) +
+        ",\"InheritedBuffer\":" + coordinateJson(display.inheritedBuffer) +
+        ",\"InheritedWindow\":" + coordinateJson(display.inheritedWindow) +
+        ",\"RequestedBuffer\":" + coordinateJson(display.requestedBuffer) +
+        ",\"ActiveWindow\":" + coordinateJson(display.activeWindow) + "}");
+
     std::string counts="[";for(size_t i=0;i<checkpoints.size();++i){if(i)counts+=',';counts+="{";bool first=true;for(size_t vk=0;vk<256;++vk)if(checkpoints[i][vk]){if(!first)counts+=',';first=false;counts+=json(std::to_string(vk))+":"+std::to_string(checkpoints[i][vk]);}counts+='}';}
     writeFile(out+L"\\physical-checks.json","{\"Stages\":"+stageRows+"],\"KeyCountsByStage\":"+counts+"],\"PrintableTextCollected\":false,\"Resizes\":"+resizeRows+"]}");
     writeFile(out+L"\\probe.json","{\"Kind\":\"OrdinaryProfileProbe\",\"SchemaVersion\":1,\"Status\":"+json(okay?"Pass":"Fail")+
         ",\"SourceCommit\":"+json(GenVersion_Commit)+",\"RuntimeSourceCommit\":"+json(manualRuntimeSource())+",\"SyntheticInputUsed\":"+boolean(synthetic)+
-        ",\"OrdinaryProfilesLoaded\":"+boolean(!synthetic)+",\"ProfileContentCollected\":false,\"ShellOutputCollected\":false,\"HistoryContentCollected\":false,\"Stages\":"+std::to_string(stage)+
-        ",\"OwnedProcessesCleaned\":"+boolean(context.cleaned)+",\"HostExited\":"+boolean(context.hostExited)+",\"Error\":"+json(failure)+",\"Step12Accepted\":false}");
+        ",\"OrdinaryShellStarted\":"+boolean(!synthetic && shellPid != 0)+",\"OrdinaryProfilesLoaded\":"+boolean(!synthetic && stage != 0)+",\"ProfileContentCollected\":false,\"ShellOutputCollected\":false,\"HistoryContentCollected\":false,\"Stages\":"+std::to_string(stage)+
+        ",\"OwnedProcessesCleaned\":"+boolean(context.cleaned)+",\"HostExited\":"+boolean(context.hostExited)+",\"Error\":"+json(failure)+",\"StartupHandshake\":1,\"Step12Accepted\":false}");
     printf("Ordinary profile %s: %s\n",synthetic?"synthetic smoke":"physical check",okay?"PASS":"FAIL");return okay?0:1;
 }
 int smoke(const std::wstring &out,bool pwsh){

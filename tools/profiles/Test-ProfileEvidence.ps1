@@ -30,6 +30,60 @@ function Snapshot-P([string]$Root,[int]$Stage,$launch){
     Need-P ($s.Engine -cmatch '^(2\.0|5\.1\.|7\.2\.24)' -and $s.WindowWidth -ge 20 -and $s.WindowHeight -ge 10) 'engine and actual geometry'
     return $s
 }
+function StartupReference-P([string]$Root,$Launch){
+    $path=Join-Path $Root 'startup-reference'
+    $reference=Read-P (Join-Path $path 'reference.json')
+    Need-P ($reference.Kind -ceq 'NativeProfileStartupReference' -and $reference.SchemaVersion -eq 1 -and
+        $reference.NoProfile -and $reference.NativeConsole -and $reference.NaturalExit -eq 37 -and
+        $reference.ProcessId -gt 0 -and $reference.Nonce -cmatch '^[0-9a-f]+$' -and
+        $reference.Nonce -cne $Launch.Nonce -and $reference.Executable -ieq $Launch.Executable) 'matching native clean-shell reference'
+    $snapshot=Snapshot-P $path 0 $reference
+    Need-P ([IO.File]::ReadAllText((Join-Path $path 'snapshot-entered.txt')) -ceq ($reference.Nonce+'|'+$reference.ProcessId)) 'native reference reached snapshot'
+    return $snapshot
+}
+function StartupErrors-P($Snapshot,$Reference){
+    foreach($value in @($Snapshot,$Reference)){
+        Need-P ($value.StartupErrorCount -ge 0 -and $value.ErrorCount -eq $value.StartupErrorCount -and
+            $value.StartupErrorDigest -cmatch '^[0-9a-f]{64}$' -and $value.ErrorDigest -ceq $value.StartupErrorDigest -and
+            $value.StartupErrorTypes -cmatch '^(?:[A-Za-z0-9_.+]{1,128}(?:\|[A-Za-z0-9_.+]{1,128}){0,3})?$' -and
+            ($value.StartupErrorCount -eq 0) -eq ($value.StartupErrorDigest -ceq 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')) 'typed startup and setup error evidence'
+    }
+    Need-P ($Snapshot.Engine -ceq $Reference.Engine -and $Snapshot.CLRVersion -ceq $Reference.CLRVersion -and
+        $Snapshot.CLRVersion -cmatch '^[0-9]+\.[0-9]+' -and
+        ($Snapshot.Engine -cne '2.0' -or $Snapshot.CLRVersion.StartsWith('2.0.')) -and
+        $Snapshot.Policy.Process -ceq $Reference.Policy.Process -and
+        ($Snapshot.StartupErrorCount -eq 0 -or
+            ($Snapshot.StartupErrorCount -eq $Reference.StartupErrorCount -and
+             $Snapshot.StartupErrorDigest -ceq $Reference.StartupErrorDigest))) 'startup errors match native clean shell'
+}
+function Prediction-P([string]$Path,$Launch){
+    $p=Read-P (Join-Path $Path 'prediction-support.json')
+    Need-P ($p.Kind -ceq 'ProfilePredictionCapability' -and $p.SchemaVersion -eq 1 -and
+        $p.Nonce -ceq $Launch.Nonce -and $p.ProcessId -eq $Launch.ProcessId -and
+        $p.Requested -ceq 'History' -and $p.Before -ceq 'None' -and $p.Restored -ceq 'None' -and
+        (($p.Outcome -ceq 'SettingAccepted' -and $p.Observed -ceq 'History' -and -not $p.ErrorType) -or
+         ($p.Outcome -ceq 'LegacyConsoleRejected' -and $p.Observed -ceq 'None' -and
+          $p.ErrorType -ceq 'System.ArgumentException'))) 'classified prediction setting and restoration'
+    return $p.Outcome
+}
+function ManualStartup-P([string]$Root,$Launch){
+    $status=Read-P (Join-Path $Root 'startup-progress.json')
+    Need-P ($status.Kind -ceq 'OrdinaryProfileStartup' -and $status.SchemaVersion -eq 1 -and
+        $status.ProcessId -eq $Launch.ProcessId -and $status.Nonce -ceq $Launch.Nonce -and $status.Step -ceq 'Ready' -and
+        $status.InteractiveCommandAccepted -and $status.HelpersLoaded -and
+        $status.SnapshotEntered -and $status.SnapshotPublished -and $status.DisplayActivated) 'complete F8 startup handshake'
+    foreach($name in @('f8-entered','helpers-ready','snapshot-entered')){
+        Need-P ([IO.File]::ReadAllText((Join-Path $Root ('session\'+$name+'.txt'))) -ceq
+            ($Launch.Nonce+'|'+$Launch.ProcessId)) 'same-shell F8 startup acknowledgment'
+    }
+    Need-P ($status.InheritedWindow.Columns -gt 0 -and $status.InheritedWindow.Rows -gt 0 -and
+        $status.RequestedBuffer.Columns -ge [Math]::Max(160,[Math]::Max($status.InheritedWindow.Columns,$status.InheritedBuffer.Columns)) -and
+        $status.RequestedBuffer.Rows -ge [Math]::Max(60,[Math]::Max($status.InheritedWindow.Rows,$status.InheritedBuffer.Rows)) -and
+        $status.ActiveWindow.Columns -ge 40 -and $status.ActiveWindow.Rows -ge 16 -and
+        $status.RequestedBuffer.Columns -ge $status.ActiveWindow.Columns -and
+        $status.RequestedBuffer.Rows -ge $status.ActiveWindow.Rows) 'display buffer contains inherited and active windows'
+    return $status
+}
 function EqualState-P($first,$last){
     foreach($name in @('Engine','HostName','LanguageMode','FixtureOrder','FixtureWinner')){Need-P ($first.$name -ceq $last.$name) 'stable profile session identity'}
     foreach($name in @('MachinePolicy','UserPolicy','Process','CurrentUser','LocalMachine')){Need-P ($first.Policy.$name -ceq $last.Policy.$name) 'execution policy preserved'}
@@ -129,6 +183,8 @@ function Native-P([string]$Root,[string]$Harness){
         Need-P ((Read-P (Join-Path $Root 'publication\proof.json')).Invocation -eq 2 -and (Read-P (Join-Path $Root 'publication\proof.previous')).Invocation -eq 1) 'original and replaced publication proofs'
         $publicationChecks=3
     }
+    $configurationChecks = if($p.PSObject.Properties['ConfigurationChecks']){[int]$p.ConfigurationChecks}else{0}
+    Need-P ($configurationChecks -in @(0,1)) 'known controlled profile proof format'
     $reported=(Read-P (Join-Path $Root 'cases.json')).Cases
     $definitions=(Read-P (Join-Path $PSScriptRoot 'cases.json')).Cases
     Need-P ($p.Total -in @(2,4) -and $p.Passed -eq $p.Total) 'profile fixture total'
@@ -141,10 +197,26 @@ function Native-P([string]$Root,[string]$Harness){
         $launch=Launch-P $directory
         Need-P (-not $launch.Ordinary -and $launch.NoProfile -and -not $launch.SyntheticInputUsed -and $launch.ControlledInlineFixtures) 'controlled launch arguments'
         $first=Snapshot-P $directory 0 $launch;$last=Snapshot-P $directory 1 $launch;EqualState-P $first $last
-        Need-P ($first.StartupErrorCount -eq 0 -and $first.ErrorCount -eq 0) 'controlled startup and workflow errors'
+        if($configurationChecks){
+            $reference=StartupReference-P $directory $launch
+            StartupErrors-P $first $reference
+        }else{
+            Need-P ($first.StartupErrorCount -eq 0 -and $first.ErrorCount -eq 0) 'controlled startup and workflow errors'
+        }
         if($definition.Engine -ceq 'pwsh'){Need-P ($first.Engine -ceq '7.2.24' -and @($first.Editors).Count -eq 1 -and $first.Options.HistorySaveStyle -ceq 'SaveNothing') 'pinned controlled PSReadLine'}
         else{Need-P ($first.Engine -cmatch '^(2\.0|5\.1\.)' -and @($first.Editors).Count -eq 0) 'native Windows PowerShell editor'}
-        Need-P ($first.Options.EditMode -ceq $definition.EditMode -and $first.Options.PredictionSource -ceq $definition.PredictionSource) 'controlled profile editor options'
+        $predictionExpected = $definition.PredictionSource
+        if(-not $configurationChecks -and $definition.Case -ceq 'pwsh-layered-readline'){$predictionExpected='History'}
+        Need-P ($first.Options.EditMode -ceq $definition.EditMode -and $first.Options.PredictionSource -ceq $predictionExpected) 'controlled profile editor options'
+        if($configurationChecks){
+            Need-P ($first.EditorCount -eq @($first.Editors).Count -and $last.EditorCount -eq $first.EditorCount -and
+                $last.EditorVersion -ceq $first.EditorVersion -and
+                $first.EditorVersion -ceq $(if($definition.Engine -ceq 'pwsh'){'2.1.0'}else{''}) -and
+                $first.StartupErrorDigest -ceq $last.StartupErrorDigest -and $first.StartupErrorCount -eq $last.StartupErrorCount) 'stable and pinned controlled editor/startup identity'
+        }
+        $prediction = if($configurationChecks -and $definition.Case -ceq 'pwsh-layered-readline'){
+            Prediction-P $directory $launch
+        }else{'NotRun'}
         Need-P ($first.FixtureOrder -ceq $(if($definition.Layered){'AllUsersAllHosts,AllUsersCurrentHost,CurrentUserAllHosts,CurrentUserCurrentHost'}else{''}) -and
             $first.FixtureWinner -ceq $(if($definition.Layered){'CurrentUserCurrentHost'}else{''})) 'controlled profile precedence'
         $wanted=@('Editing','History','Completion','Multiline','Continue','Resize');if($definition.Case -ceq 'pwsh-layered-readline'){$wanted+=@('Binding')}
@@ -159,11 +231,11 @@ function Native-P([string]$Root,[string]$Harness){
         $cancel=Read-P (Join-Path $directory 'cancel.json');Need-P ($cancel.PartialLineDiscarded -and $cancel.NextCommandPassed) 'profile cancellation and next command'
         Need-P ($last.WindowWidth -eq 100 -and $last.WindowHeight -eq 32) 'actual profile resize readback'
         Child-P $directory $launch
-        $cases+=@(@{Case=$definition.Case;Status='Pass';Engine=$first.Engine;Editor=$definition.Editor;Layered=$definition.Layered;Shell=$launch.ProcessId})
+        $cases+=@(@{Case=$definition.Case;Status='Pass';Engine=$first.Engine;Editor=$definition.Editor;Layered=$definition.Layered;Shell=$launch.ProcessId;StartupErrors=$first.StartupErrorCount;PredictionCapability=$prediction})
     }
     $trace=Trace-P $Root $Harness $definitions.Count
     return [ordered]@{Kind='ProfileFixtureReview';Status='Pass';SourceCommit=$Harness;RuntimeSourceCommit=$runtimeSource;Cases=$cases
-        HostLifetimes=$trace.HostLifetimes;KeyboardOperations=$trace.KeyboardOperations;PublicationChecks=$publicationChecks;OrdinaryUserProfiles='NotRun';Step12Accepted=$false}
+        HostLifetimes=$trace.HostLifetimes;KeyboardOperations=$trace.KeyboardOperations;PublicationChecks=$publicationChecks;ConfigurationChecks=$configurationChecks;OrdinaryUserProfiles='NotRun';Step12Accepted=$false}
 }
 function Manual-P([string]$Root,[string]$Harness){
     $p=Read-P (Join-Path $Root 'probe.json');if(-not $Harness){$Harness=$p.SourceCommit}
@@ -177,7 +249,17 @@ function Manual-P([string]$Root,[string]$Harness){
     foreach($name in @('runtime-trace.jsonl','stream.bin','ui-transcript.txt','output-trace.json')){
         Need-P (-not (Test-Path -LiteralPath (Join-Path $Root $name)) -and -not (Test-Path -LiteralPath (Join-Path $directory $name))) 'no ordinary output/transcript collection'
     }
-    $first=Snapshot-P $directory 0 $launch;Need-P ($first.StartupErrorCount -eq 0) 'ordinary startup clean before test helpers'
+    $first=Snapshot-P $directory 0 $launch
+    $handshake = if($p.PSObject.Properties['StartupHandshake']){[int]$p.StartupHandshake}else{0}
+    Need-P ($handshake -in @(0,1)) 'known ordinary startup proof format'
+    $display=$null
+    if($handshake){
+        $display=ManualStartup-P $Root $launch
+        $reference=StartupReference-P $Root $launch
+        StartupErrors-P $first $reference
+    }else{
+        Need-P ($first.StartupErrorCount -eq 0) 'ordinary startup clean before test helpers'
+    }
     foreach($stage in 1..7){$snapshot=Snapshot-P $directory $stage $launch;EqualState-P $first $snapshot}
     foreach($name in @('Editing','History','Completion','Multiline','Continue','Resize')){$null=Proof-P $directory $name $launch}
     Need-P ((Proof-P $directory 'History' $launch).CheckInvocation -ge 2) 'ordinary history actually recalled'
@@ -190,7 +272,7 @@ function Manual-P([string]$Root,[string]$Harness){
     if(-not $p.SyntheticInputUsed){foreach($stage in @(5,6)){Need-P ($physical.KeyCountsByStage[$stage].'67' -ge 1) 'physical Ctrl+C observed'}}
     return [ordered]@{Kind='OrdinaryProfileReview';Status='Pass';SourceCommit=$Harness;RuntimeSourceCommit=$runtimeSource;Engine=$first.Engine
         SyntheticSmoke=[bool]$p.SyntheticInputUsed;OrdinaryProfilesQualified=(-not $p.SyntheticInputUsed);ProfileFilesPresent=@($first.Profiles | Where-Object {$_.Present}).Count
-        EditorVersions=@($first.Editors | ForEach-Object {$_.Version});Stages=8;HostLifetimes=1;ProfileContentCollected=$false;Step12Accepted=$false}
+        EditorVersions=@($first.Editors | ForEach-Object {$_.Version});Stages=8;StartupHandshake=$handshake;Display=$display;HostLifetimes=1;ProfileContentCollected=$false;Step12Accepted=$false}
 }
 if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')){
     $p=Read-P (Join-Path $Directory 'probe.json')
@@ -217,9 +299,21 @@ if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')){
     }else{Need-P ($r.PowerShell7.Required -and $r.PowerShell7.Version -ceq '7.2.24' -and $r.PowerShell7.Sha256 -cmatch '^[0-9a-f]{64}$' -and
         $r.PowerShell7.ModuleManifestSha256 -cmatch '^[0-9a-f]{64}$') 'pinned profile PowerShell 7 inventory'}
     Files-P $PackageRoot $m.Files
+    $rc3 = $m.Profiles.PSObject.Properties['ConfigurationChecks'] -and $m.Profiles.ConfigurationChecks -eq 1
+    $bundleCaseFile=Join-Path $PackageRoot 'tools\profiles\cases.json'
+    $bundleProbeFile=Join-Path $PackageRoot 'tools\profiles\ProfileProbe.ps1'
+    if($rc3){
+        $sourceCases=Join-Path $PSScriptRoot 'cases.json'
+        $sourceProbe=Join-Path $PSScriptRoot 'ProfileProbe.ps1'
+        Need-P ($m.Manual.StartupHandshake -eq 1 -and
+            @($m.Files | Where-Object {$_.Path -ceq 'tools/profiles/ProfileJsonWriter.ps1'}).Count -eq 1) 'package includes startup handshake and PS2 JSON writer'
+    }else{
+        $historic=Join-Path $PSScriptRoot '..\..\docs\validation\results\step-1.2\profiles-rc2-candidate-2026-11-20'
+        $sourceCases=Join-Path $historic 'cases.json.txt'
+        $sourceProbe=Join-Path $historic 'ProfileProbe.ps1.txt'
+    }
     Need-P ((Hash-P (Join-Path $PackageRoot 'reference\manifest.json')) -ceq $m.Runtime.ManifestSha256 -and
-        (Hash-P (Join-Path $PackageRoot 'tools\profiles\cases.json')) -ceq (Hash-P (Join-Path $PSScriptRoot 'cases.json')) -and
-        (Hash-P (Join-Path $PackageRoot 'tools\profiles\ProfileProbe.ps1')) -ceq (Hash-P (Join-Path $PSScriptRoot 'ProfileProbe.ps1'))) 'frozen reference and reviewed fixture source'
+        (Hash-P $bundleCaseFile) -ceq (Hash-P $sourceCases) -and (Hash-P $bundleProbeFile) -ceq (Hash-P $sourceProbe)) 'frozen reference and reviewed fixture source'
     $original=Read-P (Join-Path $PackageRoot 'reference\manifest.json')
     foreach($f in $m.Reference.Files){
         $o=@($original.Files | Where-Object {$_.Path -ceq ('runtime/bin/'+$f.Name)})
@@ -231,7 +325,7 @@ if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')){
     }
     $files=(Read-P (Join-Path $Directory 'evidence-files.json')).Files;Files-P $Directory $files
     Need-P (@(Get-ChildItem -LiteralPath $Directory -File -Recurse).Count -eq $files.Count+1) 'complete profile evidence inventory'
-    $expectedRoles=if($r.Mode -ceq 'Manual'){@($m.Manual.EnginesByTier.($r.Tier))}else{@('Guard','Profiles','Input','Profiles','Profiles')}
+    $expectedRoles=@(if($r.Mode -ceq 'Manual'){$m.Manual.EnginesByTier.($r.Tier)}else{'Guard','Profiles','Input','Profiles','Profiles'})
     Need-P (($r.Trials.Role -join '|') -ceq ($expectedRoles -join '|') -and @($r.Trials).Count -eq $expectedRoles.Count) 'complete ordered profile trial inventory'
     $reviews=@()
     foreach($t in $r.Trials){
@@ -239,6 +333,10 @@ if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')){
             $t.CollectionStatus -ceq 'Completed' -and $t.Outcome -ceq 'Pass' -and $t.ExitCode -eq 0 -and -not $t.TimedOut -and -not $t.Error) 'completed profile controller'
         $native=Join-Path $Directory ($t.Directory+'\native')
         if($r.Mode -ceq 'Manual'){
+            if($rc3){
+                $issuedProbe=Read-P (Join-Path $native 'probe.json')
+                Need-P ($issuedProbe.PSObject.Properties['StartupHandshake'] -and $issuedProbe.StartupHandshake -eq 1) 'required ordinary startup handshake'
+            }
             $review=Manual-P $native $m.Harness.SourceCommit
             Need-P ($review.OrdinaryProfilesQualified -and -not $review.SyntheticSmoke) 'real ordinary profile qualification'
             $snap=Read-P (Join-Path $native 'session\snapshot-0.json')
@@ -249,6 +347,10 @@ if(Test-Path -LiteralPath (Join-Path $Directory 'probe.json')){
             $review=& (Join-Path $PSScriptRoot '..\input\Test-InputEvidence.ps1') -Directory $native -ExpectedRuntimeSource $runtimeSource -ExpectedHarnessSource $runtimeSource -CaseDefinitionsPath (Join-Path $PackageRoot 'reference\input-cases.json')
             Need-P ($review.Outcome -ceq 'Pass' -and $review.Passed -eq 43 -and $review.Total -eq 43) 'accepted frozen input matrix'
         }else{
+            if($rc3){
+                $issuedProbe=Read-P (Join-Path $native 'probe.json')
+                Need-P ($issuedProbe.PSObject.Properties['ConfigurationChecks'] -and $issuedProbe.ConfigurationChecks -eq 1) 'required controlled profile configuration checks'
+            }
             $review=Native-P $native $m.Harness.SourceCommit
             Need-P (@($review.Cases).Count -eq $m.Profiles.CasesByTier.($r.Tier)) 'tier-specific fixture inventory'
             if($m.Profiles.PSObject.Properties['PublicationChecks']){Need-P ($m.Profiles.PublicationChecks -eq 3 -and $review.PublicationChecks -eq 3) 'required publication checks in each profile trial'}

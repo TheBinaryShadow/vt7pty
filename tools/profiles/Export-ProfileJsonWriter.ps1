@@ -1,0 +1,16 @@
+[CmdletBinding()]
+param([Parameter(Mandatory=$true)][string]$OutputPath)
+$ErrorActionPreference = 'Stop'
+$compat = Join-Path $PSScriptRoot '..\platform\Windows7Compat.ps1'
+$tokens = $null
+$parseErrors = $null
+$ast = [Management.Automation.Language.Parser]::ParseFile($compat, [ref]$tokens, [ref]$parseErrors)
+if ($parseErrors.Count) { throw 'The Windows 7 JSON writer source does not parse.' }
+$source = foreach ($name in @('Add-VT7JsonString','Add-VT7JsonValue')) {
+    $function = $ast.Find({ param($node)
+        $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name
+    }, $false)
+    if (-not $function) { throw ('Missing Windows 7 JSON writer function '+$name) }
+    $function.Extent.Text
+}
+[IO.File]::WriteAllText($OutputPath, ($source -join [string][char]10), [Text.UTF8Encoding]::new($false))

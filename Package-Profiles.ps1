@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')][string]$Suffix='rc2',[string]$InputRc2Archive='')
+param([ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')][string]$Suffix='rc3',[string]$InputRc2Archive='')
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version 2.0
 $root=$PSScriptRoot;$source=(& git -C $root rev-parse HEAD).Trim()
@@ -70,6 +70,7 @@ $plan=[ordered]@{'README.md'='docs\PROFILE_TESTS.md';'tools\profiles\Invoke-Prof
     'tools\platform\Windows7Compat.ps1'='tools\platform\Windows7Compat.ps1';'LICENSE.txt'='LICENSE';'CREDITS.md'='CREDITS.md';'UPSTREAM.md'='UPSTREAM.md'}
 foreach($tier in @('NONESU','ESU','LEGACY')){foreach($manual in @('','MANUAL-')){$name='RUN-PROFILES-'+$manual+$tier+'.cmd';$plan[$name]=$name}}
 foreach($name in $plan.Keys){$destination=Join-Path $stage $name;[void][IO.Directory]::CreateDirectory((Split-Path -Parent $destination));Copy-Item -LiteralPath (Join-Path $root $plan[$name]) -Destination $destination}
+& (Join-Path $root 'tools\profiles\Export-ProfileJsonWriter.ps1') -OutputPath (Join-Path $stage 'tools\profiles\ProfileJsonWriter.ps1')
 $readme=Join-Path $stage 'README.md';$text=[IO.File]::ReadAllText($readme)
 $text=[regex]::Replace($text,'\]\(([^)]+)\)',{param($match)
     $link=$match.Groups[1].Value;if($link -match '^[a-zA-Z]+:' -or $link.StartsWith('#')){return $match.Value}
@@ -84,8 +85,8 @@ $manifest=[ordered]@{Kind='VT7PtyProfileCandidate';SchemaVersion=1;Step12Accepte
     Runtime=[ordered]@{SourceCommit=$runtimeSource;UnchangedFromInputRc2=$true;ArchiveSha256=$archiveHash;ManifestSha256=$manifestHash;Version=$version;ApiVersion='1.1';ProtocolVersion=2;Architecture='x64'}
     Harness=[ordered]@{SourceCommit=$source;SourceTreeClean=$true;Architecture='x64';Configuration='Release'}
     Reference=[ordered]@{SourceCommit=$runtimeSource;Files=$frozen;GuardCasesByTier=@{DevelopmentHost=41;NonESU=41;ESU=41;Legacy=33};InputCases=43}
-    Profiles=[ordered]@{CasesByTier=@{DevelopmentHost=4;NonESU=4;ESU=4;Legacy=2};Repetitions=3;PublicationChecks=3;Source='ControlledInlineFixtures';OrdinaryUserProfiles='NotRun'}
-    Manual=[ordered]@{Required=$true;EnginesByTier=@{DevelopmentHost=@('wps','pwsh');NonESU=@('wps','pwsh');ESU=@('wps','pwsh');Legacy=@('wps')};Stages=8
+    Profiles=[ordered]@{CasesByTier=@{DevelopmentHost=4;NonESU=4;ESU=4;Legacy=2};Repetitions=3;PublicationChecks=3;ConfigurationChecks=1;Source='ControlledInlineFixtures';OrdinaryUserProfiles='NotRun'}
+    Manual=[ordered]@{Required=$true;EnginesByTier=@{DevelopmentHost=@('wps','pwsh');NonESU=@('wps','pwsh');ESU=@('wps','pwsh');Legacy=@('wps')};Stages=8;StartupHandshake=1
         Source='PhysicalConsoleInput';LoadsRealProfiles=$true;SavesShellOutput=$false;ChangesGlobalProfiles=$false;OverridesExecutionPolicy=$false}
     CtrlBreakTransport='Unsupported';ApiFramingLimitsUnchanged=$true;Files=$files}
 [IO.File]::WriteAllText((Join-Path $stage 'manifest.json'),($manifest | ConvertTo-Json -Depth 12),[Text.UTF8Encoding]::new($false))

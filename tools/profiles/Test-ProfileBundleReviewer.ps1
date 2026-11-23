@@ -32,6 +32,14 @@ $controls=@(
     @{Name='failed-profile-proof';File='02-profiles\native\wps-clean-native\Editing.json';Expected='command proof Editing';Edit={param($v)$v.Matched=$false}},
     @{Name='missing-profile-case';File='02-profiles\native\cases.json';Expected='case inventory';Edit={param($v)$v.Cases=@($v.Cases | Select-Object -Skip 1)}}
 )
+$profile=Join-Path $copy '02-profiles\native\probe.json'
+if((Get-Content -Raw -LiteralPath $profile | ConvertFrom-Json).PSObject.Properties['ConfigurationChecks']){
+    $controls+=@(
+        @{Name='configuration-proof-omitted';File='02-profiles\native\probe.json';Expected='required controlled profile configuration';Edit={
+            param($v)$v.PSObject.Properties.Remove('ConfigurationChecks')
+        }}
+    )
+}
 $results=@()
 foreach($control in $controls){
     $path=Join-Path $copy $control.File;$bytes=[IO.File]::ReadAllBytes($path)

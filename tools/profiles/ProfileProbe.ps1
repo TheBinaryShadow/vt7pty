@@ -7,20 +7,52 @@ $script:VT7PtyProfileExe=__EXE__
 $script:VT7PtyProfileCounter=0
 $script:VT7PtyProfileCounts=@{}
 $script:VT7PtyProfileControlled=__CONTROLLED__
-$script:VT7PtyProfileStartupErrors=@($global:Error).Count
 function global:__HASH__([string]$VT7PtyPath) {
     $VT7PtyStream=[IO.File]::OpenRead($VT7PtyPath)
     $VT7PtyHash=[Security.Cryptography.SHA256]::Create()
     try {return [BitConverter]::ToString($VT7PtyHash.ComputeHash($VT7PtyStream)).Replace('-','').ToLowerInvariant()}
     finally {$VT7PtyStream.Close();$VT7PtyHash.Clear()}
 }
-function global:__JSON__([string]$VT7PtyName,$VT7PtyValue) {
-    if($PSVersionTable.PSVersion.Major -ge 3){$VT7PtyJson=Microsoft.PowerShell.Utility\ConvertTo-Json -InputObject $VT7PtyValue -Depth 9 -Compress}
-    else {
-        Add-Type -AssemblyName System.Web.Extensions
-        $VT7PtySerializer=New-Object System.Web.Script.Serialization.JavaScriptSerializer
-        $VT7PtyJson=$VT7PtySerializer.Serialize($VT7PtyValue)
+# Fingerprint error types, categories and IDs without saving error text.
+# Messages, targets and invocation text stay in the shell.
+function global:__ERRORS__ {
+    $VT7PtyKeys = New-Object 'System.Collections.Generic.List[string]'
+    $VT7PtyTypes = @()
+    foreach ($VT7PtyRecord in $global:Error) {
+        if ($null -eq $VT7PtyRecord) { continue }
+        if ($VT7PtyRecord -is [Management.Automation.ErrorRecord]) {
+            $VT7PtyType = $VT7PtyRecord.Exception.GetType().FullName
+            $VT7PtyCategory = [int]$VT7PtyRecord.CategoryInfo.Category
+            $VT7PtyId = $VT7PtyRecord.FullyQualifiedErrorId
+        } else {
+            # Older ConsoleHost versions can store bare exceptions, such as an incomplete parse.
+            $VT7PtyType = $VT7PtyRecord.GetType().FullName
+            $VT7PtyCategory = -1
+            $VT7PtyId = ''
+        }
+        $VT7PtyKeys.Add(($VT7PtyType+'|'+$VT7PtyCategory+'|'+$VT7PtyId))
+        if ($VT7PtyTypes.Count -lt 4) {
+            if ($VT7PtyType -cnotmatch '^[A-Za-z0-9_.+]{1,128}$') { $VT7PtyType = 'OtherException' }
+            $VT7PtyTypes += @($VT7PtyType)
+        }
     }
+    $VT7PtyKeys.Sort([StringComparer]::Ordinal)
+    $VT7PtyHash = [Security.Cryptography.SHA256]::Create()
+    try {
+        $VT7PtyData = [Text.Encoding]::UTF8.GetBytes(($VT7PtyKeys.ToArray() -join [string][char]10))
+        $VT7PtyDigest = [BitConverter]::ToString($VT7PtyHash.ComputeHash($VT7PtyData)).Replace('-','').ToLowerInvariant()
+    } finally { $VT7PtyHash.Clear() }
+    return @{Count=$VT7PtyKeys.Count; Digest=$VT7PtyDigest; Types=($VT7PtyTypes -join '|')}
+}
+$script:VT7PtyProfileStartup = __ERRORS__
+function global:__MARK__([string]$VT7PtyStep) {
+    [IO.File]::WriteAllText(($script:VT7PtyProfileRoot+'\'+$VT7PtyStep+'.txt'), ($script:VT7PtyProfileNonce+'|'+$PID))
+}
+function global:__JSON__([string]$VT7PtyName,$VT7PtyValue) {
+    __JSON_WRITER__
+    $VT7PtyBuilder = New-Object Text.StringBuilder
+    Add-VT7JsonValue $VT7PtyBuilder $VT7PtyValue
+    $VT7PtyJson = $VT7PtyBuilder.ToString()
     $VT7PtyTarget=$script:VT7PtyProfileRoot+'\'+$VT7PtyName
     $VT7PtyPending=$VT7PtyTarget+'.pending'
     [IO.File]::WriteAllText($VT7PtyPending,$VT7PtyJson,(New-Object Text.UTF8Encoding($false)))
@@ -28,44 +60,55 @@ function global:__JSON__([string]$VT7PtyName,$VT7PtyValue) {
     else {[IO.File]::Move($VT7PtyPending,$VT7PtyTarget)}
 }
 function global:__SNAPSHOT__([int]$VT7PtyStage) {
-    $VT7PtyErrorCount=@($global:Error).Count
-    $VT7PtyFiles=@()
-    foreach($VT7PtyScope in @('AllUsersAllHosts','AllUsersCurrentHost','CurrentUserAllHosts','CurrentUserCurrentHost')){
-        $VT7PtyPath=[string]$PROFILE.$VT7PtyScope
-        $VT7PtyPresent=[IO.File]::Exists($VT7PtyPath)
-        $VT7PtyBytes=0;$VT7PtyDigest='';$VT7PtyReadError=''
-        if($VT7PtyPresent){
-            try {$VT7PtyBytes=(New-Object IO.FileInfo($VT7PtyPath)).Length;$VT7PtyDigest=__HASH__ $VT7PtyPath}
-            catch {$VT7PtyReadError=$_.Exception.GetType().FullName}
+    $VT7PtyFailure = 'SnapshotMetadata'
+    if ($VT7PtyStage -eq 0) { __MARK__ 'snapshot-entered' }
+    try {
+        $VT7PtyFiles=@()
+        foreach($VT7PtyScope in @('AllUsersAllHosts','AllUsersCurrentHost','CurrentUserAllHosts','CurrentUserCurrentHost')){
+            $VT7PtyPath=[string]$PROFILE.$VT7PtyScope
+            $VT7PtyPresent=[IO.File]::Exists($VT7PtyPath)
+            $VT7PtyBytes=0;$VT7PtyDigest='';$VT7PtyReadError=''
+            if($VT7PtyPresent){
+                try {$VT7PtyBytes=(New-Object IO.FileInfo($VT7PtyPath)).Length;$VT7PtyDigest=__HASH__ $VT7PtyPath}
+                catch {$VT7PtyReadError=$_.Exception.GetType().FullName}
+            }
+            $VT7PtyFiles+=@(@{Scope=$VT7PtyScope;Present=$VT7PtyPresent;Bytes=$VT7PtyBytes;Sha256=$VT7PtyDigest;ReadErrorType=$VT7PtyReadError})
         }
-        $VT7PtyFiles+=@(@{Scope=$VT7PtyScope;Present=$VT7PtyPresent;Bytes=$VT7PtyBytes;Sha256=$VT7PtyDigest;ReadErrorType=$VT7PtyReadError})
+        $VT7PtyEditors=@()
+        foreach($VT7PtyModule in @(Microsoft.PowerShell.Core\Get-Module PSReadLine)){
+            $VT7PtyEditors+=@(@{Name=$VT7PtyModule.Name;Version=$VT7PtyModule.Version.ToString();Sha256=(__HASH__ $VT7PtyModule.Path)})
+        }
+        $VT7PtyOptions=@{EditMode='Native';HistorySaveStyle='Native';PredictionSource='NotApplicable'}
+        if($VT7PtyEditors.Count){
+            $VT7PtyOption=PSReadLine\Get-PSReadLineOption
+            $VT7PtyOptions.EditMode=$VT7PtyOption.EditMode.ToString();$VT7PtyOptions.HistorySaveStyle=$VT7PtyOption.HistorySaveStyle.ToString()
+            if($null -ne $VT7PtyOption.PSObject.Properties['PredictionSource']){$VT7PtyOptions.PredictionSource=$VT7PtyOption.PredictionSource.ToString()}
+        }
+        $VT7PtyPolicy=@{}
+        $VT7PtyPolicyCommand=Microsoft.PowerShell.Core\Get-Command Get-ExecutionPolicy -CommandType Cmdlet -ErrorAction Stop
+        foreach($VT7PtyScope in @('MachinePolicy','UserPolicy','Process','CurrentUser','LocalMachine')){
+            $VT7PtyPolicy[$VT7PtyScope]=(& $VT7PtyPolicyCommand -Scope $VT7PtyScope).ToString()
+        }
+        $VT7PtyLanguage='NotExposed'
+        if($null -ne $ExecutionContext.SessionState.PSObject.Properties['LanguageMode']){$VT7PtyLanguage=$ExecutionContext.SessionState.LanguageMode.ToString()}
+        $VT7PtyOrderText='';$VT7PtyWinnerText=''
+        if($script:VT7PtyProfileControlled){$VT7PtyOrderText=@($global:VT7PtyFixtureOrder) -join ',';$VT7PtyWinnerText=[string]$global:VT7PtyFixtureWinner}
+        $VT7PtyErrors = __ERRORS__
+        $VT7PtyState=@{Kind='ProfileShellSnapshot';SchemaVersion=1;Nonce=$script:VT7PtyProfileNonce;Stage=$VT7PtyStage;ProcessId=$PID
+            Engine=$PSVersionTable.PSVersion.ToString();CLRVersion=[Environment]::Version.ToString();HostName=$Host.Name;Profiles=$VT7PtyFiles;Editors=$VT7PtyEditors;Options=$VT7PtyOptions
+            Policy=$VT7PtyPolicy;LanguageMode=$VT7PtyLanguage
+            StartupErrorCount=$script:VT7PtyProfileStartup.Count;StartupErrorDigest=$script:VT7PtyProfileStartup.Digest
+            StartupErrorTypes=$script:VT7PtyProfileStartup.Types;ErrorCount=$VT7PtyErrors.Count;ErrorDigest=$VT7PtyErrors.Digest
+            ErrorTypes=$VT7PtyErrors.Types;EditorCount=$VT7PtyEditors.Count
+            EditorVersion=$(if($VT7PtyEditors.Count -eq 1){$VT7PtyEditors[0].Version}else{''})
+            ProfileContentCollected=$false;ShellOutputCollected=$false;HistoryContentCollected=$false
+            FixtureOrder=$VT7PtyOrderText;FixtureWinner=$VT7PtyWinnerText;WindowWidth=[Console]::WindowWidth;WindowHeight=[Console]::WindowHeight}
+        $VT7PtyFailure = 'SnapshotPublication'
+        __JSON__ ('snapshot-'+$VT7PtyStage.ToString()+'.json') $VT7PtyState
+    } catch {
+        if ($VT7PtyStage -eq 0) { __MARK__ $VT7PtyFailure }
+        throw
     }
-    $VT7PtyEditors=@()
-    foreach($VT7PtyModule in @(Microsoft.PowerShell.Core\Get-Module PSReadLine)){
-        $VT7PtyEditors+=@(@{Name=$VT7PtyModule.Name;Version=$VT7PtyModule.Version.ToString();Sha256=(__HASH__ $VT7PtyModule.Path)})
-    }
-    $VT7PtyOptions=@{EditMode='Native';HistorySaveStyle='Native';PredictionSource='NotApplicable'}
-    if($VT7PtyEditors.Count){
-        $VT7PtyOption=PSReadLine\Get-PSReadLineOption
-        $VT7PtyOptions.EditMode=$VT7PtyOption.EditMode.ToString();$VT7PtyOptions.HistorySaveStyle=$VT7PtyOption.HistorySaveStyle.ToString()
-        if($null -ne $VT7PtyOption.PSObject.Properties['PredictionSource']){$VT7PtyOptions.PredictionSource=$VT7PtyOption.PredictionSource.ToString()}
-    }
-    $VT7PtyPolicy=@{}
-    $VT7PtyPolicyCommand=Microsoft.PowerShell.Core\Get-Command Get-ExecutionPolicy -CommandType Cmdlet -ErrorAction Stop
-    foreach($VT7PtyScope in @('MachinePolicy','UserPolicy','Process','CurrentUser','LocalMachine')){
-        $VT7PtyPolicy[$VT7PtyScope]=(& $VT7PtyPolicyCommand -Scope $VT7PtyScope).ToString()
-    }
-    $VT7PtyLanguage='NotExposed'
-    if($null -ne $ExecutionContext.SessionState.PSObject.Properties['LanguageMode']){$VT7PtyLanguage=$ExecutionContext.SessionState.LanguageMode.ToString()}
-    $VT7PtyOrderText='';$VT7PtyWinnerText=''
-    if($script:VT7PtyProfileControlled){$VT7PtyOrderText=@($global:VT7PtyFixtureOrder) -join ',';$VT7PtyWinnerText=[string]$global:VT7PtyFixtureWinner}
-    $VT7PtyState=@{Kind='ProfileShellSnapshot';SchemaVersion=1;Nonce=$script:VT7PtyProfileNonce;Stage=$VT7PtyStage;ProcessId=$PID
-        Engine=$PSVersionTable.PSVersion.ToString();HostName=$Host.Name;Profiles=$VT7PtyFiles;Editors=$VT7PtyEditors;Options=$VT7PtyOptions
-        Policy=$VT7PtyPolicy;LanguageMode=$VT7PtyLanguage
-        StartupErrorCount=$script:VT7PtyProfileStartupErrors;ErrorCount=$VT7PtyErrorCount
-        ProfileContentCollected=$false;ShellOutputCollected=$false;HistoryContentCollected=$false
-        FixtureOrder=$VT7PtyOrderText;FixtureWinner=$VT7PtyWinnerText;WindowWidth=[Console]::WindowWidth;WindowHeight=[Console]::WindowHeight}
-    __JSON__ ('snapshot-'+$VT7PtyStage.ToString()+'.json') $VT7PtyState
 }
 function global:__CHECK__([string]$VT7PtyCheck,[string]$VT7PtyValue) {
     $VT7PtyExpected=@{Editing='EDIT čćđšž';History='HISTORY_OK';Completion='COMPLETE_OK';Multiline="firstč`nsecondž";Continue='CONTINUE_OK';Resize='RESIZE_OK';Binding='BINDING_OK'}
@@ -79,3 +122,35 @@ function global:__CHECK__([string]$VT7PtyCheck,[string]$VT7PtyValue) {
 }
 function global:__COMPLETE__ {__CHECK__ 'Completion' 'COMPLETE_OK'}
 function global:__CHILD__ {& $script:VT7PtyProfileExe --profile-child $script:VT7PtyProfileRoot $script:VT7PtyProfileNonce}
+
+# The controlled workflow runs with predictions off. This is a separate check
+# of the setting on the actual console used by pinned PSReadLine 2.1.0.
+function global:__PREDICTION__ {
+    $VT7PtyBefore = (PSReadLine\Get-PSReadLineOption).PredictionSource.ToString()
+    $VT7PtyOutcome = 'UnexpectedError'
+    $VT7PtyErrorType = ''
+    try {
+        PSReadLine\Set-PSReadLineOption -PredictionSource History -ErrorAction Stop
+        $VT7PtyOutcome = 'SettingAccepted'
+    } catch {
+        $VT7PtyException = $_.Exception
+        $VT7PtyErrorType = $VT7PtyException.GetType().FullName
+        while ($null -ne $VT7PtyException) {
+            if ($VT7PtyException.GetType().FullName -ceq 'System.ArgumentException' -and
+                $VT7PtyException.Message -like '*predictive suggestion feature cannot be enabled*virtual terminal processing*') {
+                $VT7PtyOutcome = 'LegacyConsoleRejected'
+                $VT7PtyErrorType = 'System.ArgumentException'
+                break
+            }
+            $VT7PtyException = $VT7PtyException.InnerException
+        }
+    }
+    $VT7PtyObserved = (PSReadLine\Get-PSReadLineOption).PredictionSource.ToString()
+    PSReadLine\Set-PSReadLineOption -PredictionSource None -ErrorAction Stop
+    $VT7PtyRestored = (PSReadLine\Get-PSReadLineOption).PredictionSource.ToString()
+    __JSON__ 'prediction-support.json' @{
+        Kind='ProfilePredictionCapability';SchemaVersion=1;Nonce=$script:VT7PtyProfileNonce;ProcessId=$PID
+        Requested='History';Before=$VT7PtyBefore;Observed=$VT7PtyObserved;Restored=$VT7PtyRestored
+        Outcome=$VT7PtyOutcome;ErrorType=$VT7PtyErrorType
+    }
+}

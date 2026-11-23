@@ -3,11 +3,20 @@
 #pragma once
 namespace profilecases {
 struct Spec {std::string name;bool pwsh=false,layered=false;};
-std::vector<Spec> specs() {
-    std::vector<Spec> result={{"wps-clean-native",false,false},{"wps-layered-native",false,true}};
-    wchar_t legacy[8]={};GetEnvironmentVariableW(L"VT7PTY_H4_LEGACY",legacy,8);
-    if(std::wstring(legacy)!=L"1"){
-        result.push_back({"pwsh-clean-readline",true,false});result.push_back({"pwsh-layered-readline",true,true});
+bool legacyEngine()
+{
+    wchar_t value[8] = {};
+    GetEnvironmentVariableW(L"VT7PTY_H4_LEGACY", value, std::size(value));
+    return std::wstring_view(value) == L"1";
+}
+
+std::vector<Spec> specs()
+{
+    std::vector<Spec> result = {{"wps-clean-native", false, false}, {"wps-layered-native", false, true}};
+    if (!legacyEngine())
+    {
+        result.push_back({"pwsh-clean-readline", true, false});
+        result.push_back({"pwsh-layered-readline", true, true});
     }
     return result;
 }
@@ -75,31 +84,177 @@ std::wstring engine(bool pwsh) {
     return std::wstring(system)+L"\\WindowsPowerShell\\v1.0\\powershell.exe";
 }
 std::wstring currentExe(){std::wstring path(32768,0);const auto length=GetModuleFileNameW(nullptr,path.data(),static_cast<DWORD>(path.size()));check(length>0&&length<path.size(),"profile harness path");path.resize(length);return path;}
-std::wstring probeSource(const std::wstring &out,const std::string &nonce,bool controlled=true) {
-    auto result=wide(profileText(guardEnvironment(L"VT7PTY_PROFILE_PROBE_SOURCE")));
-    for(const auto &pair:std::vector<std::pair<std::wstring,std::wstring>>{{L"__CONTROLLED__",controlled?L"$true":L"$false"},{L"__ROOT__",psLiteral(out)},{L"__NONCE__",psLiteral(wide(nonce))},{L"__EXE__",psLiteral(currentExe())},
-        {L"__HASH__",L"VT7PtyHash_"+wide(nonce)},{L"__JSON__",L"VT7PtyJson_"+wide(nonce)},{L"__SNAPSHOT__",L"VT7PtySnapshot_"+wide(nonce)},
-        {L"__CHECK__",L"VT7PtyCheck_"+wide(nonce)},{L"__COMPLETE__",L"VT7PtyProfileComplete_"+wide(nonce)},{L"__CHILD__",L"VT7PtyProfileChild_"+wide(nonce)}})result=replace(result,pair.first,pair.second);
+std::wstring helperName(std::wstring_view stem, const std::string &nonce)
+{
+    return std::wstring(stem) + L"_" + wide(nonce);
+}
+
+std::string profileNonce()
+{
+    static uint32_t sequence = 0;
+    return std::format("{:08x}{:016x}{:08x}", GetCurrentProcessId(), GetTickCount64(), ++sequence);
+}
+
+std::wstring probeSource(const std::wstring &out, const std::string &nonce, bool controlled)
+{
+    auto result = wide(profileText(guardEnvironment(L"VT7PTY_PROFILE_PROBE_SOURCE")));
+    for (const auto &[token, value] : std::vector<std::pair<std::wstring, std::wstring>>{
+        {L"__CONTROLLED__", controlled ? L"$true" : L"$false"},
+        {L"__ROOT__", psLiteral(out)},
+        {L"__NONCE__", psLiteral(wide(nonce))},
+        {L"__EXE__", psLiteral(currentExe())},
+        {L"__HASH__", helperName(L"VT7PtyHash", nonce)},
+        {L"__ERRORS__", helperName(L"VT7PtyErrors", nonce)},
+        {L"__MARK__", helperName(L"VT7PtyMark", nonce)},
+        {L"__JSON__", helperName(L"VT7PtyJson", nonce)},
+        {L"__SNAPSHOT__", helperName(L"VT7PtySnapshot", nonce)},
+        {L"__CHECK__", helperName(L"VT7PtyCheck", nonce)},
+        {L"__COMPLETE__", helperName(L"VT7PtyProfileComplete", nonce)},
+        {L"__CHILD__", helperName(L"VT7PtyProfileChild", nonce)},
+        {L"__PREDICTION__", helperName(L"VT7PtyPrediction", nonce)},
+        {L"__JSON_WRITER__", wide(profileText(guardEnvironment(L"VT7PTY_PROFILE_JSON_WRITER_SOURCE")))}})
+    {
+        result = replace(std::move(result), token, value);
+    }
     return result;
 }
-std::wstring flattened(std::wstring source) {
-    std::vector<std::wstring> lines;size_t at=0;
-    while(at<source.size()){
-        const auto end=source.find(L'\n',at);auto line=source.substr(at,end==std::wstring::npos?source.size()-at:end-at);
-        while(!line.empty() && (line.back()==L'\r'||line.back()==L' '))line.pop_back();
-        const auto first=line.find_first_not_of(L" \t");
-        if(first!=std::wstring::npos && line[first]!=L'#')lines.push_back(line.substr(first));
-        if(end==std::wstring::npos)break;at=end+1;
+
+std::wstring bootVariable(const std::string &nonce)
+{
+    return helperName(L"VT7PTY_PROFILE_BOOT", nonce);
+}
+
+std::wstring resultVariable(const std::string &nonce)
+{
+    return helperName(L"VT7PTY_PROFILE_RESULT", nonce);
+}
+
+std::wstring loadProbe(const std::string &nonce)
+{
+    return L". ([scriptblock]::Create($env:" + bootVariable(nonce) + L"))";
+}
+
+// The owned shell inherits these two values. They never change the caller's
+// environment or the shell's startup arguments or execution policy.
+struct ProfileBootstrap
+{
+    std::wstring bootName;
+    std::wstring resultName;
+
+    ProfileBootstrap(const std::string &nonce, const std::wstring &root, const std::wstring &source)
+        : bootName(bootVariable(nonce)), resultName(resultVariable(nonce))
+    {
+        check(source.size() < 32767, "bounded profile helper source");
+        check(SetEnvironmentVariableW(bootName.c_str(), source.c_str()), "profile helper environment");
+        if (!SetEnvironmentVariableW(resultName.c_str(), root.c_str()))
+        {
+            const auto error = GetLastError();
+            SetEnvironmentVariableW(bootName.c_str(), nullptr);
+            SetLastError(error);
+            check(false, "profile result environment");
+        }
     }
-    std::wstring result;
-    for(size_t i=0;i<lines.size();++i){
-        result+=lines[i];
-        const bool continued=i+1<lines.size() && (lines[i+1].starts_with(L"else")||lines[i+1].starts_with(L"catch")||lines[i+1].starts_with(L"finally"));
-        if(lines[i].back()!=L'{' && lines[i].back()!=L';' && !continued)result+=L';';result+=L' ';
-    }return result;
+
+    ProfileBootstrap(const ProfileBootstrap &) = delete;
+    ProfileBootstrap &operator=(const ProfileBootstrap &) = delete;
+
+    ~ProfileBootstrap()
+    {
+        SetEnvironmentVariableW(resultName.c_str(), nullptr);
+        SetEnvironmentVariableW(bootName.c_str(), nullptr);
+    }
+};
+
+std::wstring shellCommandLine(const std::wstring &exe, bool pwsh)
+{
+    return quote(exe) + (!pwsh && legacyEngine() ? L" -Version 2.0 -NoLogo" : L" -NoLogo");
+}
+
+// The JSON fields examined in the native harness are fixed ASCII tokens.
+std::string profileField(const std::string &data, const std::string &name)
+{
+    auto at = data.find('"' + name + '"');
+    check(at != std::string::npos, "profile metadata field");
+    at = data.find(':', at);
+    check(at != std::string::npos, "profile metadata delimiter");
+    at = data.find_first_not_of(" \t\r\n", at + 1);
+    check(at != std::string::npos && data[at] == '"', "profile metadata string");
+    const auto end = data.find('"', ++at);
+    check(end != std::string::npos, "complete profile metadata string");
+    return data.substr(at, end - at);
+}
+
+bool matchesSession(const std::string &data, const std::string &nonce, DWORD pid)
+{
+    return !data.empty() && data.back() == '}' && profileField(data, "Nonce") == nonce && number(data, "ProcessId") == pid;
 }
 std::string schema(const std::string &nonce,DWORD pid,const std::string &kind) {
     return "{\"SchemaVersion\":1,\"Nonce\":"+json(nonce)+",\"ProcessId\":"+std::to_string(pid)+",\"Kind\":"+json(kind);
+}
+std::string nativeStartupReference(const std::wstring &out, bool pwsh)
+{
+    check(CreateDirectoryW(out.c_str(), nullptr), "new native startup reference");
+    const auto nonce = profileNonce();
+    const auto exe = engine(pwsh);
+    const auto payload = probeSource(out, nonce, false) + L"\n" +
+        helperName(L"VT7PtySnapshot", nonce) + L" 0\nexit 37";
+    const ProfileBootstrap environment(nonce, out, payload);
+    auto command = shellCommandLine(exe, pwsh) + L" -NoProfile -NoExit -EncodedCommand " + encoded(loadProbe(nonce));
+    STARTUPINFOW startup = {};
+    startup.cb = sizeof(startup);
+    startup.dwFlags = STARTF_USESHOWWINDOW;
+    startup.wShowWindow = SW_HIDE;
+    PROCESS_INFORMATION process = {};
+    check(CreateProcessW(exe.c_str(), command.data(), nullptr, nullptr, FALSE, CREATE_NEW_CONSOLE,
+        nullptr, nullptr, &startup, &process), "owned native PowerShell reference");
+    Handle shell(process.hProcess);
+    Handle thread(process.hThread);
+    if (WaitForSingleObject(shell.value, 30000) != WAIT_OBJECT_0)
+    {
+        TerminateProcess(shell.value, 124);
+        WaitForSingleObject(shell.value, 10000);
+        check(false, "native PowerShell reference deadline");
+    }
+    DWORD exitCode = 0;
+    check(GetExitCodeProcess(shell.value, &exitCode) && exitCode == 37, "native PowerShell reference exit");
+    const auto snapshot = profileText(out + L"\\snapshot-0.json");
+    check(matchesSession(snapshot, nonce, process.dwProcessId) && number(snapshot, "Stage") == 0 &&
+        profileField(snapshot, "HostName") == "ConsoleHost", "native PowerShell reference identity");
+    check(number(snapshot, "ErrorCount") == number(snapshot, "StartupErrorCount") &&
+        profileField(snapshot, "ErrorDigest") == profileField(snapshot, "StartupErrorDigest"),
+        "native PowerShell reference metadata adds no errors");
+    writeFile(out + L"\\reference.json", schema(nonce, process.dwProcessId, "NativeProfileStartupReference") +
+        ",\"NaturalExit\":37,\"NoProfile\":true,\"NativeConsole\":true,\"Executable\":" + json(utf8(exe)) + "}");
+    return snapshot;
+}
+
+void checkProfileStartup(const std::string &snapshot, const std::string &reference)
+{
+    const auto errors = number(snapshot, "StartupErrorCount");
+    const auto initial = profileField(snapshot, "StartupErrorDigest");
+    check(profileField(snapshot, "Engine") == profileField(reference, "Engine") &&
+        profileField(snapshot, "CLRVersion") == profileField(reference, "CLRVersion") &&
+        profileField(snapshot, "Process") == profileField(reference, "Process") &&
+        profileField(snapshot, "HostName") == "ConsoleHost", "profile shell engine and process policy match native reference");
+    check(errors == 0 || (errors == number(reference, "StartupErrorCount") &&
+        initial == profileField(reference, "StartupErrorDigest")), "profile startup errors differ from native reference");
+    check(number(snapshot, "ErrorCount") == errors && profileField(snapshot, "ErrorDigest") == initial,
+        "new profile setup or snapshot errors");
+}
+
+void checkProfileConfiguration(const std::string &snapshot, const Spec &spec)
+{
+    const auto expectedEditMode = spec.pwsh ? (spec.layered ? "Emacs" : "Windows") : "Native";
+    check(profileField(snapshot, "EditMode") == expectedEditMode && number(snapshot, "EditorCount") == (spec.pwsh ? 1u : 0u),
+        "controlled profile editor mode");
+    check(profileField(snapshot, "EditorVersion") == (spec.pwsh ? "2.1.0" : "") &&
+        profileField(snapshot, "PredictionSource") == (spec.pwsh ? "None" : "NotApplicable") &&
+        profileField(snapshot, "HistorySaveStyle") == (spec.pwsh ? "SaveNothing" : "Native"), "controlled profile editor options");
+    constexpr auto profileOrder = "AllUsersAllHosts,AllUsersCurrentHost,CurrentUserAllHosts,CurrentUserCurrentHost";
+    check(profileField(snapshot, "FixtureOrder") == (spec.layered ? profileOrder : "") &&
+        profileField(snapshot, "FixtureWinner") == (spec.layered ? "CurrentUserCurrentHost" : ""), "controlled profile precedence");
+    if (spec.pwsh)
+        check(profileField(snapshot, "Engine") == "7.2.24", "pinned PowerShell 7 engine");
 }
 LONG volatile childControls=0;
 BOOL WINAPI childHandler(DWORD event){if(event!=CTRL_C_EVENT)return FALSE;InterlockedIncrement(&childControls);return TRUE;}
@@ -116,33 +271,59 @@ int child(const std::wstring &out,const std::string &nonce) {
     writeFile(out+L"\\child-result.json",schema(nonce,pid,"ProfileNativeChildResult")+",\"ParentId\":"+std::to_string(parent)+",\"CtrlC\":"+std::to_string(received)+",\"NaturalExit\":37}");
     check(SetConsoleMode(input,mode),"profile native child mode restored");return received==1?37:38;
 }
+std::wstring controlledProfileSource(const std::wstring &out, const std::string &nonce, const Spec &spec)
+{
+    auto boot = probeSource(out, nonce, true);
+    boot += L"\n$global:VT7PtyFixtureOrder=@();$global:VT7PtyFixtureWinner='';";
+    if (spec.layered)
+    {
+        for (const auto scope : {L"AllUsersAllHosts", L"AllUsersCurrentHost", L"CurrentUserAllHosts", L"CurrentUserCurrentHost"})
+            boot += L". { $global:VT7PtyFixtureOrder+=" + psLiteral(scope) +
+                L";$global:VT7PtyFixtureWinner=" + psLiteral(scope) + L" };";
+    }
+    if (spec.pwsh)
+    {
+        const auto exe = engine(true);
+        const auto module = exe.substr(0, exe.find_last_of(L'\\')) + L"\\Modules\\PSReadLine\\PSReadLine.psd1";
+        boot += L"Import-Module " + psLiteral(module) + L" -ErrorAction Stop;"
+            L"PSReadLine\\Set-PSReadLineOption -HistorySaveStyle SaveNothing -HistorySavePath " +
+            psLiteral(out + L"\\private-history.txt") + L" -EditMode " + (spec.layered ? L"Emacs" : L"Windows") +
+            L" -PredictionSource None -ErrorAction Stop;";
+        if (spec.layered)
+            boot += L"PSReadLine\\Set-PSReadLineKeyHandler -Key F6 -ScriptBlock "
+                L"{ [Microsoft.PowerShell.PSConsoleReadLine]::Insert('BINDING_OK') } -ErrorAction Stop;";
+    }
+    else
+    {
+        boot += L"if(Get-Module PSReadLine){Remove-Module PSReadLine -ErrorAction Stop};";
+    }
+    boot += L"$global:VT7PtyProfileSerial=0;function global:prompt { $global:VT7PtyProfileSerial++;";
+    if (spec.layered)
+        boot += L"[Console]::WriteLine('PROFILE \u010d\u0107\u0111\u0161\u017e');";
+    boot += L"'PROFILE['+$global:VT7PtyProfileSerial.ToString()+']>' };";
+    return boot;
+}
+
 struct Shell {
     Context &c;Session &s;Spec spec;std::string nonce;DWORD pid=0;uint32_t generation=0;Handle nativeChild;
-    Shell(Context &context,const Spec &which,bool ordinary=false,bool synthetic=false):c(context),s(*context.session),spec(which) {
-        nonce=std::format("{:x}{:x}",GetCurrentProcessId(),GetTickCount64());
-        if(ordinary){s.profilePrivateOutput=true;s.raw.clear();s.frames.clear();}
-        const auto exe=engine(spec.pwsh);std::wstring line=quote(exe)+L" -NoLogo";
-        if(!ordinary){
-            std::wstring boot=probeSource(c.out,nonce);
-            boot+=L";$global:VT7PtyFixtureOrder=@();$global:VT7PtyFixtureWinner='';";
-            if(spec.layered)for(const auto scope:{L"AllUsersAllHosts",L"AllUsersCurrentHost",L"CurrentUserAllHosts",L"CurrentUserCurrentHost"})
-                boot+=L". { $global:VT7PtyFixtureOrder+="+psLiteral(scope)+L";$global:VT7PtyFixtureWinner="+psLiteral(scope)+L" };";
-            if(spec.pwsh){
-                const auto module=exe.substr(0,exe.find_last_of(L'\\'))+L"\\Modules\\PSReadLine\\PSReadLine.psd1";
-                boot+=L"Import-Module "+psLiteral(module)+L" -ErrorAction Stop;Set-PSReadLineOption -HistorySaveStyle SaveNothing -HistorySavePath "+
-                    psLiteral(c.out+L"\\private-history.txt")+L" -EditMode "+(spec.layered?L"Emacs":L"Windows")+L" -PredictionSource "+(spec.layered?L"History":L"None")+L";";
-                if(spec.layered)boot+=L"Set-PSReadLineKeyHandler -Key F6 -ScriptBlock { [Microsoft.PowerShell.PSConsoleReadLine]::Insert('BINDING_OK') };";
-            }else boot+=L"if(Get-Module PSReadLine){Remove-Module PSReadLine -ErrorAction Stop};";
-            boot+=L"$global:VT7PtyProfileSerial=0;function global:prompt { $global:VT7PtyProfileSerial++;";
-            if(spec.layered)boot+=L"[Console]::WriteLine('PROFILE "+std::wstring(L"\u010d\u0107\u0111\u0161\u017e")+L"');";
-            boot+=L"'PROFILE['+$global:VT7PtyProfileSerial.ToString()+']>' };";
-            line+=L" -NoProfile -NoExit -EncodedCommand "+encoded(boot);
+    Shell(Context &context, const Spec &which, const std::string &token, bool ordinary=false, bool synthetic=false)
+        : c(context), s(*context.session), spec(which), nonce(token)
+    {
+        if (ordinary)
+        {
+            s.profilePrivateOutput = true;
+            s.raw.clear();
+            s.frames.clear();
         }
+        const auto exe = engine(spec.pwsh);
+        auto line = shellCommandLine(exe, spec.pwsh);
+        if (!ordinary)
+            line += L" -NoProfile -NoExit -EncodedCommand " + encoded(loadProbe(nonce));
         if(ordinary && synthetic){
             std::wstring boot=L"";
             if(spec.pwsh){const auto module=exe.substr(0,exe.find_last_of(L'\\'))+L"\\Modules\\PSReadLine\\PSReadLine.psd1";
                 boot=L"Import-Module "+psLiteral(module)+L";Set-PSReadLineOption -HistorySaveStyle SaveNothing -HistorySavePath "+psLiteral(c.out+L"\\smoke-history.txt")+L" -PredictionSource None;";}
-            if(!spec.pwsh)boot+=L"if(Get-Module -ListAvailable PSReadLine){Import-Module PSReadLine -ErrorAction Stop;Set-PSReadLineOption -HistorySaveStyle SaveNothing -HistorySavePath "+psLiteral(c.out+L"\\smoke-history.txt")+L" -EditMode Windows};";
+            if(!spec.pwsh && !legacyEngine())boot+=L"if(Get-Module -ListAvailable PSReadLine){Import-Module PSReadLine -ErrorAction Stop;Set-PSReadLineOption -HistorySaveStyle SaveNothing -HistorySavePath "+psLiteral(c.out+L"\\smoke-history.txt")+L" -EditMode Windows};";
             boot+=L"$global:VT7PtyProfileSerial=0;function global:prompt { $global:VT7PtyProfileSerial++; 'SMOKE['+$global:VT7PtyProfileSerial.ToString()+']>' }";
             line+=L" -NoProfile -NoExit -EncodedCommand "+encoded(boot);
         }
@@ -162,12 +343,33 @@ struct Shell {
     }
     std::wstring checkName()const{return L"VT7PtyCheck_"+wide(nonce);}
     std::wstring snapshotName()const{return L"VT7PtySnapshot_"+wide(nonce);}
-    bool valid(const std::string &value){return value.find("\"Nonce\":"+json(nonce))!=std::string::npos && number(value,"ProcessId")==pid;}
+    bool valid(const std::string &value){return matchesSession(value, nonce, pid);}
+    bool marked(std::wstring_view step)
+    {
+        try {
+            return profileText(c.out + L"\\" + std::wstring(step) + L".txt") == nonce + "|" + std::to_string(pid);
+        } catch (...) {
+            return false;
+        }
+    }
+
     void command(const std::wstring &line){const auto before=generation;s.input(utf8(line+L"\r"));check(s.until([&]{return atPrompt() && generation>before;},15000),"profile command returns to configured prompt");}
     std::string snapshot(int stage,bool ordinary=false) {
         const auto path=c.out+L"\\snapshot-"+std::to_wstring(stage)+L".json";
         if(ordinary)s.input(utf8(snapshotName()+L" "+std::to_wstring(stage)+L"\r"));else command(snapshotName()+L" "+std::to_wstring(stage));
-        check(s.until([&]{try{const auto data=profileText(path);return valid(data)&&number(data,"Stage")==static_cast<uint64_t>(stage);}catch(...){return false;}},15000),"profile snapshot completion");
+        check(s.until([&]{
+            if (stage == 0)
+            {
+                check(!marked(L"SnapshotMetadata"), "profile snapshot metadata failed");
+                check(!marked(L"SnapshotPublication"), "profile snapshot publication failed");
+            }
+            try {
+                const auto data = profileText(path);
+                return valid(data) && number(data, "Stage") == static_cast<uint64_t>(stage);
+            } catch (...) {
+                return false;
+            }
+        }, 15000), "profile snapshot completion");
         const auto data=profileText(path);check(valid(data) && number(data,"Stage")==stage,"profile snapshot identity");return data;
     }
     std::string proof(const std::wstring &name){
@@ -190,8 +392,16 @@ struct Shell {
     }
     void quit(){s.input("exit 37\r");check(s.until([&]{return WaitForSingleObject(s.descendant.value,0)==WAIT_OBJECT_0;},10000),"profile natural shell exit");DWORD code=0;check(GetExitCodeProcess(s.descendant.value,&code)&&code==37,"profile shell exit 37");}
 };
-void exercise(Context &c,const Spec &spec){
-    auto &s=c.start();Shell shell(c,spec);shell.snapshot(0);
+void exercise(Context &c, const Spec &spec)
+{
+    const auto reference = nativeStartupReference(c.out + L"\\startup-reference", spec.pwsh);
+    const auto nonce = profileNonce();
+    const ProfileBootstrap environment(nonce, c.out, controlledProfileSource(c.out, nonce, spec));
+    auto &s = c.start();
+    Shell shell(c, spec, nonce);
+    const auto startupSnapshot = shell.snapshot(0);
+    checkProfileStartup(startupSnapshot, reference);
+    checkProfileConfiguration(startupSnapshot, spec);
     const auto name=shell.checkName();std::string proofs="[";
     auto keep=[&](const std::wstring &which){if(proofs.size()>1)proofs+=',';proofs+=shell.proof(which);};
     s.input(utf8(name+L" Editing 'EDXT \u010d\u0107\u0111\u0161\u017e'"));
@@ -212,8 +422,21 @@ void exercise(Context &c,const Spec &spec){
     check(s.until([&]{return GetFileAttributesW((c.out+L"\\child-ready.json").c_str())!=INVALID_FILE_ATTRIBUTES;}),"profile native child ready");shell.retainChild();s.input("\x03");
     check(s.until([&]{return shell.atPrompt() && shell.generation>previous;}),"profile parent survives native child");shell.childProof();
     check(vt7pty_set_size(s.runtimeHandle(),100,32,nullptr),"profile resize request");s.state.resize(100,32);
-    shell.command(name+L" Resize 'RESIZE_OK'");keep(L"Resize");shell.snapshot(1);
+    shell.command(name+L" Resize 'RESIZE_OK'");keep(L"Resize");
+    checkProfileConfiguration(shell.snapshot(1), spec);
     if(spec.pwsh && spec.layered){s.input(utf8(name+L" Binding '"));s.input("\x1b[17~");shell.command(L"'");keep(L"Binding");}
+    if (spec.pwsh && spec.layered)
+    {
+        shell.command(helperName(L"VT7PtyPrediction", shell.nonce));
+        const auto prediction = profileText(c.out + L"\\prediction-support.json");
+        const auto outcome = profileField(prediction, "Outcome");
+        check(shell.valid(prediction) && profileField(prediction, "Before") == "None" &&
+            profileField(prediction, "Restored") == "None", "prediction setting restored");
+        check((outcome == "SettingAccepted" && profileField(prediction, "Observed") == "History" &&
+                profileField(prediction, "ErrorType").empty()) ||
+            (outcome == "LegacyConsoleRejected" && profileField(prediction, "Observed") == "None" &&
+                profileField(prediction, "ErrorType") == "System.ArgumentException"), "classified history prediction capability");
+    }
     shell.quit();writeFile(c.out+L"\\command-proofs.json","{\"Proofs\":"+proofs+"]}");
     writeFile(c.out+L"\\profile-result.json","{\"ShellId\":"+std::to_string(shell.pid)+",\"NaturalExit\":37,\"WorkflowsPassed\":true}");
 }
@@ -227,7 +450,7 @@ int run(const std::wstring &out){
         Context c(out+L"\\"+wide(spec.name));bool okay=false;std::string error;
         try{check(desktopPreflight(c.out+L"\\preflight.json"),"controlled profile desktop");exercise(c,spec);okay=true;}
         catch(const std::exception &e){error=e.what();}
-        okay=c.finish()&&okay;if(error.empty()&&!c.error.empty())error=c.error;
+        okay=c.finish(okay)&&okay;if(error.empty()&&!c.error.empty())error=c.error;
         if(total++)rows+=',';if(okay)++passed;
         rows+="{\"Case\":"+json(spec.name)+",\"Passed\":"+boolean(okay)+",\"OwnedProcessesCleaned\":"+boolean(c.cleaned)+",\"HostExited\":"+boolean(c.hostExited)+",\"Error\":"+json(error)+"}";
         printf("%s: %s %s\n",okay?"PASS":"FAIL",spec.name.c_str(),error.c_str());
@@ -235,13 +458,13 @@ int run(const std::wstring &out){
     collector.stop();writeFile(out+L"\\cases.json","{\"SchemaVersion\":1,\"Cases\":"+rows+"]}");
     writeFile(out+L"\\probe.json","{\"Kind\":\"ProfileFixtureProbe\",\"SchemaVersion\":1,\"Status\":"+json(passed==total?"Pass":"Fail")+
         ",\"SourceCommit\":"+json(GenVersion_Commit)+",\"RuntimeSourceCommit\":"+json(manualRuntimeSource())+",\"Passed\":"+std::to_string(passed)+",\"Total\":"+std::to_string(total)+
-        ",\"OrdinaryUserProfiles\":\"NotRun\",\"ControlledInlineFixtures\":true,\"PublicationChecks\":3,\"Step12Accepted\":false}");return passed==total?0:1;
+        ",\"OrdinaryUserProfiles\":\"NotRun\",\"ControlledInlineFixtures\":true,\"PublicationChecks\":3,\"ConfigurationChecks\":1,\"Step12Accepted\":false}");return passed==total?0:1;
 }
 void list(){
     std::string rows="[";for(const auto &spec:specs()){if(rows.size()>1)rows+=',';
         rows+="{"+json("Case")+":"+json(spec.name)+","+json("Engine")+":"+json(spec.pwsh?"pwsh":"wps")+","+json("Editor")+":"+json(spec.pwsh?"PSReadLine":"Native")+
             ","+json("Layered")+":"+boolean(spec.layered)+","+json("EditMode")+":"+json(spec.pwsh?(spec.layered?"Emacs":"Windows"):"Native")+
-            ","+json("PredictionSource")+":"+json(spec.pwsh?(spec.layered?"History":"None"):"NotApplicable")+"}";}
+            ","+json("PredictionSource")+":"+json(spec.pwsh?"None":"NotApplicable")+"}";}
     puts(("{"+json("SchemaVersion")+":1,"+json("Cases")+":"+rows+"]}").c_str());
 }
 void oracle(){check(encoded(L"A")==L"QQA=","PowerShell UTF-16 encoded command");check(truth("{\"Matched\":true}","Matched")&&!truth("{\"Matched\":false}","Matched"),"profile truth oracle");check(number("{\"Stage\":7}","Stage")==7,"profile numeric oracle");puts("Profile oracle: 3 checks passed.");}
