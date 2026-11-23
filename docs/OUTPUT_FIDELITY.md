@@ -5,10 +5,11 @@ Both use the same native fixture and session flags of zero. Rc3 runs the 13
 rc2 controls and eight new width cases against each runtime. I use the
 measurements to decide which placement differences the stream can preserve.
 
-I completed all three Windows 7 runs in rc2. The paired evidence reproduces
-column differences for a combining mark and a CJK ideograph. Rc3 repeats
-those cases and adds the code-page and replay measurements below.
-[Windows 7 review](validation/2026-11-23-step-1.3-output-rc2-windows7.md)
+I completed the rc3 width investigation on all three Windows 7 tiers. The
+available pages preserve the combining and CJK placement differences, and
+CP936 is unavailable in the tested configurations. I reproduced all 48
+available replays from the saved snapshots and bytes.
+[Windows 7 rc3 review](validation/2026-11-24-step-1.3-output-rc3-windows7.md)
 
 ## Run the candidate
 

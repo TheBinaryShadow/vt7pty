@@ -1,0 +1,192 @@
+{
+  "Kind": "OutputRc3Windows7ReviewDecision",
+  "RecordedDate": "2026-11-24",
+  "Status": "WidthCharacterizationComplete",
+  "Step13Accepted": false,
+  "MilestoneAccepted": false,
+  "Archive": "VT7Pty-output-0.5.1-dev-rc3.zip",
+  "ArchiveSha256": "922c2b8a1e38ae74cf076571561d63cdc32ccd67d160246557aeb10adc22a15a",
+  "ManifestSha256": "fcf0a396f011295cd85d8dab945213d8d046569927277a9b3dcadfccb16ba4be",
+  "PackageEntriesVerified": 26,
+  "MachineResults": [
+    {
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "RunId": "nonesu-output-20261123-231151-c35a8453",
+      "PowerShellVersion": "5.1.14409.1018",
+      "CLRVersion": "4.0.30319.42000",
+      "Outcomes": {
+        "Match": 20,
+        "Difference": 16,
+        "CapabilityUnavailable": 6
+      },
+      "WidthReplayStatuses": {
+        "ReplayComplete": 16,
+        "CapabilityUnavailable": 4
+      },
+      "Rc2Controls": {
+        "Observations": 26,
+        "Rc2SameOutcome": 26,
+        "Rc2SameStream": 24,
+        "Rc2SameActionSnapshot": 26,
+        "Rc2SameCheckpoints": 24
+      },
+      "NonidenticalRuntimePairs": [
+        "OUTPUT_CP1250",
+        "OUTPUT_CP65001"
+      ]
+    },
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "RunId": "esu-output-20261123-231405-856ffab1",
+      "PowerShellVersion": "5.1.14409.1005",
+      "CLRVersion": "4.0.30319.42000",
+      "Outcomes": {
+        "Match": 20,
+        "Difference": 16,
+        "CapabilityUnavailable": 6
+      },
+      "WidthReplayStatuses": {
+        "ReplayComplete": 16,
+        "CapabilityUnavailable": 4
+      },
+      "Rc2Controls": {
+        "Observations": 26,
+        "Rc2SameOutcome": 26,
+        "Rc2SameStream": 25,
+        "Rc2SameActionSnapshot": 26,
+        "Rc2SameCheckpoints": 26
+      },
+      "NonidenticalRuntimePairs": [
+        "OUTPUT_LATIN"
+      ]
+    },
+    {
+      "Machine": "LEOPARD",
+      "Tier": "Legacy",
+      "RunId": "legacy-output-20261123-231157-0cc79970",
+      "PowerShellVersion": "2.0",
+      "CLRVersion": "2.0.50727.8806",
+      "Outcomes": {
+        "Match": 20,
+        "Difference": 16,
+        "CapabilityUnavailable": 6
+      },
+      "WidthReplayStatuses": {
+        "ReplayComplete": 16,
+        "CapabilityUnavailable": 4
+      },
+      "Rc2Controls": {
+        "Observations": 26,
+        "Rc2SameOutcome": 26,
+        "Rc2SameStream": 26,
+        "Rc2SameActionSnapshot": 26,
+        "Rc2SameCheckpoints": 26
+      },
+      "NonidenticalRuntimePairs": []
+    }
+  ],
+  "SessionFlags": 0,
+  "Observations": 126,
+  "Outcomes": {
+    "Match": 60,
+    "Difference": 48,
+    "CapabilityUnavailable": 18
+  },
+  "VisibleSettledCheckpoints": 252,
+  "RuntimePairs": 63,
+  "IdenticalRawStreamPairs": 60,
+  "Rc2Controls": {
+    "Observations": 78,
+    "Rc2SameOutcome": 78,
+    "Rc2SameStream": 75,
+    "Rc2SameActionSnapshot": 78,
+    "Rc2SameCheckpoints": 76
+  },
+  "Rc2ControlCheckpointSemanticsMatch": 78,
+  "ReplayStatuses": {
+    "ReplayComplete": 48,
+    "CapabilityUnavailable": 12
+  },
+  "OneCellReplayMatches": 48,
+  "AnchorPreservedCombiningNonblankText": 24,
+  "AnchorErasedCjkIdeograph": 24,
+  "AppliedWidthSettings": [
+    {
+      "RequestedOutputCP": 0,
+      "AppliedOutputCP": 852,
+      "Observations": 12,
+      "SetupError": 0,
+      "Font": [
+        "Lucida Console",
+        4,
+        6
+      ]
+    },
+    {
+      "RequestedOutputCP": 437,
+      "AppliedOutputCP": 437,
+      "Observations": 12,
+      "SetupError": 0,
+      "Font": [
+        "Lucida Console",
+        4,
+        6
+      ]
+    },
+    {
+      "RequestedOutputCP": 852,
+      "AppliedOutputCP": 852,
+      "Observations": 12,
+      "SetupError": 0,
+      "Font": [
+        "Lucida Console",
+        4,
+        6
+      ]
+    },
+    {
+      "RequestedOutputCP": 936,
+      "AppliedOutputCP": 852,
+      "Observations": 12,
+      "SetupError": 87,
+      "Font": [
+        "Lucida Console",
+        4,
+        6
+      ]
+    },
+    {
+      "RequestedOutputCP": 65001,
+      "AppliedOutputCP": 65001,
+      "Observations": 12,
+      "SetupError": 0,
+      "Font": [
+        "Lucida Console",
+        4,
+        6
+      ]
+    }
+  ],
+  "WolfAtCP852WideCells": [
+    [
+      2,
+      20013,
+      263
+    ],
+    [
+      3,
+      20013,
+      519
+    ],
+    [
+      4,
+      124,
+      7
+    ]
+  ],
+  "LegacyCollectorVerified": true,
+  "RawFilesPreserved": 510,
+  "ReturnedCollectionsSha256": "14e1467f98fb81b9dbb69038131e8ce3e50c87f8c048e603185d8d0ac9d066fd"
+}

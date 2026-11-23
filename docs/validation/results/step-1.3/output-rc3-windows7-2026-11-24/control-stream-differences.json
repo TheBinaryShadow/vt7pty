@@ -1,0 +1,140 @@
+[
+  {
+    "Machine": "TURTLE",
+    "Case": "OUTPUT_LATIN",
+    "Scope": "Rc2ToRc3",
+    "Role": "baseline",
+    "SameCheckpointSemantics": true,
+    "Differences": [
+      {
+        "Segment": "BeforeInitialBarrier",
+        "LeftBytes": 210,
+        "RightBytes": 210,
+        "ChangedRanges": [
+          {
+            "LeftOffset": 0,
+            "RightOffset": 0,
+            "Left": "",
+            "Right": "1b 5b 30 6d 1b 5b 30 4b"
+          },
+          {
+            "LeftOffset": 39,
+            "RightOffset": 47,
+            "Left": "1b 5b 30 6d 1b 5b 30 4b",
+            "Right": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Machine": "TURTLE",
+    "Case": "OUTPUT_LATIN",
+    "Scope": "Rc3RuntimePair",
+    "Differences": [
+      {
+        "Segment": "BeforeInitialBarrier",
+        "LeftBytes": 210,
+        "RightBytes": 210,
+        "ChangedRanges": [
+          {
+            "LeftOffset": 0,
+            "RightOffset": 0,
+            "Left": "1b 5b 30 6d 1b 5b 30 4b",
+            "Right": ""
+          },
+          {
+            "LeftOffset": 47,
+            "RightOffset": 39,
+            "Left": "",
+            "Right": "1b 5b 30 6d 1b 5b 30 4b"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Machine": "NESSY",
+    "Case": "OUTPUT_CP1250",
+    "Scope": "Rc2ToRc3",
+    "Role": "baseline",
+    "SameCheckpointSemantics": true,
+    "Differences": [
+      {
+        "Segment": "BetweenBarriers",
+        "LeftBytes": 148,
+        "RightBytes": 165,
+        "ChangedRanges": [
+          {
+            "LeftOffset": 24,
+            "RightOffset": 24,
+            "Left": "",
+            "Right": "1b 5b 33 47 1b 5b 3f 32 35 68 1b 5b 3f 32 35 6c 0d"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Machine": "NESSY",
+    "Case": "OUTPUT_CP1250",
+    "Scope": "Rc3RuntimePair",
+    "Differences": [
+      {
+        "Segment": "BetweenBarriers",
+        "LeftBytes": 165,
+        "RightBytes": 148,
+        "ChangedRanges": [
+          {
+            "LeftOffset": 24,
+            "RightOffset": 24,
+            "Left": "1b 5b 33 47 1b 5b 3f 32 35 68 1b 5b 3f 32 35 6c 0d",
+            "Right": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Machine": "NESSY",
+    "Case": "OUTPUT_CP65001",
+    "Scope": "Rc2ToRc3",
+    "Role": "baseline",
+    "SameCheckpointSemantics": true,
+    "Differences": [
+      {
+        "Segment": "BetweenBarriers",
+        "LeftBytes": 148,
+        "RightBytes": 165,
+        "ChangedRanges": [
+          {
+            "LeftOffset": 24,
+            "RightOffset": 24,
+            "Left": "",
+            "Right": "1b 5b 33 47 1b 5b 3f 32 35 68 1b 5b 3f 32 35 6c 0d"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Machine": "NESSY",
+    "Case": "OUTPUT_CP65001",
+    "Scope": "Rc3RuntimePair",
+    "Differences": [
+      {
+        "Segment": "BetweenBarriers",
+        "LeftBytes": 165,
+        "RightBytes": 148,
+        "ChangedRanges": [
+          {
+            "LeftOffset": 24,
+            "RightOffset": 24,
+            "Left": "1b 5b 33 47 1b 5b 3f 32 35 68 1b 5b 3f 32 35 6c 0d",
+            "Right": ""
+          }
+        ]
+      }
+    ]
+  }
+]

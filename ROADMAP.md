@@ -134,6 +134,9 @@ H1, H2 and H3 remain the research evidence for the H4 implementation.
 
 - [x] Compare the expanded [output corpus](docs/OUTPUT_FIDELITY.md) on the
   released and accepted runtimes across all three Windows 7 tiers.
+- [x] Measure the combining and CJK cases across the available output code
+  pages and compare both width replays on all three Windows 7 tiers.
+  [Output rc3 review](docs/validation/2026-11-24-step-1.3-output-rc3-windows7.md)
 - [ ] Resolve measured F04-F05 failures in cells, cursor, supported attributes,
   erase, wrap, scroll, encoding and requested/actual code-page behavior.
 - [ ] Record text and width results separately; prove a narrow adaptation or
@@ -148,10 +151,10 @@ work is the column placement of the combining and CJK samples under the
 observed width rules.
 [Output rc2 Windows 7 review](docs/validation/2026-11-23-step-1.3-output-rc2-windows7.md)
 
-I verified that the cursor move can place the bar while erasing the wide
-glyph under the reference reader. Output rc3 tests the native width across
-code pages and repeats both replays on the three Windows 7 tiers.
-[Width investigation and rc3 candidate](docs/validation/2026-11-24-step-1.3-output-rc3-candidate.md)
+I completed the rc3 width investigation across 126 observations. The
+available pages preserve the same placement differences. The remaining
+decision is how to handle cell placement when the receiving terminal uses
+different widths.
 
 ### Step 1.4: Improve full-screen restoration and resize
 
