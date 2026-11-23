@@ -14,6 +14,7 @@ still in progress. [Profile rc3 Windows 7 review](2026-11-23-step-1.2-profiles-r
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
+| Step 1.3 Unicode width | [rc3 experiments, local review and verified delivery](2026-11-24-step-1.3-output-rc3-candidate.md) | Pending three live target collections |
 | Step 1.3 output | [rc2 local characterization and verified delivery](2026-11-23-step-1.3-output-rc2-candidate.md) | [78 observations reviewed, with two reproducible width differences](2026-11-23-step-1.3-output-rc2-windows7.md) |
 | Step 1.2 profiles | [rc3 local qualification and delivery](2026-11-23-step-1.2-profiles-rc3-candidate.md) | [rc3 qualified on all three tiers](2026-11-23-step-1.2-profiles-rc3-windows7.md) |
 | Profile rc2 | [Earlier candidate](2026-11-20-step-1.2-profiles-rc2-candidate.md) | [Frozen controls passed. Profile blockers identified.](2026-11-23-step-1.2-profiles-rc2-windows7.md) |

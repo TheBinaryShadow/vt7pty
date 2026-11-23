@@ -1,6 +1,6 @@
 # VT7Pty roadmap
 
-Updated: 2026-11-23.
+Updated: 2026-11-24.
 
 I've published 0.5.0 and completed Step 1.2 within the recorded input scope.
 Profile rc3 passed the controlled fixtures, physical shell checks and frozen
@@ -147,6 +147,11 @@ The two runtimes produced identical bytes in every comparison. The remaining
 work is the column placement of the combining and CJK samples under the
 observed width rules.
 [Output rc2 Windows 7 review](docs/validation/2026-11-23-step-1.3-output-rc2-windows7.md)
+
+I verified that the cursor move can place the bar while erasing the wide
+glyph under the reference reader. Output rc3 tests the native width across
+code pages and repeats both replays on the three Windows 7 tiers.
+[Width investigation and rc3 candidate](docs/validation/2026-11-24-step-1.3-output-rc3-candidate.md)
 
 ### Step 1.4: Improve full-screen restoration and resize
 

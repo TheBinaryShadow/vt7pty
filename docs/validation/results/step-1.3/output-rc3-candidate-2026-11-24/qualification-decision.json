@@ -1,0 +1,386 @@
+{
+  "Kind": "Step13WidthDiagnosticCandidate",
+  "RecordedDate": "2026-11-24",
+  "Status": "ReadyForWindows7",
+  "DeliveryStatus": "Verified",
+  "Step13Accepted": false,
+  "MilestoneAccepted": false,
+  "SessionFlags": 0,
+  "Package": {
+    "Archive": "VT7Pty-output-0.5.1-dev-rc3.zip",
+    "ArchiveBytes": 5034698,
+    "ArchiveSha256": "922c2b8a1e38ae74cf076571561d63cdc32ccd67d160246557aeb10adc22a15a",
+    "ManifestSha256": "fcf0a396f011295cd85d8dab945213d8d046569927277a9b3dcadfccb16ba4be",
+    "HarnessSourceCommit": "5dc4b80bb285ac832668d5d6771ee3b91dc15110",
+    "PackageEntriesVerified": 26,
+    "FrozenRuntimeBinaries": [
+      "baseline/bin/VT7Pty.dll",
+      "baseline/bin/VT7Pty-Agent.exe",
+      "accepted/bin/VT7Pty-Agent.exe",
+      "accepted/bin/VT7Pty-Host.dll",
+      "accepted/bin/VT7Pty.dll",
+      "accepted/bin/VT7Pty-DebugServer.exe"
+    ],
+    "UnchangedRc2Recipes": 13,
+    "NewWidthRecipes": 8,
+    "ReplayCasesPerRuntime": 10
+  },
+  "RuntimeSources": {
+    "accepted": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+    "baseline": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d"
+  },
+  "WolfRunId": "developmenthost-output-20261123-230651-6a833430",
+  "WolfObservations": 42,
+  "WolfOutcomes": {
+    "Match": 30,
+    "Difference": 12
+  },
+  "UnchangedWolfControlOutcomes": 26,
+  "WolfWidthReplays": 20,
+  "PriorCaptureReplays": 16,
+  "ReviewerNegativeControls": 2,
+  "RawFiles": 170,
+  "WidthMeasurements": [
+    {
+      "Case": "OUTPUT_COMBINING",
+      "Runtime": "baseline",
+      "RequestedOutputCP": 0,
+      "AppliedOutputCP": 437,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 3,
+      "OneCellBarColumn": 4,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": false
+    },
+    {
+      "Case": "OUTPUT_WIDE",
+      "Runtime": "baseline",
+      "RequestedOutputCP": 0,
+      "AppliedOutputCP": 437,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 4,
+      "OneCellBarColumn": 3,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": true
+    },
+    {
+      "Case": "OUTPUT_COMBINING_CP437",
+      "Runtime": "baseline",
+      "RequestedOutputCP": 437,
+      "AppliedOutputCP": 437,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 3,
+      "OneCellBarColumn": 4,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": false
+    },
+    {
+      "Case": "OUTPUT_WIDE_CP437",
+      "Runtime": "baseline",
+      "RequestedOutputCP": 437,
+      "AppliedOutputCP": 437,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 4,
+      "OneCellBarColumn": 3,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": true
+    },
+    {
+      "Case": "OUTPUT_COMBINING_CP852",
+      "Runtime": "baseline",
+      "RequestedOutputCP": 852,
+      "AppliedOutputCP": 852,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 3,
+      "OneCellBarColumn": 4,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": false
+    },
+    {
+      "Case": "OUTPUT_WIDE_CP852",
+      "Runtime": "baseline",
+      "RequestedOutputCP": 852,
+      "AppliedOutputCP": 852,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 4,
+      "OneCellBarColumn": 3,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": true
+    },
+    {
+      "Case": "OUTPUT_COMBINING_CP936",
+      "Runtime": "baseline",
+      "RequestedOutputCP": 936,
+      "AppliedOutputCP": 936,
+      "Font": "NSimSun",
+      "FontCell": [
+        3,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 3,
+      "OneCellBarColumn": 4,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": false
+    },
+    {
+      "Case": "OUTPUT_WIDE_CP936",
+      "Runtime": "baseline",
+      "RequestedOutputCP": 936,
+      "AppliedOutputCP": 936,
+      "Font": "NSimSun",
+      "FontCell": [
+        3,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 4,
+      "OneCellBarColumn": 3,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": true
+    },
+    {
+      "Case": "OUTPUT_COMBINING_CP65001",
+      "Runtime": "baseline",
+      "RequestedOutputCP": 65001,
+      "AppliedOutputCP": 65001,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 3,
+      "OneCellBarColumn": 4,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": false
+    },
+    {
+      "Case": "OUTPUT_WIDE_CP65001",
+      "Runtime": "baseline",
+      "RequestedOutputCP": 65001,
+      "AppliedOutputCP": 65001,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 4,
+      "OneCellBarColumn": 3,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": true
+    },
+    {
+      "Case": "OUTPUT_COMBINING",
+      "Runtime": "accepted",
+      "RequestedOutputCP": 0,
+      "AppliedOutputCP": 437,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 3,
+      "OneCellBarColumn": 4,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": false
+    },
+    {
+      "Case": "OUTPUT_WIDE",
+      "Runtime": "accepted",
+      "RequestedOutputCP": 0,
+      "AppliedOutputCP": 437,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 4,
+      "OneCellBarColumn": 3,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": true
+    },
+    {
+      "Case": "OUTPUT_COMBINING_CP437",
+      "Runtime": "accepted",
+      "RequestedOutputCP": 437,
+      "AppliedOutputCP": 437,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 3,
+      "OneCellBarColumn": 4,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": false
+    },
+    {
+      "Case": "OUTPUT_WIDE_CP437",
+      "Runtime": "accepted",
+      "RequestedOutputCP": 437,
+      "AppliedOutputCP": 437,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 4,
+      "OneCellBarColumn": 3,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": true
+    },
+    {
+      "Case": "OUTPUT_COMBINING_CP852",
+      "Runtime": "accepted",
+      "RequestedOutputCP": 852,
+      "AppliedOutputCP": 852,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 3,
+      "OneCellBarColumn": 4,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": false
+    },
+    {
+      "Case": "OUTPUT_WIDE_CP852",
+      "Runtime": "accepted",
+      "RequestedOutputCP": 852,
+      "AppliedOutputCP": 852,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 4,
+      "OneCellBarColumn": 3,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": true
+    },
+    {
+      "Case": "OUTPUT_COMBINING_CP936",
+      "Runtime": "accepted",
+      "RequestedOutputCP": 936,
+      "AppliedOutputCP": 936,
+      "Font": "NSimSun",
+      "FontCell": [
+        3,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 3,
+      "OneCellBarColumn": 4,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": false
+    },
+    {
+      "Case": "OUTPUT_WIDE_CP936",
+      "Runtime": "accepted",
+      "RequestedOutputCP": 936,
+      "AppliedOutputCP": 936,
+      "Font": "NSimSun",
+      "FontCell": [
+        3,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 4,
+      "OneCellBarColumn": 3,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": true
+    },
+    {
+      "Case": "OUTPUT_COMBINING_CP65001",
+      "Runtime": "accepted",
+      "RequestedOutputCP": 65001,
+      "AppliedOutputCP": 65001,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 3,
+      "OneCellBarColumn": 4,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": false
+    },
+    {
+      "Case": "OUTPUT_WIDE_CP65001",
+      "Runtime": "accepted",
+      "RequestedOutputCP": 65001,
+      "AppliedOutputCP": 65001,
+      "Font": "Lucida Console",
+      "FontCell": [
+        4,
+        6
+      ],
+      "NativeBarColumn": 4,
+      "OriginalBarColumn": 4,
+      "OneCellBarColumn": 3,
+      "AnchoredBarColumn": 4,
+      "AnchoredNonblankTextMatches": true,
+      "AnchoredCompleteRowMatches": true
+    }
+  ],
+  "Windows7Results": "Pending"
+}

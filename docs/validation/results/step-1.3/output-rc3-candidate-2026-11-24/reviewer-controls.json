@@ -1,0 +1,15 @@
+{
+    "Checks":  [
+                   {
+                       "Status":  "RejectedAsExpected",
+                       "Case":  "wrong-insertion-offset",
+                       "Received":  "Unexpected width replay byte or column command."
+                   },
+                   {
+                       "Status":  "RejectedAsExpected",
+                       "Case":  "changed-anchored-row",
+                       "Received":  "Width replay text differs: accepted/OUTPUT_COMBINING"
+                   }
+               ],
+    "Count":  2
+}
