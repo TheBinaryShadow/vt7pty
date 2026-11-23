@@ -1,0 +1,116 @@
+{
+  "RunId": "developmenthost-screen-20261123-234443-2ae2f59d",
+  "ComputerName": "WOLF",
+  "OS": {
+    "Caption": "Microsoft Windows 10 IoT Enterprise LTSC",
+    "BuildNumber": "19044",
+    "Version": "10.0.19044",
+    "ProductType": 1,
+    "ServicePackMajorVersion": 0
+  },
+  "PowerShellVersion": "5.1.19041.7844",
+  "CLRVersion": "4.0.30319.42000",
+  "Harness": {
+    "SourceTreeClean": true,
+    "VerificationSha256": "14d1acb639aa0dbef8b0e387146f4b210746af1befd33e3e04d50f6b60739c0d",
+    "Configuration": "Release",
+    "SourceCommit": "4bb2c2b2ceedd516cbb8b40a958bf254cb186c5f",
+    "SnapshotBytes": 21396,
+    "Architecture": "x64"
+  },
+  "ManifestSha256": "0f1346b9883bc23ed72dfdd510665602c19a8f2dcd2fb7462200547be9fc0192",
+  "ReportedFilesVerified": 85,
+  "Outcomes": {
+    "Match": 6,
+    "Difference": 8
+  },
+  "CharacterizationComplete": true,
+  "Step14Accepted": false,
+  "MilestoneAccepted": false,
+  "Cases": [
+    {
+      "Runtime": "baseline",
+      "Case": "ALTERNATE",
+      "Outcome": "Match",
+      "ExitCode": 0
+    },
+    {
+      "Runtime": "baseline",
+      "Case": "RESIZE",
+      "Outcome": "Difference",
+      "ExitCode": 1
+    },
+    {
+      "Runtime": "baseline",
+      "Case": "SCREEN_CMD_EXPLICIT",
+      "Outcome": "Difference",
+      "ExitCode": 1
+    },
+    {
+      "Runtime": "baseline",
+      "Case": "SCREEN_CMD_EXIT",
+      "Outcome": "Match",
+      "ExitCode": 0
+    },
+    {
+      "Runtime": "baseline",
+      "Case": "SCREEN_PS_EXIT",
+      "Outcome": "Match",
+      "ExitCode": 0
+    },
+    {
+      "Runtime": "baseline",
+      "Case": "SCREEN_CMD_RESIZE",
+      "Outcome": "Difference",
+      "ExitCode": 1
+    },
+    {
+      "Runtime": "baseline",
+      "Case": "SCREEN_PS_RESIZE",
+      "Outcome": "Difference",
+      "ExitCode": 1
+    },
+    {
+      "Runtime": "accepted",
+      "Case": "ALTERNATE",
+      "Outcome": "Match",
+      "ExitCode": 0
+    },
+    {
+      "Runtime": "accepted",
+      "Case": "RESIZE",
+      "Outcome": "Difference",
+      "ExitCode": 1
+    },
+    {
+      "Runtime": "accepted",
+      "Case": "SCREEN_CMD_EXPLICIT",
+      "Outcome": "Difference",
+      "ExitCode": 1
+    },
+    {
+      "Runtime": "accepted",
+      "Case": "SCREEN_CMD_EXIT",
+      "Outcome": "Match",
+      "ExitCode": 0
+    },
+    {
+      "Runtime": "accepted",
+      "Case": "SCREEN_PS_EXIT",
+      "Outcome": "Match",
+      "ExitCode": 0
+    },
+    {
+      "Runtime": "accepted",
+      "Case": "SCREEN_CMD_RESIZE",
+      "Outcome": "Difference",
+      "ExitCode": 1
+    },
+    {
+      "Runtime": "accepted",
+      "Case": "SCREEN_PS_RESIZE",
+      "Outcome": "Difference",
+      "ExitCode": 1
+    }
+  ]
+}
