@@ -24,6 +24,7 @@ replace release acceptance. The [roadmap](../ROADMAP.md) records what is complet
 
 | Task | Entry point | Guide |
 | --- | --- | --- |
+| Characterize Step 1.3 output | RUN-OUTPUT-NONESU.cmd, RUN-OUTPUT-ESU.cmd or RUN-OUTPUT-LEGACY.cmd | [Output characterization](OUTPUT_FIDELITY.md) |
 | Collect Step 1.2 profile coverage | RUN-PROFILES-NONESU.cmd, RUN-PROFILES-ESU.cmd or RUN-PROFILES-LEGACY.cmd, then the matching manual launcher | [Profile tests](PROFILE_TESTS.md) |
 | Reproduce accepted input rc2 | RUN-INPUT-NONESU.cmd, RUN-INPUT-ESU.cmd or RUN-INPUT-LEGACY.cmd | [Input tests](INPUT_FIDELITY.md) |
 | Verify a local build | Verify-VT7Pty.ps1 | Commands below |

@@ -132,6 +132,8 @@ H1, H2 and H3 remain the research evidence for the H4 implementation.
 
 ### Step 1.3: Improve output and Unicode reconstruction
 
+- [ ] Compare the expanded [output corpus](docs/OUTPUT_FIDELITY.md) on the
+  released and accepted runtimes across all three Windows 7 tiers.
 - [ ] Resolve measured F04-F05 failures in cells, cursor, supported attributes,
   erase, wrap, scroll, encoding and requested/actual code-page behavior.
 - [ ] Record text and width results separately; prove a narrow adaptation or

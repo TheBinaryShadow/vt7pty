@@ -53,6 +53,7 @@ The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |
 | --- | --- |
+| [Step 1.3 output characterization](OUTPUT_FIDELITY.md) | Unicode, code pages and independently checked console reconstruction |
 | [Step 1.2 profile tests](PROFILE_TESTS.md) | Controlled editors, ordinary profiles and physical input without private transcripts |
 | [Step 1.2 input tests](INPUT_FIDELITY.md) | Editing, stream fragmentation, mouse records and native Break reference |
 | [H4 runtime qualification](H4_RUNTIME.md) | Accepted opt-in contract, three-machine runner and test scope |

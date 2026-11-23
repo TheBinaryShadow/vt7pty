@@ -1,6 +1,7 @@
 // Copyright (c) 2026 VT7Pty contributors
 // SPDX-License-Identifier: MIT
 #include "../fidelity/WinTest.h"
+#include "../fidelity/OutputCorpus.h"
 #include <algorithm>
 #include <cwchar>
 using namespace fidelity;
@@ -194,6 +195,140 @@ std::unique_ptr<Packet> observe(HANDLE output, const std::vector<Key> &keys) {
         rectangle.Right == info.srWindow.Right && rectangle.Bottom == info.srWindow.Bottom,"snapshot rectangle");
     return storage;
 }
+void writeOutputCells(HANDLE output, COORD start, std::wstring_view text, WORD attribute) {
+    std::vector<CHAR_INFO> cells(text.size());
+    for (size_t i = 0; i < text.size(); ++i) {
+        cells[i].Char.UnicodeChar = text[i];
+        cells[i].Attributes = attribute;
+    }
+    const SHORT width = static_cast<SHORT>(cells.size());
+    SMALL_RECT rect = {start.X, start.Y, static_cast<SHORT>(start.X + width - 1), start.Y};
+    check(WriteConsoleOutputW(output, cells.data(), {width, 1}, {0, 0}, &rect) &&
+        rect.Left == start.X && rect.Right == start.X + width - 1 &&
+        rect.Top == start.Y && rect.Bottom == start.Y, "positioned output cells");
+}
+
+int outputFixture(const OutputCase &scenario, HANDLE output, HANDLE pipe) {
+    CONSOLE_SCREEN_BUFFER_INFO info = {};
+    check(GetConsoleScreenBufferInfo(output, &info), "output fixture geometry");
+    const auto window = info.srWindow;
+    check(window.Left == 0 && window.Right == outputColumns - 1 && info.dwSize.X == outputColumns &&
+        window.Bottom - window.Top + 1 == outputRows, "output fixture viewport");
+    const auto pos = [&window](int x, int y) {
+        return COORD{static_cast<SHORT>(x), static_cast<SHORT>(window.Top + y)};
+    };
+    const auto cursor = [&](int x, int y) {
+        check(SetConsoleCursorPosition(output, pos(x, y)) != FALSE, "fixture cursor position");
+    };
+    constexpr DWORD mode = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
+    check(SetConsoleMode(output, mode) && SetConsoleTextAttribute(output, 7), "fixture output defaults");
+    const CONSOLE_CURSOR_INFO visible = {25, TRUE};
+    check(SetConsoleCursorInfo(output, &visible) != FALSE, "fixture cursor visibility");
+    std::vector<CHAR_INFO> blank(outputColumns * outputRows);
+    for (auto &cell : blank) {
+        cell.Char.UnicodeChar = L' ';
+        cell.Attributes = 7;
+    }
+    SMALL_RECT cleared = window;
+    check(WriteConsoleOutputW(output, blank.data(), {outputColumns, outputRows}, {0, 0}, &cleared) &&
+        cleared.Left == window.Left && cleared.Top == window.Top &&
+        cleared.Right == window.Right && cleared.Bottom == window.Bottom, "clear fixture viewport");
+    cursor(0, 0);
+    if (scenario.action == OutputAction::Erase) {
+        writeOutputCells(output, pos(4, 5), L"ABCDE", 0x1e);
+    } else if (scenario.action == OutputAction::Scroll) {
+        writeOutputCells(output, pos(8, 3), L"GUARD", 0x07);
+        writeOutputCells(output, pos(8, 4), L"FIRST", 0x1e);
+        writeOutputCells(output, pos(8, 5), L"SECOND", 0x2f);
+        writeOutputCells(output, pos(8, 6), L"THIRD", 0x4e);
+    }
+
+    OutputOperation operation;
+    const auto publish = [&](uint32_t phase) {
+        operation.phase = phase;
+        writeOutputCells(output, pos(0, outputBarrierRow), outputBarriers[phase - 1], 7);
+        auto snapshot = observe(output, {});
+        transfer(pipe, &operation, sizeof(operation), true);
+        transfer(pipe, snapshot.get(), sizeof(Packet), true);
+    };
+    publish(1);
+
+    char command = 0;
+    transfer(pipe, &command, 1, false, 12000);
+    check(command == 'A', "output action acknowledgment");
+    if (scenario.isText()) cursor(outputTextX, outputTextY);
+    switch (scenario.action) {
+    case OutputAction::ByteText:
+        operation.requestedCP = scenario.codePage;
+        operation.setupSucceeded = SetConsoleOutputCP(scenario.codePage) != FALSE ? 1u : 0u;
+        if (!operation.setupSucceeded) operation.setupError = GetLastError();
+        if (operation.setupSucceeded && GetConsoleOutputCP() == scenario.codePage) {
+            operation.unitsRequested = static_cast<DWORD>(scenario.bytes.size());
+            operation.writeAttempted = 1;
+            DWORD written = 0;
+            const BOOL okay = WriteConsoleA(output, scenario.bytes.data(), operation.unitsRequested, &written, nullptr);
+            operation.writeError = okay ? 0 : GetLastError();
+            operation.writeSucceeded = okay ? 1u : 0u;
+            operation.unitsWritten = written;
+        }
+        break;
+    case OutputAction::RawVT: {
+        operation.requestedMode = mode | rawOutputMode;
+        operation.setupSucceeded = SetConsoleMode(output, operation.requestedMode) != FALSE ? 1u : 0u;
+        if (!operation.setupSucceeded) operation.setupError = GetLastError();
+        DWORD applied = 0;
+        check(GetConsoleMode(output, &applied) != FALSE, "raw VT output mode readback");
+        if (!operation.setupSucceeded || (applied & operation.requestedMode) != operation.requestedMode) break;
+        [[fallthrough]];
+    }
+    case OutputAction::WideText: {
+        operation.unitsRequested = static_cast<DWORD>(scenario.wide.size());
+        operation.writeAttempted = 1;
+        DWORD written = 0;
+        const BOOL okay = WriteConsoleW(output, scenario.wide.data(), operation.unitsRequested, &written, nullptr);
+        operation.writeError = okay ? 0 : GetLastError();
+        operation.writeSucceeded = okay ? 1u : 0u;
+        operation.unitsWritten = written;
+        break;
+    }
+    case OutputAction::Position:
+        writeOutputCells(output, pos(5, 6), L"COLOR", 0x1e);
+        writeOutputCells(output, pos(13, 6), L"RED", 0x4f);
+        cursor(17, 7);
+        break;
+    case OutputAction::Erase: {
+        DWORD written = 0;
+        check(FillConsoleOutputCharacterW(output, L' ', 2, pos(5, 5), &written) && written == 2,
+            "erase two characters");
+        check(FillConsoleOutputAttribute(output, 0x20, 2, pos(5, 5), &written) && written == 2,
+            "erase attributes");
+        cursor(5, 5);
+        break;
+    }
+    case OutputAction::Wrap: {
+        cursor(outputColumns - 2, 7);
+        DWORD written = 0;
+        check(WriteConsoleW(output, L"WXYZ", 4, &written, nullptr) && written == 4, "wrap write");
+        break;
+    }
+    case OutputAction::Scroll: {
+        const SMALL_RECT source = {8, pos(8, 5).Y, 13, pos(8, 6).Y};
+        const SMALL_RECT clip = {8, pos(8, 4).Y, 13, pos(8, 6).Y};
+        CHAR_INFO fill = {};
+        fill.Char.UnicodeChar = L' ';
+        fill.Attributes = 0x20;
+        check(ScrollConsoleScreenBufferW(output, &source, &clip, pos(8, 4), &fill) != FALSE, "scroll region");
+        cursor(8, 6);
+        break;
+    }
+    }
+    publish(2);
+
+    transfer(pipe, &command, 1, false, 12000);
+    check(command == 'Q', "output fixture finish acknowledgment");
+    return 0;
+}
+
 void draw(HANDLE output, bool unicode, bool alternate=false) {
     CONSOLE_SCREEN_BUFFER_INFO info={}; check(GetConsoleScreenBufferInfo(output,&info),"draw geometry");
     const int columns=info.srWindow.Right-info.srWindow.Left+1, rows=info.srWindow.Bottom-info.srWindow.Top+1;
@@ -230,11 +365,12 @@ int wmain(int argc,wchar_t **argv) {
         ULONG server=0; check(GetNamedPipeServerProcessId(pipe.value,&server) && server == expectedServer,"fixture server PID");
         SetConsoleTitleW(L"VT7Pty controlled fidelity fixture");
         if (mode.starts_with(L"CHILD_")) return childFixture(mode,pipe.value);
+        Handle output(CreateFileW(L"CONOUT$",GENERIC_READ|GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,nullptr,OPEN_EXISTING,0,nullptr));
+        check(output.value != INVALID_HANDLE_VALUE,"fixture output");
+        if (const auto *scenario = findOutputCase(mode)) return outputFixture(*scenario, output.value, pipe.value);
         const bool input=mode == L"INPUT" || mode == L"PROCESSED";
         const bool unicode=mode == L"UNICODE";
         check(input || unicode || mode == L"STATE","fixture mode");
-        Handle output(CreateFileW(L"CONOUT$",GENERIC_READ|GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,nullptr,OPEN_EXISTING,0,nullptr));
-        check(output.value != INVALID_HANDLE_VALUE,"fixture output");
         Handle alternate;
         HANDLE active=output.value;
         std::vector<Key> keys;

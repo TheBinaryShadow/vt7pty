@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 #include "WinTest.h"
 #include "VtState.h"
+#include "OutputCorpus.h"
 #include "../../src/include/vt7pty.h"
 #include <functional>
 #include <fstream>
@@ -35,8 +36,9 @@ public:
     std::string raw;
     uint64_t lineFeeds=0;
     bool dropOutput=false;
+    std::string decodeError;
     Handle child, agent, descendant;
-    Session() {
+    explicit Session(bool observeDecodeErrors = false) : observeDecodeErrors_(observeDecodeErrors) {
         vt7pty_error_ptr_t error=nullptr;
         auto *config=vt7pty_config_new(0,&error);
         check(config != nullptr,"session config");
@@ -77,7 +79,7 @@ public:
             DWORD available=0;
             if (!PeekNamedPipe(output_.value,nullptr,0,nullptr,&available,nullptr)) {
                 check(GetLastError() == ERROR_BROKEN_PIPE || GetLastError() == ERROR_PIPE_NOT_CONNECTED,"output peek");
-                eof_=true; if (!dropOutput) state.finish(); return;
+                eof_=true; decode({}); return;
             }
             if (available == 0) return;
             char bytes[4096]={};
@@ -86,7 +88,7 @@ public:
             check(raw.size()+length <= 1024*1024,"captured output bound");
             raw.append(bytes,length);
             lineFeeds+=static_cast<uint64_t>(std::count(bytes,bytes+length,'\n'));
-            if (!dropOutput) state.feed(std::string_view(bytes,length));
+            decode(std::string_view(bytes,length));
             for (const auto &reply : state.takeReplies()) input(reply);
         }
     }
@@ -124,6 +126,18 @@ public:
         return cleanupOkay_;
     }
 private:
+    void decode(std::string_view bytes) {
+        if (dropOutput) return;
+        try {
+            if (bytes.empty()) state.finish();
+            else state.feed(bytes);
+        } catch (const std::runtime_error &error) {
+            if (!observeDecodeErrors_) throw;
+            decodeError = error.what();
+            dropOutput = true;
+        }
+    }
+    bool observeDecodeErrors_;
     vt7pty_t *pty_=nullptr;
     Handle input_,output_;
     bool eof_=false,closed_=false,cleanupOkay_=true;
@@ -222,6 +236,246 @@ struct Observations {
     bool cleanup=true;
     void add(const std::string &key,bool value) { fields+=","+json(key)+":"+(value ? "true" : "false"); }
 };
+std::string pointList(std::u32string_view text) {
+    std::string result = "[";
+    for (const auto value : text) {
+        if (result.size() > 1) result += ',';
+        result += std::to_string(static_cast<uint32_t>(value));
+    }
+    return result + ']';
+}
+
+std::u32string outputBarrier(uint32_t phase) {
+    const auto marker = outputBarriers[phase - 1];
+    return std::u32string(marker.begin(), marker.end());
+}
+
+std::unique_ptr<Packet> outputRecipe(const OutputCase &scenario, uint32_t phase, bool applicable) {
+    auto expected = std::make_unique<Packet>();
+    expected->columns = outputColumns;
+    expected->rows = outputRows;
+    expected->cursorVisible = 1;
+    for (int i = 0; i < outputColumns * outputRows; ++i) {
+        expected->cells[i].Char.UnicodeChar = L' ';
+        expected->cells[i].Attributes = 7;
+    }
+    const auto row = [&](int x, int y, std::wstring_view text, WORD attribute) {
+        for (const auto value : text) {
+            auto &cell = expected->cells[y * outputColumns + x++];
+            cell.Char.UnicodeChar = value;
+            cell.Attributes = attribute;
+        }
+    };
+    row(0, outputBarrierRow, outputBarriers[phase - 1], 7);
+    switch (scenario.action) {
+    case OutputAction::Position:
+        if (phase == 2) {
+            row(5, 6, L"COLOR", 0x1e);
+            row(13, 6, L"RED", 0x4f);
+            expected->cursorX = 17;
+            expected->cursorY = 7;
+        }
+        break;
+    case OutputAction::Erase:
+        row(4, 5, L"ABCDE", 0x1e);
+        if (phase == 2) {
+            row(5, 5, L"  ", 0x20);
+            expected->cursorX = 5;
+            expected->cursorY = 5;
+        }
+        break;
+    case OutputAction::Wrap:
+        if (phase == 2) {
+            row(outputColumns - 2, 7, L"WX", 7);
+            row(0, 8, L"YZ", 7);
+            expected->cursorX = 2;
+            expected->cursorY = 8;
+        }
+        break;
+    case OutputAction::Scroll:
+        row(8, 3, L"GUARD", 7);
+        row(8, 4, phase == 1 ? L"FIRST" : L"SECOND", phase == 1 ? 0x1e : 0x2f);
+        row(8, 5, phase == 1 ? L"SECOND" : L"THIRD", phase == 1 ? 0x2f : 0x4e);
+        row(8, 6, phase == 1 ? L"THIRD" : L"      ", phase == 1 ? 0x4e : 0x20);
+        if (phase == 2) {
+            expected->cursorX = 8;
+            expected->cursorY = 6;
+        }
+        break;
+    case OutputAction::RawVT:
+        if (phase == 2 && applicable) {
+            row(3, 8, L"V", 0x14);
+            expected->cursorX = 4;
+            expected->cursorY = 8;
+        }
+        break;
+    case OutputAction::WideText:
+    case OutputAction::ByteText:
+        break;
+    }
+    return expected;
+}
+
+bool consoleMatchesRecipe(const Packet &actual, const Packet &expected) {
+    return actual.columns == expected.columns && actual.rows == expected.rows &&
+        actual.cursorX == expected.cursorX && actual.cursorY == expected.cursorY &&
+        actual.cursorVisible == expected.cursorVisible &&
+        std::equal(actual.cells, actual.cells + actual.rows * actual.columns, expected.cells,
+            [](const CHAR_INFO &a, const CHAR_INFO &b) {
+                return a.Char.UnicodeChar == b.Char.UnicodeChar && visualAttribute(a.Attributes) == visualAttribute(b.Attributes);
+            });
+}
+
+const char *boolean(bool value) { return value ? "true" : "false"; }
+
+struct OutputCheckpoint {
+    bool nativeDifference = false;
+    bool reconstructedDifference = false;
+    bool unavailable = false;
+    std::string report;
+};
+
+OutputCheckpoint compareOutput(const OutputCase &scenario, const OutputOperation &op, const Packet &packet,
+    const Session &session, bool barrierSeen, bool settled) {
+    OutputCheckpoint result;
+    const auto &state = session.state;
+    const bool cursor = state.x() == static_cast<int>(packet.cursorX) && state.y() == static_cast<int>(packet.cursorY) &&
+        state.visible() == (packet.cursorVisible != 0);
+    const bool applicable = !(op.requestedCP || op.requestedMode) ||
+        (op.setupSucceeded && (!op.requestedCP || packet.outputCP == op.requestedCP) &&
+            (!op.requestedMode || (packet.outputMode & op.requestedMode) == op.requestedMode));
+    result.unavailable = !applicable;
+    const auto expected = outputRecipe(scenario, op.phase, applicable);
+    bool compared = false;
+    std::string metrics;
+    if (op.phase == 2 && scenario.isText()) {
+        const auto native = snapshotText(packet, outputTextY);
+        const auto rendered = trimmed(state.row(outputTextY));
+        const bool hasExpected = applicable && !scenario.text.empty();
+        std::u32string wanted(outputTextX, U' ');
+        wanted += scenario.text;
+        const bool nativeTextMatch = native == wanted;
+        const bool nativeWidthMatch = packet.cursorX == static_cast<uint32_t>(outputTextX + scenario.width) &&
+            packet.cursorY == outputTextY;
+        result.nativeDifference = hasExpected && (!op.writeSucceeded || !nativeTextMatch || !nativeWidthMatch);
+        compared = native == rendered && cursor;
+        metrics = ",\"ExpectedText\":" + (hasExpected ? pointList(wanted) : "null") +
+            ",\"NativeText\":" + pointList(native) + ",\"ReconstructedText\":" + pointList(rendered) +
+            ",\"NativeTextMatchesIntent\":" + (hasExpected ? boolean(nativeTextMatch) : "null") +
+            ",\"ExpectedCursorAdvance\":" + (hasExpected ? std::to_string(scenario.width) : "null") +
+            ",\"NativeCursorAdvance\":" + std::to_string(static_cast<int>(packet.cursorX) - outputTextX) +
+            ",\"ReconstructedCursorAdvance\":" + std::to_string(state.x() - outputTextX) +
+            ",\"NativeWidthMatchesIntent\":" + (hasExpected ? boolean(nativeWidthMatch) : "null") +
+            ",\"ReconstructedTextMatchesNative\":" + boolean(native == rendered);
+    } else {
+        result.nativeDifference = applicable && (!consoleMatchesRecipe(packet, *expected) ||
+            (op.writeAttempted && !op.writeSucceeded));
+        compared = sameScreen(state, packet);
+        metrics = ",\"ExpectedCursorX\":" + std::to_string(expected->cursorX) +
+            ",\"ExpectedCursorY\":" + std::to_string(expected->cursorY);
+    }
+    result.reconstructedDifference = !barrierSeen || !settled || !session.decodeError.empty() || !compared;
+    result.report = "{\"Phase\":" + std::to_string(op.phase) +
+        ",\"RequestedOutputCP\":" + std::to_string(op.requestedCP) +
+        ",\"RequestedOutputMode\":" + std::to_string(op.requestedMode) +
+        ",\"SetupSucceeded\":" + boolean(op.setupSucceeded != 0) + ",\"SetupError\":" + std::to_string(op.setupError) +
+        ",\"WriteAttempted\":" + boolean(op.writeAttempted != 0) +
+        ",\"WriteSucceeded\":" + boolean(op.writeSucceeded != 0) + ",\"WriteError\":" + std::to_string(op.writeError) +
+        ",\"UnitsRequested\":" + std::to_string(op.unitsRequested) + ",\"UnitsWritten\":" + std::to_string(op.unitsWritten) +
+        ",\"CapabilityUnavailable\":" + boolean(result.unavailable) +
+        ",\"BackingConsoleDiffers\":" + boolean(result.nativeDifference) +
+        ",\"ReconstructionDiffers\":" + boolean(result.reconstructedDifference) +
+        ",\"BarrierSeen\":" + boolean(barrierSeen) + ",\"Settled\":" + boolean(settled) +
+        ",\"CapturedBytes\":" + std::to_string(session.raw.size()) + ",\"ReaderError\":" + json(session.decodeError) +
+        ",\"ReconstructedCursorMatchesNative\":" + boolean(cursor) +
+        ",\"Console\":" + packetJson(packet) + ",\"Reconstructed\":" + differenceJson(state, packet) + metrics + '}';
+    return result;
+}
+
+void outputCase(const OutputCase &scenario, const std::wstring &resultDirectory, Observations &observations) {
+    Session session(true);
+    std::string checkpoints;
+    bool consoleDifference = false;
+    bool reconstructionDifference = false;
+    bool unavailable = false;
+    const auto save = [&] {
+        const bool validUtf8 = !session.raw.empty() &&
+            MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, session.raw.data(),
+                static_cast<int>(session.raw.size()), nullptr, 0) != 0;
+        observations.raw = session.raw;
+        observations.add("CompleteStreamValidUtf8", validUtf8);
+        observations.fields += ",\"ReaderError\":" + json(session.decodeError) +
+            ",\"OutputCheckpoints\":[" + checkpoints + "],\"BackingConsoleDiffers\":" + boolean(consoleDifference) +
+            ",\"ReconstructionDiffers\":" + boolean(reconstructionDifference || !session.decodeError.empty()) +
+            ",\"CapabilityUnavailable\":" + boolean(unavailable);
+        return validUtf8;
+    };
+    try {
+        const auto pipeName = L"\\\\.\\pipe\\VT7Pty.Output." + std::to_wstring(GetCurrentProcessId()) +
+            L"." + std::to_wstring(GetTickCount64());
+        Handle pipe(privateServer(pipeName));
+        const auto fixture = directory() + L"\\FidelityFixture.exe";
+        session.spawn(fixture, quote(fixture) + L" " + std::wstring(scenario.name) + L" " + quote(pipeName) +
+            L" " + std::to_wstring(GetCurrentProcessId()));
+        connect(pipe.value);
+        ULONG peer = 0;
+        check(GetNamedPipeClientProcessId(pipe.value, &peer) && peer == GetProcessId(session.child.value), "output fixture PID");
+
+        std::vector<wchar_t> path(32768);
+        const auto client = GetModuleHandleW(L"VT7Pty.dll");
+        const DWORD clientLength = client ? GetModuleFileNameW(client, path.data(), static_cast<DWORD>(path.size())) : 0;
+        check(clientLength != 0 && clientLength < path.size() &&
+            _wcsicmp(path.data(), (directory() + L"\\VT7Pty.dll").c_str()) == 0, "packaged client identity");
+        DWORD length = static_cast<DWORD>(path.size());
+        check(QueryFullProcessImageNameW(session.agent.value, 0, path.data(), &length) &&
+            _wcsicmp(path.data(), (directory() + L"\\VT7Pty-Agent.exe").c_str()) == 0, "packaged agent identity");
+
+        auto packet = std::make_unique<Packet>();
+        for (uint32_t phase = 1; phase <= 2; ++phase) {
+            OutputOperation op;
+            session.pump();
+            transfer(pipe.value, &op, sizeof(op), false);
+            transfer(pipe.value, packet.get(), sizeof(Packet), false);
+            validate(*packet);
+            check(op.phase == phase && packet->columns == outputColumns && packet->rows == outputRows &&
+                snapshotText(*packet, outputBarrierRow) == outputBarrier(phase), "native output checkpoint identity");
+            writeFile(resultDirectory + L"\\console-" + std::to_wstring(phase) + L".bin",
+                std::string_view(reinterpret_cast<const char *>(packet.get()), sizeof(Packet)));
+            observations.console = packetJson(*packet);
+            bool seen = false;
+            size_t bytes = session.raw.size();
+            ULONGLONG changed = GetTickCount64();
+            const auto marker = outputBarrier(phase);
+            const bool settled = session.until([&] {
+                const auto now = GetTickCount64();
+                if (bytes != session.raw.size()) {
+                    bytes = session.raw.size();
+                    changed = now;
+                }
+                seen = trimmed(session.state.row(outputBarrierRow)) == marker;
+                return (seen || !session.decodeError.empty()) && now - changed >= 80;
+            }, 4000);
+            auto checkpoint = compareOutput(scenario, op, *packet, session, seen, settled);
+            consoleDifference = consoleDifference || checkpoint.nativeDifference;
+            reconstructionDifference = reconstructionDifference || checkpoint.reconstructedDifference;
+            unavailable = unavailable || checkpoint.unavailable;
+            if (!checkpoints.empty()) checkpoints += ',';
+            checkpoints += checkpoint.report;
+            char command = phase == 1 ? 'A' : 'Q';
+            transfer(pipe.value, &command, 1, true);
+        }
+        session.finish();
+    } catch (...) {
+        observations.cleanup = session.cleanup();
+        save();
+        throw;
+    }
+    observations.cleanup = session.cleanup();
+    const bool utf8Valid = save();
+    if (consoleDifference || reconstructionDifference || !session.decodeError.empty() || !utf8Valid)
+        throw Mismatch("output characterization difference");
+}
+
 void fixtureCase(const std::wstring &name,const std::wstring &resultDirectory,Observations &observations) {
     Session session;
     auto packetStorage=std::make_unique<Packet>();
@@ -630,6 +884,17 @@ void shellCase(const std::wstring &name,const std::wstring &directoryPath,const 
 }
 }
 int wmain(int argc,wchar_t **argv) {
+    if (argc == 2 && std::wstring_view(argv[1]) == L"--output-cases") {
+        std::string list = "{\"SchemaVersion\":1,\"SnapshotBytes\":" + std::to_string(sizeof(Packet)) + ",\"Cases\":[";
+        for (const auto &scenario : outputCases) {
+            if (&scenario != outputCases) list += ',';
+            list += "{\"Name\":" + json(utf8(scenario.name)) + ",\"Area\":" +
+                (scenario.isText() ? "\"F04\"" : "\"F05\"") + ",\"RequestedOutputCP\":" +
+                std::to_string(scenario.codePage) + '}';
+        }
+        puts((list + "]}").c_str());
+        return 0;
+    }
     if (argc<3 || argc>4) return 2;
     const std::wstring name=argv[1], outputDirectory=argv[2], program=argc == 4 ? argv[3] : L"";
     const ULONGLONG begin=GetTickCount64();
@@ -638,8 +903,10 @@ int wmain(int argc,wchar_t **argv) {
     int result=0;
     try {
         const std::vector<std::wstring> cases={L"STATE",L"UNICODE",L"ALTERNATE",L"RESIZE",L"INPUT",L"PROCESSED_CTRL_C",L"UNPROCESSED_CTRL_C",L"DRAIN",L"NEGATIVE_CELL",L"NEGATIVE_ATTRIBUTE",L"NEGATIVE_CURSOR",L"NEGATIVE_PACKET",L"NEGATIVE_DUPLICATE",L"NEGATIVE_DRAIN",L"NEGATIVE_TIMEOUT",L"NEGATIVE_ORPHAN",L"CMD_EMPTY",L"CMD_PARTIAL",L"PS_EMPTY",L"PS_PARTIAL",L"PS7_EMPTY",L"PS7_PARTIAL",L"CMD_CHILD_HANDLED",L"CMD_CHILD_DEFAULT",L"CMD_CHILD_UNPROCESSED",L"PS_CHILD_HANDLED",L"PS_CHILD_DEFAULT",L"PS_CHILD_UNPROCESSED",L"PS7_CHILD_HANDLED",L"PS7_CHILD_DEFAULT",L"PS7_CHILD_UNPROCESSED",L"NEGATIVE_CHILD_CONTROL",L"NEGATIVE_CHILD_EXIT",L"READCONSOLE_TRANSPORT",L"READCONSOLE_EVENT",L"READCONSOLE_RECORD_EVENT",L"READCONSOLE_OWNED_CANCEL"};
-        check(std::find(cases.begin(),cases.end(),name) != cases.end(),"unknown case");
-        if (name.find(L"_CHILD_") != std::wstring::npos) childCase(name,outputDirectory,program,observations);
+        const auto *output = findOutputCase(name);
+        check(output || std::find(cases.begin(),cases.end(),name) != cases.end(),"unknown case");
+        if (output) outputCase(*output, outputDirectory, observations);
+        else if (name.find(L"_CHILD_") != std::wstring::npos) childCase(name,outputDirectory,program,observations);
         else if (name.starts_with(L"READCONSOLE_")) cookedCase(name,outputDirectory,observations);
         else if (name.starts_with(L"CMD") || name.starts_with(L"PS")) shellCase(name,outputDirectory,program,observations);
         else fixtureCase(name,outputDirectory,observations);
