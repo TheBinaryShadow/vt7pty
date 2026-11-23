@@ -355,10 +355,17 @@ OutputCheckpoint compareOutput(const OutputCase &scenario, const OutputOperation
         std::u32string wanted(outputTextX, U' ');
         wanted += scenario.text;
         const bool nativeTextMatch = native == wanted;
-        const bool nativeWidthMatch = packet.cursorX == static_cast<uint32_t>(outputTextX + scenario.width) &&
-            packet.cursorY == outputTextY;
+        int nativeBar = -1;
+        int renderedBar = -1;
+        for (int x = 0; x < outputColumns; ++x) {
+            if (packet.cells[outputTextY * outputColumns + x].Char.UnicodeChar == L'|') nativeBar = x;
+            if (state.at(x, outputTextY).text == U"|") renderedBar = x;
+        }
+        const int expectedBar = outputTextX + scenario.width - 1;
+        const bool nativeWidthMatch = packet.cursorX == static_cast<uint32_t>(expectedBar + 1) &&
+            packet.cursorY == outputTextY && nativeBar == expectedBar;
         result.nativeDifference = hasExpected && (!op.writeSucceeded || !nativeTextMatch || !nativeWidthMatch);
-        compared = native == rendered && cursor;
+        compared = native == rendered && cursor && nativeBar == renderedBar;
         metrics = ",\"ExpectedText\":" + (hasExpected ? pointList(wanted) : "null") +
             ",\"NativeText\":" + pointList(native) + ",\"ReconstructedText\":" + pointList(rendered) +
             ",\"NativeTextMatchesIntent\":" + (hasExpected ? boolean(nativeTextMatch) : "null") +
@@ -366,6 +373,10 @@ OutputCheckpoint compareOutput(const OutputCase &scenario, const OutputOperation
             ",\"NativeCursorAdvance\":" + std::to_string(static_cast<int>(packet.cursorX) - outputTextX) +
             ",\"ReconstructedCursorAdvance\":" + std::to_string(state.x() - outputTextX) +
             ",\"NativeWidthMatchesIntent\":" + (hasExpected ? boolean(nativeWidthMatch) : "null") +
+            ",\"ExpectedTrailingBarColumn\":" + (hasExpected ? std::to_string(expectedBar) : "null") +
+            ",\"NativeTrailingBarColumn\":" + std::to_string(nativeBar) +
+            ",\"ReconstructedTrailingBarColumn\":" + std::to_string(renderedBar) +
+            ",\"TrailingBarColumnMatchesNative\":" + boolean(nativeBar == renderedBar) +
             ",\"ReconstructedTextMatchesNative\":" + boolean(native == rendered);
     } else {
         result.nativeDifference = applicable && (!consoleMatchesRecipe(packet, *expected) ||

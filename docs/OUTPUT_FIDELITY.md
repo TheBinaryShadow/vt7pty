@@ -7,7 +7,7 @@ output reconstruction.
 
 ## Run the candidate
 
-I extract the complete VT7Pty-output-0.5.1-dev-rc1.zip into a short local folder
+I extract the complete VT7Pty-output-0.5.1-dev-rc2.zip into a short local folder
 on each machine. I run the matching launcher from an ordinary Windows session.
 
 | Machine | Launcher |
@@ -41,7 +41,8 @@ result, its error and the applied setting before any dependent write.
 
 A case keeps both native snapshots, the raw output bytes and the comparison
 record. For text I keep the intended and observed code points, cursor advances
-and write counts. For screen operations I compare the cells, colors, geometry
+and write counts. I record the trailing bar's column separately from the
+final cursor. For screen operations I compare the cells, colors, geometry
 and cursor with the fixture recipe and between the two views. The reader models
 the widths of the declared samples. I review host differences before deciding
 whether the console, the output stream or the reader explains them.
