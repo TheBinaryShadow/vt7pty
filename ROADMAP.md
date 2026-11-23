@@ -2,15 +2,11 @@
 
 Updated: 2026-11-23.
 
-I've completed Milestone 0 and published 0.5.0. H3 and the opt-in H4 runtime
-are accepted within their recorded boundaries. The [input rc2 review](docs/validation/2026-11-19-step-1.2-input-rc2-windows7.md)
-qualifies the decoder/framing fixes on all three Windows 7 tiers, with 387/387
-input cases and 345/345 H4 guards passing. The
-[profile rc2 Windows 7 review](docs/validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
-verifies all frozen controls. I corrected the fixture and manual startup
-issues in [profile rc3](docs/validation/2026-11-23-step-1.2-profiles-rc3-candidate.md).
-Windows 7 profile qualification remains open. The public Break gap, input/reply
-contract limits and VT7 integration remain open.
+I've published 0.5.0 and completed Step 1.2 within the recorded input scope.
+Profile rc3 passed the controlled fixtures, physical shell checks and frozen
+controls on all three Windows 7 tiers. The next step is output and Unicode
+reconstruction. The broader baseline and VT7 integration remain open.
+[Profile rc3 qualification](docs/validation/2026-11-23-step-1.2-profiles-rc3-windows7.md)
 
 I check an item only when its stated work and required tests are complete.
 Partial implementations stay unchecked. A local pass does not replace a required
@@ -31,7 +27,7 @@ The [foundation](docs/FOUNDATION.md) records the engineering decisions;
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Modern native VT7Pty 0.5.x foundation | Complete; 0.5.0 accepted and published |
-| 1 | Better console fidelity and reliability | In progress; Step 1.2 profile coverage is the current focus |
+| 1 | Better console fidelity and reliability | In progress. Step 1.3 output and Unicode reconstruction is next |
 | 2 | VT7-facing API and standalone integration host | Planned after backend validation |
 | 3 | Versioned handoff ready for VT7 integration | Planned after API and consumer tests |
 | Later | Other consumers and optional ConPTY compatibility | Deferred |
@@ -83,9 +79,10 @@ state and input. The [runner guide](docs/FIDELITY_BASELINE.md) lists remaining c
 
 ### Step 1.2: Improve input and control semantics
 
-The [cancellation investigation](docs/INPUT_CANCELLATION.md) records why the
-public-API experiments failed. I'm now following the
-[console-host design](docs/HOST_CANCELLATION_DESIGN.md):
+I completed the scoped input work using the console-host design. I keep the
+earlier public API experiments and their failures in the investigation.
+[Console-host design](docs/HOST_CANCELLATION_DESIGN.md) ·
+[Cancellation investigation](docs/INPUT_CANCELLATION.md)
 
 - [x] H1: Verify host identity and isolation on all three Windows 7 tiers.
   [Results](docs/validation/2026-10-13-step-1.2-host-identity-rc1-windows7.md).
@@ -118,18 +115,20 @@ public-API experiments failed. I'm now following the
   [rc2 review](docs/validation/2026-11-19-step-1.2-input-rc2-windows7.md) verifies
   387/387 input cases, 345/345 H4 guards, 21 lifetime/fault guards and 42
   regressions. The unchanged rc1 reference retains its three failures per machine.
-- [ ] Qualify the [controlled and ordinary-profile matrix](docs/PROFILE_TESTS.md)
-  on all three Windows 7 tiers. The [rc2 results](docs/validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
-  confirm passing frozen controls. The corrected rc3 package passes local
-  qualification and needs the controlled and ordinary-profile Windows 7 runs.
-- [ ] Record the final F01-F03 and Step 1.2 scope after reviewing that coverage. Public Ctrl+Break transport
-  remains unsupported by explicit decision; all 24 native references in rc2
-  pass. Escape latency and cursor-report/F3 ambiguity remain documented for
-  the Milestone 2 input contract. Step 1.2 stays open.
+- [x] Qualify controlled profiles and ordinary PowerShell startup on all three
+  Windows 7 tiers. Profile rc3 passes 30/30 controlled cases, 27/27 publication
+  checks and 40/40 physical checkpoints. The five manual shells use their
+  normal configurations with empty profile scopes. The controlled fixtures
+  cover profile precedence. [Windows 7 review](docs/validation/2026-11-23-step-1.2-profiles-rc3-windows7.md)
+- [x] Record the accepted F01-F03 scope. I qualify prompt and active-child
+  Ctrl+C, editing and the documented records and byte streams within the
+  opt-in H4 contract. Ctrl+Break is covered by native references and has no
+  public transport. Standalone Escape latency and cursor-report/F3 ambiguity
+  go into the Milestone 2 input contract.
+  [Scope and evidence](docs/validation/2026-11-23-step-1.2-profiles-rc3-windows7.md#step-12-scope)
 
-I'll complete this step when the defined input workflows pass without duplicate
-or lost input, incorrect child interruption, or a broken shell after cancellation.
-H1, H2 and H3 are research results; the released runtime still has the original defect.
+The released 0.5.0 runtime still has the original prompt cancellation defect.
+H1, H2 and H3 remain the research evidence for the H4 implementation.
 
 ### Step 1.3: Improve output and Unicode reconstruction
 

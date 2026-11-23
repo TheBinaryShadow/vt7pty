@@ -1,0 +1,60 @@
+{
+  "Kind": "ProfileRc3ReturnedEvidenceIntegrity",
+  "Status": "Pass",
+  "Archive": "VT7Pty-profiles-0.5.1-dev-rc3.zip",
+  "ArchiveSha256": "98e251ca18e53e31279e516df1cdcec7e052a2f0196506148eabcccde3448483",
+  "ManifestSha256": "bdff4e1551868ead1ec7318fc101d7599728171a7becf659c249872b3ae6542c",
+  "PackageEntries": 58,
+  "Collections": [
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "Mode": "Automated",
+      "RunId": "esu-profiles-automated-20261123-213503-b6afcff4",
+      "InventoriedFiles": 1191,
+      "EvidenceInventorySha256": "52053e9e1455206eddf103a3f147bd9e2552d6422519b088c130ffb1bd004dcf"
+    },
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "Mode": "Manual",
+      "RunId": "esu-profiles-manual-20261123-213949-c542d499",
+      "InventoriedFiles": 63,
+      "EvidenceInventorySha256": "e1595e841ef41cd5a4da972d5886f7a386be571bf95b1dccd01cb9cc7439934e"
+    },
+    {
+      "Machine": "LEOPARD",
+      "Tier": "Legacy",
+      "Mode": "Automated",
+      "RunId": "legacy-profiles-automated-20261123-212933-1a5ebe05",
+      "InventoriedFiles": 961,
+      "EvidenceInventorySha256": "a2051e12c3a4eb66112d98c70615f3c161bcd103ba764307f8d7b05bcff2c9eb"
+    },
+    {
+      "Machine": "LEOPARD",
+      "Tier": "Legacy",
+      "Mode": "Manual",
+      "RunId": "legacy-profiles-manual-20261123-213231-889636a8",
+      "InventoriedFiles": 32,
+      "EvidenceInventorySha256": "e114527debea8ea90bd18d37078eb88ac8fe906fe4c534823d145f0308c1cd98"
+    },
+    {
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "Mode": "Automated",
+      "RunId": "nonesu-profiles-automated-20261123-211729-e3c73bff",
+      "InventoriedFiles": 1191,
+      "EvidenceInventorySha256": "ab1dbbc346d868df85d2e73320760c8336b6154db3d99207464299e09cdabef1"
+    },
+    {
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "Mode": "Manual",
+      "RunId": "nonesu-profiles-manual-20261123-212440-e7929bd7",
+      "InventoriedFiles": 63,
+      "EvidenceInventorySha256": "e8b553035b6f96823355aa9e8c78e55de500fde206c697e0660a4cb7108d6c49"
+    }
+  ],
+  "InventoriedFiles": 3501,
+  "RawFilesIncludingInventories": 3507
+}

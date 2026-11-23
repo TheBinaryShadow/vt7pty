@@ -20,27 +20,16 @@ system. The exact release passed all 30 acceptance cases and a two-hour soak
 on each of my three Windows 7 test machines, including a PowerShell 2.0
 installation without KB3191566. See the [release review](docs/validation/2026-10-02-0.5.0-release-acceptance.md).
 
-I'm now working on console fidelity. The released runtime still leaves typed
-input behind when Ctrl+C is used at CMD and native Windows PowerShell prompts.
-I've qualified the [H3 cancellation prototype](docs/validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
-on all three Windows 7 machines, with 282/282 guard cases passing. Completion/close
-races, actual access denial, native children and the applicable PowerShell 7
-checks pass within the controlled research boundary. The opt-in
-[H4 runtime candidate](docs/H4_RUNTIME.md) now integrates cancellation and two-phase
-close, with ordinary-desktop applications. The
-[rc4 Windows 7 review](docs/validation/2026-11-18-step-1.2-h4-runtime-rc4-windows7.md)
-verifies 345 runtime, 21 qualification and 90 regression cases, both full soaks
-on each machine, and the elevated-caller checks. The
-[manual Windows 7 review](docs/validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
-completes all nine keyboard and lock/unlock workflows. I accept H4 within its
-opt-in contract. The [input rc1 review](docs/validation/2026-11-19-step-1.2-input-rc1-windows7.md)
-confirms three stream-fragmentation failures across all three Windows 7 tiers,
-with the H4 guards still passing. The [input rc2 review](docs/validation/2026-11-19-step-1.2-input-rc2-windows7.md)
-qualifies those fixes on all three tiers: 387/387 input cases, 345/345 H4 guards,
-21 lifetime/fault guards and 42 regressions pass. The
-[profile rc2 Windows 7 review](docs/validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
-verifies all frozen controls. I prepared [profile rc3](docs/validation/2026-11-23-step-1.2-profiles-rc3-candidate.md)
-to finish the controlled and ordinary-profile matrix on Windows 7.
+I've completed the scoped Step 1.2 input work on all three Windows 7 tiers.
+The released 0.5.0 runtime still has the prompt cancellation defect. The
+opt-in H4 development runtime qualifies cancellation, private backing desktops
+and two-phase close. Input rc2 qualifies the UTF-8 and cursor-reply fixes.
+Profile rc3 finishes the scoped shell coverage with 30/30 controlled cases
+and 40/40 physical checkpoints.
+[H4 acceptance](docs/validation/2026-11-19-step-1.2-h4-manual-rc1-windows7.md) ·
+[Input rc2 review](docs/validation/2026-11-19-step-1.2-input-rc2-windows7.md) ·
+[Profile rc3 review](docs/validation/2026-11-23-step-1.2-profiles-rc3-windows7.md)
+
 VT7 integration comes after the backend and its API are ready. VT7Pty does not
 yet replace ConPTY for unmodified applications. I am not planning a kernel driver.
 

@@ -1,0 +1,208 @@
+{
+  "Kind": "ProfileRc3Windows7ReviewDecision",
+  "RecordedDate": "2026-11-23",
+  "Status": "Qualified",
+  "Archive": "VT7Pty-profiles-0.5.1-dev-rc3.zip",
+  "ArchiveSha256": "98e251ca18e53e31279e516df1cdcec7e052a2f0196506148eabcccde3448483",
+  "ManifestSha256": "bdff4e1551868ead1ec7318fc101d7599728171a7becf659c249872b3ae6542c",
+  "HarnessSource": "e231efe8e7e6ea1b793f63c38a2505839b92201f",
+  "RuntimeSource": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "RuntimeUnchangedFromInputRc2": true,
+  "CollectionsPassed": 6,
+  "RawFilesPreserved": 3507,
+  "ReturnedCollectionsSha256": "7ab2df64059fb08ff7ed03652dcdad8fdb2b20ab8c219e2965699ef1e7e1d502",
+  "Totals": {
+    "H4Guards": 115,
+    "InputCases": 129,
+    "ControlledProfileCases": 30,
+    "PublicationChecks": 27,
+    "NativeCtrlBreakReferenceCases": 6,
+    "PSReadLineHistoryPredictionRejections": 6,
+    "RetainedHostLifetimes": 288,
+    "TracedKeyboardOperations": 132,
+    "StartupFingerprintMatches": 35,
+    "ManualShellRuns": 5,
+    "ManualCheckpoints": 40
+  },
+  "MachineResults": [
+    {
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "AutomatedRunId": "nonesu-profiles-automated-20261123-211729-e3c73bff",
+      "H4GuardsPassed": 41,
+      "InputCasesPassed": 43,
+      "ControlledProfilesPassed": 12,
+      "PublicationChecksPassed": 9,
+      "NativeCtrlBreakReferenceCasesPassed": 2,
+      "PSReadLineHistoryPredictionRejections": 3,
+      "ManualRunId": "nonesu-profiles-manual-20261123-212440-e7929bd7",
+      "LinkedAutomatedRunId": "nonesu-profiles-automated-20261123-211729-e3c73bff",
+      "ManualShells": [
+        {
+          "Shell": "wps",
+          "EngineVersion": "5.1.14409.1018",
+          "CLRVersion": "4.0.30319.42000",
+          "ProfileFilesPresent": 0,
+          "EditorVersions": [],
+          "StartupErrorCount": 1,
+          "StartupErrorTypes": "System.IO.FileNotFoundException",
+          "NativeStartupErrorCount": 1,
+          "StartupErrorFingerprintMatchesNative": true,
+          "InheritedWindow": {
+            "Columns": 160,
+            "Rows": 40
+          },
+          "DisplayBuffer": {
+            "Columns": 160,
+            "Rows": 60
+          },
+          "FinalResize": {
+            "Columns": 160,
+            "Rows": 54
+          },
+          "PhysicalCheckpointsPassed": 8,
+          "NaturalExit": 37
+        },
+        {
+          "Shell": "pwsh",
+          "EngineVersion": "7.2.24",
+          "CLRVersion": "6.0.35",
+          "ProfileFilesPresent": 0,
+          "EditorVersions": [
+            "2.1.0"
+          ],
+          "StartupErrorCount": 0,
+          "StartupErrorTypes": "",
+          "NativeStartupErrorCount": 0,
+          "StartupErrorFingerprintMatchesNative": true,
+          "InheritedWindow": {
+            "Columns": 160,
+            "Rows": 40
+          },
+          "DisplayBuffer": {
+            "Columns": 160,
+            "Rows": 60
+          },
+          "FinalResize": {
+            "Columns": 160,
+            "Rows": 54
+          },
+          "PhysicalCheckpointsPassed": 8,
+          "NaturalExit": 37
+        }
+      ]
+    },
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "AutomatedRunId": "esu-profiles-automated-20261123-213503-b6afcff4",
+      "H4GuardsPassed": 41,
+      "InputCasesPassed": 43,
+      "ControlledProfilesPassed": 12,
+      "PublicationChecksPassed": 9,
+      "NativeCtrlBreakReferenceCasesPassed": 2,
+      "PSReadLineHistoryPredictionRejections": 3,
+      "ManualRunId": "esu-profiles-manual-20261123-213949-c542d499",
+      "LinkedAutomatedRunId": "esu-profiles-automated-20261123-213503-b6afcff4",
+      "ManualShells": [
+        {
+          "Shell": "wps",
+          "EngineVersion": "5.1.14409.1005",
+          "CLRVersion": "4.0.30319.42000",
+          "ProfileFilesPresent": 0,
+          "EditorVersions": [],
+          "StartupErrorCount": 1,
+          "StartupErrorTypes": "System.IO.FileNotFoundException",
+          "NativeStartupErrorCount": 1,
+          "StartupErrorFingerprintMatchesNative": true,
+          "InheritedWindow": {
+            "Columns": 180,
+            "Rows": 63
+          },
+          "DisplayBuffer": {
+            "Columns": 180,
+            "Rows": 63
+          },
+          "FinalResize": {
+            "Columns": 160,
+            "Rows": 45
+          },
+          "PhysicalCheckpointsPassed": 8,
+          "NaturalExit": 37
+        },
+        {
+          "Shell": "pwsh",
+          "EngineVersion": "7.2.24",
+          "CLRVersion": "6.0.35",
+          "ProfileFilesPresent": 0,
+          "EditorVersions": [
+            "2.1.0"
+          ],
+          "StartupErrorCount": 0,
+          "StartupErrorTypes": "",
+          "NativeStartupErrorCount": 0,
+          "StartupErrorFingerprintMatchesNative": true,
+          "InheritedWindow": {
+            "Columns": 180,
+            "Rows": 63
+          },
+          "DisplayBuffer": {
+            "Columns": 180,
+            "Rows": 63
+          },
+          "FinalResize": {
+            "Columns": 160,
+            "Rows": 45
+          },
+          "PhysicalCheckpointsPassed": 8,
+          "NaturalExit": 37
+        }
+      ]
+    },
+    {
+      "Machine": "LEOPARD",
+      "Tier": "Legacy",
+      "AutomatedRunId": "legacy-profiles-automated-20261123-212933-1a5ebe05",
+      "H4GuardsPassed": 33,
+      "InputCasesPassed": 43,
+      "ControlledProfilesPassed": 6,
+      "PublicationChecksPassed": 9,
+      "NativeCtrlBreakReferenceCasesPassed": 2,
+      "PSReadLineHistoryPredictionRejections": 0,
+      "ManualRunId": "legacy-profiles-manual-20261123-213231-889636a8",
+      "LinkedAutomatedRunId": "legacy-profiles-automated-20261123-212933-1a5ebe05",
+      "ManualShells": [
+        {
+          "Shell": "wps",
+          "EngineVersion": "2.0",
+          "CLRVersion": "2.0.50727.8806",
+          "ProfileFilesPresent": 0,
+          "EditorVersions": [],
+          "StartupErrorCount": 0,
+          "StartupErrorTypes": "",
+          "NativeStartupErrorCount": 0,
+          "StartupErrorFingerprintMatchesNative": true,
+          "InheritedWindow": {
+            "Columns": 160,
+            "Rows": 40
+          },
+          "DisplayBuffer": {
+            "Columns": 160,
+            "Rows": 60
+          },
+          "FinalResize": {
+            "Columns": 160,
+            "Rows": 51
+          },
+          "PhysicalCheckpointsPassed": 8,
+          "NaturalExit": 37
+        }
+      ]
+    }
+  ],
+  "OrdinaryUserProfiles": "QualifiedWithinReturnedConfiguration",
+  "PersonalProfileScriptsPresent": false,
+  "PublicCtrlBreakTransport": "Unsupported",
+  "Step12Accepted": true,
+  "MilestoneAccepted": false
+}

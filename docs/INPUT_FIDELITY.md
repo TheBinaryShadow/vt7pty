@@ -8,9 +8,8 @@ The frozen rc1 reference retains its original three failures on each machine.
 
 API 1.1, protocol 2 and the H4 cancellation contract stay the same. The
 [issuance review](validation/2026-11-19-step-1.2-input-rc2-candidate.md) records
-local qualification and the exact archive. Step 1.2 remains open for its
-remaining coverage and recorded limitations. The commands below reproduce
-this accepted decoder matrix; they are not a request for another run.
+local qualification and the exact archive. The commands below reproduce
+the accepted decoder matrix.
 
 ## Run on the Windows 7 machines
 
@@ -102,10 +101,12 @@ references target retained child process groups and require exactly one Break,
 zero Ctrl+C, no parent notification and natural child exit. They establish
 Windows behavior, not a VT7Pty transport.
 
-I collect ordinary-user-profile coverage separately. The
-[profile rc2 Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
-verifies all 129 input controls and records the open profile qualification work.
-Clipboard, held physical keys and IME UI remain outside committed-text tests.
+I completed the scoped Step 1.2 coverage with the Windows 7 profile rc3 runs.
+They repeat all 129 input controls and verify controlled and ordinary PowerShell
+startup. The committed-text cases cover backend text delivery. Clipboard and
+IME interaction belong to the terminal UI, and the H4 keyboard suite records
+the measured physical key workflows.
+[Profile rc3 qualification](validation/2026-11-23-step-1.2-profiles-rc3-windows7.md)
 
 ## Build and independent review
 

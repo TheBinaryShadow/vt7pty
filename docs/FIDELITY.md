@@ -1,7 +1,7 @@
 # Milestone 1 Fidelity Plan
 
 Status: rc3 Step 1.1 corpus measured on the development host and all three Windows 7 tiers; broader coverage pending.
-Updated: 2026-11-19.
+Updated: 2026-11-23.
 
 I'm using these applications and measurements to improve the
 [published 0.5.0 baseline](validation/2026-10-02-0.5.0-publication.md).
@@ -32,12 +32,12 @@ and blocks that gate. Newer PowerShell versions do not qualify 7.2.24.
 
 The initial full-screen corpus uses native Win32 console fixtures. Additional
 applications need an exact version, distribution/license record, and reproducible
-scenario before becoming gates. Automated shell runs use clean profiles;
-ordinary profiles have a separately recorded manual check. The
-[Step 1.2 profile package](PROFILE_TESTS.md) collects that matrix using the
-accepted input rc2 runtime. I recorded partial coverage and the remaining
-startup failures in the [Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md).
-I preserve global profiles, execution policy, console settings and installed code pages.
+scenario before becoming gates. I use clean and layered controlled fixtures
+for automated profile checks. The manual checks use the installed shells with
+normal startup, preserving profile files, execution policy, console settings
+and code pages. I qualified both sets in profile rc3 on all three Windows 7
+tiers. The manual profile scopes were empty in the returned runs.
+[Profile runner](PROFILE_TESTS.md) · [Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc3-windows7.md)
 
 ## Measurement matrix
 
@@ -53,9 +53,11 @@ verifies 345 frozen guards and 270/297 new input observations on Windows 7,
 including editing, fragmentation and mouse records. Three stream failures
 are confirmed. The [input rc2 review](validation/2026-11-19-step-1.2-input-rc2-windows7.md)
 qualifies the corrections and 10 added cases: all 387 input observations, 345
-H4 guards, 21 lifetime/fault guards and 42 regressions pass. The missing public
-Break transport and ordinary-profile matrix retain their explicit status.
-I keep the original 30-case regression suite and broader corpus requirements.
+H4 guards, 21 lifetime/fault guards and 42 regressions pass. I recorded the
+accepted F01-F03 input scope with profile rc3, including the public Ctrl+Break
+gap and the remaining input contract work. I keep the original 30-case
+regression suite and broader corpus requirements.
+[Accepted Step 1.2 scope](validation/2026-11-23-step-1.2-profiles-rc3-windows7.md#step-12-scope)
 
 | ID | Scenario | Required observable result |
 | --- | --- | --- |

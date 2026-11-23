@@ -8,8 +8,12 @@ I corrected the legacy snapshot writer, manual display setup, F8 startup and
 the automated verdict after the Windows 7 profile rc2 runs.
 [Profile rc2 Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
 
-The exact rc3 archive passes local qualification. The three Windows 7 runs
-will complete the controlled and ordinary-profile coverage.
+I qualified the exact rc3 archive on all three Windows 7 tiers. The 30
+controlled cases, 27 publication checks and 40 physical checkpoints pass.
+The five manual shells used normal startup with all four profile scopes empty.
+I use the controlled fixtures for profile precedence coverage. The procedure
+below reproduces the accepted matrix.
+[Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc3-windows7.md) ·
 [Local rc3 review](validation/2026-11-23-step-1.2-profiles-rc3-candidate.md)
 
 ## Run on all three machines

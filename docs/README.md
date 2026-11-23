@@ -44,12 +44,11 @@ passes all nine physical workflows on those machines and completes H4 within
 its approved opt-in scope. The [input rc1 review](validation/2026-11-19-step-1.2-input-rc1-windows7.md)
 now confirms three fragmented-input failures on all three Windows 7 tiers;
 its frozen H4 guards pass. The [input rc2 review](validation/2026-11-19-step-1.2-input-rc2-windows7.md)
-qualifies the corrections on all three tiers: 387/387 input cases, 345/345 H4
-guards, 21 lifetime/fault guards and 42 regressions pass. The
-[profile rc2 Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
-verifies all frozen controls and records the fixture and ordinary-profile
-failures addressed in [rc3](validation/2026-11-23-step-1.2-profiles-rc3-candidate.md).
-I still need the Windows 7 rc3 results.
+qualifies the corrections on all three tiers, with 387/387 input cases, 345/345 H4
+guards, 21 lifetime/fault guards and 42 regressions passing. I completed the
+scoped Step 1.2 input work after profile rc3 passed all 30 controlled cases
+and 40 physical checkpoints on the same tiers.
+[Profile rc3 Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc3-windows7.md)
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |

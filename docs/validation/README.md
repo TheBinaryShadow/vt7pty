@@ -4,31 +4,18 @@ I keep dated reviews here so I can trace a decision back to the exact source,
 package and test environment. The [roadmap](../../ROADMAP.md) describes current
 progress; each review describes the state at the time it was written.
 
-**Current result:** H1, H2 and the controlled H3 cancellation prototype are
-accepted on all three Windows 7 machines. The
-[H3 guard review](2026-11-14-step-1.2-host-guards-rc1-windows7.md)
-verifies 282/282 guard cases, with no prototype coverage gaps or neighbor trace
-loss. Original controls and unprotected contrasts retain their failures.
-The opt-in [H4 runtime candidate](../H4_RUNTIME.md) now implements the approved
-desktop and two-phase close contract. Its automated rc2 matrix passes on all
-three Windows 7 tiers, with 345/345 runtime cases. The
-[rc4 Windows 7 review](2026-11-18-step-1.2-h4-runtime-rc4-windows7.md) verifies
-345 runtime, 21 qualification and 90 regression cases, with both full soaks and
-elevated-caller checks on every machine. The
-[manual review](2026-11-19-step-1.2-h4-manual-rc1-windows7.md)
-completes all nine physical workflows and accepts H4 within the approved opt-in
-contract. The [input rc1 review](2026-11-19-step-1.2-input-rc1-windows7.md)
-confirms three stream failures across all nine input repetitions, with 345/345
-frozen guards passing. The [input rc2 review](2026-11-19-step-1.2-input-rc2-windows7.md)
-qualifies those corrections on all three tiers: 387/387 input cases, 345/345 H4
-guards, 21 lifetime/fault guards and 42 regressions pass. Remaining Step 1.2
-coverage, Milestone 1 and VT7 integration stay open.
+I completed Step 1.2 within the recorded scope. Profile rc3 passes 115 H4
+guards, 129 input cases, 30 controlled profile cases, 27 publication checks
+and 40 physical checkpoints across the three Windows 7 tiers. The earlier
+H3, H4 and input qualification results remain linked below. Milestone 1 is
+still in progress. [Profile rc3 Windows 7 review](2026-11-23-step-1.2-profiles-rc3-windows7.md)
 
 ## Current fidelity work
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| Step 1.2 profiles | [rc3 passes local qualification](2026-11-23-step-1.2-profiles-rc3-candidate.md) | [Rc2 frozen controls pass. Profile blockers identified.](2026-11-23-step-1.2-profiles-rc2-windows7.md) |
+| Step 1.2 profiles | [rc3 local qualification and delivery](2026-11-23-step-1.2-profiles-rc3-candidate.md) | [rc3 qualified on all three tiers](2026-11-23-step-1.2-profiles-rc3-windows7.md) |
+| Profile rc2 | [Earlier candidate](2026-11-20-step-1.2-profiles-rc2-candidate.md) | [Frozen controls passed. Profile blockers identified.](2026-11-23-step-1.2-profiles-rc2-windows7.md) |
 | Step 1.2 input decoder | [rc2: exact archive, 129 input and 123 H4 guards pass locally](2026-11-19-step-1.2-input-rc2-candidate.md) | [Qualified: 387 input, 345 H4 guards, 21 lifetime/fault guards and 42 regressions pass](2026-11-19-step-1.2-input-rc2-windows7.md) |
 | Step 1.2 input coverage | [rc1 characterization, 33 new cases and frozen guards](2026-11-19-step-1.2-input-rc1-candidate.md) | [Reviewed: 345 guards pass; three input failures confirmed](2026-11-19-step-1.2-input-rc1-windows7.md) |
 | H4 manual follow-up | [Corrected runner and exact-package verification](2026-11-19-step-1.2-h4-manual-rc1-candidate.md) | [Accepted: 9/9 physical workflows; H4 complete](2026-11-19-step-1.2-h4-manual-rc1-windows7.md) |

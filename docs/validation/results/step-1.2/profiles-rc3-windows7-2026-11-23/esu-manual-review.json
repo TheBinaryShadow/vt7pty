@@ -1,0 +1,115 @@
+{
+  "Kind": "ProfileBundleReview",
+  "Status": "Pass",
+  "Mode": "Manual",
+  "ComputerName": "TURTLE",
+  "Tier": "ESU",
+  "SourceCommit": "e231efe8e7e6ea1b793f63c38a2505839b92201f",
+  "RuntimeSourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "RuntimeUnchanged": true,
+  "Reviews": [
+    {
+      "Order": 1,
+      "Review": {
+        "Kind": "OrdinaryProfileReview",
+        "Status": "Pass",
+        "SourceCommit": "e231efe8e7e6ea1b793f63c38a2505839b92201f",
+        "RuntimeSourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+        "Engine": "5.1.14409.1005",
+        "SyntheticSmoke": false,
+        "OrdinaryProfilesQualified": true,
+        "ProfileFilesPresent": 0,
+        "EditorVersions": [],
+        "Stages": 8,
+        "StartupHandshake": 1,
+        "Display": {
+          "SchemaVersion": 1,
+          "Nonce": "000017d400000000005e64eb00000001",
+          "ProcessId": 2772,
+          "Kind": "OrdinaryProfileStartup",
+          "Step": "Ready",
+          "InteractiveCommandAccepted": true,
+          "HelpersLoaded": true,
+          "SnapshotEntered": true,
+          "SnapshotPublished": true,
+          "DisplayActivated": true,
+          "InheritedBuffer": {
+            "Columns": 180,
+            "Rows": 63
+          },
+          "InheritedWindow": {
+            "Columns": 180,
+            "Rows": 63
+          },
+          "RequestedBuffer": {
+            "Columns": 180,
+            "Rows": 63
+          },
+          "ActiveWindow": {
+            "Columns": 180,
+            "Rows": 63
+          }
+        },
+        "HostLifetimes": 1,
+        "ProfileContentCollected": false,
+        "Step12Accepted": false
+      },
+      "Role": "wps"
+    },
+    {
+      "Order": 2,
+      "Review": {
+        "Kind": "OrdinaryProfileReview",
+        "Status": "Pass",
+        "SourceCommit": "e231efe8e7e6ea1b793f63c38a2505839b92201f",
+        "RuntimeSourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+        "Engine": "7.2.24",
+        "SyntheticSmoke": false,
+        "OrdinaryProfilesQualified": true,
+        "ProfileFilesPresent": 0,
+        "EditorVersions": [
+          "2.1.0"
+        ],
+        "Stages": 8,
+        "StartupHandshake": 1,
+        "Display": {
+          "SchemaVersion": 1,
+          "Nonce": "0000066000000000005fc54300000001",
+          "ProcessId": 5820,
+          "Kind": "OrdinaryProfileStartup",
+          "Step": "Ready",
+          "InteractiveCommandAccepted": true,
+          "HelpersLoaded": true,
+          "SnapshotEntered": true,
+          "SnapshotPublished": true,
+          "DisplayActivated": true,
+          "InheritedBuffer": {
+            "Columns": 180,
+            "Rows": 63
+          },
+          "InheritedWindow": {
+            "Columns": 180,
+            "Rows": 63
+          },
+          "RequestedBuffer": {
+            "Columns": 180,
+            "Rows": 63
+          },
+          "ActiveWindow": {
+            "Columns": 180,
+            "Rows": 63
+          }
+        },
+        "HostLifetimes": 1,
+        "ProfileContentCollected": false,
+        "Step12Accepted": false
+      },
+      "Role": "pwsh"
+    }
+  ],
+  "AutomatedRunId": "esu-profiles-automated-20261123-213503-b6afcff4",
+  "OrdinaryProfilesQualified": true,
+  "OrdinaryUserProfiles": "QualifiedWithinReturnedConfiguration",
+  "CtrlBreakTransport": "Unsupported",
+  "Step12Accepted": false
+}

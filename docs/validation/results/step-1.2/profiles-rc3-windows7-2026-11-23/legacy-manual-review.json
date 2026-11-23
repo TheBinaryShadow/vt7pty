@@ -1,0 +1,65 @@
+{
+  "Kind": "ProfileBundleReview",
+  "Status": "Pass",
+  "Mode": "Manual",
+  "ComputerName": "LEOPARD",
+  "Tier": "Legacy",
+  "SourceCommit": "e231efe8e7e6ea1b793f63c38a2505839b92201f",
+  "RuntimeSourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "RuntimeUnchanged": true,
+  "Reviews": [
+    {
+      "Order": 1,
+      "Review": {
+        "Kind": "OrdinaryProfileReview",
+        "Status": "Pass",
+        "SourceCommit": "e231efe8e7e6ea1b793f63c38a2505839b92201f",
+        "RuntimeSourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+        "Engine": "2.0",
+        "SyntheticSmoke": false,
+        "OrdinaryProfilesQualified": true,
+        "ProfileFilesPresent": 0,
+        "EditorVersions": [],
+        "Stages": 8,
+        "StartupHandshake": 1,
+        "Display": {
+          "SchemaVersion": 1,
+          "Nonce": "00000d2c00000000005a0d2b00000001",
+          "ProcessId": 3292,
+          "Kind": "OrdinaryProfileStartup",
+          "Step": "Ready",
+          "InteractiveCommandAccepted": true,
+          "HelpersLoaded": true,
+          "SnapshotEntered": true,
+          "SnapshotPublished": true,
+          "DisplayActivated": true,
+          "InheritedBuffer": {
+            "Columns": 160,
+            "Rows": 40
+          },
+          "InheritedWindow": {
+            "Columns": 160,
+            "Rows": 40
+          },
+          "RequestedBuffer": {
+            "Columns": 160,
+            "Rows": 60
+          },
+          "ActiveWindow": {
+            "Columns": 160,
+            "Rows": 40
+          }
+        },
+        "HostLifetimes": 1,
+        "ProfileContentCollected": false,
+        "Step12Accepted": false
+      },
+      "Role": "wps"
+    }
+  ],
+  "AutomatedRunId": "legacy-profiles-automated-20261123-212933-1a5ebe05",
+  "OrdinaryProfilesQualified": true,
+  "OrdinaryUserProfiles": "QualifiedWithinReturnedConfiguration",
+  "CtrlBreakTransport": "Unsupported",
+  "Step12Accepted": false
+}
