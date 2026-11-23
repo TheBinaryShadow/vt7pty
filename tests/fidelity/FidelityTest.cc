@@ -3,6 +3,7 @@
 #include "WinTest.h"
 #include "VtState.h"
 #include "OutputCorpus.h"
+#include "ScreenCases.h"
 #include "../../src/include/vt7pty.h"
 #include <cstring>
 #include <functional>
@@ -99,7 +100,14 @@ public:
         pump(); return condition();
     }
     void resize(int columns,int rows) {
-        check(vt7pty_set_size(pty_,columns,rows,nullptr) != FALSE,"resize");
+        vt7pty_error_ptr_t error = nullptr;
+        const BOOL resized = vt7pty_set_size(pty_, columns, rows, &error);
+        if (error) {
+            const auto message = utf8(vt7pty_error_msg(error));
+            vt7pty_error_free(error);
+            if (!resized) throw std::runtime_error("resize: " + message);
+        }
+        check(resized != FALSE, "resize");
         state.resize(columns,rows);
     }
     void finish(DWORD expectedStatus=0) {
@@ -772,6 +780,240 @@ std::string fileText(const std::wstring &path) {
     while (!text.empty() && (text.back() == '\r' || text.back() == '\n' || text.back() == ' ')) text.pop_back();
     return text;
 }
+
+void openShellFixture(Session &session, HANDLE pipe, const std::wstring &fixture) {
+    connect(pipe);
+    ULONG peer = 0;
+    check(GetNamedPipeClientProcessId(pipe, &peer), "shell fixture peer PID");
+    Handle candidate(OpenProcess(SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_TERMINATE, FALSE, peer));
+    check(candidate.value != nullptr, "shell fixture process");
+    check(parentProcessId(peer) == GetProcessId(session.child.value), "fixture parent is tested shell");
+    std::vector<wchar_t> image(32768);
+    DWORD length = static_cast<DWORD>(image.size());
+    check(QueryFullProcessImageNameW(candidate.value, 0, image.data(), &length) &&
+        _wcsicmp(image.data(), fixture.c_str()) == 0, "shell fixture image");
+    // Adopt teardown ownership only after both ancestry and image validation.
+    session.descendant.reset(candidate.value);
+    candidate.value = INVALID_HANDLE_VALUE;
+}
+
+std::wstring shellFixtureCommand(bool cmd, const std::wstring &fixture, std::wstring_view mode,
+    const std::wstring &pipeName) {
+    const auto serverId = std::to_wstring(GetCurrentProcessId());
+    if (cmd) return quote(fixture) + L" " + std::wstring(mode) + L" " + quote(pipeName) + L" " + serverId;
+    return L"& " + psLiteral(fixture) + L" " + psLiteral(mode) + L" " + psLiteral(pipeName) + L" " + serverId;
+}
+
+std::string screenGeometryJson(const ScreenActivity &size) {
+    return "{\"Columns\":" + std::to_string(size.columns) + ",\"Rows\":" + std::to_string(size.rows) +
+        ",\"BufferColumns\":" + std::to_string(size.bufferColumns) + ",\"BufferRows\":" + std::to_string(size.bufferRows) +
+        ",\"WindowLeft\":" + std::to_string(size.windowLeft) + ",\"WindowTop\":" + std::to_string(size.windowTop) +
+        ",\"Draws\":" + std::to_string(size.draws) + ",\"WindowEvents\":" + std::to_string(size.windowEvents) +
+        ",\"EventColumns\":" + std::to_string(size.eventColumns) + ",\"EventRows\":" + std::to_string(size.eventRows) + '}';
+}
+
+bool screenEditMatches(const Packet &packet, std::wstring_view text) {
+    if (packet.keyCount != text.size()) return false;
+    for (uint32_t i = 0; i < packet.keyCount; ++i)
+        if (packet.keys[i].character != static_cast<uint32_t>(text[i]) || packet.keys[i].repeat != 1) return false;
+    return true;
+}
+
+void screenCase(const ScreenCase &scenario, const std::wstring &resultDirectory, Observations &observations) {
+    Session session;
+    Handle pipe;
+    auto packet = std::make_unique<Packet>();
+    std::string checkpoints = "[", resizes = "[";
+    bool matched = true;
+    bool completed = false;
+    auto add = [&](const char *name, bool condition) {
+        observations.add(name, condition);
+        matched = matched && condition;
+    };
+    auto finishEvidence = [&] {
+        observations.fields += ",\"ScreenCheckpoints\":" + checkpoints + "],\"ResizeChecks\":" + resizes + ']';
+        observations.add("ScreenWorkflowCompleted", completed);
+        pipe.reset();
+        observations.raw = session.raw;
+        observations.cleanup = session.cleanup();
+    };
+    auto send = [&](char command) { transfer(pipe.value, &command, 1, true); };
+    auto resize = [&](COORD size) {
+        try {
+            session.resize(size.X, size.Y);
+        } catch (const std::runtime_error &error) {
+            DWORD code = 0;
+            check(GetExitCodeProcess(session.agent.value, &code), "read agent status after resize failure");
+            observations.fields += ",\"FailedResize\":{\"Columns\":" + std::to_string(size.X) +
+                ",\"Rows\":" + std::to_string(size.Y) + ",\"CapturedBytesBefore\":" +
+                std::to_string(session.raw.size()) + ",\"AgentExitCode\":" + std::to_string(code) +
+                ",\"Error\":" + json(error.what()) + '}';
+            throw Mismatch(error.what());
+        }
+    };
+    auto capture = [&](const wchar_t *label, COORD size, bool alternate, std::wstring_view edit = L"") {
+        ScreenActivity activity;
+        transfer(pipe.value, packet.get(), sizeof(Packet), false);
+        transfer(pipe.value, &activity, sizeof(activity), false);
+        validate(*packet);
+        writeFile(resultDirectory + L"\\console-" + label + L".bin",
+            std::string_view(reinterpret_cast<const char *>(packet.get()), sizeof(Packet)));
+        const bool marker = alternate ? screenTextAt(*packet, 2, 1, screenAlternate, 0x2f) :
+            screenTextAt(*packet, 2, 1, screenPrimary, 0x1e);
+        const bool geometry = packet->columns == static_cast<uint32_t>(size.X) &&
+            packet->rows == static_cast<uint32_t>(size.Y) && packet->bufferColumns == static_cast<uint32_t>(size.X) &&
+            (!alternate || (packet->bufferRows == static_cast<uint32_t>(size.Y) && packet->windowTop == 0 && packet->windowLeft == 0));
+        const bool frame = !alternate ||
+            (screenTextAt(*packet, 3, 4, L"FRAME " + std::to_wstring(activity.draws), 0x3e) &&
+                screenTextAt(*packet, 2, packet->rows - 2, L"EDIT:" + std::wstring(edit), 0x4f) &&
+                screenTextAt(*packet, packet->columns - 8, packet->rows - 1, screenCorner, 0x70) &&
+                packet->cursorX == edit.size() + 7 && packet->cursorY == packet->rows - 2 &&
+                (packet->cursorVisible != 0) == (scenario.exit != ScreenExit::Explicit));
+        const bool reconstructed = session.until([&] { return sameScreen(session.state, *packet); }, 2000);
+        matched = matched && marker && geometry && frame && reconstructed;
+        observations.console = packetJson(*packet);
+        observations.comparison = differenceJson(session.state, *packet);
+        if (checkpoints.size() > 1) checkpoints += ',';
+        checkpoints += "{\"Name\":" + json(utf8(label)) + ",\"NativeActiveMarker\":" + (marker ? "true" : "false") +
+            ",\"NativeGeometryMatches\":" + (geometry ? "true" : "false") + ",\"NativeFrameMatches\":" +
+            (frame ? "true" : "false") + ",\"ReconstructedMatches\":" + (reconstructed ? "true" : "false") +
+            ",\"NativeCursorVisible\":" + (packet->cursorVisible ? "true" : "false") +
+            ",\"ReconstructedCursorVisible\":" + (session.state.visible() ? "true" : "false") +
+            ",\"RequestedColumns\":" + std::to_string(size.X) + ",\"RequestedRows\":" + std::to_string(size.Y) +
+            ",\"CapturedBytes\":" + std::to_string(session.raw.size()) + ",\"Draws\":" + std::to_string(activity.draws) +
+            ",\"WindowEvents\":" + std::to_string(activity.windowEvents) + ",\"Console\":" + observations.console +
+            ",\"DecodedState\":" + observations.comparison + '}';
+        return activity;
+    };
+    auto waitFixtureExit = [&] {
+        if (!session.until([&] { return WaitForSingleObject(session.descendant.value, 0) == WAIT_OBJECT_0; }))
+            throw Mismatch("full-screen child exit deadline");
+        DWORD code = 0;
+        check(GetExitCodeProcess(session.descendant.value, &code), "full-screen child exit status");
+        return code;
+    };
+
+    try {
+        const auto prompt = startShell(scenario.cmd ? L"CMD_SCREEN" : L"PS_SCREEN", resultDirectory, L"", session, observations);
+        const auto atPrompt = [&] { return trimmed(session.state.row(session.state.y())) == prompt; };
+        const std::wstring prefix = L"\\\\.\\pipe\\VT7Pty.Screen." + std::to_wstring(GetCurrentProcessId()) +
+            L"." + std::to_wstring(GetTickCount64());
+        const std::wstring fixture = directory() + L"\\FidelityFixture.exe";
+        const std::wstring appPipe = prefix + L".app";
+        pipe.reset(privateServer(appPipe));
+        const auto mode = scenario.exit == ScreenExit::Explicit ? L"SCREEN_HIDDEN" : L"SCREEN_APP";
+        session.input(utf8(shellFixtureCommand(scenario.cmd, fixture, mode, appPipe) + L"\r"));
+        openShellFixture(session, pipe.value, fixture);
+        send('I');
+        capture(L"primary", screenInitialSize, false);
+        send('A');
+        capture(L"alternate", screenInitialSize, true);
+
+        COORD shellSize = screenInitialSize;
+        if (scenario.exit == ScreenExit::Explicit) {
+            send('M');
+            capture(L"explicit-restore", screenInitialSize, false);
+        }
+        if (scenario.exit == ScreenExit::Resize) {
+            send('B');
+            session.input("stageX\x7f");
+            ScreenActivity last;
+            for (uint32_t i = 0; i < 2 * screenResizePairs; ++i) {
+                const COORD size = i % 2 == 0 ? screenGrownSize : screenInitialSize;
+                const char key = static_cast<char>('1' + i);
+                session.input(std::string_view(&key, 1));
+                session.pump();
+                const auto offset = session.raw.size();
+                const auto begin = GetTickCount64();
+                resize(size);
+                ScreenActivity sample;
+                const bool drew = session.until([&] {
+                    send('G');
+                    transfer(pipe.value, &sample, sizeof(sample), false);
+                    return sample.draws > last.draws;
+                }, 2000);
+                const bool dimensions = sample.columns == static_cast<uint32_t>(size.X) && sample.bufferColumns == sample.columns &&
+                    sample.rows == static_cast<uint32_t>(size.Y) && sample.bufferRows == sample.rows &&
+                    sample.windowTop == 0 && sample.windowLeft == 0;
+                matched = matched && drew && dimensions;
+                last = sample;
+                if (resizes.size() > 1) resizes += ',';
+                resizes += "{\"Columns\":" + std::to_string(size.X) + ",\"Rows\":" + std::to_string(size.Y) +
+                    ",\"CapturedBytesBefore\":" + std::to_string(offset) + ",\"Milliseconds\":" +
+                    std::to_string(GetTickCount64() - begin) + ",\"ContinuedDrawing\":" + (drew ? "true" : "false") +
+                    ",\"NativeGeometryMatches\":" + (dimensions ? "true" : "false") +
+                    ",\"Child\":" + screenGeometryJson(sample) + '}';
+            }
+            send('R');
+            uint32_t keys = 7 + 2 * screenResizePairs;
+            transfer(pipe.value, &keys, sizeof(keys), true);
+            const auto final = capture(L"settled-edit", screenInitialSize, true, L"stage12345678");
+            add("FullScreenEditMatches", screenEditMatches(*packet, L"stageX\b12345678"));
+            add("ResizeEventsReceived", final.windowEvents != 0);
+            send('X');
+            char acknowledgement = 0;
+            transfer(pipe.value, &acknowledgement, 1, false);
+            check(acknowledgement == 'X', "exit/resize acknowledgement");
+            observations.add("ExitObservedBeforeResize", WaitForSingleObject(session.descendant.value, 0) == WAIT_OBJECT_0);
+            observations.fields += ",\"ExitResizeCapturedBytesBefore\":" + std::to_string(session.raw.size());
+            shellSize = screenGrownSize;
+            resize(shellSize);
+            observations.add("ExitObservedAfterResize", WaitForSingleObject(session.descendant.value, 0) == WAIT_OBJECT_0);
+        } else {
+            send('Q');
+        }
+
+        const auto exitCode = waitFixtureExit();
+        observations.fields += ",\"FullScreenExitCode\":" + std::to_string(exitCode);
+        add("FullScreenExitMatches", exitCode == screenExitCode);
+        add("ReturnedToShellPrompt", session.until(atPrompt));
+
+        const std::wstring statusPath = resultDirectory + L"\\child-exit-code.txt";
+        const std::wstring inspectPipe = prefix + L".inspect";
+        pipe.reset(privateServer(inspectPipe));
+        const std::wstring saveExit = scenario.cmd ? L"echo %errorlevel%>" + quote(statusPath) + L" & " :
+            L"[IO.File]::WriteAllText(" + psLiteral(statusPath) + L",$LASTEXITCODE.ToString()); ";
+        session.input(utf8(saveExit + shellFixtureCommand(scenario.cmd, fixture, L"SCREEN_INSPECT", inspectPipe) + L"\r"));
+        openShellFixture(session, pipe.value, fixture);
+        send('I');
+        capture(L"after-exit", shellSize, false);
+        const auto reportedExit = fileText(statusPath);
+        observations.fields += ",\"ShellReportedChildExit\":" + json(reportedExit);
+        add("ShellReportedExitMatches", reportedExit == std::to_string(screenExitCode));
+        send('Q');
+        add("InspectorExited", waitFixtureExit() == 0);
+        pipe.reset();
+        session.until(atPrompt);
+
+        const std::wstring continued = resultDirectory + L"\\continued-command.txt";
+        const std::wstring beforeEdit = scenario.cmd ? L"echo SCREEN_SHELL_OKX" :
+            L"[IO.File]::WriteAllText(" + psLiteral(continued) + L",'SCREEN_SHELL_OKX";
+        const std::wstring afterEdit = scenario.cmd ? L">" + quote(continued) + L" & echo SCREEN_SHELL_READY" :
+            L"'); Write-Output 'SCREEN_SHELL_READY'";
+        const auto lines = session.lineFeeds;
+        session.input(utf8(beforeEdit) + "\x7f" + utf8(afterEdit) + "\r");
+        const bool ready = session.until([&] {
+            return fileText(continued) == "SCREEN_SHELL_OK" && session.lineFeeds > lines &&
+                session.state.contains(U"SCREEN_SHELL_READY") && atPrompt();
+        });
+        add("NextEditedCommandExecuted", fileText(continued) == "SCREEN_SHELL_OK");
+        add("ShellRepainted", ready && !session.state.contains(U"SCREEN_ALTERNATE"));
+        session.input("exit 0\r");
+        session.finish();
+        completed = true;
+    } catch (...) {
+        if (session.descendant.value != INVALID_HANDLE_VALUE) {
+            // Preserve a fixture's diagnostic line if it exited before replying.
+            try { session.until([&] { return WaitForSingleObject(session.descendant.value, 0) == WAIT_OBJECT_0; }, 250); }
+            catch (...) {}
+        }
+        finishEvidence();
+        throw;
+    }
+    finishEvidence();
+    if (!matched) throw Mismatch("full-screen restoration or resize differs");
+}
+
 void childCase(const std::wstring &name,const std::wstring &resultDirectory,const std::wstring &program,Observations &observations) {
     const bool negative=name.starts_with(L"NEGATIVE_CHILD");
     const bool cmd=negative || name.starts_with(L"CMD");
@@ -787,20 +1029,9 @@ void childCase(const std::wstring &name,const std::wstring &resultDirectory,cons
         const std::wstring pipeName=L"\\\\.\\pipe\\VT7Pty.Child."+std::to_wstring(GetCurrentProcessId())+L"."+std::to_wstring(GetTickCount64());
         pipe.reset(privateServer(pipeName));
         const std::wstring fixture=directory()+L"\\FidelityFixture.exe";
-        const std::wstring serverId=std::to_wstring(GetCurrentProcessId());
-        const std::wstring command=cmd ? quote(fixture)+L" "+mode+L" "+quote(pipeName)+L" "+serverId :
-            L"& "+psLiteral(fixture)+L" "+psLiteral(mode)+L" "+psLiteral(pipeName)+L" "+serverId;
-        session.input(utf8(command+L"\r"));
-        connect(pipe.value); connected=true;
-        ULONG peer=0; check(GetNamedPipeClientProcessId(pipe.value,&peer),"child peer PID");
-        Handle candidate(OpenProcess(SYNCHRONIZE|PROCESS_QUERY_LIMITED_INFORMATION|PROCESS_TERMINATE,FALSE,peer));
-        const HANDLE nativeChild=candidate.value;
-        if (nativeChild == nullptr) throw std::runtime_error("cannot open child process (Win32 "+std::to_string(GetLastError())+")");
-        check(parentProcessId(peer) == GetProcessId(session.child.value),"fixture parent is tested shell");
-        std::vector<wchar_t> image(32768); DWORD length=static_cast<DWORD>(image.size());
-        check(QueryFullProcessImageNameW(nativeChild,0,image.data(),&length) && _wcsicmp(image.data(),fixture.c_str()) == 0,"child fixture image");
-        // Adopt teardown ownership only after both ancestry and image validation.
-        session.descendant.reset(candidate.value); candidate.value=INVALID_HANDLE_VALUE;
+        session.input(utf8(shellFixtureCommand(cmd, fixture, mode, pipeName)+L"\r"));
+        openShellFixture(session, pipe.value, fixture); connected=true;
+        const DWORD peer=GetProcessId(session.descendant.value);
         ChildPacket packet;
         transfer(pipe.value,&packet,sizeof(packet),false); validateChild(packet);
         check(packet.stage == 1 && packet.processId == peer && packet.parentId == GetProcessId(session.child.value) &&
@@ -1011,6 +1242,20 @@ void shellCase(const std::wstring &name,const std::wstring &directoryPath,const 
 }
 }
 int wmain(int argc,wchar_t **argv) {
+    if (argc == 2 && std::wstring_view(argv[1]) == L"--screen-cases") {
+        std::string list = "{\"SchemaVersion\":1,\"SnapshotBytes\":" + std::to_string(sizeof(Packet)) +
+            ",\"ResizePairs\":" + std::to_string(screenResizePairs) + ",\"Cases\":["
+            "{\"Name\":\"ALTERNATE\",\"Area\":\"F06\",\"Mode\":\"Control\"},"
+            "{\"Name\":\"RESIZE\",\"Area\":\"F07\",\"Mode\":\"Control\"}";
+        for (const auto &scenario : screenCases) {
+            const char *mode = scenario.exit == ScreenExit::Explicit ? "Explicit" :
+                scenario.exit == ScreenExit::Implicit ? "Implicit" : "Resize";
+            list += ",{\"Name\":" + json(utf8(scenario.name)) + ",\"Area\":" +
+                json(scenario.exit == ScreenExit::Resize ? "F07" : "F06") + ",\"Mode\":" + json(mode) + '}';
+        }
+        puts((list + "]}").c_str());
+        return 0;
+    }
     if (argc == 6 && std::wstring_view(argv[1]) == L"--replay-width") {
         try {
             return replayWidthFromFiles(argv);
@@ -1039,8 +1284,10 @@ int wmain(int argc,wchar_t **argv) {
     try {
         const std::vector<std::wstring> cases={L"STATE",L"UNICODE",L"ALTERNATE",L"RESIZE",L"INPUT",L"PROCESSED_CTRL_C",L"UNPROCESSED_CTRL_C",L"DRAIN",L"NEGATIVE_CELL",L"NEGATIVE_ATTRIBUTE",L"NEGATIVE_CURSOR",L"NEGATIVE_PACKET",L"NEGATIVE_DUPLICATE",L"NEGATIVE_DRAIN",L"NEGATIVE_TIMEOUT",L"NEGATIVE_ORPHAN",L"CMD_EMPTY",L"CMD_PARTIAL",L"PS_EMPTY",L"PS_PARTIAL",L"PS7_EMPTY",L"PS7_PARTIAL",L"CMD_CHILD_HANDLED",L"CMD_CHILD_DEFAULT",L"CMD_CHILD_UNPROCESSED",L"PS_CHILD_HANDLED",L"PS_CHILD_DEFAULT",L"PS_CHILD_UNPROCESSED",L"PS7_CHILD_HANDLED",L"PS7_CHILD_DEFAULT",L"PS7_CHILD_UNPROCESSED",L"NEGATIVE_CHILD_CONTROL",L"NEGATIVE_CHILD_EXIT",L"READCONSOLE_TRANSPORT",L"READCONSOLE_EVENT",L"READCONSOLE_RECORD_EVENT",L"READCONSOLE_OWNED_CANCEL"};
         const auto *output = findOutputCase(name);
-        check(output || std::find(cases.begin(),cases.end(),name) != cases.end(),"unknown case");
+        const auto *screen = findScreenCase(name);
+        check(output || screen || std::find(cases.begin(),cases.end(),name) != cases.end(),"unknown case");
         if (output) outputCase(*output, outputDirectory, observations);
+        else if (screen) screenCase(*screen, outputDirectory, observations);
         else if (name.find(L"_CHILD_") != std::wstring::npos) childCase(name,outputDirectory,program,observations);
         else if (name.starts_with(L"READCONSOLE_")) cookedCase(name,outputDirectory,observations);
         else if (name.starts_with(L"CMD") || name.starts_with(L"PS")) shellCase(name,outputDirectory,program,observations);

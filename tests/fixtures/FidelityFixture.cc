@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 #include "../fidelity/WinTest.h"
 #include "../fidelity/OutputCorpus.h"
+#include "../fidelity/ScreenCases.h"
 #include <algorithm>
 #include <cwchar>
 using namespace fidelity;
@@ -359,6 +360,189 @@ void draw(HANDLE output, bool unicode, bool alternate=false) {
     } else check(SetConsoleCursorPosition(output,{static_cast<SHORT>(info.srWindow.Left+17),static_cast<SHORT>(info.srWindow.Top+7)}),"draw cursor");
     CONSOLE_CURSOR_INFO cursor={25,TRUE}; check(SetConsoleCursorInfo(output,&cursor),"visible cursor");
 }
+
+ScreenActivity screenGeometry(HANDLE output, ScreenActivity activity) {
+    CONSOLE_SCREEN_BUFFER_INFO info = {};
+    check(GetConsoleScreenBufferInfo(output, &info), "full-screen geometry");
+    activity.columns = static_cast<uint32_t>(info.srWindow.Right - info.srWindow.Left + 1);
+    activity.rows = static_cast<uint32_t>(info.srWindow.Bottom - info.srWindow.Top + 1);
+    activity.bufferColumns = static_cast<uint32_t>(info.dwSize.X);
+    activity.bufferRows = static_cast<uint32_t>(info.dwSize.Y);
+    activity.windowLeft = static_cast<uint32_t>(info.srWindow.Left);
+    activity.windowTop = static_cast<uint32_t>(info.srWindow.Top);
+    return activity;
+}
+
+void readScreenInput(HANDLE input, ScreenActivity &activity, std::vector<Key> &keys, std::wstring &edit) {
+    DWORD count = 0;
+    check(GetNumberOfConsoleInputEvents(input, &count), "full-screen input count");
+    if (count == 0) return;
+    INPUT_RECORD records[64] = {};
+    DWORD read = 0;
+    check(ReadConsoleInputW(input, records, std::min<DWORD>(count, 64), &read), "full-screen input");
+    for (DWORD i = 0; i < read; ++i) {
+        const INPUT_RECORD &record = records[i];
+        if (record.EventType == WINDOW_BUFFER_SIZE_EVENT) {
+            ++activity.windowEvents;
+            activity.eventColumns = static_cast<uint32_t>(record.Event.WindowBufferSizeEvent.dwSize.X);
+            activity.eventRows = static_cast<uint32_t>(record.Event.WindowBufferSizeEvent.dwSize.Y);
+        }
+        if (record.EventType != KEY_EVENT || !record.Event.KeyEvent.bKeyDown) continue;
+        const auto &key = record.Event.KeyEvent;
+        const wchar_t text = key.uChar.UnicodeChar;
+        if (text != L'\b' && (text < L' ' || text > L'~')) continue;
+        check(keys.size() < 128 && edit.size() + key.wRepeatCount < 35, "full-screen edit bounds");
+        keys.push_back({text, key.wVirtualKeyCode, key.dwControlKeyState, key.wRepeatCount});
+        for (WORD repeat = 0; repeat < key.wRepeatCount; ++repeat) {
+            if (text != L'\b') edit.push_back(text);
+            else if (!edit.empty()) edit.pop_back();
+        }
+    }
+}
+
+void drawScreenFrame(HANDLE output, bool alternate, bool visible, const std::wstring &edit, uint32_t draws) {
+    const auto size = screenGeometry(output, {});
+    check(size.columns >= 40 && size.columns <= 120 && size.rows >= 12 && size.rows <= 40, "full-screen draw bounds");
+    const auto left = static_cast<SHORT>(size.windowLeft);
+    const auto top = static_cast<SHORT>(size.windowTop);
+    const auto columns = static_cast<SHORT>(size.columns);
+    const auto rows = static_cast<SHORT>(size.rows);
+    std::vector<CHAR_INFO> cells(size.columns * size.rows);
+    for (auto &cell : cells) {
+        cell.Char.UnicodeChar = L' ';
+        cell.Attributes = 7;
+    }
+    SMALL_RECT rect{left, top, static_cast<SHORT>(left + columns - 1), static_cast<SHORT>(top + rows - 1)};
+    check(WriteConsoleOutputW(output, cells.data(), {columns, rows}, {0, 0}, &rect), "full-screen paint");
+    const auto position = [&](int x, int y) {
+        return COORD{static_cast<SHORT>(left + x), static_cast<SHORT>(top + y)};
+    };
+    writeOutputCells(output, position(2, 1), alternate ? screenAlternate : screenPrimary, alternate ? 0x2f : 0x1e);
+    int cursorX = 0;
+    int cursorY = 8;
+    if (alternate) {
+        writeOutputCells(output, position(3, 4), L"FRAME " + std::to_wstring(draws), 0x3e);
+        const auto line = L"EDIT:" + edit;
+        cursorX = 2 + static_cast<int>(line.size());
+        cursorY = rows - 2;
+        writeOutputCells(output, position(2, cursorY), line, 0x4f);
+        writeOutputCells(output, position(columns - 8, rows - 1), screenCorner, 0x70);
+    }
+    check(SetConsoleTextAttribute(output, 7), "full-screen default attribute");
+    CONSOLE_CURSOR_INFO cursor{25, visible ? TRUE : FALSE};
+    check(SetConsoleCursorInfo(output, &cursor), "full-screen cursor visibility");
+    check(SetConsoleCursorPosition(output, position(cursorX, cursorY)), "full-screen cursor position");
+}
+
+void sendActiveScreen(HANDLE pipe, const std::vector<Key> &keys, const ScreenActivity &activity) {
+    // Release this short-lived handle before acknowledging the checkpoint.
+    // Keeping an alternate handle open could affect fallback on application exit.
+    std::unique_ptr<Packet> packet;
+    {
+        Handle active(CreateFileW(L"CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+            nullptr, OPEN_EXISTING, 0, nullptr));
+        check(active.value != INVALID_HANDLE_VALUE, "active buffer snapshot handle");
+        packet = observe(active.value, keys);
+    }
+    packet->bufferTag = screenTextAt(*packet, 2, 1, screenAlternate, 0x2f) ? 2u : 1u;
+    transfer(pipe, packet.get(), sizeof(Packet), true);
+    auto copy = activity;
+    transfer(pipe, &copy, sizeof(copy), true);
+}
+
+int screenFixture(HANDLE primary, HANDLE pipe, std::wstring_view mode) {
+    char start = 0;
+    transfer(pipe, &start, 1, false);
+    check(start == 'I', "full-screen start");
+    if (mode == L"SCREEN_INSPECT") {
+        sendActiveScreen(pipe, {}, {});
+        char quit = 0;
+        transfer(pipe, &quit, 1, false, 10000);
+        check(quit == 'Q', "inspect shutdown");
+        return 0;
+    }
+    const bool visible = mode != L"SCREEN_HIDDEN";
+    const HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
+    ConsoleModeRestore restore(input);
+    Handle alternate;
+    std::vector<Key> keys;
+    std::wstring edit;
+    ScreenActivity activity;
+    drawScreenFrame(primary, false, true, edit, 0);
+    sendActiveScreen(pipe, keys, activity);
+    bool producing = false;
+    ULONGLONG nextFrame = 0;
+    const ULONGLONG deadline = GetTickCount64() + 60000;
+    while (GetTickCount64() < deadline) {
+        if (alternate.value != INVALID_HANDLE_VALUE) readScreenInput(input, activity, keys, edit);
+        if (producing && GetTickCount64() >= nextFrame) {
+            ++activity.draws;
+            writeOutputCells(alternate.value, {3, 4}, L"FRAME " + std::to_wstring(activity.draws), 0x3e);
+            // Keep live writes within both sizes while the host changes the viewport.
+            writeOutputCells(alternate.value, {2, 6}, L"EDIT:" + edit + std::wstring(34 - edit.size(), L' '), 0x4f);
+            nextFrame = GetTickCount64() + 16;
+        }
+        DWORD available = 0;
+        check(PeekNamedPipe(pipe, nullptr, 0, nullptr, &available, nullptr), "full-screen control");
+        if (available == 0) {
+            Sleep(2);
+            continue;
+        }
+        char command = 0;
+        transfer(pipe, &command, 1, false);
+        switch (command) {
+        case 'A': {
+            check(alternate.value == INVALID_HANDLE_VALUE, "single alternate");
+            alternate.reset(CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                nullptr, CONSOLE_TEXTMODE_BUFFER, nullptr));
+            check(alternate.value != INVALID_HANDLE_VALUE, "create full-screen buffer");
+            const SMALL_RECT window{0, 0, screenInitialSize.X - 1, screenInitialSize.Y - 1};
+            check(SetConsoleScreenBufferSize(alternate.value, screenInitialSize), "initial full-screen buffer size");
+            check(SetConsoleWindowInfo(alternate.value, TRUE, &window), "initial full-screen viewport");
+            check(SetConsoleActiveScreenBuffer(alternate.value), "activate full-screen buffer");
+            check(SetConsoleMode(input, ENABLE_EXTENDED_FLAGS | ENABLE_WINDOW_INPUT), "full-screen input mode");
+            drawScreenFrame(alternate.value, true, visible, edit, activity.draws);
+            sendActiveScreen(pipe, keys, activity);
+            break;
+        }
+        case 'B':
+            producing = true;
+            break;
+        case 'G': {
+            auto sample = screenGeometry(alternate.value, activity);
+            transfer(pipe, &sample, sizeof(sample), true);
+            break;
+        }
+        case 'R': {
+            producing = false;
+            uint32_t expectedKeys = 0;
+            transfer(pipe, &expectedKeys, sizeof(expectedKeys), false);
+            check(expectedKeys < 128, "requested edit record count");
+            const ULONGLONG editDeadline = GetTickCount64() + 2000;
+            while (keys.size() < expectedKeys && GetTickCount64() < editDeadline) {
+                readScreenInput(input, activity, keys, edit);
+                Sleep(2);
+            }
+            drawScreenFrame(alternate.value, true, visible, edit, activity.draws);
+            sendActiveScreen(pipe, keys, activity);
+            break;
+        }
+        case 'M':
+            check(SetConsoleActiveScreenBuffer(primary), "explicit primary restoration");
+            sendActiveScreen(pipe, keys, activity);
+            break;
+        case 'X':
+            // Acknowledge the last instruction while the alternate is still active.
+            transfer(pipe, &command, 1, true);
+            return static_cast<int>(screenExitCode);
+        case 'Q':
+            return static_cast<int>(screenExitCode);
+        default:
+            throw std::runtime_error("unknown full-screen command");
+        }
+    }
+    throw std::runtime_error("full-screen fixture deadline");
+}
 }
 int wmain(int argc,wchar_t **argv) {
     if (argc != 4) return 2;
@@ -372,6 +556,8 @@ int wmain(int argc,wchar_t **argv) {
         if (mode.starts_with(L"CHILD_")) return childFixture(mode,pipe.value);
         Handle output(CreateFileW(L"CONOUT$",GENERIC_READ|GENERIC_WRITE,FILE_SHARE_READ|FILE_SHARE_WRITE,nullptr,OPEN_EXISTING,0,nullptr));
         check(output.value != INVALID_HANDLE_VALUE,"fixture output");
+        if (mode == L"SCREEN_APP" || mode == L"SCREEN_HIDDEN" || mode == L"SCREEN_INSPECT")
+            return screenFixture(output.value, pipe.value, mode);
         if (const auto *scenario = findOutputCase(mode)) return outputFixture(*scenario, output.value, pipe.value);
         const bool input=mode == L"INPUT" || mode == L"PROCESSED";
         const bool unicode=mode == L"UNICODE";

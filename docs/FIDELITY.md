@@ -66,6 +66,10 @@ use compatible glyph widths. I keep separate results for the observed
 width differences and unavailable output capabilities.
 [Accepted Step 1.3 scope](OUTPUT_FIDELITY.md#accepted-output-scope)
 
+For Step 1.4 I compare the native active buffer and VT stream through
+full-screen exit, repeated resize and shell return.
+[Full-screen test guide](SCREEN_FIDELITY.md)
+
 | ID | Scenario | Required observable result |
 | --- | --- | --- |
 | F01 | Ctrl+C at empty and partially typed shell prompts | Typed line canceled, canceled text never executed, fresh prompt accepts the next command, shell remains alive |

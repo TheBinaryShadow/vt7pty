@@ -1,14 +1,10 @@
 # Shared package and result checks. Keep this compatible with Windows PowerShell 2.0.
-function Read-OutputPackage([string]$Root) {
-    $manifest = Read-VT7Json (Join-Path $Root 'manifest.json')
-    if ($manifest.Kind -cne 'VT7PtyOutputCharacterization' -or @(1,2) -notcontains $manifest.SchemaVersion -or
-        -not $manifest.Harness.SourceTreeClean -or $manifest.Harness.SourceCommit -cnotmatch '^[0-9a-f]{40}$' -or
-        $manifest.Harness.SnapshotBytes -lt 8000 -or $manifest.Harness.SnapshotBytes -gt 65536 -or
-        $manifest.SessionFlags -ne 0 -or $manifest.CheckpointsPerCase -ne 2 -or $manifest.Step13Accepted) {
-        throw 'Wrong output characterization package.'
-    }
+function Confirm-PairedFidelityPackage([string]$Root, $Manifest) {
+    if (-not $Manifest.Harness.SourceTreeClean -or $Manifest.Harness.SourceCommit -cnotmatch '^[0-9a-f]{40}$' -or
+        $Manifest.Harness.SnapshotBytes -lt 8000 -or $Manifest.Harness.SnapshotBytes -gt 65536 -or
+        $Manifest.SessionFlags -ne 0) { throw 'Wrong paired fidelity harness.' }
     $files = @{}
-    foreach ($entry in $manifest.Files) {
+    foreach ($entry in $Manifest.Files) {
         if ($entry.Path -notmatch '^[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*$' -or
             $entry.Path -match '(^|/)\.\.?(/|$)' -or $files.ContainsKey($entry.Path)) {
             throw 'Duplicate or invalid package inventory path.'
@@ -19,24 +15,8 @@ function Read-OutputPackage([string]$Root) {
         }
         $files[$entry.Path] = $entry
     }
-    $seen = @{}
-    $widthCases = 0
-    foreach ($entry in $manifest.Cases) {
-        if ($entry.Name -cnotmatch '^OUTPUT_[A-Z0-9_]+$' -or @('F04','F05') -cnotcontains $entry.Area -or
-            $seen.ContainsKey($entry.Name)) { throw 'Invalid or repeated output case.' }
-        $seen[$entry.Name] = $true
-        if ($manifest.SchemaVersion -eq 2) {
-            if ($entry.WidthProbe -isnot [bool]) { throw 'Missing width probe recipe field.' }
-            if ($entry.WidthProbe) { $widthCases++ }
-        }
-    }
-    $expectedCases = if ($manifest.SchemaVersion -eq 1) { 13 } else { 21 }
-    if ($seen.Count -ne $expectedCases -or ($manifest.SchemaVersion -eq 2 -and $widthCases -ne 10)) {
-        throw 'Wrong output case count.'
-    }
-
     foreach ($role in @('baseline','accepted')) {
-        $runtime = $manifest.Runtimes[$role]
+        $runtime = $Manifest.Runtimes[$role]
         $sourcePath = $role + '/source-manifest.json'
         if (-not $files.ContainsKey($sourcePath) -or $files[$sourcePath].Sha256 -cne $runtime.ManifestSha256) {
             throw ('Original runtime manifest does not match: ' + $role)
@@ -62,9 +42,31 @@ function Read-OutputPackage([string]$Root) {
         $base = $files['baseline/bin/' + $name]
         $accepted = $files['accepted/bin/' + $name]
         if (-not $base -or -not $accepted -or $base.Sha256 -cne $accepted.Sha256) {
-            throw ('Both runtimes must use the same output harness: ' + $name)
+            throw ('Both runtimes must use the same fidelity harness: ' + $name)
         }
     }
+}
+
+function Read-OutputPackage([string]$Root) {
+    $manifest = Read-VT7Json (Join-Path $Root 'manifest.json')
+    if ($manifest.Kind -cne 'VT7PtyOutputCharacterization' -or @(1,2) -notcontains $manifest.SchemaVersion -or
+        $manifest.CheckpointsPerCase -ne 2 -or $manifest.Step13Accepted) { throw 'Wrong output characterization package.' }
+    $seen = @{}
+    $widthCases = 0
+    foreach ($entry in $manifest.Cases) {
+        if ($entry.Name -cnotmatch '^OUTPUT_[A-Z0-9_]+$' -or @('F04','F05') -cnotcontains $entry.Area -or
+            $seen.ContainsKey($entry.Name)) { throw 'Invalid or repeated output case.' }
+        $seen[$entry.Name] = $true
+        if ($manifest.SchemaVersion -eq 2) {
+            if ($entry.WidthProbe -isnot [bool]) { throw 'Missing width probe recipe field.' }
+            if ($entry.WidthProbe) { $widthCases++ }
+        }
+    }
+    $expectedCases = if ($manifest.SchemaVersion -eq 1) { 13 } else { 21 }
+    if ($seen.Count -ne $expectedCases -or ($manifest.SchemaVersion -eq 2 -and $widthCases -ne 10)) {
+        throw 'Wrong output case count.'
+    }
+    Confirm-PairedFidelityPackage $Root $manifest
     return $manifest
 }
 

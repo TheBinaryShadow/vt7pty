@@ -2,7 +2,8 @@
 param(
     [ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')][string]$Suffix = 'rc3',
     [string]$ReleasedRuntimeArchive = '',
-    [string]$AcceptedInputArchive = ''
+    [string]$AcceptedInputArchive = '',
+    [ValidateSet('Output','Screen')][string]$Suite = 'Output'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -10,12 +11,17 @@ Set-StrictMode -Version 2.0
 $root = $PSScriptRoot
 . (Join-Path $root 'tools\platform\Windows7Compat.ps1')
 . (Join-Path $root 'tools\output\OutputEvidence.ps1')
+$screen = $Suite -eq 'Screen'
+if ($screen) {
+    . (Join-Path $root 'tools\output\ScreenEvidence.ps1')
+    if (-not $PSBoundParameters.ContainsKey('Suffix')) { $Suffix = 'rc1' }
+}
 $source = (& git -C $root rev-parse --verify HEAD).Trim()
 if ($LASTEXITCODE -ne 0 -or @(& git -C $root status --porcelain=v1).Count) {
-    throw 'Output packaging requires clean committed source.'
+    throw 'Paired fidelity packaging requires clean committed source.'
 }
 $version = [IO.File]::ReadAllText((Join-Path $root 'VERSION.txt')).Trim()
-if ($version -cne '0.5.1-dev') { throw 'Wrong Step 1.3 harness version.' }
+if ($version -cne '0.5.1-dev') { throw 'Wrong fidelity harness version.' }
 $packages = Join-Path $root 'artifacts\fidelity\packages'
 if (-not $ReleasedRuntimeArchive) {
     $ReleasedRuntimeArchive = Join-Path $root 'artifacts\packages\VT7Pty-0.5.0-win7-x64-release-runtime.zip'
@@ -30,7 +36,7 @@ if ((Get-VT7Sha256 $ReleasedRuntimeArchive) -cne $baselineHash -or
     throw 'Provide the exact accepted 0.5.0 release and input rc2 ZIPs.'
 }
 
-$stage = Join-Path $packages ('VT7Pty-output-' + $version + '-' + $Suffix)
+$stage = Join-Path $packages ('VT7Pty-' + $Suite.ToLowerInvariant() + '-' + $version + '-' + $Suffix)
 $zip = $stage + '.zip'
 foreach ($path in @($stage,$zip,($zip + '.sha256'))) {
     if (Test-Path -LiteralPath $path) { throw ('Candidate already exists: ' + $path) }
@@ -96,16 +102,17 @@ $acceptedManifest = 'e66b761b06c4c99fb885dcfe1862537cd9fb3dd577365569668639ccd09
 $accepted = Export-OutputRuntime 'accepted' $AcceptedInputArchive $acceptedHash '0ca6e3fa78481cd4df35820b9fe3988f46e0bff4' 'runtime/bin/' $acceptedNames $acceptedManifest
 $baseline.Version = '0.5.0'
 $accepted.Version = $version
-$casesJson = (& (Join-Path $stage 'baseline\bin\FidelityTest.exe') --output-cases | Out-String).Trim()
-if ($LASTEXITCODE -ne 0) { throw 'Cannot load the output harness against the released runtime.' }
-$acceptedJson = (& (Join-Path $stage 'accepted\bin\FidelityTest.exe') --output-cases | Out-String).Trim()
+$caseArgument = '--' + $Suite.ToLowerInvariant() + '-cases'
+$casesJson = (& (Join-Path $stage 'baseline\bin\FidelityTest.exe') $caseArgument | Out-String).Trim()
+if ($LASTEXITCODE -ne 0) { throw 'Cannot load the fidelity harness against the released runtime.' }
+$acceptedJson = (& (Join-Path $stage 'accepted\bin\FidelityTest.exe') $caseArgument | Out-String).Trim()
 if ($LASTEXITCODE -ne 0 -or $acceptedJson -cne $casesJson) { throw 'The paired harness recipes differ.' }
 $compiled = $casesJson | ConvertFrom-Json
 & (Join-Path $bin 'VtStateTest.exe')
 if ($LASTEXITCODE -ne 0) { throw 'Independent VT state tests failed.' }
 
 $plan = @{
-    'README.md' = 'docs\OUTPUT_FIDELITY.md'
+    'README.md' = 'docs\' + $Suite.ToUpperInvariant() + '_FIDELITY.md'
     'LICENSE.txt' = 'LICENSE'
     'UPSTREAM.md' = 'UPSTREAM.md'
     'CREDITS.md' = 'CREDITS.md'
@@ -117,8 +124,9 @@ $plan = @{
     'tools\output\OutputEvidence.ps1' = 'tools\output\OutputEvidence.ps1'
     'tools\output\Invoke-OutputFidelity.ps1' = 'tools\output\Invoke-OutputFidelity.ps1'
 }
+if ($screen) { $plan['tools\output\ScreenEvidence.ps1'] = 'tools\output\ScreenEvidence.ps1' }
 foreach ($tier in @('NONESU','ESU','LEGACY')) {
-    $launcher = 'RUN-OUTPUT-' + $tier + '.cmd'
+    $launcher = 'RUN-' + $Suite.ToUpperInvariant() + '-' + $tier + '.cmd'
     $plan[$launcher] = $launcher
 }
 foreach ($relative in $plan.Keys) {
@@ -130,23 +138,34 @@ $files = @(Get-ChildItem -LiteralPath $stage -Recurse -File | Sort-Object FullNa
     @{Path = $_.FullName.Substring($stage.Length + 1).Replace('\','/'); Bytes = $_.Length; Sha256 = Get-VT7Sha256 $_.FullName}
 })
 $manifest = @{
-    SchemaVersion = 2; Kind = 'VT7PtyOutputCharacterization'; Step13Accepted = $false
     Runtimes = @{baseline = $baseline; accepted = $accepted}; SessionFlags = 0
     Harness = @{SourceCommit = $source; SourceTreeClean = $true; Configuration = 'Release'; Architecture = 'x64'
         SnapshotBytes = $compiled.SnapshotBytes; VerificationSha256 = Get-VT7Sha256 $verificationPath}
-    Cases = @($compiled.Cases | ForEach-Object {
+    Files = $files
+}
+if ($screen) {
+    $manifest.SchemaVersion = 1
+    $manifest.Kind = 'VT7PtyScreenCharacterization'
+    $manifest.Step14Accepted = $false
+    $manifest.ResizePairs = $compiled.ResizePairs
+    $manifest.Cases = @($compiled.Cases | ForEach-Object { @{Name = $_.Name; Area = $_.Area; Mode = $_.Mode} })
+} else {
+    $manifest.SchemaVersion = 2
+    $manifest.Kind = 'VT7PtyOutputCharacterization'
+    $manifest.Step13Accepted = $false
+    $manifest.CheckpointsPerCase = 2
+    $manifest.Cases = @($compiled.Cases | ForEach-Object {
         @{Name = $_.Name; Area = $_.Area; RequestedOutputCP = $_.RequestedOutputCP; WidthProbe = $_.WidthProbe}
     })
-    CheckpointsPerCase = 2; Files = $files
 }
 Write-VT7Json (Join-Path $stage 'manifest.json') $manifest
-$null = Read-OutputPackage $stage
+if ($screen) { $null = Read-ScreenPackage $stage } else { $null = Read-OutputPackage $stage }
 if ($source -cne (& git -C $root rev-parse HEAD).Trim() -or @(& git -C $root status --porcelain=v1).Count) {
-    throw 'Source changed during output candidate packaging.'
+    throw 'Source changed during fidelity candidate packaging.'
 }
 [IO.Compression.ZipFile]::CreateFromDirectory($stage, $zip, [IO.Compression.CompressionLevel]::Optimal, $false)
 $hash = Get-VT7Sha256 $zip
 [IO.File]::WriteAllText($zip + '.sha256', $hash + '  ' + [IO.Path]::GetFileName($zip) + [Environment]::NewLine,
     [Text.UTF8Encoding]::new($false))
-Write-Host ('Output characterization ZIP: ' + $zip)
+Write-Host ($Suite + ' characterization ZIP: ' + $zip)
 Write-Host ('SHA-256: ' + $hash)

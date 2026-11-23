@@ -1,23 +1,30 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('DevelopmentHost','NonESU','ESU','Legacy')][string]$Tier = 'DevelopmentHost'
+    [ValidateSet('DevelopmentHost','NonESU','ESU','Legacy')][string]$Tier = 'DevelopmentHost',
+    [ValidateSet('Output','Screen')][string]$Suite = 'Output'
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
 $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 $root = [IO.Path]::GetFullPath((Join-Path $scriptDirectory '..\..')).TrimEnd('\')
+$screen = $Suite -eq 'Screen'
 try {
     . (Join-Path $root 'tools\platform\Windows7Compat.ps1')
     . (Join-Path $root 'tools\platform\NativeCapture.ps1')
     . (Join-Path $scriptDirectory 'OutputEvidence.ps1')
-    $manifest = Read-OutputPackage $root
+    if ($screen) {
+        . (Join-Path $scriptDirectory 'ScreenEvidence.ps1')
+        $manifest = Read-ScreenPackage $root
+    } else {
+        $manifest = Read-OutputPackage $root
+    }
 } catch {
-    Write-Host ('Output package startup failed: ' + $_.Exception.Message)
+    Write-Host ($Suite + ' package startup failed: ' + $_.Exception.Message)
     exit 2
 }
 
-$runId = $Tier.ToLowerInvariant() + '-output-' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') +
+$runId = $Tier.ToLowerInvariant() + '-' + $Suite.ToLowerInvariant() + '-' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') +
     '-' + [Guid]::NewGuid().ToString('N').Substring(0,8)
 $resultRoot = Join-Path $root ('results\' + $runId)
 [void][IO.Directory]::CreateDirectory($resultRoot)
@@ -36,7 +43,7 @@ if ($Tier -ceq 'Legacy' -and ($PSVersionTable.PSVersion.Major -ne 2 -or
 
 $environment = @{VT7PTY_SHOW_CONSOLE=''; VT7PTY_DEBUG=''}
 $report = @{
-    SchemaVersion = 1; Kind = 'VT7PtyOutputResults'; RunId = $runId; Tier = $Tier
+    SchemaVersion = 1; Kind = 'VT7Pty' + $Suite + 'Results'; RunId = $runId; Tier = $Tier
     ComputerName = $env:COMPUTERNAME; StartedUtc = [DateTime]::UtcNow.ToString('o')
     OS = @{Caption = [string]$os.Caption; Version = [string]$os.Version; BuildNumber = [string]$os.BuildNumber
         ServicePackMajorVersion = [int]$os.ServicePackMajorVersion; ProductType = [int]$os.ProductType}
@@ -45,8 +52,9 @@ $report = @{
     ManifestSha256 = Get-VT7Sha256 (Join-Path $root 'manifest.json')
     Harness = $manifest.Harness; Runtimes = $manifest.Runtimes; SessionFlags = $manifest.SessionFlags
     PreflightErrors = $preflight; Oracle = $null; Cases = @(); CharacterizationComplete = $false
-    Step13Accepted = $false; MilestoneAccepted = $false
+    MilestoneAccepted = $false
 }
+$report[$(if ($screen) { 'Step14Accepted' } else { 'Step13Accepted' })] = $false
 $ready = $preflight.Count -eq 0
 if ($ready) {
     try {
@@ -73,11 +81,15 @@ if ($ready) {
             try {
                 $controller = Invoke-InputProcess $exe ($spec.Name + ' "' + $directory + '"') $bin 75000 $environment
                 $case.Controller = $controller
-                if ($controller.TimedOut) { throw 'Native output case exceeded its deadline.' }
-                $observed = Read-OutputCase $directory $spec $controller.ExitCode $manifest.Harness.SnapshotBytes
+                if ($controller.TimedOut) { throw 'Native fidelity case exceeded its deadline.' }
+                if ($screen) {
+                    $observed = Read-ScreenCase $directory $spec $controller.ExitCode $manifest
+                } else {
+                    $observed = Read-OutputCase $directory $spec $controller.ExitCode $manifest.Harness.SnapshotBytes
+                }
                 $case.Status = 'Observed'
                 $case.Outcome = if ($observed.Status -ceq 'Fail') { 'Difference' }
-                    elseif ($observed.CapabilityUnavailable) { 'CapabilityUnavailable' } else { 'Match' }
+                    elseif (-not $screen -and $observed.CapabilityUnavailable) { 'CapabilityUnavailable' } else { 'Match' }
             } catch {
                 $case.Error = $_.Exception.Message
             }
