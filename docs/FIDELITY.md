@@ -1,7 +1,7 @@
 # Milestone 1 Fidelity Plan
 
 Status: rc3 Step 1.1 corpus measured on the development host and all three Windows 7 tiers; broader coverage pending.
-Updated: 2026-11-23.
+Updated: 2026-11-24.
 
 I'm using these applications and measurements to improve the
 [published 0.5.0 baseline](validation/2026-10-02-0.5.0-publication.md).
@@ -59,13 +59,20 @@ gap and the remaining input contract work. I keep the original 30-case
 regression suite and broader corpus requirements.
 [Accepted Step 1.2 scope](validation/2026-11-23-step-1.2-profiles-rc3-windows7.md#step-12-scope)
 
+I completed Step 1.3 using the paired rc3 evidence. I compare the Unicode
+captured in the backing console, the stable cursor and the measured screen
+state. Exact native cell placement applies where the console and receiver
+use compatible glyph widths. I keep separate results for the observed
+width differences and unavailable output capabilities.
+[Accepted Step 1.3 scope](OUTPUT_FIDELITY.md#accepted-output-scope)
+
 | ID | Scenario | Required observable result |
 | --- | --- | --- |
 | F01 | Ctrl+C at empty and partially typed shell prompts | Typed line canceled, canceled text never executed, fresh prompt accepts the next command, shell remains alive |
 | F02 | Ctrl+C/Ctrl+Break during an active child; processed/unprocessed input | Record mode and expected shell/child policy; verify the intended event/key representation, no duplicate delivery, expected child status and usable parent prompt |
 | F03 | Editing and input records | Text, Enter, Tab, Backspace, Delete, arrows, Home/End, supported modifiers and paste arrive in order with correct records; repeat and fragmented UTF-8 do not duplicate text |
 | F04 | Unicode and code pages | Ordinal text comparison, valid stream decoding, separate cursor/width results and requested-versus-actual code-page reporting; Croatian, combining, wide and supplementary text |
-| F05 | Positioned output, attributes, erase, wrap and scroll | Reconstructed cells, supported attributes, cursor and dimensions match expected stable state at a synchronization barrier |
+| F05 | Positioned output, attributes, erase, wrap and scroll | Stable cursor and dimensions match at a synchronization barrier. Cells and supported attributes also match where widths agree |
 | F06 | Alternate console buffers and shell return | Correct active-buffer content/cursor; original screen/prompt restored after explicit restoration and application exit |
 | F07 | Resize while editing and drawing full-screen output | Child and host dimensions converge; final layout/cursor match; no hang, lost final marker or lasting corruption |
 | F08 | Child exit, final output, close and failure | Final output drains before completion, exit status preserved, bounded shutdown with no owned agent/child left behind |

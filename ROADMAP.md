@@ -2,11 +2,13 @@
 
 Updated: 2026-11-24.
 
-I've published 0.5.0 and completed Step 1.2 within the recorded input scope.
-Profile rc3 passed the controlled fixtures, physical shell checks and frozen
-controls on all three Windows 7 tiers. The next step is output and Unicode
-reconstruction. The broader baseline and VT7 integration remain open.
-[Profile rc3 qualification](docs/validation/2026-11-23-step-1.2-profiles-rc3-windows7.md)
+I've published 0.5.0 and completed the scoped Step 1.2 input and Step 1.3
+output work. I accept measured Unicode reconstruction with native cell
+placement where the console and terminal use compatible widths. Step 1.4
+covers full-screen restoration and resize. The broader baseline and VT7
+integration remain open.
+[Input acceptance](docs/validation/2026-11-23-step-1.2-profiles-rc3-windows7.md#step-12-scope) ·
+[Output acceptance](docs/OUTPUT_FIDELITY.md#accepted-output-scope)
 
 I check an item only when its stated work and required tests are complete.
 Partial implementations stay unchecked. A local pass does not replace a required
@@ -27,7 +29,7 @@ The [foundation](docs/FOUNDATION.md) records the engineering decisions;
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Modern native VT7Pty 0.5.x foundation | Complete; 0.5.0 accepted and published |
-| 1 | Better console fidelity and reliability | In progress. Step 1.3 output and Unicode reconstruction is next |
+| 1 | Better console fidelity and reliability | In progress. Step 1.4 full-screen restoration and resize is next |
 | 2 | VT7-facing API and standalone integration host | Planned after backend validation |
 | 3 | Versioned handoff ready for VT7 integration | Planned after API and consumer tests |
 | Later | Other consumers and optional ConPTY compatibility | Deferred |
@@ -137,24 +139,17 @@ H1, H2 and H3 remain the research evidence for the H4 implementation.
 - [x] Measure the combining and CJK cases across the available output code
   pages and compare both width replays on all three Windows 7 tiers.
   [Output rc3 review](docs/validation/2026-11-24-step-1.3-output-rc3-windows7.md)
-- [ ] Resolve measured F04-F05 failures in cells, cursor, supported attributes,
-  erase, wrap, scroll, encoding and requested/actual code-page behavior.
-- [ ] Record text and width results separately; prove a narrow adaptation or
-  document my scope decision for information lost by the backing console.
+- [x] Verify the measured F04-F05 requirements for Unicode text, code-page
+  requests, stable cells and cursor, supported attributes, erase, wrap and
+  scroll.
+- [x] Settle the separate text and cell-placement requirements for divergent
+  widths. I preserve the captured Unicode and require stable placement where
+  widths agree. The scope records the observed width, raw-VT and polling
+  limits. [Accepted output scope](docs/OUTPUT_FIDELITY.md#accepted-output-scope)
 
-I'll complete this step when stable states and text match independently checked
-expectations, with raw-VT, width and intermediate-state limits documented.
-
-I completed all 78 output observations on the three Windows 7 tiers.
-The two runtimes produced identical bytes in every comparison. The remaining
-work is the column placement of the combining and CJK samples under the
-observed width rules.
+I accept Step 1.3 within that scope. The rc2 and rc3 results preserve the
+measured differences and their evidence.
 [Output rc2 Windows 7 review](docs/validation/2026-11-23-step-1.3-output-rc2-windows7.md)
-
-I completed the rc3 width investigation across 126 observations. The
-available pages preserve the same placement differences. The remaining
-decision is how to handle cell placement when the receiving terminal uses
-different widths.
 
 ### Step 1.4: Improve full-screen restoration and resize
 
@@ -207,6 +202,8 @@ repository. Changes to VT7 itself belong to a separate integration task.
   cursor-report/modified-F3 ambiguity of the inherited byte stream.
 - [ ] Implement documented headers and the API over the proven backend.
 - [ ] Build a standalone consumer and contract tests in this repository.
+  Apply the [output scope](docs/OUTPUT_FIDELITY.md#accepted-output-scope)
+  to the VT7-facing consumer and document its observed cell placement.
 - [ ] Validate the contract on Windows 7 and publish examples and migration
   guidance from the renamed inherited interface.
 

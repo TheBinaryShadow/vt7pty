@@ -1,0 +1,62 @@
+{
+  "Kind": "Step13OutputScopeAcceptance",
+  "RecordedDate": "2026-11-24",
+  "Status": "AcceptedWithinRecordedScope",
+  "Step13Accepted": true,
+  "MilestoneAccepted": false,
+  "SessionFlags": 0,
+  "Runtimes": {
+    "accepted": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+    "baseline": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d"
+  },
+  "Archive": "VT7Pty-output-0.5.1-dev-rc3.zip",
+  "ArchiveSha256": "922c2b8a1e38ae74cf076571561d63cdc32ccd67d160246557aeb10adc22a15a",
+  "ManifestSha256": "fcf0a396f011295cd85d8dab945213d8d046569927277a9b3dcadfccb16ba4be",
+  "Windows7EvidenceSha256": "14e1467f98fb81b9dbb69038131e8ce3e50c87f8c048e603185d8d0ac9d066fd",
+  "WolfEvidenceSha256": "7376994890596ad8368e24e099c26c89739809dae3a08dbecec6883caf635a1a",
+  "Windows7ScopeObservations": {
+    "F04Match": 36,
+    "CombiningWidthDifference": 24,
+    "CjkWidthDifference": 24,
+    "F05Match": 24,
+    "RawVtUnavailable": 6,
+    "Cp936Unavailable": 12
+  },
+  "Windows7ByMachine": {
+    "NESSY": {
+      "F04Match": 12,
+      "CombiningWidthDifference": 8,
+      "CjkWidthDifference": 8,
+      "F05Match": 8,
+      "RawVtUnavailable": 2,
+      "Cp936Unavailable": 4
+    },
+    "TURTLE": {
+      "F04Match": 12,
+      "CombiningWidthDifference": 8,
+      "CjkWidthDifference": 8,
+      "F05Match": 8,
+      "RawVtUnavailable": 2,
+      "Cp936Unavailable": 4
+    },
+    "LEOPARD": {
+      "F04Match": 12,
+      "CombiningWidthDifference": 8,
+      "CjkWidthDifference": 8,
+      "F05Match": 8,
+      "RawVtUnavailable": 2,
+      "Cp936Unavailable": 4
+    }
+  },
+  "WolfScopeObservations": {
+    "F04Match": 20,
+    "CombiningWidthDifference": 10,
+    "BackingConsoleReplacementAndWidth": 2,
+    "F05Match": 10
+  },
+  "StableCheckpointScope": true,
+  "ObservedUnicodePreserved": true,
+  "ReceivingTerminalDeterminesWidths": true,
+  "Windows7WidthDifferencesRecorded": 48,
+  "Rc2ControlOutcomesAndActionSnapshotsMatched": 78
+}

@@ -27,8 +27,11 @@ what I've learned from testing it.
 
 ## Follow current development
 
-I'm working on input fidelity within Milestone 1. H1, H2 and the controlled
-H3 prototype are accepted on all three Windows 7 tiers. The
+I've completed the scoped input and output work in Milestone 1. Step 1.4
+covers full-screen restoration and resize.
+[Accepted output scope](OUTPUT_FIDELITY.md#accepted-output-scope)
+
+H1, H2 and the controlled H3 prototype are accepted on all three Windows 7 tiers. The
 [guard review](validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)
 verifies 282/282 cases, including races, actual access denial, native children
 and the applicable PowerShell 7 matrix. The opt-in H4 runtime candidate now

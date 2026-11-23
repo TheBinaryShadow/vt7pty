@@ -4,7 +4,12 @@ I keep dated reviews here so I can trace a decision back to the exact source,
 package and test environment. The [roadmap](../../ROADMAP.md) describes current
 progress; each review describes the state at the time it was written.
 
-I completed Step 1.2 within the recorded scope. Profile rc3 passes 115 H4
+I completed Steps 1.2 and 1.3 within their recorded scopes. Output rc3
+establishes the measured text and cell-placement boundary on all three
+Windows 7 tiers.
+[Accepted output scope](../OUTPUT_FIDELITY.md#accepted-output-scope)
+
+Profile rc3 passes 115 H4
 guards, 129 input cases, 30 controlled profile cases, 27 publication checks
 and 40 physical checkpoints across the three Windows 7 tiers. The earlier
 H3, H4 and input qualification results remain linked below. Milestone 1 is

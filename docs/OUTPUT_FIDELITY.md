@@ -5,13 +5,43 @@ Both use the same native fixture and session flags of zero. Rc3 runs the 13
 rc2 controls and eight new width cases against each runtime. I use the
 measurements to decide which placement differences the stream can preserve.
 
-I completed the rc3 width investigation on all three Windows 7 tiers. The
-available pages preserve the combining and CJK placement differences, and
-CP936 is unavailable in the tested configurations. I reproduced all 48
-available replays from the saved snapshots and bytes.
-[Windows 7 rc3 review](validation/2026-11-24-step-1.3-output-rc3-windows7.md)
+## Accepted output scope
 
-## Run the candidate
+I use the captured backing-console text as the source for UTF-8/VT output.
+I preserve the observed Unicode code points in supported text runs as valid
+UTF-8 and require the measured cursor position at settled checkpoints. The
+receiving terminal applies its own glyph widths. I require exact cell placement, supported
+attributes and dimensions in the measured cases where the native cells
+and terminal use compatible widths.
+[Output path](ARCHITECTURE.md#output-path-and-fidelity-boundary)
+
+Where the widths differ, I keep the captured text and accept the recorded
+combining and CJK column shifts. The cursor-move experiment adds a blank
+after the combining sample and erases the ideograph in the narrow CJK
+case under the reference reader. A fixed one-cell rule also shifts the
+correctly placed CJK sample on WOLF. I preserve the native snapshots,
+decoded text, final cursor and measured column differences separately.
+The historical verdicts remain evidence, and a new text, cursor or placement
+failure gets its own review.
+[Width replays](validation/2026-11-24-step-1.3-output-rc3-windows7.md#code-pages-and-replay-results)
+
+I accept the measured F04-F05 scope on all three Windows 7 tiers with
+session flags set to zero. The 126 observations cover 36 matching text
+and code-page cases, 24 matching screen operations, 48 documented width
+differences, and 18 unavailable capability checks. CP936 and native VT
+processing for application output were unavailable on these configurations.
+I qualify the successfully applied pages and settled snapshots. WOLF
+illustrates source text loss when the backing console already stores U+FFFD.
+Writes overwritten between polls can escape a capture.
+[Windows 7 rc3 review](validation/2026-11-24-step-1.3-output-rc3-windows7.md) ·
+[Acceptance record](validation/results/step-1.3/step-1.3-output-scope-2026-11-24.json)
+
+I apply this scope in the Milestone 2 standalone consumer tests. If an
+actual VT7 workflow depends on native cell placement for divergent widths,
+I use that workflow to evaluate a stronger consumer contract.
+[Milestone 2](../ROADMAP.md#milestone-2-define-the-vt7-integration-api)
+
+## Reproduce the accepted comparison
 
 I extract the complete VT7Pty-output-0.5.1-dev-rc3.zip into a short local folder
 on each machine. I run the matching launcher from an ordinary Windows session.

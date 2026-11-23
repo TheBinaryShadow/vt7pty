@@ -133,11 +133,11 @@ The child application changes the backing console through writes or Win32
 Console APIs. The agent polls the screen buffer, compares its state with the
 previous state, and emits VT sequences describing the observed result.
 
-This is reconstruction, not interception of the original application intent.
-Information already reduced by the legacy console representation cannot always
-be recovered by improving the emitter. Milestone 1 should preserve working
-scraper behavior while testing whether a specific fidelity requirement needs an
-augmentation or replacement at a narrower boundary.
+The backing console's captured cells supply the text and measured cursor.
+The receiving terminal interprets the VT sequences and applies its own
+glyph widths. I compare stable cell positions where the widths agree and
+preserve captured Unicode across the measured width differences.
+[Accepted output scope](OUTPUT_FIDELITY.md#accepted-output-scope)
 
 ## Resize and lifecycle
 

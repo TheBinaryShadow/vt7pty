@@ -30,6 +30,12 @@ and 40/40 physical checkpoints.
 [Input rc2 review](docs/validation/2026-11-19-step-1.2-input-rc2-windows7.md) ·
 [Profile rc3 review](docs/validation/2026-11-23-step-1.2-profiles-rc3-windows7.md)
 
+I've also completed the scoped Step 1.3 output work. I preserve captured
+Unicode text and qualify native cell placement where the console and
+terminal use compatible widths. Step 1.4 covers full-screen restoration
+and resize.
+[Accepted output scope](docs/OUTPUT_FIDELITY.md#accepted-output-scope)
+
 VT7 integration comes after the backend and its API are ready. VT7Pty does not
 yet replace ConPTY for unmodified applications. I am not planning a kernel driver.
 
