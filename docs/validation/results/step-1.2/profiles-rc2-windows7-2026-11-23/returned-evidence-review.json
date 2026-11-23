@@ -1,0 +1,890 @@
+{
+  "Kind": "ProfileRc2Windows7EvidenceReview",
+  "ManifestSha256": "8edc81b170c0a300e5ab94de91720f484af80a16ff56f66b52a25baaacb4d922",
+  "HarnessSource": "cc564026447b95d458270c3a671ea37efb009f93",
+  "RuntimeSource": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "BundleReviews": [
+    {
+      "RunId": "esu-profiles-automated-20261123-195738-d57850b1",
+      "Machine": "TURTLE",
+      "Mode": "Automated",
+      "Status": "Rejected",
+      "Reason": "Profile evidence: controlled startup and workflow errors"
+    },
+    {
+      "RunId": "esu-profiles-manual-20261123-200427-1a8c80f1",
+      "Machine": "TURTLE",
+      "Mode": "Manual",
+      "Status": "Rejected",
+      "Reason": "Profile evidence: completed profile controller"
+    },
+    {
+      "RunId": "esu-profiles-manual-20261123-200456-447ea3ce",
+      "Machine": "TURTLE",
+      "Mode": "Manual",
+      "Status": "Rejected",
+      "Reason": "Profile evidence: completed profile controller"
+    },
+    {
+      "RunId": "legacy-profiles-automated-20261123-195534-46e2b682",
+      "Machine": "LEOPARD",
+      "Mode": "Automated",
+      "Status": "Rejected",
+      "Reason": "Profile evidence: completed profile controller"
+    },
+    {
+      "RunId": "legacy-profiles-manual-20261123-200334-d9422392",
+      "Machine": "LEOPARD",
+      "Mode": "Manual",
+      "Status": "Rejected",
+      "Reason": "Profile evidence: profile report prerequisites/privacy"
+    },
+    {
+      "RunId": "nonesu-profiles-automated-20261123-195544-ce98fcdf",
+      "Machine": "NESSY",
+      "Mode": "Automated",
+      "Status": "Rejected",
+      "Reason": "Profile evidence: controlled startup and workflow errors"
+    },
+    {
+      "RunId": "nonesu-profiles-manual-20261123-195920-f1fc4def",
+      "Machine": "NESSY",
+      "Mode": "Manual",
+      "Status": "Rejected",
+      "Reason": "Profile evidence: completed profile controller"
+    },
+    {
+      "RunId": "nonesu-profiles-manual-20261123-200147-2bc5d7c2",
+      "Machine": "NESSY",
+      "Mode": "Manual",
+      "Status": "Rejected",
+      "Reason": "Profile evidence: completed profile controller"
+    }
+  ],
+  "Automated": [
+    {
+      "RunId": "esu-profiles-automated-20261123-195738-d57850b1",
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "WindowsPowerShell": "5.1.14409.1005",
+      "CLR": "4.0.30319.42000",
+      "PowerShell7": "7.2.24",
+      "GuardCases": 41,
+      "GuardSessions": 44,
+      "GuardKeyboardRestorations": 39,
+      "InputCases": 43,
+      "InputHostLifetimes": 43,
+      "InputKeyboardRestorations": 1,
+      "ProfileTrials": [
+        {
+          "Order": 2,
+          "LauncherOutcome": "Pass",
+          "ReportedPassed": 4,
+          "Total": 4,
+          "PublicationChecks": 3,
+          "Trace": {
+            "KeyboardOperations": 2,
+            "HostLifetimes": 4
+          },
+          "Cases": [
+            {
+              "Case": "wps-clean-native",
+              "Engine": "5.1.14409.1005",
+              "EditorVersions": [],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 1,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 2,
+              "EditMode": "Native",
+              "ExpectedPrediction": "NotApplicable",
+              "ActualPrediction": "NotApplicable",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "wps-layered-native",
+              "Engine": "5.1.14409.1005",
+              "EditorVersions": [],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 1,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 2,
+              "EditMode": "Native",
+              "ExpectedPrediction": "NotApplicable",
+              "ActualPrediction": "NotApplicable",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "pwsh-clean-readline",
+              "Engine": "7.2.24",
+              "EditorVersions": [
+                "2.1.0"
+              ],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": true,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 0,
+              "InitialErrorCount": 0,
+              "FinalErrorCount": 0,
+              "EditMode": "Windows",
+              "ExpectedPrediction": "None",
+              "ActualPrediction": "None",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "pwsh-layered-readline",
+              "Engine": "7.2.24",
+              "EditorVersions": [
+                "2.1.0"
+              ],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 7,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 0,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 1,
+              "EditMode": "Emacs",
+              "ExpectedPrediction": "History",
+              "ActualPrediction": "None",
+              "PredictionRefusalInControlledStream": true,
+              "ProfilePrecedenceMatched": true
+            }
+          ]
+        },
+        {
+          "Order": 4,
+          "LauncherOutcome": "Pass",
+          "ReportedPassed": 4,
+          "Total": 4,
+          "PublicationChecks": 3,
+          "Trace": {
+            "KeyboardOperations": 2,
+            "HostLifetimes": 4
+          },
+          "Cases": [
+            {
+              "Case": "wps-clean-native",
+              "Engine": "5.1.14409.1005",
+              "EditorVersions": [],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 1,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 2,
+              "EditMode": "Native",
+              "ExpectedPrediction": "NotApplicable",
+              "ActualPrediction": "NotApplicable",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "wps-layered-native",
+              "Engine": "5.1.14409.1005",
+              "EditorVersions": [],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 1,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 2,
+              "EditMode": "Native",
+              "ExpectedPrediction": "NotApplicable",
+              "ActualPrediction": "NotApplicable",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "pwsh-clean-readline",
+              "Engine": "7.2.24",
+              "EditorVersions": [
+                "2.1.0"
+              ],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": true,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 0,
+              "InitialErrorCount": 0,
+              "FinalErrorCount": 0,
+              "EditMode": "Windows",
+              "ExpectedPrediction": "None",
+              "ActualPrediction": "None",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "pwsh-layered-readline",
+              "Engine": "7.2.24",
+              "EditorVersions": [
+                "2.1.0"
+              ],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 7,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 0,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 1,
+              "EditMode": "Emacs",
+              "ExpectedPrediction": "History",
+              "ActualPrediction": "None",
+              "PredictionRefusalInControlledStream": true,
+              "ProfilePrecedenceMatched": true
+            }
+          ]
+        },
+        {
+          "Order": 5,
+          "LauncherOutcome": "Pass",
+          "ReportedPassed": 4,
+          "Total": 4,
+          "PublicationChecks": 3,
+          "Trace": {
+            "KeyboardOperations": 2,
+            "HostLifetimes": 4
+          },
+          "Cases": [
+            {
+              "Case": "wps-clean-native",
+              "Engine": "5.1.14409.1005",
+              "EditorVersions": [],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 1,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 2,
+              "EditMode": "Native",
+              "ExpectedPrediction": "NotApplicable",
+              "ActualPrediction": "NotApplicable",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "wps-layered-native",
+              "Engine": "5.1.14409.1005",
+              "EditorVersions": [],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 1,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 2,
+              "EditMode": "Native",
+              "ExpectedPrediction": "NotApplicable",
+              "ActualPrediction": "NotApplicable",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "pwsh-clean-readline",
+              "Engine": "7.2.24",
+              "EditorVersions": [
+                "2.1.0"
+              ],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": true,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 0,
+              "InitialErrorCount": 0,
+              "FinalErrorCount": 0,
+              "EditMode": "Windows",
+              "ExpectedPrediction": "None",
+              "ActualPrediction": "None",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "pwsh-layered-readline",
+              "Engine": "7.2.24",
+              "EditorVersions": [
+                "2.1.0"
+              ],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 7,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 0,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 1,
+              "EditMode": "Emacs",
+              "ExpectedPrediction": "History",
+              "ActualPrediction": "None",
+              "PredictionRefusalInControlledStream": true,
+              "ProfilePrecedenceMatched": true
+            }
+          ]
+        }
+      ],
+      "AutomaticProfileQualification": "Incomplete"
+    },
+    {
+      "RunId": "legacy-profiles-automated-20261123-195534-46e2b682",
+      "Machine": "LEOPARD",
+      "Tier": "Legacy",
+      "WindowsPowerShell": "2.0",
+      "CLR": "2.0.50727.8806",
+      "PowerShell7": "",
+      "GuardCases": 33,
+      "GuardSessions": 36,
+      "GuardKeyboardRestorations": 33,
+      "InputCases": 43,
+      "InputHostLifetimes": 43,
+      "InputKeyboardRestorations": 1,
+      "ProfileTrials": [
+        {
+          "Order": 2,
+          "LauncherOutcome": "Fail",
+          "ReportedPassed": 0,
+          "Total": 2,
+          "PublicationChecks": 3,
+          "Trace": null,
+          "Cases": [
+            {
+              "Case": "wps-clean-native",
+              "Engine": "2.0",
+              "RecordedBehavior": "StoppedBeforeChecks",
+              "MeetsProfileRecipe": false,
+              "SnapshotBytes": 0,
+              "Exception": "JavaScriptSerializer circular reference through System.Management.Automation.PSMethod",
+              "FixtureExitStatusRecorded": true,
+              "Cleanup": true
+            },
+            {
+              "Case": "wps-layered-native",
+              "Engine": "2.0",
+              "RecordedBehavior": "StoppedBeforeChecks",
+              "MeetsProfileRecipe": false,
+              "SnapshotBytes": 0,
+              "Exception": "JavaScriptSerializer circular reference through System.Management.Automation.PSMethod",
+              "FixtureExitStatusRecorded": true,
+              "Cleanup": true
+            }
+          ]
+        },
+        {
+          "Order": 4,
+          "LauncherOutcome": "Fail",
+          "ReportedPassed": 0,
+          "Total": 2,
+          "PublicationChecks": 3,
+          "Trace": null,
+          "Cases": [
+            {
+              "Case": "wps-clean-native",
+              "Engine": "2.0",
+              "RecordedBehavior": "StoppedBeforeChecks",
+              "MeetsProfileRecipe": false,
+              "SnapshotBytes": 0,
+              "Exception": "JavaScriptSerializer circular reference through System.Management.Automation.PSMethod",
+              "FixtureExitStatusRecorded": true,
+              "Cleanup": true
+            },
+            {
+              "Case": "wps-layered-native",
+              "Engine": "2.0",
+              "RecordedBehavior": "StoppedBeforeChecks",
+              "MeetsProfileRecipe": false,
+              "SnapshotBytes": 0,
+              "Exception": "JavaScriptSerializer circular reference through System.Management.Automation.PSMethod",
+              "FixtureExitStatusRecorded": true,
+              "Cleanup": true
+            }
+          ]
+        },
+        {
+          "Order": 5,
+          "LauncherOutcome": "Fail",
+          "ReportedPassed": 0,
+          "Total": 2,
+          "PublicationChecks": 3,
+          "Trace": null,
+          "Cases": [
+            {
+              "Case": "wps-clean-native",
+              "Engine": "2.0",
+              "RecordedBehavior": "StoppedBeforeChecks",
+              "MeetsProfileRecipe": false,
+              "SnapshotBytes": 0,
+              "Exception": "JavaScriptSerializer circular reference through System.Management.Automation.PSMethod",
+              "FixtureExitStatusRecorded": true,
+              "Cleanup": true
+            },
+            {
+              "Case": "wps-layered-native",
+              "Engine": "2.0",
+              "RecordedBehavior": "StoppedBeforeChecks",
+              "MeetsProfileRecipe": false,
+              "SnapshotBytes": 0,
+              "Exception": "JavaScriptSerializer circular reference through System.Management.Automation.PSMethod",
+              "FixtureExitStatusRecorded": true,
+              "Cleanup": true
+            }
+          ]
+        }
+      ],
+      "AutomaticProfileQualification": "Incomplete"
+    },
+    {
+      "RunId": "nonesu-profiles-automated-20261123-195544-ce98fcdf",
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "WindowsPowerShell": "5.1.14409.1018",
+      "CLR": "4.0.30319.42000",
+      "PowerShell7": "7.2.24",
+      "GuardCases": 41,
+      "GuardSessions": 44,
+      "GuardKeyboardRestorations": 39,
+      "InputCases": 43,
+      "InputHostLifetimes": 43,
+      "InputKeyboardRestorations": 1,
+      "ProfileTrials": [
+        {
+          "Order": 2,
+          "LauncherOutcome": "Pass",
+          "ReportedPassed": 4,
+          "Total": 4,
+          "PublicationChecks": 3,
+          "Trace": {
+            "KeyboardOperations": 2,
+            "HostLifetimes": 4
+          },
+          "Cases": [
+            {
+              "Case": "wps-clean-native",
+              "Engine": "5.1.14409.1018",
+              "EditorVersions": [],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 1,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 2,
+              "EditMode": "Native",
+              "ExpectedPrediction": "NotApplicable",
+              "ActualPrediction": "NotApplicable",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "wps-layered-native",
+              "Engine": "5.1.14409.1018",
+              "EditorVersions": [],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 1,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 2,
+              "EditMode": "Native",
+              "ExpectedPrediction": "NotApplicable",
+              "ActualPrediction": "NotApplicable",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "pwsh-clean-readline",
+              "Engine": "7.2.24",
+              "EditorVersions": [
+                "2.1.0"
+              ],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": true,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 0,
+              "InitialErrorCount": 0,
+              "FinalErrorCount": 0,
+              "EditMode": "Windows",
+              "ExpectedPrediction": "None",
+              "ActualPrediction": "None",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "pwsh-layered-readline",
+              "Engine": "7.2.24",
+              "EditorVersions": [
+                "2.1.0"
+              ],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 7,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 0,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 1,
+              "EditMode": "Emacs",
+              "ExpectedPrediction": "History",
+              "ActualPrediction": "None",
+              "PredictionRefusalInControlledStream": true,
+              "ProfilePrecedenceMatched": true
+            }
+          ]
+        },
+        {
+          "Order": 4,
+          "LauncherOutcome": "Pass",
+          "ReportedPassed": 4,
+          "Total": 4,
+          "PublicationChecks": 3,
+          "Trace": {
+            "KeyboardOperations": 2,
+            "HostLifetimes": 4
+          },
+          "Cases": [
+            {
+              "Case": "wps-clean-native",
+              "Engine": "5.1.14409.1018",
+              "EditorVersions": [],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 1,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 2,
+              "EditMode": "Native",
+              "ExpectedPrediction": "NotApplicable",
+              "ActualPrediction": "NotApplicable",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "wps-layered-native",
+              "Engine": "5.1.14409.1018",
+              "EditorVersions": [],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 1,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 2,
+              "EditMode": "Native",
+              "ExpectedPrediction": "NotApplicable",
+              "ActualPrediction": "NotApplicable",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "pwsh-clean-readline",
+              "Engine": "7.2.24",
+              "EditorVersions": [
+                "2.1.0"
+              ],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": true,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 0,
+              "InitialErrorCount": 0,
+              "FinalErrorCount": 0,
+              "EditMode": "Windows",
+              "ExpectedPrediction": "None",
+              "ActualPrediction": "None",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "pwsh-layered-readline",
+              "Engine": "7.2.24",
+              "EditorVersions": [
+                "2.1.0"
+              ],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 7,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 0,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 1,
+              "EditMode": "Emacs",
+              "ExpectedPrediction": "History",
+              "ActualPrediction": "None",
+              "PredictionRefusalInControlledStream": true,
+              "ProfilePrecedenceMatched": true
+            }
+          ]
+        },
+        {
+          "Order": 5,
+          "LauncherOutcome": "Pass",
+          "ReportedPassed": 4,
+          "Total": 4,
+          "PublicationChecks": 3,
+          "Trace": {
+            "KeyboardOperations": 2,
+            "HostLifetimes": 4
+          },
+          "Cases": [
+            {
+              "Case": "wps-clean-native",
+              "Engine": "5.1.14409.1018",
+              "EditorVersions": [],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 1,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 2,
+              "EditMode": "Native",
+              "ExpectedPrediction": "NotApplicable",
+              "ActualPrediction": "NotApplicable",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "wps-layered-native",
+              "Engine": "5.1.14409.1018",
+              "EditorVersions": [],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 1,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 2,
+              "EditMode": "Native",
+              "ExpectedPrediction": "NotApplicable",
+              "ActualPrediction": "NotApplicable",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "pwsh-clean-readline",
+              "Engine": "7.2.24",
+              "EditorVersions": [
+                "2.1.0"
+              ],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": true,
+              "ProofsChecked": 6,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 0,
+              "InitialErrorCount": 0,
+              "FinalErrorCount": 0,
+              "EditMode": "Windows",
+              "ExpectedPrediction": "None",
+              "ActualPrediction": "None",
+              "PredictionRefusalInControlledStream": false,
+              "ProfilePrecedenceMatched": true
+            },
+            {
+              "Case": "pwsh-layered-readline",
+              "Engine": "7.2.24",
+              "EditorVersions": [
+                "2.1.0"
+              ],
+              "RecordedBehavior": "Pass",
+              "MeetsProfileRecipe": false,
+              "ProofsChecked": 7,
+              "NaturalExit": 37,
+              "NativeChildCtrlC": 1,
+              "Cleanup": true,
+              "StartupErrorCount": 0,
+              "InitialErrorCount": 1,
+              "FinalErrorCount": 1,
+              "EditMode": "Emacs",
+              "ExpectedPrediction": "History",
+              "ActualPrediction": "None",
+              "PredictionRefusalInControlledStream": true,
+              "ProfilePrecedenceMatched": true
+            }
+          ]
+        }
+      ],
+      "AutomaticProfileQualification": "Incomplete"
+    }
+  ],
+  "ManualAttempts": [
+    {
+      "RunId": "esu-profiles-manual-20261123-200427-1a8c80f1",
+      "Machine": "TURTLE",
+      "Engine": "wps",
+      "Outcome": "Fail",
+      "Attempted": true,
+      "Stages": 0,
+      "Error": "profile display capacity (Win32 87)",
+      "CleanupError": "fixture exit status (Win32 0)",
+      "HostExited": true,
+      "OwnedProcessesCleaned": true,
+      "PrivacyVerified": true,
+      "OrdinaryProfilesQualified": false
+    },
+    {
+      "RunId": "esu-profiles-manual-20261123-200427-1a8c80f1",
+      "Machine": "TURTLE",
+      "Engine": "pwsh",
+      "Outcome": "Fail",
+      "Attempted": true,
+      "Stages": 0,
+      "Error": "profile display capacity (Win32 87)",
+      "CleanupError": "fixture exit status (Win32 0)",
+      "HostExited": true,
+      "OwnedProcessesCleaned": true,
+      "PrivacyVerified": true,
+      "OrdinaryProfilesQualified": false
+    },
+    {
+      "RunId": "esu-profiles-manual-20261123-200456-447ea3ce",
+      "Machine": "TURTLE",
+      "Engine": "wps",
+      "Outcome": "Fail",
+      "Attempted": true,
+      "Stages": 0,
+      "Error": "profile display capacity (Win32 87)",
+      "CleanupError": "fixture exit status (Win32 0)",
+      "HostExited": true,
+      "OwnedProcessesCleaned": true,
+      "PrivacyVerified": true,
+      "OrdinaryProfilesQualified": false
+    },
+    {
+      "RunId": "esu-profiles-manual-20261123-200456-447ea3ce",
+      "Machine": "TURTLE",
+      "Engine": "pwsh",
+      "Outcome": "Fail",
+      "Attempted": true,
+      "Stages": 0,
+      "Error": "profile display capacity (Win32 87)",
+      "CleanupError": "fixture exit status (Win32 0)",
+      "HostExited": true,
+      "OwnedProcessesCleaned": true,
+      "PrivacyVerified": true,
+      "OrdinaryProfilesQualified": false
+    },
+    {
+      "RunId": "legacy-profiles-manual-20261123-200334-d9422392",
+      "Machine": "LEOPARD",
+      "Engine": "wps",
+      "Outcome": "NotRun",
+      "Attempted": false,
+      "Stages": 0,
+      "Error": "Run the matching automated launcher successfully before the ordinary-profile phase.",
+      "OrdinaryProfilesQualified": false
+    },
+    {
+      "RunId": "nonesu-profiles-manual-20261123-195920-f1fc4def",
+      "Machine": "NESSY",
+      "Engine": "wps",
+      "Outcome": "Fail",
+      "Attempted": true,
+      "Stages": 0,
+      "Error": "profile snapshot completion (Win32 2)",
+      "CleanupError": "fixture exit status (Win32 0)",
+      "HostExited": true,
+      "OwnedProcessesCleaned": true,
+      "PrivacyVerified": true,
+      "OrdinaryProfilesQualified": false
+    },
+    {
+      "RunId": "nonesu-profiles-manual-20261123-195920-f1fc4def",
+      "Machine": "NESSY",
+      "Engine": "pwsh",
+      "Outcome": "Fail",
+      "Attempted": true,
+      "Stages": 0,
+      "Error": "profile snapshot completion (Win32 2)",
+      "CleanupError": "fixture exit status (Win32 0)",
+      "HostExited": true,
+      "OwnedProcessesCleaned": true,
+      "PrivacyVerified": true,
+      "OrdinaryProfilesQualified": false
+    },
+    {
+      "RunId": "nonesu-profiles-manual-20261123-200147-2bc5d7c2",
+      "Machine": "NESSY",
+      "Engine": "wps",
+      "Outcome": "Fail",
+      "Attempted": true,
+      "Stages": 0,
+      "Error": "profile snapshot completion (Win32 2)",
+      "CleanupError": "fixture exit status (Win32 0)",
+      "HostExited": true,
+      "OwnedProcessesCleaned": true,
+      "PrivacyVerified": true,
+      "OrdinaryProfilesQualified": false
+    },
+    {
+      "RunId": "nonesu-profiles-manual-20261123-200147-2bc5d7c2",
+      "Machine": "NESSY",
+      "Engine": "pwsh",
+      "Outcome": "Fail",
+      "Attempted": true,
+      "Stages": 0,
+      "Error": "profile snapshot completion (Win32 2)",
+      "CleanupError": "fixture exit status (Win32 0)",
+      "HostExited": true,
+      "OwnedProcessesCleaned": true,
+      "PrivacyVerified": true,
+      "OrdinaryProfilesQualified": false
+    }
+  ],
+  "Step12Accepted": false
+}

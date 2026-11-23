@@ -1,0 +1,77 @@
+{
+  "Kind": "ProfileReturnedEvidenceIntegrity",
+  "Status": "Pass",
+  "Source": "K:\\VT7_work\\results",
+  "Archive": "VT7Pty-profiles-0.5.1-dev-rc2.zip",
+  "ArchiveSha256": "f9d3b0681f4efc1f5e7a8baeed7a79090eff3649cbd20b82d62ea7d67e7e9d2c",
+  "ManifestSha256": "8edc81b170c0a300e5ab94de91720f484af80a16ff56f66b52a25baaacb4d922",
+  "PackageFiles": 57,
+  "Collections": [
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "Mode": "Automated",
+      "RunId": "esu-profiles-automated-20261123-195738-d57850b1",
+      "InventoriedFiles": 1140,
+      "EvidenceInventorySha256": "a136d615f656150061e7874ead34a9de2e6b5144cfad60909d17c6c5e8f5dcc8"
+    },
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "Mode": "Manual",
+      "RunId": "esu-profiles-manual-20261123-200427-1a8c80f1",
+      "InventoriedFiles": 15,
+      "EvidenceInventorySha256": "457a8e77aa9d425b41bf65c103b025e8701a92ef68d830e1d429914496a7c619"
+    },
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "Mode": "Manual",
+      "RunId": "esu-profiles-manual-20261123-200456-447ea3ce",
+      "InventoriedFiles": 15,
+      "EvidenceInventorySha256": "7516d393a1edb15127fd3244b0bc1cf9a182cdc28480a55b5be1bc538e02f7e8"
+    },
+    {
+      "Machine": "LEOPARD",
+      "Tier": "Legacy",
+      "Mode": "Automated",
+      "RunId": "legacy-profiles-automated-20261123-195534-46e2b682",
+      "InventoriedFiles": 865,
+      "EvidenceInventorySha256": "eea2a863ac6db8c3ec97af70e295edcf02a6b228d655946aa60af5b7b2174c82"
+    },
+    {
+      "Machine": "LEOPARD",
+      "Tier": "Legacy",
+      "Mode": "Manual",
+      "RunId": "legacy-profiles-manual-20261123-200334-d9422392",
+      "InventoriedFiles": 1,
+      "EvidenceInventorySha256": "0ead4703fde7f9ee533bde65ad02eb32c81add615f23b75f8462bdfce039f989"
+    },
+    {
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "Mode": "Automated",
+      "RunId": "nonesu-profiles-automated-20261123-195544-ce98fcdf",
+      "InventoriedFiles": 1140,
+      "EvidenceInventorySha256": "ded3397159f03d4cede6579924a86dc68fdb5cdccb13ff8511cd359e9f3798b4"
+    },
+    {
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "Mode": "Manual",
+      "RunId": "nonesu-profiles-manual-20261123-195920-f1fc4def",
+      "InventoriedFiles": 15,
+      "EvidenceInventorySha256": "2331417681a0b286f454b385fccd201261be905e458d6f62439e65a2d3c525eb"
+    },
+    {
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "Mode": "Manual",
+      "RunId": "nonesu-profiles-manual-20261123-200147-2bc5d7c2",
+      "InventoriedFiles": 15,
+      "EvidenceInventorySha256": "95f8f306b70ff1a743edce374bd44d07c0d4f103de974f71b6ff90810b5c92b9"
+    }
+  ],
+  "InventoriedReturnedFiles": 3206,
+  "ReturnedFilesIncludingInventories": 3214
+}

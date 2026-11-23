@@ -102,10 +102,9 @@ references target retained child process groups and require exactly one Break,
 zero Ctrl+C, no parent notification and natural child exit. They establish
 Windows behavior, not a VT7Pty transport.
 
-Ordinary-user-profile coverage remains NotRun in these input packages. The
-[profile rc2 package](PROFILE_TESTS.md) keeps the accepted input rc2 runtime unchanged
-and is [qualified locally](validation/2026-11-20-step-1.2-profiles-rc2-candidate.md).
-Its Windows 7 controlled and ordinary-profile phases are pending.
+I collect ordinary-user-profile coverage separately. The
+[profile rc2 Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
+verifies all 129 input controls and records the open profile qualification work.
 Clipboard, held physical keys and IME UI remain outside committed-text tests.
 
 ## Build and independent review

@@ -1,0 +1,58 @@
+{
+  "Kind": "ProfileRc2Windows7ReviewDecision",
+  "RecordedDate": "2026-11-23",
+  "Status": "ProfileQualificationIncomplete",
+  "Archive": "VT7Pty-profiles-0.5.1-dev-rc2.zip",
+  "ArchiveSha256": "f9d3b0681f4efc1f5e7a8baeed7a79090eff3649cbd20b82d62ea7d67e7e9d2c",
+  "ManifestSha256": "8edc81b170c0a300e5ab94de91720f484af80a16ff56f66b52a25baaacb4d922",
+  "HarnessSource": "cc564026447b95d458270c3a671ea37efb009f93",
+  "RuntimeSource": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "CollectionsReviewed": 8,
+  "RawFilesPreserved": 3214,
+  "FrozenControlsPassed": true,
+  "CompletedCommandProofs": 150,
+  "MachineResults": [
+    {
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "RunId": "nonesu-profiles-automated-20261123-195544-ce98fcdf",
+      "FrozenH4GuardsPassed": 41,
+      "FrozenInputCasesPassed": 43,
+      "PublicationChecksPassed": 9,
+      "CompletedControlledWorkflows": 12,
+      "ControlledCasesMeetingRecipe": 3,
+      "ControlledCasesRequired": 12,
+      "ManualEngineRunsAttempted": 4,
+      "ManualEngineRunsQualified": 0
+    },
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "RunId": "esu-profiles-automated-20261123-195738-d57850b1",
+      "FrozenH4GuardsPassed": 41,
+      "FrozenInputCasesPassed": 43,
+      "PublicationChecksPassed": 9,
+      "CompletedControlledWorkflows": 12,
+      "ControlledCasesMeetingRecipe": 3,
+      "ControlledCasesRequired": 12,
+      "ManualEngineRunsAttempted": 4,
+      "ManualEngineRunsQualified": 0
+    },
+    {
+      "Machine": "LEOPARD",
+      "Tier": "Legacy",
+      "RunId": "legacy-profiles-automated-20261123-195534-46e2b682",
+      "FrozenH4GuardsPassed": 33,
+      "FrozenInputCasesPassed": 43,
+      "PublicationChecksPassed": 9,
+      "CompletedControlledWorkflows": 0,
+      "ControlledCasesMeetingRecipe": 0,
+      "ControlledCasesRequired": 6,
+      "ManualEngineRunsAttempted": 0,
+      "ManualEngineRunsQualified": 0
+    }
+  ],
+  "OrdinaryProfilesQualified": false,
+  "Step12Accepted": false,
+  "MilestoneAccepted": false
+}

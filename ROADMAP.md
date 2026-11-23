@@ -1,14 +1,15 @@
 # VT7Pty roadmap
 
-Updated: 2026-11-20.
+Updated: 2026-11-23.
 
 I've completed Milestone 0 and published 0.5.0. H3 and the opt-in H4 runtime
 are accepted within their recorded boundaries. The [input rc2 review](docs/validation/2026-11-19-step-1.2-input-rc2-windows7.md)
 qualifies the decoder/framing fixes on all three Windows 7 tiers, with 387/387
-input cases and 345/345 H4 guards passing. **Current: qualify the [Step 1.2 profile package](docs/PROFILE_TESTS.md)** on all
-three machines, including the separate ordinary-profile phase. The public Break gap
-and input/reply contract limits remain explicit. The [profile rc2 archive](docs/validation/2026-11-20-step-1.2-profiles-rc2-candidate.md)
-is qualified locally and delivered; Windows 7 results are pending. VT7 integration stays open.
+input cases and 345/345 H4 guards passing. The
+[profile rc2 Windows 7 review](docs/validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
+verifies all frozen controls. Profile qualification remains open while I address
+fixture setup and manual startup failures. The public Break gap, input/reply
+contract limits and VT7 integration remain open.
 
 I check an item only when its stated work and required tests are complete.
 Partial implementations stay unchecked. A local pass does not replace a required
@@ -117,8 +118,9 @@ public-API experiments failed. I'm now following the
   387/387 input cases, 345/345 H4 guards, 21 lifetime/fault guards and 42
   regressions. The unchanged rc1 reference retains its three failures per machine.
 - [ ] Qualify the [controlled and ordinary-profile matrix](docs/PROFILE_TESTS.md)
-  on all three Windows 7 tiers. The new harness keeps the accepted input rc2
-  runtime and controls unchanged; target qualification is pending.
+  on all three Windows 7 tiers. The [rc2 results](docs/validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
+  confirm passing frozen controls, with legacy serialization, fixture setup
+  and ordinary-profile startup still to resolve.
 - [ ] Record the final F01-F03 and Step 1.2 scope after reviewing that coverage. Public Ctrl+Break transport
   remains unsupported by explicit decision; all 24 native references in rc2
   pass. Escape latency and cursor-report/F3 ambiguity remain documented for

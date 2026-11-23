@@ -1,0 +1,360 @@
+{
+  "Kind": "InputNativeReview",
+  "CollectionStatus": "Completed",
+  "Outcome": "Pass",
+  "SourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "RuntimeSourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+  "Passed": 43,
+  "Total": 43,
+  "FailedCases": [],
+  "Cases": [
+    {
+      "Case": "raw-text-controls",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 24,
+      "SignificantKeys": 9,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "raw-navigation",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 24,
+      "SignificantKeys": 11,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "raw-modifiers",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 20,
+      "SignificantKeys": 5,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "raw-key-repeat",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 260,
+      "SignificantKeys": 129,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "utf8-combined",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 22,
+      "SignificantKeys": 6,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "utf8-bytewise",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 22,
+      "SignificantKeys": 6,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "utf8-two-byte",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 4,
+      "SignificantKeys": 1,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "utf8-three-byte",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 8,
+      "SignificantKeys": 1,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "utf8-four-byte",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 6,
+      "SignificantKeys": 2,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "escape-bytewise",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 24,
+      "SignificantKeys": 11,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "alt-text-bytewise",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 8,
+      "SignificantKeys": 2,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "raw-crlf",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 12,
+      "SignificantKeys": 4,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "committed-paste-burst",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 326,
+      "SignificantKeys": 148,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "committed-paste-fragmented",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 326,
+      "SignificantKeys": 148,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "mouse-sgr",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 9,
+      "SignificantKeys": 0,
+      "MouseRecords": 7
+    },
+    {
+      "Case": "mouse-sgr-bytewise",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 9,
+      "SignificantKeys": 0,
+      "MouseRecords": 7
+    },
+    {
+      "Case": "mouse-x10",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 4,
+      "SignificantKeys": 0,
+      "MouseRecords": 2
+    },
+    {
+      "Case": "mouse-disabled",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 2,
+      "SignificantKeys": 0,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "cooked-unicode",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 0,
+      "SignificantKeys": 0,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "cooked-delete-backspace",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 0,
+      "SignificantKeys": 0,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "cooked-home-end",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 0,
+      "SignificantKeys": 0,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "cooked-tab",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 0,
+      "SignificantKeys": 0,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "cooked-repeat",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 0,
+      "SignificantKeys": 0,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "cooked-multiline-paste",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 0,
+      "SignificantKeys": 0,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "cooked-cancel-unicode",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 0,
+      "SignificantKeys": 0,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "processed-ctrl-c",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 4,
+      "SignificantKeys": 1,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "unprocessed-ctrl-c",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 8,
+      "SignificantKeys": 2,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "native-break-processed",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 2,
+      "SignificantKeys": 0,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "native-break-unprocessed",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 2,
+      "SignificantKeys": 0,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "ctrl-backslash-byte",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 8,
+      "SignificantKeys": 2,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "utf8-timeout-fragment",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 6,
+      "SignificantKeys": 2,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "utf8-live-replies",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 22,
+      "SignificantKeys": 6,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "escape-live-replies",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 24,
+      "SignificantKeys": 11,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "utf8-timeout-three",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 10,
+      "SignificantKeys": 2,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "utf8-timeout-four",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 8,
+      "SignificantKeys": 3,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "utf8-malformed-recovery",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 18,
+      "SignificantKeys": 8,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "utf8-malformed-bytewise",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 18,
+      "SignificantKeys": 8,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "escape-alone-live",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 4,
+      "SignificantKeys": 1,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "escape-alone-no-reply",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 4,
+      "SignificantKeys": 1,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "utf8-fragmented-replies",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 22,
+      "SignificantKeys": 6,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "escape-fragmented-replies",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 24,
+      "SignificantKeys": 11,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "alt-unicode-timeout",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 8,
+      "SignificantKeys": 2,
+      "MouseRecords": 0
+    },
+    {
+      "Case": "alt-unicode-live-replies",
+      "Passed": true,
+      "Reasons": [],
+      "RawRecords": 8,
+      "SignificantKeys": 2,
+      "MouseRecords": 0
+    }
+  ],
+  "HostLifetimes": 43,
+  "KeyboardOperations": 1,
+  "CtrlBreakTransport": "Unsupported",
+  "Step12Accepted": false
+}

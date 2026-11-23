@@ -1,0 +1,246 @@
+[CmdletBinding()]
+param([Parameter(Mandatory=$true)][string]$Repository,
+      [Parameter(Mandatory=$true)][string]$ReviewRoot)
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version 2.0
+
+$exact=Join-Path $ReviewRoot 'exact-package'
+$collections=Join-Path $ReviewRoot 'collections'
+$tools=Join-Path $Repository 'tools'
+$profileReviewer=Join-Path $tools 'profiles\Test-ProfileEvidence.ps1'
+$seen=$null
+$parseErrors=$null
+$ast=[Management.Automation.Language.Parser]::ParseFile($profileReviewer,[ref]$seen,[ref]$parseErrors)
+if($parseErrors.Count){throw 'The checked-in profile reviewer does not parse.'}
+# Reuse the checked-in case checks for completed workflows. Leave the strict
+# bundle verdict intact when a fixture failed to establish its configuration.
+$functions=@('Need-P','Read-P','Hash-P','Files-P','Snapshot-P','EqualState-P','Proof-P','Child-P','Launch-P','Trace-P')
+foreach($functionName in $functions){
+    $definition=$ast.Find({param($node)
+        $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $functionName
+    },$false)
+    if(-not $definition){throw ('Missing reviewer function '+$functionName)}
+    . ([ScriptBlock]::Create($definition.Extent.Text))
+}
+function Save-A([string]$Name,$Value){
+    [IO.File]::WriteAllText((Join-Path $ReviewRoot $Name),($Value | ConvertTo-Json -Depth 25),[Text.UTF8Encoding]::new($false))
+}
+function Publication-A([string]$Root,[string]$Harness){
+    $p=Read-P (Join-Path $Root 'publication\result.json')
+    Need-P ($p.Kind -ceq 'ProfilePublicationOracle' -and $p.SchemaVersion -eq 1 -and $p.Status -ceq 'Pass' -and
+        $p.SourceCommit -ceq $Harness -and $p.OriginalReaderReplaceError -eq 32 -and $p.SharedReaderReplacement -and
+        $p.PreviousHandleStable -and $p.NextReadCurrent -and $p.Checks -eq 3) 'held-reader regression receipts'
+    Need-P ((Read-P (Join-Path $Root 'publication\proof.previous')).Invocation -eq 1 -and
+        (Read-P (Join-Path $Root 'publication\proof.json')).Invocation -eq 2) 'held-reader old and new proof'
+    return $p.Checks
+}
+function Completed-A([string]$Path,$Case,$Report){
+    $launch=Launch-P $Path
+    Need-P ($launch.NoProfile -and $launch.ControlledInlineFixtures -and -not $launch.Ordinary -and
+        -not $launch.SyntheticInputUsed) 'controlled fixture launch'
+    $first=Snapshot-P $Path 0 $launch
+    $last=Snapshot-P $Path 1 $launch
+    EqualState-P $first $last
+    $processPolicy=if($Report.OriginalProcessPolicy.Present){$Report.OriginalProcessPolicy.Value}else{'Undefined'}
+    Need-P ($first.Policy.Process -ceq $processPolicy) 'original execution policy in fixture'
+    $editorVersions=@($first.Editors | ForEach-Object {$_.Version})
+    if($Case.Engine -ceq 'pwsh'){
+        Need-P ($first.Engine -ceq '7.2.24' -and ($editorVersions -join '|') -ceq '2.1.0' -and
+            $first.Options.HistorySaveStyle -ceq 'SaveNothing') 'pinned PowerShell 7 and editor'
+    }else{Need-P ($first.Engine -ceq $Report.PowerShellVersion -and $editorVersions.Count -eq 0) 'installed Windows PowerShell and native editing'}
+    $order=if($Case.Layered){'AllUsersAllHosts,AllUsersCurrentHost,CurrentUserAllHosts,CurrentUserCurrentHost'}else{''}
+    $winner=if($Case.Layered){'CurrentUserCurrentHost'}else{''}
+    Need-P ($first.FixtureOrder -ceq $order -and $first.FixtureWinner -ceq $winner) 'controlled profile precedence'
+    Need-P ($first.Options.EditMode -ceq $Case.EditMode) 'expected editor mode'
+    $names=@('Editing','History','Completion','Multiline','Continue','Resize')
+    if($Case.Case -ceq 'pwsh-layered-readline'){$names+=@('Binding')}
+    $proofs=(Read-P (Join-Path $Path 'command-proofs.json')).Proofs
+    Need-P (($proofs.Check -join '|') -ceq ($names -join '|')) 'complete controlled command proofs'
+    for($i=0;$i -lt $names.Count;$i++){
+        $p=Proof-P $Path $names[$i] $launch
+        $required=if($names[$i] -ceq 'History'){2}else{1}
+        Need-P ($p.CheckInvocation -eq $required -and $proofs[$i].Matched -and
+            $proofs[$i].Invocation -eq $p.Invocation -and $proofs[$i].CheckInvocation -eq $required) 'matching command readback and count'
+    }
+    $cancel=Read-P (Join-Path $Path 'cancel.json')
+    Need-P ($cancel.PartialLineDiscarded -and $cancel.NextCommandPassed -and
+        -not (Test-Path -LiteralPath (Join-Path $Path 'Cancelled.json'))) 'canceled line never executes'
+    Need-P ($last.WindowWidth -eq 100 -and $last.WindowHeight -eq 32) 'child reads resized geometry'
+    Child-P $Path $launch
+    $withinRecipe=$first.StartupErrorCount -eq 0 -and $first.ErrorCount -eq 0 -and
+        $first.Options.PredictionSource -ceq $Case.PredictionSource
+    $predictionRefused=$false
+    if($Case.Case -ceq 'pwsh-layered-readline'){
+        $stream=[IO.File]::ReadAllText((Join-Path $Path 'stream.bin'))
+        $stream=[regex]::Replace($stream,([char]27+'\[[0-?]*[ -/]*[@-~]'),'')
+        $predictionRefused=($stream -replace '\s+',' ') -match 'doesn.t support virtual terminal processing or it.s redirected'
+        Need-P ($first.Options.PredictionSource -ceq 'None' -and $first.ErrorCount -eq 1 -and $predictionRefused) 'recorded prediction refusal and actual setting'
+    }
+    if($Case.Engine -ceq 'wps'){
+        Need-P ($first.StartupErrorCount -eq 1 -and $first.ErrorCount -eq 1) 'repeatable initial Windows PowerShell error count'
+    }
+    return [ordered]@{
+        Case=$Case.Case;Engine=$first.Engine;EditorVersions=$editorVersions;RecordedBehavior='Pass'
+        MeetsProfileRecipe=$withinRecipe;ProofsChecked=$proofs.Count;NaturalExit=37;NativeChildCtrlC=1;Cleanup=$true
+        StartupErrorCount=$first.StartupErrorCount;InitialErrorCount=$first.ErrorCount;FinalErrorCount=$last.ErrorCount
+        EditMode=$first.Options.EditMode;ExpectedPrediction=$Case.PredictionSource;ActualPrediction=$first.Options.PredictionSource
+        PredictionRefusalInControlledStream=$predictionRefused;ProfilePrecedenceMatched=$true
+    }
+}
+function LegacyFailure-A([string]$Path,$Case,[string]$Harness){
+    $launch=Read-P (Join-Path $Path 'shell-launch.json')
+    $identity=Read-P (Join-Path $Path 'identity.json')
+    $life=Read-P (Join-Path $Path 'lifetime.json')
+    $desktop=Read-P (Join-Path $Path 'desktop.json')
+    $preflight=Read-P (Join-Path $Path 'preflight.json')
+    $snapshot=Get-Item -LiteralPath (Join-Path $Path 'snapshot-0.json')
+    $stream=[IO.File]::ReadAllText((Join-Path $Path 'stream.bin'))
+    $stream=[regex]::Replace($stream,([char]27+'\[[0-?]*[ -/]*[@-~]'),'')
+    $compact=$stream -replace '\s+',''
+    Need-P ($compact.Contains('Acircularreferencewasdetected') -and
+        $compact.Contains('System.Management.Automation.PSMethod') -and $compact.Contains('Serialize') -and $snapshot.Length -eq 0) 'legacy snapshot serializer failure'
+    Need-P ($launch.NoProfile -and $launch.ControlledInlineFixtures -and -not $launch.PolicyOverride -and
+        $launch.ShellParentId -eq $identity.Fixture.ProcessId -and $preflight.Eligible -and $preflight.SourceCommit -ceq $Harness -and
+        $identity.IdentityEligible -and $identity.NativeX64 -and $identity.SameUserLogonIntegritySession -and $desktop.ApplicationGuiOrdinary -and
+        $desktop.HostWindowPrivate -and $life.OwnedProcessesCleaned -and $life.HostExited -and $life.Error -ceq 'fixture exit status (Win32 0)') 'legacy failure occurs after a valid launch and cleans up'
+    Need-P (-not (Test-Path -LiteralPath (Join-Path $Path 'command-proofs.json'))) 'legacy did not reach the command checks'
+    return [ordered]@{Case=$Case.Case;Engine='2.0';RecordedBehavior='StoppedBeforeChecks';MeetsProfileRecipe=$false;
+        SnapshotBytes=$snapshot.Length;Exception='JavaScriptSerializer circular reference through System.Management.Automation.PSMethod';FixtureExitStatusRecorded=$true;Cleanup=$true}
+}
+function ManualAttempt-A($Trial,[string]$Root,$Report,[string]$Harness){
+    $path=Join-Path $Root ($Trial.Directory+'\native')
+    $probe=Read-P (Join-Path $path 'probe.json')
+    $launch=Read-P (Join-Path $path 'session\shell-launch.json')
+    $identity=Read-P (Join-Path $path 'session\identity.json')
+    $desktop=Read-P (Join-Path $path 'session\desktop.json')
+    $life=Read-P (Join-Path $path 'session\lifetime.json')
+    $check=Read-P (Join-Path $path 'physical-checks.json')
+    $preflight=Read-P (Join-Path $path 'preflight.json')
+    Need-P ($Trial.CollectionStatus -ceq 'Completed' -and $Trial.Outcome -ceq 'Fail' -and $Trial.ExitCode -eq 1 -and
+        $probe.Kind -ceq 'OrdinaryProfileProbe' -and $probe.Status -ceq 'Fail' -and $probe.SourceCommit -ceq $Harness -and
+        $probe.RuntimeSourceCommit -ceq $runtimeSource -and $probe.Stages -eq 0 -and -not $probe.Step12Accepted) 'failed ordinary launcher outcome'
+    Need-P ($launch.Ordinary -and -not $launch.NoProfile -and -not $launch.SyntheticInputUsed -and -not $launch.PolicyOverride -and
+        $launch.ShellParentId -eq $identity.Fixture.ProcessId -and $identity.IdentityEligible -and $identity.NativeX64 -and
+        $identity.SameUserLogonIntegritySession -and $desktop.ApplicationGuiOrdinary -and $desktop.HostWindowPrivate -and
+        $preflight.Eligible -and $preflight.SourceCommit -ceq $Harness) 'actual ordinary shell startup path'
+    Need-P ($life.OwnedProcessesCleaned -and $life.HostExited -and $probe.OwnedProcessesCleaned -and $probe.HostExited -and
+        $life.Error -ceq 'fixture exit status (Win32 0)') 'aborted fixture status and owned cleanup'
+    Need-P (-not $probe.ProfileContentCollected -and -not $probe.ShellOutputCollected -and -not $probe.HistoryContentCollected -and
+        -not $check.PrintableTextCollected -and @($check.Stages).Count -eq 0 -and @($check.KeyCountsByStage).Count -eq 0 -and
+        @($check.Resizes).Count -eq 0) 'no ordinary profile evidence exposure'
+    $actualFiles=@(Get-ChildItem -LiteralPath $path -File -Recurse | ForEach-Object {$_.FullName.Substring($path.Length+1)} | Sort-Object)
+    $wantedFiles=@('physical-checks.json','preflight.json','probe.json','session\desktop.json','session\identity.json','session\lifetime.json','session\shell-launch.json') | Sort-Object
+    Need-P (($actualFiles -join '|') -ceq ($wantedFiles -join '|')) 'ordinary attempt contains only startup and cleanup metadata'
+    return [ordered]@{
+        RunId=$Report.RunId;Machine=$Report.ComputerName;Engine=$Trial.Role;Outcome='Fail';Attempted=$true;Stages=0;
+        Error=$probe.Error;CleanupError=$life.Error;HostExited=$true;OwnedProcessesCleaned=$true
+        PrivacyVerified=$true;OrdinaryProfilesQualified=$false
+    }
+}
+
+$m=Read-P (Join-Path $exact 'manifest.json')
+$runtimeSource=$m.Runtime.SourceCommit
+$harness=$m.Harness.SourceCommit
+$manifestHash=Hash-P (Join-Path $exact 'manifest.json')
+$definitions=(Read-P (Join-Path $exact 'tools\profiles\cases.json')).Cases
+$machineByTier=@{NonESU='NESSY';ESU='TURTLE';Legacy='LEOPARD'}
+$rawReviewed=@()
+$automated=@()
+$manual=@()
+foreach($run in Get-ChildItem -LiteralPath $collections -Directory | Sort-Object Name){
+    $report=Read-P (Join-Path $run.FullName 'report.json')
+    Need-P ($report.ComputerName -ceq $machineByTier[$report.Tier] -and $report.OS.Version -ceq '6.1.7601' -and
+        $report.OS.ServicePackMajorVersion -eq 1 -and $report.OS.ProductType -eq 1 -and
+        $report.ManifestSha256 -ceq $manifestHash -and $report.Harness.SourceCommit -ceq $harness -and
+        $report.Runtime.SourceCommit -ceq $runtimeSource -and $report.Runtime.UnchangedFromInputRc2 -and
+        -not $report.PolicyOverrideInherited -and -not $report.Step12Accepted -and -not $report.MilestoneAccepted) 'issued candidate and returned machine identity'
+    if($report.Tier -ceq 'Legacy'){
+        Need-P ($report.PowerShellVersion -ceq '2.0' -and $report.CLRVersion -ceq '2.0.50727.8806' -and
+            -not $report.PowerShell7.Required -and @($report.Updates | Where-Object {$_.Id -ceq 'KB3191566'}).Count -eq 0) 'Windows PowerShell 2.0 and CLR 2.0 tier'
+    }else{
+        Need-P ($report.PowerShell7.Required -and $report.PowerShell7.Version -ceq '7.2.24' -and $report.PowerShellVersion.StartsWith('5.1.')) 'qualified shell versions in inventoried tier'
+    }
+
+    $reason=''
+    try{$null=& $profileReviewer -Directory $run.FullName -PackageRoot $exact}
+    catch{$reason=$_.Exception.Message}
+    $expected=if($report.Mode -ceq 'Manual' -and $report.Tier -ceq 'Legacy'){'profile report prerequisites/privacy'}
+              elseif($report.Mode -ceq 'Automated' -and $report.Tier -cne 'Legacy'){'controlled startup and workflow errors'}
+              else{'completed profile controller'}
+    Need-P ($reason.Contains($expected)) ('strict qualification rejection for '+$run.Name+' '+$reason)
+    $rawReviewed+=@([ordered]@{RunId=$run.Name;Machine=$report.ComputerName;Mode=$report.Mode;Status='Rejected';Reason=$reason})
+    if($report.Mode -ceq 'Manual'){
+        if($report.Tier -ceq 'Legacy'){
+            Need-P (-not $report.AutomatedRunId -and @($report.PreflightErrors).Count -eq 1 -and
+                $report.PreflightErrors[0] -ceq 'Run the matching automated launcher successfully before the ordinary-profile phase.' -and
+                @($report.Trials).Count -eq 1 -and $report.Trials[0].Role -ceq 'wps' -and
+                $report.Trials[0].CollectionStatus -ceq 'Partial' -and -not (Test-Path -LiteralPath (Join-Path $run.FullName '01-wps\native'))) 'manual gate prevented legacy shell launch'
+            $manual+=@([ordered]@{RunId=$run.Name;Machine=$report.ComputerName;Engine='wps';Outcome='NotRun';Attempted=$false;Stages=0;Error=$report.PreflightErrors[0];OrdinaryProfilesQualified=$false})
+        }else{
+            $linked=Read-P (Join-Path $collections ($report.AutomatedRunId+'\report.json'))
+            Need-P ($linked.Mode -ceq 'Automated' -and $linked.ComputerName -ceq $report.ComputerName -and
+                $linked.Tier -ceq $report.Tier -and $linked.ManifestSha256 -ceq $manifestHash -and
+                @($report.PreflightErrors).Count -eq 0 -and ($report.Trials.Role -join '|') -ceq 'wps|pwsh') 'same machine automated link and manual engine plan'
+            foreach($trial in $report.Trials){
+                $manual+=@(ManualAttempt-A $trial $run.FullName $report $harness)
+            }
+        }
+        continue
+    }
+
+    Need-P ($report.Mode -ceq 'Automated' -and @($report.PreflightErrors).Count -eq 0 -and
+        ($report.Trials.Role -join '|') -ceq 'Guard|Profiles|Input|Profiles|Profiles' -and
+        @($report.Trials | Where-Object {$_.CollectionStatus -cne 'Completed' -or $_.TimedOut -or $_.Error}).Count -eq 0) 'all automated controllers finished'
+    $guardPath=Join-Path $run.FullName '01-guard\native'
+    $guard=& (Join-Path $tools 'research\Test-H4RuntimeEvidence.ps1') -Directory $guardPath
+    $inputReview=& (Join-Path $tools 'input\Test-InputEvidence.ps1') -Directory (Join-Path $run.FullName '03-input\native') -ExpectedHarnessSource $runtimeSource -ExpectedRuntimeSource $runtimeSource -CaseDefinitionsPath (Join-Path $exact 'reference\input-cases.json')
+    Need-P ($guard.Status -ceq 'Pass' -and $guard.Cases -eq $m.Reference.GuardCasesByTier.($report.Tier) -and
+        (Read-P (Join-Path $guardPath 'probe.json')).SourceCommit -ceq $runtimeSource -and
+        $inputReview.Outcome -ceq 'Pass' -and $inputReview.Passed -eq 43 -and $inputReview.Total -eq 43) 'independently passing frozen controls'
+    Save-A ($report.Tier.ToLowerInvariant()+'-guard-review.json') $guard
+    Save-A ($report.Tier.ToLowerInvariant()+'-input-review.json') $inputReview
+    $legacy=$report.Tier -ceq 'Legacy'
+    $cases=if($legacy){@($definitions | Select-Object -First 2)}else{@($definitions)}
+    $profiles=foreach($trial in $report.Trials | Where-Object {$_.Role -ceq 'Profiles'}){
+        $p=Join-Path $run.FullName ($trial.Directory+'\native')
+        $probe=Read-P (Join-Path $p 'probe.json')
+        $rows=(Read-P (Join-Path $p 'cases.json')).Cases
+        Need-P ($probe.Kind -ceq 'ProfileFixtureProbe' -and $probe.SchemaVersion -eq 1 -and
+            $probe.SourceCommit -ceq $harness -and $probe.RuntimeSourceCommit -ceq $runtimeSource -and $probe.PublicationChecks -eq 3 -and
+            $probe.OrdinaryUserProfiles -ceq 'NotRun' -and $probe.ControlledInlineFixtures -and -not $probe.Step12Accepted -and
+            $probe.Total -eq $cases.Count -and ($rows.Case -join '|') -ceq ($cases.Case -join '|') -and
+            ($trial.ExitCode -eq 0) -eq ($probe.Status -ceq 'Pass')) 'recorded profile source, cases and stage exit'
+        $publication=Publication-A $p $harness
+        $trace=if(-not $legacy){Trace-P $p $harness $cases.Count}
+        $details=for($i=0;$i -lt $cases.Count;$i++){
+            Need-P ($rows[$i].OwnedProcessesCleaned -and $rows[$i].HostExited) 'fixture backing host exits and processes are cleaned'
+            $path=Join-Path $p $cases[$i].Case
+            if($legacy){
+                Need-P (-not $rows[$i].Passed -and $rows[$i].Error -like 'profile snapshot completion*') 'legacy failure at first snapshot'
+                LegacyFailure-A $path $cases[$i] $harness
+            }else{
+                Need-P ($rows[$i].Passed -and -not $rows[$i].Error) 'complete native command workflow'
+                Completed-A $path $cases[$i] $report
+            }
+        }
+        [ordered]@{Order=$trial.Order;LauncherOutcome=$probe.Status;ReportedPassed=$probe.Passed;Total=$probe.Total
+            PublicationChecks=$publication;Trace=$trace;Cases=@($details)}
+    }
+    $automated+=@([ordered]@{RunId=$run.Name;Machine=$report.ComputerName;Tier=$report.Tier
+        WindowsPowerShell=$report.PowerShellVersion;CLR=$report.CLRVersion;PowerShell7=$report.PowerShell7.Version
+        GuardCases=$guard.Cases;GuardSessions=$guard.Sessions;GuardKeyboardRestorations=$guard.KeyboardOperations
+        InputCases=$inputReview.Passed;InputHostLifetimes=$inputReview.HostLifetimes;InputKeyboardRestorations=$inputReview.KeyboardOperations
+        ProfileTrials=@($profiles);AutomaticProfileQualification='Incomplete'})
+}
+Need-P (@($automated).Count -eq 3 -and @($manual).Count -eq 9 -and @($rawReviewed).Count -eq 8) 'complete three-machine evidence'
+Save-A 'returned-evidence-review.json' ([ordered]@{
+    Kind='ProfileRc2Windows7EvidenceReview';ManifestSha256=$manifestHash;HarnessSource=$harness;RuntimeSource=$runtimeSource
+    BundleReviews=$rawReviewed;Automated=$automated;ManualAttempts=$manual;Step12Accepted=$false
+})
+$automated | ForEach-Object {
+    $p=@($_.ProfileTrials | ForEach-Object {$_.Cases})
+    [pscustomobject]@{Machine=$_.Machine;Guard=$_.GuardCases;Input=$_.InputCases;Behavior=@($p | Where-Object {$_.RecordedBehavior -ceq 'Pass'}).Count
+        ProfileRecipe=@($p | Where-Object {$_.MeetsProfileRecipe}).Count;ProfileCases=$p.Count
+        Publication=(($_.ProfileTrials | ForEach-Object {$_.PublicationChecks}) | Measure-Object -Sum).Sum}
+} | Format-Table -AutoSize
+$rawReviewed | ForEach-Object {[pscustomobject]$_} | Format-Table Machine,Mode,Status,Reason -AutoSize

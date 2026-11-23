@@ -45,10 +45,10 @@ its approved opt-in scope. The [input rc1 review](validation/2026-11-19-step-1.2
 now confirms three fragmented-input failures on all three Windows 7 tiers;
 its frozen H4 guards pass. The [input rc2 review](validation/2026-11-19-step-1.2-input-rc2-windows7.md)
 qualifies the corrections on all three tiers: 387/387 input cases, 345/345 H4
-guards, 21 lifetime/fault guards and 42 regressions pass. The [profile rc2 package](PROFILE_TESTS.md) is
-[qualified locally and delivered](validation/2026-11-20-step-1.2-profiles-rc2-candidate.md)
-with that runtime unchanged. Its Windows 7 controlled/ordinary-profile runs and
-broader Milestone 1 work stay open.
+guards, 21 lifetime/fault guards and 42 regressions pass. The
+[profile rc2 Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
+verifies all frozen controls and records the remaining fixture and
+ordinary-profile blockers.
 The released 0.5.0 runtime still has the recorded cancellation defect.
 
 | Guide | Purpose |

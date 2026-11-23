@@ -35,8 +35,9 @@ applications need an exact version, distribution/license record, and reproducibl
 scenario before becoming gates. Automated shell runs use clean profiles;
 ordinary profiles have a separately recorded manual check. The
 [Step 1.2 profile package](PROFILE_TESTS.md) collects that matrix using the
-accepted input rc2 runtime; Windows 7 qualification is pending. Do not change global
-profiles, execution policy, console settings, or installed code pages.
+accepted input rc2 runtime. I recorded partial coverage and the remaining
+startup failures in the [Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md).
+I preserve global profiles, execution policy, console settings and installed code pages.
 
 ## Measurement matrix
 

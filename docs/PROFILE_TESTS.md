@@ -3,10 +3,11 @@
 I use this Step 1.2 package to check shell input with controlled configurations
 and ordinary PowerShell profiles. The accepted input rc2 runtime stays unchanged:
 0.5.1-dev, API 1.1, protocol 2, source 0ca6e3fa. Only the test harness is new.
-Windows 7 qualification is pending until I review the returned runs. I retain
-rc1's failed local qualification: its history command ran, but a result-file
-reader blocked publication of the updated proof. Rc2 changes only the harness
-reader's file sharing and adds a held-reader publication check.
+I retain rc1's failed local qualification, where a result-file reader blocked
+publication of the updated history proof. Rc2 corrects file sharing and adds
+a held-reader publication check. The [Windows 7 review](validation/2026-11-23-step-1.2-profiles-rc2-windows7.md)
+verifies those checks and the frozen controls. I need a follow-up candidate for
+the remaining profile fixture and manual startup failures.
 
 The [local rc2 review](validation/2026-11-20-step-1.2-profiles-rc2-candidate.md)
 records the exact archive, completed checks and verified delivery to K:\VT7_work.
