@@ -1,0 +1,83 @@
+{
+  "Kind": "OutputRc2Windows7ReviewDecision",
+  "RecordedDate": "2026-11-23",
+  "Status": "CharacterizationComplete",
+  "Step13Accepted": false,
+  "MilestoneAccepted": false,
+  "Archive": "VT7Pty-output-0.5.1-dev-rc2.zip",
+  "ArchiveSha256": "c24e489d1d9c4f9b4dfbcfd0bed15e045f2816967055f21e08cc58683628e2a5",
+  "ManifestSha256": "eb2586703160764130e3b2a2a41e66978a9b7e56c387bb98e30838188cfd0641",
+  "PackageEntriesVerified": 26,
+  "Comparisons": 39,
+  "MatchesByRuntimePair": 30,
+  "DifferencesByRuntimePair": 6,
+  "UnavailableByRuntimePair": 3,
+  "Observations": 78,
+  "Outcomes": {
+    "Match": 60,
+    "Difference": 12,
+    "CapabilityUnavailable": 6
+  },
+  "VisibleSettledCheckpoints": 156,
+  "RuntimeFlags": 0,
+  "AllRuntimePairsByteIdentical": true,
+  "SharedStreamSha256ByCase": {
+    "OUTPUT_LATIN": "3cedb6d8e2a6d243406594b640c87d6aaeb0a2862c16670094840f1befee1967",
+    "OUTPUT_COMBINING": "d24c33704b506429aaecaab23296f68e5853fca7bf4af07f0074926f7f94ffdf",
+    "OUTPUT_WIDE": "68528c0cbf6df4e836e0ee45f4bd05da054fe27c981303f3495b87c1658e6383",
+    "OUTPUT_SUPPLEMENTARY": "9a9662d81887948662a28f5a5c729085a5ba38ded5981b332ea7e84388dbea3c",
+    "OUTPUT_CP437": "62cb0d451992d0bc0f20f23850ee01a0e6b089ec2fe79a36d604e0636e945ab8",
+    "OUTPUT_CP1250": "3cedb6d8e2a6d243406594b640c87d6aaeb0a2862c16670094840f1befee1967",
+    "OUTPUT_CP65001": "3cedb6d8e2a6d243406594b640c87d6aaeb0a2862c16670094840f1befee1967",
+    "OUTPUT_CP65001_MALFORMED": "c9d6a82898872e3b083dca862c3f1534c100b7dea7d0fb2c6aa6056562043287",
+    "OUTPUT_POSITION": "426a575411a10f76fea1e4b941ae1083b6cc5867aa9759dd0e664d6d467c7d9a",
+    "OUTPUT_ERASE": "a50176610ad02f892d3eba7e005da436eb30fb1ee2547dd34e6018c3d56eca93",
+    "OUTPUT_WRAP": "cc11e675082163ceed7a8f4d796d8c39ab77c421df30c31fc3f5b1b02c288e7a",
+    "OUTPUT_SCROLL": "a547df0dc4cedf3357234cc127e35a8e9ed0cc572cbab74736aab0f2fdee6170",
+    "OUTPUT_RAW_VT": "8d284762222a495a8485ae17d3fe5b544faee0d5aeccca798b516ce9667580a8"
+  },
+  "MachineResults": [
+    {
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "RunId": "nonesu-output-20261123-224119-11c72924",
+      "PowerShellVersion": "5.1.14409.1018",
+      "CLRVersion": "4.0.30319.42000",
+      "Outcomes": {
+        "Match": 20,
+        "Difference": 4,
+        "CapabilityUnavailable": 2
+      },
+      "IdenticalRuntimePairs": 13
+    },
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "RunId": "esu-output-20261123-224240-6c65cfa0",
+      "PowerShellVersion": "5.1.14409.1005",
+      "CLRVersion": "4.0.30319.42000",
+      "Outcomes": {
+        "Match": 20,
+        "Difference": 4,
+        "CapabilityUnavailable": 2
+      },
+      "IdenticalRuntimePairs": 13
+    },
+    {
+      "Machine": "LEOPARD",
+      "Tier": "Legacy",
+      "RunId": "legacy-output-20261123-224142-acff2e51",
+      "PowerShellVersion": "2.0",
+      "CLRVersion": "2.0.50727.8806",
+      "Outcomes": {
+        "Match": 20,
+        "Difference": 4,
+        "CapabilityUnavailable": 2
+      },
+      "IdenticalRuntimePairs": 13
+    }
+  ],
+  "LegacyCollectorVerified": true,
+  "RawFilesPreserved": 318,
+  "ReturnedCollectionsSha256": "4f3542d44154fffa63306440bb8c051c8277440d6a5973e93ea7c7276e8fd02f"
+}

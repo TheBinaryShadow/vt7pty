@@ -5,6 +5,11 @@ Both use the same native fixture and session flags of zero. The 13 cases run
 once against each runtime. I use their differences to decide where to fix
 output reconstruction.
 
+I completed all three Windows 7 runs in rc2. The paired evidence reproduces
+column differences for a combining mark and a CJK ideograph. The procedure
+below reproduces that matrix.
+[Windows 7 review](validation/2026-11-23-step-1.3-output-rc2-windows7.md)
+
 ## Run the candidate
 
 I extract the complete VT7Pty-output-0.5.1-dev-rc2.zip into a short local folder

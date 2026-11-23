@@ -1,0 +1,95 @@
+{
+  "Kind": "OutputRc2ReturnedEvidenceIntegrity",
+  "Status": "Pass",
+  "Archive": "VT7Pty-output-0.5.1-dev-rc2.zip",
+  "ArchiveSha256": "c24e489d1d9c4f9b4dfbcfd0bed15e045f2816967055f21e08cc58683628e2a5",
+  "ManifestSha256": "eb2586703160764130e3b2a2a41e66978a9b7e56c387bb98e30838188cfd0641",
+  "PackageEntriesVerified": 26,
+  "Collections": [
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "RunId": "esu-output-20261123-224240-6c65cfa0",
+      "OS": "Microsoft Windows 7 Ultimate ",
+      "OSVersion": "6.1.7601",
+      "PowerShellVersion": "5.1.14409.1005",
+      "CLRVersion": "4.0.30319.42000",
+      "TotalFiles": 106,
+      "EvidenceIndexSha256": "c9ba2423d9decda887d99248247f93c31991871fbabdab82f4ae3fa7e41fd8dc",
+      "Complete": true,
+      "Prerequisites": [],
+      "CollectionStatus": {
+        "Observed": 26
+      },
+      "ReportedOutcomes": {
+        "baseline": {
+          "Match": 10,
+          "Difference": 2,
+          "CapabilityUnavailable": 1
+        },
+        "accepted": {
+          "Match": 10,
+          "Difference": 2,
+          "CapabilityUnavailable": 1
+        }
+      }
+    },
+    {
+      "Machine": "LEOPARD",
+      "Tier": "Legacy",
+      "RunId": "legacy-output-20261123-224142-acff2e51",
+      "OS": "Microsoft Windows 7 Ultimate ",
+      "OSVersion": "6.1.7601",
+      "PowerShellVersion": "2.0",
+      "CLRVersion": "2.0.50727.8806",
+      "TotalFiles": 106,
+      "EvidenceIndexSha256": "ee425480dbf139d2097557c4004c3691355707e252d7d6c0a78420f2241a3f72",
+      "Complete": true,
+      "Prerequisites": [],
+      "CollectionStatus": {
+        "Observed": 26
+      },
+      "ReportedOutcomes": {
+        "baseline": {
+          "Match": 10,
+          "Difference": 2,
+          "CapabilityUnavailable": 1
+        },
+        "accepted": {
+          "Match": 10,
+          "Difference": 2,
+          "CapabilityUnavailable": 1
+        }
+      }
+    },
+    {
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "RunId": "nonesu-output-20261123-224119-11c72924",
+      "OS": "Microsoft Windows 7 Ultimate ",
+      "OSVersion": "6.1.7601",
+      "PowerShellVersion": "5.1.14409.1018",
+      "CLRVersion": "4.0.30319.42000",
+      "TotalFiles": 106,
+      "EvidenceIndexSha256": "be207ceaba3cb96fcfc2c6fa3d2d755391a915dea7d9b772637577eb4b0b3e29",
+      "Complete": true,
+      "Prerequisites": [],
+      "CollectionStatus": {
+        "Observed": 26
+      },
+      "ReportedOutcomes": {
+        "baseline": {
+          "Match": 10,
+          "Difference": 2,
+          "CapabilityUnavailable": 1
+        },
+        "accepted": {
+          "Match": 10,
+          "Difference": 2,
+          "CapabilityUnavailable": 1
+        }
+      }
+    }
+  ],
+  "RawFiles": 318
+}

@@ -132,7 +132,7 @@ H1, H2 and H3 remain the research evidence for the H4 implementation.
 
 ### Step 1.3: Improve output and Unicode reconstruction
 
-- [ ] Compare the expanded [output corpus](docs/OUTPUT_FIDELITY.md) on the
+- [x] Compare the expanded [output corpus](docs/OUTPUT_FIDELITY.md) on the
   released and accepted runtimes across all three Windows 7 tiers.
 - [ ] Resolve measured F04-F05 failures in cells, cursor, supported attributes,
   erase, wrap, scroll, encoding and requested/actual code-page behavior.
@@ -142,9 +142,11 @@ H1, H2 and H3 remain the research evidence for the H4 implementation.
 I'll complete this step when stable states and text match independently checked
 expectations, with raw-VT, width and intermediate-state limits documented.
 
-I qualified the automated output characterization package locally and verified
-its delivery to the Windows 7 test share. The target comparison is next.
-[Output rc2 candidate](docs/validation/2026-11-23-step-1.3-output-rc2-candidate.md)
+I completed all 78 output observations on the three Windows 7 tiers.
+The two runtimes produced identical bytes in every comparison. The remaining
+work is the column placement of the combining and CJK samples under the
+observed width rules.
+[Output rc2 Windows 7 review](docs/validation/2026-11-23-step-1.3-output-rc2-windows7.md)
 
 ### Step 1.4: Improve full-screen restoration and resize
 
