@@ -1,0 +1,87 @@
+{
+  "Kind": "Step13OutputCandidateQualification",
+  "RecordedDate": "2026-11-23",
+  "Status": "LocalCharacterizationComplete",
+  "Windows7Results": "Pending",
+  "Step13Accepted": false,
+  "DeliveryStatus": "Verified",
+  "SessionFlags": 0,
+  "RunId": "developmenthost-output-20261123-222710-deb84084",
+  "Package": {
+    "Archive": "VT7Pty-output-0.5.1-dev-rc2.zip",
+    "ArchiveBytes": 4932863,
+    "ArchiveSha256": "c24e489d1d9c4f9b4dfbcfd0bed15e045f2816967055f21e08cc58683628e2a5",
+    "ManifestSha256": "eb2586703160764130e3b2a2a41e66978a9b7e56c387bb98e30838188cfd0641",
+    "FilesVerified": 26,
+    "HarnessSourceCommit": "43eea0b306244fefa9e1e38ce803dac9cae0d5a8",
+    "CasePairs": 13,
+    "SourceBinariesVerified": 6
+  },
+  "RuntimeSources": {
+    "accepted": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+    "baseline": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d"
+  },
+  "Pairs": 13,
+  "Observations": 26,
+  "RawFiles": 106,
+  "MatchingObservations": 22,
+  "ObservedDifferences": 4,
+  "CommonDifferenceDetails": {
+    "OUTPUT_COMBINING": {
+      "ExpectedText": [
+        32,
+        32,
+        101,
+        769,
+        124
+      ],
+      "NativeText": [
+        32,
+        32,
+        101,
+        769,
+        124
+      ],
+      "ReconstructedText": [
+        32,
+        32,
+        101,
+        769,
+        124
+      ],
+      "ExpectedCursorAdvance": 2,
+      "NativeCursorAdvance": 3,
+      "ReconstructedCursorAdvance": 3,
+      "ExpectedTrailingBarColumn": 3,
+      "NativeTrailingBarColumn": 4,
+      "ReconstructedTrailingBarColumn": 3
+    },
+    "OUTPUT_SUPPLEMENTARY": {
+      "ExpectedText": [
+        32,
+        32,
+        128578,
+        124
+      ],
+      "NativeText": [
+        32,
+        32,
+        65533,
+        124
+      ],
+      "ReconstructedText": [
+        32,
+        32,
+        65533,
+        124
+      ],
+      "ExpectedCursorAdvance": 3,
+      "NativeCursorAdvance": 3,
+      "ReconstructedCursorAdvance": 3,
+      "ExpectedTrailingBarColumn": 4,
+      "NativeTrailingBarColumn": 4,
+      "ReconstructedTrailingBarColumn": 3
+    }
+  },
+  "ReviewerFaultChecks": 2
+}

@@ -14,6 +14,7 @@ still in progress. [Profile rc3 Windows 7 review](2026-11-23-step-1.2-profiles-r
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
+| Step 1.3 output | [rc2 local characterization and verified delivery](2026-11-23-step-1.3-output-rc2-candidate.md) | Pending paired runs on all three tiers |
 | Step 1.2 profiles | [rc3 local qualification and delivery](2026-11-23-step-1.2-profiles-rc3-candidate.md) | [rc3 qualified on all three tiers](2026-11-23-step-1.2-profiles-rc3-windows7.md) |
 | Profile rc2 | [Earlier candidate](2026-11-20-step-1.2-profiles-rc2-candidate.md) | [Frozen controls passed. Profile blockers identified.](2026-11-23-step-1.2-profiles-rc2-windows7.md) |
 | Step 1.2 input decoder | [rc2: exact archive, 129 input and 123 H4 guards pass locally](2026-11-19-step-1.2-input-rc2-candidate.md) | [Qualified: 387 input, 345 H4 guards, 21 lifetime/fault guards and 42 regressions pass](2026-11-19-step-1.2-input-rc2-windows7.md) |

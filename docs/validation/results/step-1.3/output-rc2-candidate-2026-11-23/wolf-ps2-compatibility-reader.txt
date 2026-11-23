@@ -1,0 +1,7 @@
+﻿DeserializeObject : Exception calling "DeserializeObject" with "1" argument(s): "Configuration system failed to initial
+ize"
+At D:\Git\vt7pty\artifacts\fidelity\output-rc1-exact\tools\platform\Windows7Compat.ps1:10 char:45
++     return $script:vt7Json.DeserializeObject <<<< ([IO.File]::ReadAllText($Path))
+    + CategoryInfo          : NotSpecified: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : DotNetMethodException
+ 

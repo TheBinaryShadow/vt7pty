@@ -142,6 +142,10 @@ H1, H2 and H3 remain the research evidence for the H4 implementation.
 I'll complete this step when stable states and text match independently checked
 expectations, with raw-VT, width and intermediate-state limits documented.
 
+I qualified the automated output characterization package locally and verified
+its delivery to the Windows 7 test share. The target comparison is next.
+[Output rc2 candidate](docs/validation/2026-11-23-step-1.3-output-rc2-candidate.md)
+
 ### Step 1.4: Improve full-screen restoration and resize
 
 - [ ] Resolve measured F06-F07 failures in active-buffer transitions, return to

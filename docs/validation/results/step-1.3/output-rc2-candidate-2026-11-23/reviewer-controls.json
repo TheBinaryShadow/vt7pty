@@ -1,0 +1,15 @@
+{
+    "Checks":  [
+                   {
+                       "Status":  "RejectedAsExpected",
+                       "Case":  "wrong-utf8",
+                       "Received":  "UTF-8 status differs: baseline/OUTPUT_LATIN"
+                   },
+                   {
+                       "Status":  "RejectedAsExpected",
+                       "Case":  "wrong-native-cp",
+                       "Received":  "Snapshot output mode or code page differs: accepted/OUTPUT_CP437"
+                   }
+               ],
+    "Count":  2
+}
