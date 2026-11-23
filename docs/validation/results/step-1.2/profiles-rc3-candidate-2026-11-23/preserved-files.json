@@ -2,6 +2,51 @@
   "SchemaVersion": 1,
   "Files": [
     {
+      "Path": "Export-ProfileJsonWriter.ps1.txt",
+      "Bytes": 856,
+      "Sha256": "c6785323ea1f835b428e4997ba6ddd4255574034fe4531dd2a61a306f528a5a3"
+    },
+    {
+      "Path": "Invoke-ProfileTests.ps1.txt",
+      "Bytes": 11065,
+      "Sha256": "96c3e86a2d942364c923d48c705d8ee9ac55cc49c21adf8b644ee6fd7f42cecf"
+    },
+    {
+      "Path": "Package-Profiles.ps1.txt",
+      "Bytes": 10096,
+      "Sha256": "7180db134f629daa88dff840e7547b58a2d8bdb72dcc5434984b0439da8a7414"
+    },
+    {
+      "Path": "ProfileCases.h.txt",
+      "Bytes": 31286,
+      "Sha256": "0a1f2a1e9c8a25735b2c7ff19e9b88a4b79db467a7c249820200586b1443d43e"
+    },
+    {
+      "Path": "ProfileManual.h.txt",
+      "Bytes": 26623,
+      "Sha256": "f27ee34e48a68388545d4fef1bf09c31c846ad4bdd19e4a8a6f81f7c428b4880"
+    },
+    {
+      "Path": "ProfileProbe.ps1.txt",
+      "Bytes": 9937,
+      "Sha256": "f3894f188d10314a3ec5feca282002da43b1d2d1d6e02f31ef6929c83d5bc7c0"
+    },
+    {
+      "Path": "Test-ProfileBundleReviewer.ps1.txt",
+      "Bytes": 5413,
+      "Sha256": "97489c8d0deef9d5803a01329c37a34e1276b8856016c468a1e9cac989fd7735"
+    },
+    {
+      "Path": "Test-ProfileEvidence.ps1.txt",
+      "Bytes": 34606,
+      "Sha256": "0c9165a66157da03acd05b01cfe7b1f93954fdb5e27117398dec1ce5ad21cd88"
+    },
+    {
+      "Path": "Test-ProfileReviewer.ps1.txt",
+      "Bytes": 9423,
+      "Sha256": "3ac48c7865e1c12bdc1e9331fdcf01090aa7ec4fe3057847398850658d368292"
+    },
+    {
       "Path": "archive-integrity.json",
       "Bytes": 1926,
       "Sha256": "e359768df50c883cf3e83b071f020b3ba850192cfe1ef2bdf310156b2574b772"
@@ -30,6 +75,11 @@
       "Path": "debug-final-native.txt",
       "Bytes": 490,
       "Sha256": "7b37e3a727404f3380fcc4b4f311ab33e2eb05372c9dc75e94a7a589fecd0554"
+    },
+    {
+      "Path": "delivery-verified.json",
+      "Bytes": 599,
+      "Sha256": "5d415b3cca68456c911c05dc7d347758a98b931478c8fce5241c7ad73ede0bea"
     },
     {
       "Path": "exact-automated-review.json",
@@ -72,19 +122,9 @@
       "Sha256": "8cfbb7906eaf1d2d8f53fd6855e54f216d901ed13ac1daaa0ae9b9d01d85788d"
     },
     {
-      "Path": "Export-ProfileJsonWriter.ps1.txt",
-      "Bytes": 856,
-      "Sha256": "c6785323ea1f835b428e4997ba6ddd4255574034fe4531dd2a61a306f528a5a3"
-    },
-    {
       "Path": "harness-oracles.json",
       "Bytes": 778,
       "Sha256": "f5471da9211bebb5d1907d1fb0cc5be540655c67289a8788f6ce403be6466fc4"
-    },
-    {
-      "Path": "Invoke-ProfileTests.ps1.txt",
-      "Bytes": 11065,
-      "Sha256": "96c3e86a2d942364c923d48c705d8ee9ac55cc49c21adf8b644ee6fd7f42cecf"
     },
     {
       "Path": "native-reviewer-controls.json",
@@ -95,11 +135,6 @@
       "Path": "package-manifest.json",
       "Bytes": 16178,
       "Sha256": "bdff4e1551868ead1ec7318fc101d7599728171a7becf659c249872b3ae6542c"
-    },
-    {
-      "Path": "Package-Profiles.ps1.txt",
-      "Bytes": 10096,
-      "Sha256": "7180db134f629daa88dff840e7547b58a2d8bdb72dcc5434984b0439da8a7414"
     },
     {
       "Path": "package.txt",
@@ -122,21 +157,6 @@
       "Sha256": "cd778a6593769051a54d8ca22fe4e88c8a12e5e451cdc596454a7f647d5ce1e8"
     },
     {
-      "Path": "ProfileCases.h.txt",
-      "Bytes": 31286,
-      "Sha256": "0a1f2a1e9c8a25735b2c7ff19e9b88a4b79db467a7c249820200586b1443d43e"
-    },
-    {
-      "Path": "ProfileManual.h.txt",
-      "Bytes": 26623,
-      "Sha256": "f27ee34e48a68388545d4fef1bf09c31c846ad4bdd19e4a8a6f81f7c428b4880"
-    },
-    {
-      "Path": "ProfileProbe.ps1.txt",
-      "Bytes": 9937,
-      "Sha256": "f3894f188d10314a3ec5feca282002da43b1d2d1d6e02f31ef6929c83d5bc7c0"
-    },
-    {
       "Path": "ps2-collector-reader-contrast.txt",
       "Bytes": 189,
       "Sha256": "b187a647baf0efba0944adf29b74452cab732e3ee55ccd1d3c8f19f097880976"
@@ -148,8 +168,8 @@
     },
     {
       "Path": "qualification-decision.json",
-      "Bytes": 1172,
-      "Sha256": "fdfb16d4bf4079b2f8a7b75d7b4136aebea540e2cc439d284114e636d6ba9c16"
+      "Bytes": 1189,
+      "Sha256": "ff233d1f506ba132eb06a3953b817499b68a2751fcebfb9b879f85d9e46520ba"
     },
     {
       "Path": "raw-collections.zip",
@@ -170,21 +190,6 @@
       "Path": "run-exact-smokes.ps1.txt",
       "Bytes": 1152,
       "Sha256": "bf366f6c798899339eef838d7ce52d4d6ca79628309155e63842d58f1ceae65a"
-    },
-    {
-      "Path": "Test-ProfileBundleReviewer.ps1.txt",
-      "Bytes": 5413,
-      "Sha256": "97489c8d0deef9d5803a01329c37a34e1276b8856016c468a1e9cac989fd7735"
-    },
-    {
-      "Path": "Test-ProfileEvidence.ps1.txt",
-      "Bytes": 34606,
-      "Sha256": "0c9165a66157da03acd05b01cfe7b1f93954fdb5e27117398dec1ce5ad21cd88"
-    },
-    {
-      "Path": "Test-ProfileReviewer.ps1.txt",
-      "Bytes": 9423,
-      "Sha256": "3ac48c7865e1c12bdc1e9331fdcf01090aa7ec4fe3057847398850658d368292"
     }
   ]
 }
