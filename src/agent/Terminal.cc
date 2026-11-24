@@ -300,12 +300,12 @@ void Terminal::reset(SendClearFlag sendClearFirst, int64_t newLine)
         // 0m   ==> reset SGR parameters
         // 1;1H ==> move cursor to top-left position
         // 2J   ==> clear the entire screen
+        // Preserve the last emitted cursor visibility across this clear.
         m_output.write(CSI "0m" CSI "1;1H" CSI "2J");
     }
     m_remoteLine = newLine;
     m_remoteColumn = 0;
     m_lineData.clear();
-    m_cursorHidden = false;
     m_remoteColor = -1;
 }
 
@@ -427,8 +427,11 @@ void Terminal::sendLine(int64_t line, const CHAR_INFO *lineData, int width,
     m_remoteColumn = trimmedCellCount;
 }
 
-void Terminal::showTerminalCursor(int column, int64_t line)
+void Terminal::setTerminalCursor(int column, int64_t line, bool visible)
 {
+    if (!visible && m_plainMode) {
+        return;
+    }
     moveTerminalToLine(line);
     if (!m_plainMode) {
         if (m_remoteColumn != column) {
@@ -438,7 +441,9 @@ void Terminal::showTerminalCursor(int column, int64_t line)
             m_lineData.clear();
             m_remoteColumn = column;
         }
-        if (m_cursorHidden) {
+        if (!visible) {
+            hideTerminalCursor();
+        } else if (m_cursorHidden) {
             m_output.write(CSI "?25h");
             m_cursorHidden = false;
         }

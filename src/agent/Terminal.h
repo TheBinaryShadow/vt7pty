@@ -43,7 +43,7 @@ public:
     void reset(SendClearFlag sendClearFirst, int64_t newLine);
     void sendLine(int64_t line, const CHAR_INFO *lineData, int width,
                   int cursorColumn);
-    void showTerminalCursor(int column, int64_t line);
+    void setTerminalCursor(int column, int64_t line, bool visible);
     void hideTerminalCursor();
 
 private:

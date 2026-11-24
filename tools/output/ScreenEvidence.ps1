@@ -1,7 +1,13 @@
 # Full-screen package and result checks. Keep these compatible with PowerShell 2.0.
+function Get-ScreenRuntimeRoles($Manifest) {
+    'baseline'
+    'accepted'
+    if ($Manifest.SchemaVersion -eq 2) { 'candidate' }
+}
+
 function Read-ScreenPackage([string]$Root) {
     $manifest = Read-VT7Json (Join-Path $Root 'manifest.json')
-    if ($manifest.Kind -cne 'VT7PtyScreenCharacterization' -or $manifest.SchemaVersion -ne 1 -or
+    if ($manifest.Kind -cne 'VT7PtyScreenCharacterization' -or @(1,2) -notcontains $manifest.SchemaVersion -or
         $manifest.Step14Accepted -or $manifest.ResizePairs -ne 4) { throw 'Wrong screen characterization package.' }
     $required = @{
         ALTERNATE = 'F06/Control'; RESIZE = 'F07/Control'
@@ -15,7 +21,7 @@ function Read-ScreenPackage([string]$Root) {
         $required.Remove($case.Name)
     }
     if ($required.Count) { throw 'Missing screen cases.' }
-    Confirm-PairedFidelityPackage $Root $manifest
+    Confirm-FidelityPackage $Root $manifest @(Get-ScreenRuntimeRoles $manifest)
     return $manifest
 }
 

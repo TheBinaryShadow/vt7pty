@@ -14,6 +14,7 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Directory = [IO.Path]::GetFullPath($Directory).TrimEnd('\')
 $PackageRoot = [IO.Path]::GetFullPath($PackageRoot).TrimEnd('\')
 $package = Read-ScreenPackage $PackageRoot
+$roles = @(Get-ScreenRuntimeRoles $package)
 $inventory = Read-VT7Json (Join-Path $Directory 'evidence-files.json')
 $names = @{}
 foreach ($file in $inventory.Files) {
@@ -37,7 +38,8 @@ if ($run.SchemaVersion -ne 1 -or $run.Kind -cne 'VT7PtyScreenResults' -or
     $run.Harness.SourceCommit -cne $package.Harness.SourceCommit -or $run.SessionFlags -ne $package.SessionFlags -or
     -not $run.CharacterizationComplete -or $run.Step14Accepted -or $run.MilestoneAccepted -or
     @($run.PreflightErrors).Count -ne 0 -or $run.Oracle.ExitCode -ne 0 -or $run.Oracle.TimedOut -or
-    $run.Oracle.StandardOutput -cne 'VT7Pty VT state oracle tests passed.' -or @($run.Cases).Count -ne 2 * $package.Cases.Count) {
+    $run.Oracle.StandardOutput -cne 'VT7Pty VT state oracle tests passed.' -or
+    $run.Runtimes.Count -ne $roles.Count -or @($run.Cases).Count -ne $roles.Count * $package.Cases.Count) {
     throw 'Incomplete screen results or wrong package identity.'
 }
 if ($run.Tier -cne 'DevelopmentHost' -and
@@ -47,11 +49,11 @@ if ($run.Tier -cne 'DevelopmentHost' -and
 if ($run.Tier -ceq 'Legacy' -and ($run.PowerShellVersion -cne '2.0' -or $run.CLRVersion -cnotlike '2.0.*' -or
     @($run.Updates | Where-Object { $_.Id -ceq 'KB3191566' }).Count)) { throw 'Wrong legacy engine or update state.' }
 
-foreach ($role in @('baseline','accepted')) {
+foreach ($role in $roles) {
     $original = $package.Runtimes[$role]
     $actual = $run.Runtimes[$role]
     if ($actual.SourceCommit -cne $original.SourceCommit -or $actual.ManifestSha256 -cne $original.ManifestSha256 -or
-        $actual.ArchiveSha256 -cne $original.ArchiveSha256) { throw 'Runtime observation provenance differs.' }
+        ($role -cne 'candidate' -and $actual.ArchiveSha256 -cne $original.ArchiveSha256)) { throw 'Runtime observation provenance differs.' }
     foreach ($spec in $package.Cases) {
         $cases = @($run.Cases | Where-Object { $_.Runtime -ceq $role -and $_.Name -ceq $spec.Name })
         $relative = $role + '/' + $spec.Name

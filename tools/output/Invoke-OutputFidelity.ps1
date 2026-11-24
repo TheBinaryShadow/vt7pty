@@ -23,6 +23,7 @@ try {
     Write-Host ($Suite + ' package startup failed: ' + $_.Exception.Message)
     exit 2
 }
+$roles = if ($screen) { @(Get-ScreenRuntimeRoles $manifest) } else { @('baseline','accepted') }
 
 $runId = $Tier.ToLowerInvariant() + '-' + $Suite.ToLowerInvariant() + '-' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss') +
     '-' + [Guid]::NewGuid().ToString('N').Substring(0,8)
@@ -68,7 +69,7 @@ if ($ready) {
     }
 }
 if ($ready) {
-    foreach ($role in @('baseline','accepted')) {
+    foreach ($role in $roles) {
         $bin = Join-Path $root ($role + '\bin')
         $exe = Join-Path $bin 'FidelityTest.exe'
         foreach ($spec in $manifest.Cases) {
@@ -97,7 +98,7 @@ if ($ready) {
         }
     }
 }
-$report.CharacterizationComplete = $ready -and $report.Cases.Count -eq 2 * $manifest.Cases.Count -and
+$report.CharacterizationComplete = $ready -and $report.Cases.Count -eq $roles.Count * $manifest.Cases.Count -and
     @($report.Cases | Where-Object { $_.Status -ne 'Observed' }).Count -eq 0
 $report.CompletedUtc = [DateTime]::UtcNow.ToString('o')
 Write-VT7Json (Join-Path $resultRoot 'report.json') $report

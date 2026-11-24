@@ -342,7 +342,7 @@ void Scraper::syncConsoleContentAndSize(
     const ConsoleScreenBufferInfo info = m_consoleBuffer->bufferInfo();
     bool cursorVisible = true;
     CONSOLE_CURSOR_INFO cursorInfo = {};
-    if (!GetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo)) {
+    if (!GetConsoleCursorInfo(m_consoleBuffer->conout(), &cursorInfo)) {
         trace("GetConsoleCursorInfo failed");
     } else {
         cursorVisible = cursorInfo.bVisible != 0;
@@ -452,12 +452,11 @@ void Scraper::directScrapeOutput(const ConsoleScreenBufferInfo &info,
     const int h = scrapeRect.height();
 
     const Coord cursor = info.cursorPosition();
-    const bool showTerminalCursor =
-        consoleCursorVisible && scrapeRect.contains(cursor);
-    const int cursorColumn = !showTerminalCursor ? -1 : cursor.X - scrapeRect.Left;
-    const int cursorLine = !showTerminalCursor ? -1 : cursor.Y - scrapeRect.Top;
+    const bool cursorInViewport = scrapeRect.contains(cursor);
+    const int cursorColumn = cursorInViewport ? cursor.X - scrapeRect.Left : -1;
+    const int cursorLine = cursorInViewport ? cursor.Y - scrapeRect.Top : -1;
 
-    if (!showTerminalCursor) {
+    if (!consoleCursorVisible || !cursorInViewport) {
         m_terminal->hideTerminalCursor();
     }
 
@@ -474,8 +473,8 @@ void Scraper::directScrapeOutput(const ConsoleScreenBufferInfo &info,
         }
     }
 
-    if (showTerminalCursor) {
-        m_terminal->showTerminalCursor(cursorColumn, cursorLine);
+    if (cursorInViewport) {
+        m_terminal->setTerminalCursor(cursorColumn, cursorLine, consoleCursorVisible);
     }
 }
 
@@ -616,12 +615,11 @@ bool Scraper::scrollingScrapeOutput(const ConsoleScreenBufferInfo &info,
         std::min(m_dirtyLineCount, windowRect.top() + windowRect.height()) +
             m_scrolledCount;
 
-    const bool showTerminalCursor =
-        consoleCursorVisible && windowRect.contains(cursor);
-    const int64_t cursorLine = !showTerminalCursor ? -1 : cursor.Y + m_scrolledCount;
-    const int cursorColumn = !showTerminalCursor ? -1 : cursor.X;
+    const bool cursorInViewport = windowRect.contains(cursor);
+    const int64_t cursorLine = cursorInViewport ? cursor.Y + m_scrolledCount : -1;
+    const int cursorColumn = cursorInViewport ? cursor.X : -1;
 
-    if (!showTerminalCursor) {
+    if (!consoleCursorVisible || !cursorInViewport) {
         m_terminal->hideTerminalCursor();
     }
 
@@ -651,8 +649,8 @@ bool Scraper::scrollingScrapeOutput(const ConsoleScreenBufferInfo &info,
 
     m_scrapedLineCount = windowRect.top() + m_scrolledCount;
 
-    if (showTerminalCursor) {
-        m_terminal->showTerminalCursor(cursorColumn, cursorLine);
+    if (cursorInViewport) {
+        m_terminal->setTerminalCursor(cursorColumn, cursorLine, consoleCursorVisible);
     }
 
     return true;

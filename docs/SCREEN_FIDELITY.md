@@ -1,8 +1,8 @@
 # Full-screen restoration and resize
 
-I use this package to characterize Step 1.4 on Windows 7 SP1 x64. Each run
-uses the same fixture with the released 0.5.0 runtime and the accepted
-input rc2 runtime. Both sessions use flags 0.
+I use screen rc2 to verify the Step 1.4 cursor fix on Windows 7 SP1 x64.
+The same fixture runs with the released 0.5.0 runtime, the accepted input
+rc2 runtime and the fixed candidate. All sessions use flags 0.
 
 ## Run the tests
 
@@ -17,16 +17,17 @@ input. The Legacy launcher uses the installed PowerShell 2.0 on LEOPARD.
 | LEOPARD | `RUN-SCREEN-LEGACY.cmd` |
 
 Copy the complete new `results\<run-id>` folder to `K:\VT7_work\results`.
-I use the snapshots, stream and receipts together, including any differences
-or incomplete observations. Each run attempts 14 cases across the two
-runtimes.
+I use the snapshots, stream and receipts together. Each run attempts 21
+cases across the three runtimes. I expect the two controls to reproduce the
+hidden cursor difference and the fixed candidate to match the native frame.
 
 ## What I measure
 
 - **F06 controls and restoration.** I keep the original switch test and
-  exercise an alternate buffer with a hidden cursor. CMD explicitly restores
-  the primary buffer. In separate CMD and native Windows PowerShell sessions,
-  the app exits while the alternate buffer is active.
+  exercise an alternate buffer with a hidden cursor. I check the cursor
+  position while hidden and check that the cursor reappears when CMD
+  restores the primary buffer. In separate CMD and native Windows PowerShell
+  sessions, the app exits while the alternate buffer is active.
 - **F07 controls and resize.** I keep the original synchronized resize test
   and run eight alternating 100×30 and 80×25 requests while the app reads
   edited input and draws. I record progress and the dimensions returned to
@@ -46,7 +47,7 @@ use ASCII with fixed positions and colors.
 ## Build and review
 
 From a clean, committed VT7Pty checkout with the two pinned runtime ZIPs,
-I package with `Package-OutputFidelity.ps1 -Suite Screen -Suffix rc1`.
+I package with `Package-OutputFidelity.ps1 -Suite Screen -WithCandidate -Suffix rc2`.
 I use `tools/output/Test-ScreenEvidence.ps1 -Directory <run-directory>
 -PackageRoot <extracted-zip>` to check the returned receipts and file hashes.
 The characterization records both matches and differences. Step 1.4 stays

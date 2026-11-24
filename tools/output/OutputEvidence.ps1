@@ -1,8 +1,8 @@
 # Shared package and result checks. Keep this compatible with Windows PowerShell 2.0.
-function Confirm-PairedFidelityPackage([string]$Root, $Manifest) {
+function Confirm-FidelityPackage([string]$Root, $Manifest, [string[]]$Roles = @('baseline','accepted')) {
     if (-not $Manifest.Harness.SourceTreeClean -or $Manifest.Harness.SourceCommit -cnotmatch '^[0-9a-f]{40}$' -or
         $Manifest.Harness.SnapshotBytes -lt 8000 -or $Manifest.Harness.SnapshotBytes -gt 65536 -or
-        $Manifest.SessionFlags -ne 0) { throw 'Wrong paired fidelity harness.' }
+        $Manifest.SessionFlags -ne 0 -or $Manifest.Runtimes.Count -ne $Roles.Count) { throw 'Wrong fidelity harness or runtime count.' }
     $files = @{}
     foreach ($entry in $Manifest.Files) {
         if ($entry.Path -notmatch '^[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*$' -or
@@ -15,34 +15,45 @@ function Confirm-PairedFidelityPackage([string]$Root, $Manifest) {
         }
         $files[$entry.Path] = $entry
     }
-    foreach ($role in @('baseline','accepted')) {
+    foreach ($role in $Roles) {
         $runtime = $Manifest.Runtimes[$role]
-        $sourcePath = $role + '/source-manifest.json'
+        $built = $role -ceq 'candidate'
+        $sourcePath = if ($built) { $role + '/source-verification.json' } else { $role + '/source-manifest.json' }
         if (-not $files.ContainsKey($sourcePath) -or $files[$sourcePath].Sha256 -cne $runtime.ManifestSha256) {
             throw ('Original runtime manifest does not match: ' + $role)
         }
         $original = Read-VT7Json (Join-Path $Root $sourcePath)
-        $originalIdentity = if ($role -ceq 'baseline') { $original } else { $original.Runtime }
+        $originalIdentity = if ($role -ceq 'accepted') { $original.Runtime } else { $original }
         if ($originalIdentity.SourceCommit -cne $runtime.SourceCommit) { throw 'Runtime source identity differs.' }
-        foreach ($required in @('VT7Pty.dll','VT7Pty-Agent.exe')) {
+        $requiredBinaries = @('VT7Pty.dll','VT7Pty-Agent.exe')
+        if ($built) {
+            if ($runtime.SourceCommit -cne $Manifest.Harness.SourceCommit -or
+                $runtime.ManifestSha256 -cne $Manifest.Harness.VerificationSha256 -or
+                -not $original.SourceTreeClean -or $original.Configuration -cne 'Release' -or
+                $original.Architecture -cne 'x64') { throw 'Wrong candidate build verification.' }
+            $requiredBinaries += 'VT7Pty-Host.dll','VT7Pty-DebugServer.exe'
+        }
+        foreach ($required in $requiredBinaries) {
             if (-not $runtime.Binaries.ContainsKey($required)) { throw ('Missing runtime binary: ' + $required) }
         }
+        $referenceFiles = if ($built) { $original.Artifacts } else { $original.Files }
+        $referenceField = if ($built) { 'Name' } else { 'Path' }
         foreach ($name in $runtime.Binaries.Keys) {
             $installedPath = $role + '/bin/' + $name
             $originalPath = $runtime.Binaries[$name]
-            $reference = @($original.Files | Where-Object { $_.Path -ceq $originalPath })
+            $reference = @($referenceFiles | Where-Object { $_[$referenceField] -ceq $originalPath })
             if ($reference.Count -ne 1 -or -not $files.ContainsKey($installedPath) -or
                 $reference[0].Sha256 -cne $files[$installedPath].Sha256 -or
                 $reference[0].Bytes -ne $files[$installedPath].Bytes) {
-                throw ('Extracted runtime differs from its source archive: ' + $installedPath)
+                throw ('Runtime binary differs from its recorded source: ' + $installedPath)
             }
         }
-    }
-    foreach ($name in @('FidelityTest.exe','FidelityFixture.exe')) {
-        $base = $files['baseline/bin/' + $name]
-        $accepted = $files['accepted/bin/' + $name]
-        if (-not $base -or -not $accepted -or $base.Sha256 -cne $accepted.Sha256) {
-            throw ('Both runtimes must use the same fidelity harness: ' + $name)
+        foreach ($name in @('FidelityTest.exe','FidelityFixture.exe')) {
+            $base = $files['baseline/bin/' + $name]
+            $harness = $files[$role + '/bin/' + $name]
+            if (-not $base -or -not $harness -or $base.Sha256 -cne $harness.Sha256) {
+                throw ('All runtimes must use the same fidelity harness: ' + $name)
+            }
         }
     }
 }
@@ -66,7 +77,7 @@ function Read-OutputPackage([string]$Root) {
     if ($seen.Count -ne $expectedCases -or ($manifest.SchemaVersion -eq 2 -and $widthCases -ne 10)) {
         throw 'Wrong output case count.'
     }
-    Confirm-PairedFidelityPackage $Root $manifest
+    Confirm-FidelityPackage $Root $manifest
     return $manifest
 }
 

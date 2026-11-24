@@ -3,7 +3,8 @@ param(
     [ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')][string]$Suffix = 'rc3',
     [string]$ReleasedRuntimeArchive = '',
     [string]$AcceptedInputArchive = '',
-    [ValidateSet('Output','Screen')][string]$Suite = 'Output'
+    [ValidateSet('Output','Screen')][string]$Suite = 'Output',
+    [switch]$WithCandidate
 )
 
 $ErrorActionPreference = 'Stop'
@@ -12,13 +13,16 @@ $root = $PSScriptRoot
 . (Join-Path $root 'tools\platform\Windows7Compat.ps1')
 . (Join-Path $root 'tools\output\OutputEvidence.ps1')
 $screen = $Suite -eq 'Screen'
+if ($WithCandidate -and -not $screen) { throw 'The current build can be added to the Screen suite.' }
 if ($screen) {
     . (Join-Path $root 'tools\output\ScreenEvidence.ps1')
-    if (-not $PSBoundParameters.ContainsKey('Suffix')) { $Suffix = 'rc1' }
+    if (-not $PSBoundParameters.ContainsKey('Suffix')) {
+        $Suffix = if ($WithCandidate) { 'rc2' } else { 'rc1' }
+    }
 }
 $source = (& git -C $root rev-parse --verify HEAD).Trim()
 if ($LASTEXITCODE -ne 0 -or @(& git -C $root status --porcelain=v1).Count) {
-    throw 'Paired fidelity packaging requires clean committed source.'
+    throw 'Fidelity packaging requires clean committed source.'
 }
 $version = [IO.File]::ReadAllText((Join-Path $root 'VERSION.txt')).Trim()
 if ($version -cne '0.5.1-dev') { throw 'Wrong fidelity harness version.' }
@@ -89,9 +93,6 @@ function Export-OutputRuntime([string]$Role, [string]$ArchivePath, [string]$Arch
     } finally {
         $archive.Dispose()
     }
-    foreach ($name in @('FidelityTest.exe','FidelityFixture.exe')) {
-        Copy-Item -LiteralPath (Join-Path $bin $name) -Destination (Join-Path $runtimeBin $name)
-    }
     return @{Archive = [IO.Path]::GetFileName($ArchivePath); ArchiveSha256 = $ArchiveHash
         ManifestSha256 = $actualHash; SourceCommit = $Commit; Binaries = $runtimeFiles}
 }
@@ -102,11 +103,35 @@ $acceptedManifest = 'e66b761b06c4c99fb885dcfe1862537cd9fb3dd577365569668639ccd09
 $accepted = Export-OutputRuntime 'accepted' $AcceptedInputArchive $acceptedHash '0ca6e3fa78481cd4df35820b9fe3988f46e0bff4' 'runtime/bin/' $acceptedNames $acceptedManifest
 $baseline.Version = '0.5.0'
 $accepted.Version = $version
+$runtimes = @{baseline = $baseline; accepted = $accepted}
+$roles = @('baseline','accepted')
+$verificationHash = Get-VT7Sha256 $verificationPath
+if ($WithCandidate) {
+    $roles += 'candidate'
+    $folder = Join-Path $stage 'candidate'
+    $runtimeBin = Join-Path $folder 'bin'
+    [void][IO.Directory]::CreateDirectory($runtimeBin)
+    Copy-Item -LiteralPath $verificationPath -Destination (Join-Path $folder 'source-verification.json')
+    $binaries = @{}
+    foreach ($name in $acceptedNames) {
+        Copy-Item -LiteralPath (Join-Path $bin $name) -Destination (Join-Path $runtimeBin $name)
+        $binaries[$name] = $name
+    }
+    $runtimes.candidate = @{Version = $version; SourceCommit = $source; ManifestSha256 = $verificationHash; Binaries = $binaries}
+}
 $caseArgument = '--' + $Suite.ToLowerInvariant() + '-cases'
-$casesJson = (& (Join-Path $stage 'baseline\bin\FidelityTest.exe') $caseArgument | Out-String).Trim()
-if ($LASTEXITCODE -ne 0) { throw 'Cannot load the fidelity harness against the released runtime.' }
-$acceptedJson = (& (Join-Path $stage 'accepted\bin\FidelityTest.exe') $caseArgument | Out-String).Trim()
-if ($LASTEXITCODE -ne 0 -or $acceptedJson -cne $casesJson) { throw 'The paired harness recipes differ.' }
+$casesJson = $null
+foreach ($role in $roles) {
+    $runtimeBin = Join-Path $stage ($role + '\bin')
+    foreach ($name in @('FidelityTest.exe','FidelityFixture.exe')) {
+        Copy-Item -LiteralPath (Join-Path $bin $name) -Destination (Join-Path $runtimeBin $name)
+    }
+    $recipe = (& (Join-Path $runtimeBin 'FidelityTest.exe') $caseArgument | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0 -or ($null -ne $casesJson -and $recipe -cne $casesJson)) {
+        throw ('Cannot load the same fidelity recipes with runtime ' + $role)
+    }
+    $casesJson = $recipe
+}
 $compiled = $casesJson | ConvertFrom-Json
 & (Join-Path $bin 'VtStateTest.exe')
 if ($LASTEXITCODE -ne 0) { throw 'Independent VT state tests failed.' }
@@ -138,13 +163,13 @@ $files = @(Get-ChildItem -LiteralPath $stage -Recurse -File | Sort-Object FullNa
     @{Path = $_.FullName.Substring($stage.Length + 1).Replace('\','/'); Bytes = $_.Length; Sha256 = Get-VT7Sha256 $_.FullName}
 })
 $manifest = @{
-    Runtimes = @{baseline = $baseline; accepted = $accepted}; SessionFlags = 0
+    Runtimes = $runtimes; SessionFlags = 0
     Harness = @{SourceCommit = $source; SourceTreeClean = $true; Configuration = 'Release'; Architecture = 'x64'
-        SnapshotBytes = $compiled.SnapshotBytes; VerificationSha256 = Get-VT7Sha256 $verificationPath}
+        SnapshotBytes = $compiled.SnapshotBytes; VerificationSha256 = $verificationHash}
     Files = $files
 }
 if ($screen) {
-    $manifest.SchemaVersion = 1
+    $manifest.SchemaVersion = if ($WithCandidate) { 2 } else { 1 }
     $manifest.Kind = 'VT7PtyScreenCharacterization'
     $manifest.Step14Accepted = $false
     $manifest.ResizePairs = $compiled.ResizePairs
