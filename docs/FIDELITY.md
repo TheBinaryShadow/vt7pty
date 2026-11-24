@@ -70,6 +70,10 @@ For Step 1.4 I compare the native active buffer and VT stream through
 full-screen exit, repeated resize and shell return.
 [Full-screen test guide](SCREEN_FIDELITY.md)
 
+For Step 1.5 I measure final drain, shutdown, recovery and resource use
+against the released 0.5.0 and accepted screen rc3 runtimes.
+[Lifecycle test guide](LIFECYCLE_FIDELITY.md)
+
 | ID | Scenario | Required observable result |
 | --- | --- | --- |
 | F01 | Ctrl+C at empty and partially typed shell prompts | Typed line canceled, canceled text never executed, fresh prompt accepts the next command, shell remains alive |

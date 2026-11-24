@@ -3,6 +3,7 @@
 #include "../fidelity/WinTest.h"
 #include "../fidelity/OutputCorpus.h"
 #include "../fidelity/ScreenCases.h"
+#include "../fidelity/LifecycleCases.h"
 #include <algorithm>
 #include <cwchar>
 using namespace fidelity;
@@ -561,7 +562,8 @@ int wmain(int argc,wchar_t **argv) {
         if (mode == L"SCREEN_APP" || mode == L"SCREEN_HIDDEN" || mode == L"SCREEN_INSPECT")
             return screenFixture(output.value, pipe.value, mode);
         if (const auto *scenario = findOutputCase(mode)) return outputFixture(*scenario, output.value, pipe.value);
-        const bool input=mode == L"INPUT" || mode == L"PROCESSED";
+        const bool lifecycle=mode == L"LIFECYCLE_MEASURE";
+        const bool input=mode == L"INPUT" || mode == L"PROCESSED" || lifecycle;
         const bool unicode=mode == L"UNICODE";
         const bool fixedRows=mode == L"FIXED_ROWS";
         check(input || unicode || fixedRows || mode == L"STATE","fixture mode");
@@ -572,11 +574,12 @@ int wmain(int argc,wchar_t **argv) {
             check(SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),ENABLE_EXTENDED_FLAGS |
                 (mode == L"PROCESSED" ? ENABLE_PROCESSED_INPUT : 0)),"fixture input mode");
             check(SetConsoleCtrlHandler(controlHandler,TRUE),"control handler");
-            draw(active,false);
+            draw(active,false,false,lifecycle);
         } else draw(active,unicode,false,fixedRows);
         auto packetStorage=observe(active,keys);
         Packet &packet=*packetStorage;
         transfer(pipe.value,&packet,sizeof(packet),true);
+        int barriers=0;
         const ULONGLONG deadline=GetTickCount64()+30000;
         while (GetTickCount64() < deadline) {
             if (input) {
@@ -620,6 +623,15 @@ int wmain(int argc,wchar_t **argv) {
                 } else if (command == 'M') {
                     check(alternate.value != INVALID_HANDLE_VALUE,"restore state");
                     check(SetConsoleActiveScreenBuffer(output.value),"restore primary"); active=output.value;
+                } else if (command == 'B' && lifecycle) {
+                    check(barriers < lifecycleSamples,"lifecycle barrier count");
+                    CONSOLE_SCREEN_BUFFER_INFO info={};
+                    check(GetConsoleScreenBufferInfo(active,&info),"lifecycle barrier geometry");
+                    const auto marker=lifecycleBarrierMarker(++barriers);
+                    const COORD position={static_cast<SHORT>(info.srWindow.Left+2),static_cast<SHORT>(info.srWindow.Top+10)};
+                    DWORD written=0;
+                    check(WriteConsoleOutputCharacterW(active,marker.c_str(),static_cast<DWORD>(marker.size()),position,&written) &&
+                        written == marker.size(),"lifecycle barrier marker");
                 } else if (command == 'R') { check(!input,"repaint input fixture"); draw(active,unicode,false,fixedRows); }
                 else check(command == 'S',"fixture command");
                 packet=*observe(active,keys); packet.bufferTag=active == output.value ? 1u : 2u;

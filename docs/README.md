@@ -11,6 +11,7 @@ what I've learned from testing it.
 | [Building](../BUILDING.md) | Set up Visual Studio, build, verify and debug |
 | [Testing](TESTING.md) | Choose the right test suite and understand its limits |
 | [Windows 7 acceptance](WINDOWS7_ACCEPTANCE.md) | Run a portable release candidate on the test machines |
+| [Lifecycle tests](LIFECYCLE_FIDELITY.md) | Collect Step 1.5 shutdown and performance measurements |
 | [Diagnostics](DIAGNOSTICS.md) | Collect logs and failure bundles |
 | [Releasing](RELEASING.md) | Package, review and publish a release |
 | [Compatibility](COMPATIBILITY.md) | Platform targets, test machines and verified support |
@@ -27,9 +28,9 @@ what I've learned from testing it.
 
 ## Follow current development
 
-I've completed the scoped input and output work in Milestone 1. Step 1.4
-covers full-screen restoration and resize.
-[Accepted output scope](OUTPUT_FIDELITY.md#accepted-output-scope)
+I've completed the scoped input, output and full-screen work in Milestone 1.
+Step 1.5 starts with paired lifecycle measurements.
+[Screen rc3 acceptance](validation/2026-11-24-step-1.4-screen-rc3-windows7.md#accepted-scope)
 
 H1, H2 and the controlled H3 prototype are accepted on all three Windows 7 tiers. The
 [guard review](validation/2026-11-14-step-1.2-host-guards-rc1-windows7.md)

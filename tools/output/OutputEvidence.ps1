@@ -18,26 +18,28 @@ function Confirm-FidelityPackage([string]$Root, $Manifest, [string[]]$Roles = @(
     foreach ($role in $Roles) {
         $runtime = $Manifest.Runtimes[$role]
         $built = $role -ceq 'candidate'
+        $screenRuntime = $role -ceq 'accepted' -and $Manifest.Kind -ceq 'VT7PtyLifecycleCharacterization'
+        $verified = $built -or $screenRuntime
         $sourcePath = if ($built) { $role + '/source-verification.json' } else { $role + '/source-manifest.json' }
         if (-not $files.ContainsKey($sourcePath) -or $files[$sourcePath].Sha256 -cne $runtime.ManifestSha256) {
             throw ('Original runtime manifest does not match: ' + $role)
         }
         $original = Read-VT7Json (Join-Path $Root $sourcePath)
-        $originalIdentity = if ($role -ceq 'accepted') { $original.Runtime } else { $original }
+        $originalIdentity = if ($role -ceq 'accepted' -and -not $screenRuntime) { $original.Runtime } else { $original }
         if ($originalIdentity.SourceCommit -cne $runtime.SourceCommit) { throw 'Runtime source identity differs.' }
         $requiredBinaries = @('VT7Pty.dll','VT7Pty-Agent.exe')
-        if ($built) {
-            if ($runtime.SourceCommit -cne $Manifest.Harness.SourceCommit -or
-                $runtime.ManifestSha256 -cne $Manifest.Harness.VerificationSha256 -or
-                -not $original.SourceTreeClean -or $original.Configuration -cne 'Release' -or
-                $original.Architecture -cne 'x64') { throw 'Wrong candidate build verification.' }
+        if ($verified) {
+            if (-not $original.SourceTreeClean -or $original.Configuration -cne 'Release' -or
+                $original.Architecture -cne 'x64' -or
+                ($built -and ($runtime.SourceCommit -cne $Manifest.Harness.SourceCommit -or
+                    $runtime.ManifestSha256 -cne $Manifest.Harness.VerificationSha256))) { throw 'Wrong runtime build verification.' }
             $requiredBinaries += 'VT7Pty-Host.dll','VT7Pty-DebugServer.exe'
         }
         foreach ($required in $requiredBinaries) {
             if (-not $runtime.Binaries.ContainsKey($required)) { throw ('Missing runtime binary: ' + $required) }
         }
-        $referenceFiles = if ($built) { $original.Artifacts } else { $original.Files }
-        $referenceField = if ($built) { 'Name' } else { 'Path' }
+        $referenceFiles = if ($verified) { $original.Artifacts } else { $original.Files }
+        $referenceField = if ($verified) { 'Name' } else { 'Path' }
         foreach ($name in $runtime.Binaries.Keys) {
             $installedPath = $role + '/bin/' + $name
             $originalPath = $runtime.Binaries[$name]

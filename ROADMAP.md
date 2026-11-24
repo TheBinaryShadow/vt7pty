@@ -174,10 +174,13 @@ flags 0 on all three Windows 7 tiers and WOLF.
 
 ### Step 1.5: Validate lifecycle and resource behavior under real workloads
 
+- [ ] Qualify the paired lifecycle package on WOLF and review the baseline
+  measurements from NESSY, TURTLE and LEOPARD.
+  [Lifecycle test guide](docs/LIFECYCLE_FIDELITY.md)
 - [ ] Resolve measured F08-F09 failures in final drain, child status, close,
   failure cleanup, response times and resource stability.
-- [ ] Before 1.0, qualify Windows 7 job inheritance, permitted/denied breakaway,
-  abrupt owner exit and descendant cleanup. Follow the
+- [ ] Before 1.0, qualify Windows 7 job inheritance, permitted and denied
+  breakaway, abrupt caller exit and descendant cleanup. Follow the
   [process lifetime plan](docs/PROCESS_LIFETIME.md), prompted by
   [VSoft.Process PR #18](https://github.com/VSoftTechnologies/VSoft.Process/pull/18).
 - [ ] Preserve existing lifecycle/stress gates and establish target-derived

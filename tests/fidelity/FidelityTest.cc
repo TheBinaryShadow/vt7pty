@@ -4,7 +4,11 @@
 #include "VtState.h"
 #include "OutputCorpus.h"
 #include "ScreenCases.h"
+#include "LifecycleCases.h"
 #include "../../src/include/vt7pty.h"
+#include <psapi.h>
+#include <bit>
+#include <chrono>
 #include <cstring>
 #include <functional>
 #include <fstream>
@@ -38,6 +42,7 @@ public:
     std::string raw;
     uint64_t lineFeeds=0;
     bool dropOutput=false;
+    bool replyToQueries=true;
     std::string decodeError;
     Handle child, agent, descendant;
     explicit Session(bool observeDecodeErrors = false) : observeDecodeErrors_(observeDecodeErrors) {
@@ -61,16 +66,24 @@ public:
     }
     ~Session() { cleanup(); }
     void spawn(const std::wstring &application,const std::wstring &command) {
-        vt7pty_error_ptr_t error=nullptr;
-        auto *config=vt7pty_spawn_config_new(VT7PTY_SPAWN_FLAG_AUTO_SHUTDOWN,
-            application.c_str(),command.c_str(),nullptr,nullptr,&error);
-        check(config != nullptr,"spawn config");
         DWORD win32=0;
+        vt7pty_result_t code=VT7PTY_ERROR_SUCCESS;
+        check(trySpawn(application,command,VT7PTY_SPAWN_FLAG_AUTO_SHUTDOWN,win32,code),"spawn");
+    }
+    bool trySpawn(const std::wstring &application,const std::wstring &command,UINT64 flags,
+                  DWORD &win32,vt7pty_result_t &code) {
+        vt7pty_error_ptr_t error=nullptr;
+        auto *config=vt7pty_spawn_config_new(flags,application.c_str(),command.c_str(),nullptr,nullptr,&error);
+        if (!config && error) vt7pty_error_free(error);
+        check(config != nullptr,"spawn config");
         const BOOL result=vt7pty_spawn(pty_,config,&child.value,nullptr,&win32,&error);
         vt7pty_spawn_config_free(config);
+        code=error ? vt7pty_error_code(error) : VT7PTY_ERROR_SUCCESS;
         if (error) vt7pty_error_free(error);
-        check(result != FALSE,"spawn");
+        return result != FALSE;
     }
+    bool outputEof() const { return eof_; }
+    vt7pty_t *runtimeHandle() const { return pty_; }
     void input(std::string_view text) {
         check(text.size() <= 4096,"input bound");
         transfer(input_.value,const_cast<char *>(text.data()),static_cast<DWORD>(text.size()),true);
@@ -91,7 +104,9 @@ public:
             raw.append(bytes,length);
             lineFeeds+=static_cast<uint64_t>(std::count(bytes,bytes+length,'\n'));
             decode(std::string_view(bytes,length));
-            for (const auto &reply : state.takeReplies()) input(reply);
+            for (const auto &reply : state.takeReplies()) {
+                if (replyToQueries) input(reply);
+            }
         }
     }
     bool until(const std::function<bool()> &condition,DWORD milliseconds=5000) {
@@ -1364,8 +1379,13 @@ void shellCase(const std::wstring &name,const std::wstring &directoryPath,const 
     } catch (...) { observations.raw=session.raw; observations.cleanup=session.cleanup(); throw; }
     observations.raw=session.raw; observations.cleanup=session.cleanup();
 }
+#include "LifecycleTest.h"
 }
 int wmain(int argc,wchar_t **argv) {
+    if (argc == 2 && std::wstring_view(argv[1]) == L"--lifecycle-cases") {
+        puts(lifecycleRecipes().c_str());
+        return 0;
+    }
     if (argc == 2 && std::wstring_view(argv[1]) == L"--screen-cases") {
         std::string list = "{\"SchemaVersion\":2,\"SnapshotBytes\":" + std::to_string(sizeof(Packet)) +
             ",\"ResizePairs\":" + std::to_string(screenResizePairs) +
@@ -1411,9 +1431,11 @@ int wmain(int argc,wchar_t **argv) {
         const std::vector<std::wstring> cases={L"STATE",L"UNICODE",L"ALTERNATE",L"RESIZE",L"INPUT",L"PROCESSED_CTRL_C",L"UNPROCESSED_CTRL_C",L"DRAIN",L"NEGATIVE_CELL",L"NEGATIVE_ATTRIBUTE",L"NEGATIVE_CURSOR",L"NEGATIVE_PACKET",L"NEGATIVE_DUPLICATE",L"NEGATIVE_DRAIN",L"NEGATIVE_TIMEOUT",L"NEGATIVE_ORPHAN",L"CMD_EMPTY",L"CMD_PARTIAL",L"PS_EMPTY",L"PS_PARTIAL",L"PS7_EMPTY",L"PS7_PARTIAL",L"CMD_CHILD_HANDLED",L"CMD_CHILD_DEFAULT",L"CMD_CHILD_UNPROCESSED",L"PS_CHILD_HANDLED",L"PS_CHILD_DEFAULT",L"PS_CHILD_UNPROCESSED",L"PS7_CHILD_HANDLED",L"PS7_CHILD_DEFAULT",L"PS7_CHILD_UNPROCESSED",L"NEGATIVE_CHILD_CONTROL",L"NEGATIVE_CHILD_EXIT",L"READCONSOLE_TRANSPORT",L"READCONSOLE_EVENT",L"READCONSOLE_RECORD_EVENT",L"READCONSOLE_OWNED_CANCEL"};
         const auto *output = findOutputCase(name);
         const auto *screen = findScreenCase(name);
-        check(output || screen || name == L"SCREEN_VIEWPORT" || name == L"SCREEN_FIXED_ROWS" ||
+        const auto *lifecycle = findLifecycleCase(name);
+        check(output || screen || lifecycle || name == L"SCREEN_VIEWPORT" || name == L"SCREEN_FIXED_ROWS" ||
             std::find(cases.begin(),cases.end(),name) != cases.end(),"unknown case");
-        if (output) outputCase(*output, outputDirectory, observations);
+        if (lifecycle) lifecycleCase(*lifecycle, outputDirectory, observations);
+        else if (output) outputCase(*output, outputDirectory, observations);
         else if (screen) screenCase(*screen, outputDirectory, observations);
         else if (name.find(L"_CHILD_") != std::wstring::npos) childCase(name,outputDirectory,program,observations);
         else if (name.starts_with(L"READCONSOLE_")) cookedCase(name,outputDirectory,observations);

@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [ValidateSet('DevelopmentHost','NonESU','ESU','Legacy')][string]$Tier = 'DevelopmentHost',
-    [ValidateSet('Output','Screen')][string]$Suite = 'Output'
+    [ValidateSet('Output','Screen','Lifecycle')][string]$Suite = 'Output'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -9,6 +9,7 @@ Set-StrictMode -Version 2.0
 $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 $root = [IO.Path]::GetFullPath((Join-Path $scriptDirectory '..\..')).TrimEnd('\')
 $screen = $Suite -eq 'Screen'
+$lifecycle = $Suite -eq 'Lifecycle'
 try {
     . (Join-Path $root 'tools\platform\Windows7Compat.ps1')
     . (Join-Path $root 'tools\platform\NativeCapture.ps1')
@@ -16,6 +17,9 @@ try {
     if ($screen) {
         . (Join-Path $scriptDirectory 'ScreenEvidence.ps1')
         $manifest = Read-ScreenPackage $root
+    } elseif ($lifecycle) {
+        . (Join-Path $scriptDirectory 'LifecycleEvidence.ps1')
+        $manifest = Read-LifecyclePackage $root
     } else {
         $manifest = Read-OutputPackage $root
     }
@@ -55,7 +59,8 @@ $report = @{
     PreflightErrors = $preflight; Oracle = $null; Cases = @(); CharacterizationComplete = $false
     MilestoneAccepted = $false
 }
-$report[$(if ($screen) { 'Step14Accepted' } else { 'Step13Accepted' })] = $false
+$report[$(if ($screen) { 'Step14Accepted' } elseif ($lifecycle) { 'Step15Accepted' } else { 'Step13Accepted' })] = $false
+if ($lifecycle) { $report.Regressions = @() }
 $ready = $preflight.Count -eq 0
 if ($ready) {
     try {
@@ -85,21 +90,43 @@ if ($ready) {
                 if ($controller.TimedOut) { throw 'Native fidelity case exceeded its deadline.' }
                 if ($screen) {
                     $observed = Read-ScreenCase $directory $spec $controller.ExitCode $manifest
+                } elseif ($lifecycle) {
+                    $observed = Read-LifecycleCase $directory $spec $controller.ExitCode $manifest $role
                 } else {
                     $observed = Read-OutputCase $directory $spec $controller.ExitCode $manifest.Harness.SnapshotBytes
                 }
                 $case.Status = 'Observed'
-                $case.Outcome = if ($observed.Status -ceq 'Fail') { 'Difference' }
+                $case.Outcome = if ($lifecycle) { Get-LifecycleOutcome $observed }
+                    elseif ($observed.Status -ceq 'Fail') { 'Difference' }
                     elseif (-not $screen -and $observed.CapabilityUnavailable) { 'CapabilityUnavailable' } else { 'Match' }
             } catch {
                 $case.Error = $_.Exception.Message
             }
             $report.Cases += $case
         }
+        if ($lifecycle) {
+            foreach ($name in $manifest.Regressions) {
+                Write-Host ($role + ' regression ' + $name)
+                $regression = @{ Runtime = $role; Name = $name; Controller = $null; Error = '' }
+                try {
+                    $limit = if ($name -ceq 'REPEAT') { 300000 } else { 60000 }
+                    $regression.Controller = Invoke-InputProcess (Join-Path $bin 'SessionContractTest.exe') $name $bin $limit $environment
+                    if (-not (Test-LifecycleRegression $regression)) { throw 'Session contract regression failed.' }
+                } catch {
+                    $regression.Error = $_.Exception.Message
+                }
+                $report.Regressions += $regression
+            }
+        }
     }
 }
 $report.CharacterizationComplete = $ready -and $report.Cases.Count -eq $roles.Count * $manifest.Cases.Count -and
     @($report.Cases | Where-Object { $_.Status -ne 'Observed' }).Count -eq 0
+if ($lifecycle) {
+    $report.CharacterizationComplete = $report.CharacterizationComplete -and
+        $report.Regressions.Count -eq $roles.Count * $manifest.Regressions.Count -and
+        @($report.Regressions | Where-Object { $_.Error }).Count -eq 0
+}
 $report.CompletedUtc = [DateTime]::UtcNow.ToString('o')
 Write-VT7Json (Join-Path $resultRoot 'report.json') $report
 $files = @(Get-ChildItem -LiteralPath $resultRoot -Recurse | Where-Object { -not $_.PSIsContainer } | Sort-Object FullName |

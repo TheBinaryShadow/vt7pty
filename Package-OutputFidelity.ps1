@@ -3,8 +3,10 @@ param(
     [ValidatePattern('^[a-z0-9]+(?:[.-][a-z0-9]+)*$')][string]$Suffix = 'rc3',
     [string]$ReleasedRuntimeArchive = '',
     [string]$AcceptedInputArchive = '',
-    [ValidateSet('Output','Screen')][string]$Suite = 'Output',
-    [switch]$WithCandidate
+    [ValidateSet('Output','Screen','Lifecycle')][string]$Suite = 'Output',
+    [switch]$WithCandidate,
+    [string]$AcceptedScreenArchive = '',
+    [switch]$NoBuild
 )
 
 $ErrorActionPreference = 'Stop'
@@ -13,12 +15,17 @@ $root = $PSScriptRoot
 . (Join-Path $root 'tools\platform\Windows7Compat.ps1')
 . (Join-Path $root 'tools\output\OutputEvidence.ps1')
 $screen = $Suite -eq 'Screen'
+$lifecycle = $Suite -eq 'Lifecycle'
 if ($WithCandidate -and -not $screen) { throw 'The current build can be added to the Screen suite.' }
 if ($screen) {
     . (Join-Path $root 'tools\output\ScreenEvidence.ps1')
     if (-not $PSBoundParameters.ContainsKey('Suffix')) {
         $Suffix = if ($WithCandidate) { 'rc3' } else { 'rc1' }
     }
+}
+if ($lifecycle) {
+    . (Join-Path $root 'tools\output\LifecycleEvidence.ps1')
+    if (-not $PSBoundParameters.ContainsKey('Suffix')) { $Suffix = 'rc1' }
 }
 $source = (& git -C $root rev-parse --verify HEAD).Trim()
 if ($LASTEXITCODE -ne 0 -or @(& git -C $root status --porcelain=v1).Count) {
@@ -34,10 +41,18 @@ if (-not $AcceptedInputArchive) {
     $AcceptedInputArchive = Join-Path $packages 'VT7Pty-input-0.5.1-dev-rc2.zip'
 }
 $baselineHash = '59554a9cf8246395e60f30875e047d1bfa20d4f3f462c113ef705a86708f5304'
+$acceptedArchive = $AcceptedInputArchive
 $acceptedHash = '93d1a1b290d796124b143d490181a861d6224bc61f36ca1cbe46113585a57fb5'
+if ($lifecycle) {
+    if (-not $AcceptedScreenArchive) {
+        $AcceptedScreenArchive = Join-Path $packages 'VT7Pty-screen-0.5.1-dev-rc3.zip'
+    }
+    $acceptedArchive = $AcceptedScreenArchive
+    $acceptedHash = 'ad51f8815e2103df9664dcef40c3bd5ac7e200528bc59d6c2cf78af306ea0816'
+}
 if ((Get-VT7Sha256 $ReleasedRuntimeArchive) -cne $baselineHash -or
-    (Get-VT7Sha256 $AcceptedInputArchive) -cne $acceptedHash) {
-    throw 'Provide the exact accepted 0.5.0 release and input rc2 ZIPs.'
+    (Get-VT7Sha256 $acceptedArchive) -cne $acceptedHash) {
+    throw ('Provide the exact 0.5.0 release and pinned ' + $Suite + ' runtime ZIPs.')
 }
 
 $stage = Join-Path $packages ('VT7Pty-' + $Suite.ToLowerInvariant() + '-' + $version + '-' + $Suffix)
@@ -46,7 +61,7 @@ foreach ($path in @($stage,$zip,($zip + '.sha256'))) {
     if (Test-Path -LiteralPath $path) { throw ('Candidate already exists: ' + $path) }
 }
 
-& (Join-Path $root 'Build-VT7Pty.ps1') -Configuration Release
+if (-not $NoBuild) { & (Join-Path $root 'Build-VT7Pty.ps1') -Configuration Release }
 & (Join-Path $root 'Verify-VT7Pty.ps1') -Configuration Release -NoBuild
 $bin = Join-Path $root 'artifacts\bin\x64\Release'
 $verificationPath = Join-Path $root 'artifacts\verification\x64\Release\verification.json'
@@ -54,7 +69,9 @@ $verification = Read-VT7Json $verificationPath
 if ($verification.SourceCommit -cne $source -or -not $verification.SourceTreeClean) {
     throw 'Wrong local verification identity.'
 }
-foreach ($name in @('FidelityTest','FidelityFixture','VtStateTest')) {
+$projects = @('FidelityTest','FidelityFixture','VtStateTest')
+if ($lifecycle) { $projects += @('SessionContractTest','SessionFixture') }
+foreach ($name in $projects) {
     $identity = [IO.File]::ReadAllLines((Join-Path $root ('build\obj\' + $name + '\x64\Release\generated\SourceIdentity.txt')))
     if ($identity[0] -cne $version -or $identity[1] -cne $source) { throw ('Wrong harness identity: ' + $name) }
 }
@@ -67,7 +84,7 @@ function Export-OutputArchiveEntry($Archive, [string]$EntryName, [string]$Destin
 }
 
 function Export-OutputRuntime([string]$Role, [string]$ArchivePath, [string]$ArchiveHash, [string]$Commit,
-    [string]$Prefix, [string[]]$Names, [string]$ManifestHash = '') {
+    [string]$Prefix, [string[]]$Names, [string]$ManifestHash = '', [switch]$ScreenRuntime) {
     $folder = Join-Path $stage $Role
     $runtimeBin = Join-Path $folder 'bin'
     [void][IO.Directory]::CreateDirectory($runtimeBin)
@@ -75,20 +92,27 @@ function Export-OutputRuntime([string]$Role, [string]$ArchivePath, [string]$Arch
     $runtimeFiles = @{}
     try {
         $originalPath = Join-Path $folder 'source-manifest.json'
-        Export-OutputArchiveEntry $archive 'manifest.json' $originalPath
+        $sourceEntry = if ($ScreenRuntime) { 'candidate/source-verification.json' } else { 'manifest.json' }
+        Export-OutputArchiveEntry $archive $sourceEntry $originalPath
         $actualHash = Get-VT7Sha256 $originalPath
         if ($ManifestHash -and $actualHash -cne $ManifestHash) { throw ('Wrong original manifest: ' + $Role) }
         $original = Read-VT7Json $originalPath
-        $identity = if ($Role -ceq 'baseline') { $original } else { $original.Runtime }
+        $identity = if ($Role -ceq 'accepted' -and -not $ScreenRuntime) { $original.Runtime } else { $original }
         if ($identity.SourceCommit -cne $Commit) { throw ('Wrong original runtime source: ' + $Role) }
         foreach ($name in $Names) {
             $entry = $Prefix + $name
             $destination = Join-Path $runtimeBin $name
             Export-OutputArchiveEntry $archive $entry $destination
-            $file = @($original.Files | Where-Object { $_.Path -ceq $entry })
+            if ($ScreenRuntime) {
+                $file = @($original.Artifacts | Where-Object { $_.Name -ceq $name })
+                $reference = $name
+            } else {
+                $file = @($original.Files | Where-Object { $_.Path -ceq $entry })
+                $reference = $entry
+            }
             if ($file.Count -ne 1 -or (Get-VT7Sha256 $destination) -cne $file[0].Sha256 -or
                 (Get-Item -LiteralPath $destination).Length -ne $file[0].Bytes) { throw ('Wrong runtime artifact: ' + $entry) }
-            $runtimeFiles[$name] = $entry
+            $runtimeFiles[$name] = $reference
         }
     } finally {
         $archive.Dispose()
@@ -99,8 +123,11 @@ function Export-OutputRuntime([string]$Role, [string]$ArchivePath, [string]$Arch
 
 $baseline = Export-OutputRuntime 'baseline' $ReleasedRuntimeArchive $baselineHash 'cbd17727b3c8af21e5afd4499b8dca7d2140ed9d' 'bin/' @('VT7Pty.dll','VT7Pty-Agent.exe')
 $acceptedNames = @('VT7Pty.dll','VT7Pty-Agent.exe','VT7Pty-Host.dll','VT7Pty-DebugServer.exe')
-$acceptedManifest = 'e66b761b06c4c99fb885dcfe1862537cd9fb3dd577365569668639ccd09f7517'
-$accepted = Export-OutputRuntime 'accepted' $AcceptedInputArchive $acceptedHash '0ca6e3fa78481cd4df35820b9fe3988f46e0bff4' 'runtime/bin/' $acceptedNames $acceptedManifest
+if ($lifecycle) {
+    $accepted = Export-OutputRuntime 'accepted' $acceptedArchive $acceptedHash 'a92b3fd4026e7d666765de7b10ab698e572eccc7' 'candidate/bin/' $acceptedNames '2912d98c7726390f5bfec45ee6e891f36c1a63cf016f13181ecec3d409f3f3b5' -ScreenRuntime
+} else {
+    $accepted = Export-OutputRuntime 'accepted' $acceptedArchive $acceptedHash '0ca6e3fa78481cd4df35820b9fe3988f46e0bff4' 'runtime/bin/' $acceptedNames 'e66b761b06c4c99fb885dcfe1862537cd9fb3dd577365569668639ccd09f7517'
+}
 $baseline.Version = '0.5.0'
 $accepted.Version = $version
 $runtimes = @{baseline = $baseline; accepted = $accepted}
@@ -121,9 +148,11 @@ if ($WithCandidate) {
 }
 $caseArgument = '--' + $Suite.ToLowerInvariant() + '-cases'
 $casesJson = $null
+$testPrograms = @('FidelityTest.exe','FidelityFixture.exe')
+if ($lifecycle) { $testPrograms += @('SessionContractTest.exe','SessionFixture.exe') }
 foreach ($role in $roles) {
     $runtimeBin = Join-Path $stage ($role + '\bin')
-    foreach ($name in @('FidelityTest.exe','FidelityFixture.exe')) {
+    foreach ($name in $testPrograms) {
         Copy-Item -LiteralPath (Join-Path $bin $name) -Destination (Join-Path $runtimeBin $name)
     }
     $recipe = (& (Join-Path $runtimeBin 'FidelityTest.exe') $caseArgument | Out-String).Trim()
@@ -150,6 +179,11 @@ $plan = @{
     'tools\output\Invoke-OutputFidelity.ps1' = 'tools\output\Invoke-OutputFidelity.ps1'
 }
 if ($screen) { $plan['tools\output\ScreenEvidence.ps1'] = 'tools\output\ScreenEvidence.ps1' }
+if ($lifecycle) {
+    foreach ($name in @('LifecycleEvidence.ps1','Test-LifecycleEvidence.ps1')) {
+        $plan['tools\output\' + $name] = 'tools\output\' + $name
+    }
+}
 foreach ($tier in @('NONESU','ESU','LEGACY')) {
     $launcher = 'RUN-' + $Suite.ToUpperInvariant() + '-' + $tier + '.cmd'
     $plan[$launcher] = $launcher
@@ -176,6 +210,17 @@ if ($screen) {
     $manifest.ResizePairs = $compiled.ResizePairs
     $manifest.ViewportResizePairs = $compiled.ViewportResizePairs
     $manifest.Cases = @($compiled.Cases | ForEach-Object { @{Name = $_.Name; Area = $_.Area; Mode = $_.Mode} })
+} elseif ($lifecycle) {
+    if ($compiled.SchemaVersion -ne 1) { throw 'Wrong lifecycle harness schema.' }
+    $manifest.SchemaVersion = 1
+    $manifest.Kind = 'VT7PtyLifecycleCharacterization'
+    $manifest.Step15Accepted = $false
+    $manifest.OutputRows = $compiled.OutputRows
+    $manifest.Samples = $compiled.Samples
+    $manifest.IdleMilliseconds = $compiled.IdleMilliseconds
+    $manifest.ShutdownMilliseconds = $compiled.ShutdownMilliseconds
+    $manifest.Cases = @($compiled.Cases | ForEach-Object { @{Name = $_.Name; Area = $_.Area} })
+    $manifest.Regressions = @(Get-LifecycleRegressionNames)
 } else {
     $manifest.SchemaVersion = 2
     $manifest.Kind = 'VT7PtyOutputCharacterization'
@@ -186,7 +231,9 @@ if ($screen) {
     })
 }
 Write-VT7Json (Join-Path $stage 'manifest.json') $manifest
-if ($screen) { $null = Read-ScreenPackage $stage } else { $null = Read-OutputPackage $stage }
+if ($screen) { $null = Read-ScreenPackage $stage }
+elseif ($lifecycle) { $null = Read-LifecyclePackage $stage }
+else { $null = Read-OutputPackage $stage }
 if ($source -cne (& git -C $root rev-parse HEAD).Trim() -or @(& git -C $root status --porcelain=v1).Count) {
     throw 'Source changed during fidelity candidate packaging.'
 }

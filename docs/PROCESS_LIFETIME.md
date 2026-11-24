@@ -5,9 +5,10 @@ required before 1.0.
 Recorded: 2026-11-10.
 
 I need cleanup that works under Windows 7's job-object rules and preserves
-the lifetime contract I expose to VT7. This plan covers the research harness
-and future runtime integration. It adds required coverage; it records no new
-implementation or passing results.
+the lifetime contract I expose to VT7. I start Step 1.5 with bounded drain,
+close and recovery tests that record job membership for controlled
+sessions. The matrix below defines the follow-up job and descendant cases.
+[Lifecycle test guide](LIFECYCLE_FIDELITY.md)
 
 ## Why this needs explicit coverage
 
