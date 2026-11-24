@@ -19,7 +19,7 @@ still in progress. [Profile rc3 Windows 7 review](2026-11-23-step-1.2-profiles-r
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| Step 1.4 full-screen restoration and resize | [Screen rc1, 14 WOLF observations and verified delivery](2026-11-24-step-1.4-screen-rc1-candidate.md) | Pending on NESSY, TURTLE and LEOPARD |
+| Step 1.4 full-screen restoration and resize | [Screen rc1, 14 WOLF observations and verified delivery](2026-11-24-step-1.4-screen-rc1-candidate.md) | [36 matches and six cursor visibility differences](2026-11-24-step-1.4-screen-rc1-windows7.md) |
 | Step 1.3 Unicode width | [rc3 experiments, local review and verified delivery](2026-11-24-step-1.3-output-rc3-candidate.md) | [126 observations and 48 available replays reviewed](2026-11-24-step-1.3-output-rc3-windows7.md) |
 | Step 1.3 output | [rc2 local characterization and verified delivery](2026-11-23-step-1.3-output-rc2-candidate.md) | [78 observations reviewed, with two reproducible width differences](2026-11-23-step-1.3-output-rc2-windows7.md) |
 | Step 1.2 profiles | [rc3 local qualification and delivery](2026-11-23-step-1.2-profiles-rc3-candidate.md) | [rc3 qualified on all three tiers](2026-11-23-step-1.2-profiles-rc3-windows7.md) |

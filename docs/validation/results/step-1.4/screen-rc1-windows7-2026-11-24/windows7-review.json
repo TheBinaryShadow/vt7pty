@@ -1,0 +1,415 @@
+{
+  "SchemaVersion": 1,
+  "Kind": "VT7PtyScreenRc1Windows7Review",
+  "ManifestSha256": "0f1346b9883bc23ed72dfdd510665602c19a8f2dcd2fb7462200547be9fc0192",
+  "ArchiveSha256": "a6df93ed61dd2c5abf2ff6b274a2bab0bf13ce4172c290dfb67c6fffb149ef7d",
+  "Harness": {
+    "SourceTreeClean": true,
+    "VerificationSha256": "14d1acb639aa0dbef8b0e387146f4b210746af1befd33e3e04d50f6b60739c0d",
+    "Configuration": "Release",
+    "SourceCommit": "4bb2c2b2ceedd516cbb8b40a958bf254cb186c5f",
+    "SnapshotBytes": 21396,
+    "Architecture": "x64"
+  },
+  "SessionFlags": 0,
+  "Runtimes": {
+    "accepted": {
+      "Archive": "VT7Pty-input-0.5.1-dev-rc2.zip",
+      "ManifestSha256": "e66b761b06c4c99fb885dcfe1862537cd9fb3dd577365569668639ccd09f7517",
+      "Version": "0.5.1-dev",
+      "Binaries": {
+        "VT7Pty-Agent.exe": "runtime/bin/VT7Pty-Agent.exe",
+        "VT7Pty-Host.dll": "runtime/bin/VT7Pty-Host.dll",
+        "VT7Pty.dll": "runtime/bin/VT7Pty.dll",
+        "VT7Pty-DebugServer.exe": "runtime/bin/VT7Pty-DebugServer.exe"
+      },
+      "SourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+      "ArchiveSha256": "93d1a1b290d796124b143d490181a861d6224bc61f36ca1cbe46113585a57fb5"
+    },
+    "baseline": {
+      "Archive": "VT7Pty-0.5.0-win7-x64-release-runtime.zip",
+      "ManifestSha256": "db1b7d067987d1f155f91c1e196e577f62fb530e68f179615793b3c136a231b1",
+      "Version": "0.5.0",
+      "Binaries": {
+        "VT7Pty.dll": "bin/VT7Pty.dll",
+        "VT7Pty-Agent.exe": "bin/VT7Pty-Agent.exe"
+      },
+      "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+      "ArchiveSha256": "59554a9cf8246395e60f30875e047d1bfa20d4f3f462c113ef705a86708f5304"
+    }
+  },
+  "RunsVerified": [
+    {
+      "Machine": "NESSY",
+      "RunId": "nonesu-screen-20261124-000620-39b05bf1",
+      "Tier": "NonESU",
+      "OS": {
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "BuildNumber": "7601",
+        "Version": "6.1.7601",
+        "ProductType": 1,
+        "ServicePackMajorVersion": 1
+      },
+      "PowerShellVersion": "5.1.14409.1018",
+      "CLRVersion": "4.0.30319.42000",
+      "KB3191566Listed": true,
+      "EvidenceFilesVerified": 93,
+      "EvidenceInventorySha256": "5df8f0599a2b40ab29ccef36b032fd7ed6aea51eec63dfe4f5762b0b20d454ff",
+      "ReportSha256": "9c28ca4b528d0750fda723270c295462e488d82fb67d8c4d853698c424b4f997",
+      "StartedUtc": "2026-11-24T00:06:24.5004813Z",
+      "CompletedUtc": "2026-11-24T00:06:36.4501023Z",
+      "Outcomes": {
+        "Match": 12,
+        "Difference": 2
+      },
+      "PreservedArchive": "nessy-screen-rc1.zip",
+      "ArchiveSha256": "311c53cc5457a4a149539daa9433cd4955898ccf4f9a751e5e0e1c1b85812658",
+      "ArchiveBytes": 48794
+    },
+    {
+      "Machine": "TURTLE",
+      "RunId": "esu-screen-20261124-000636-261bce65",
+      "Tier": "ESU",
+      "OS": {
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "BuildNumber": "7601",
+        "Version": "6.1.7601",
+        "ProductType": 1,
+        "ServicePackMajorVersion": 1
+      },
+      "PowerShellVersion": "5.1.14409.1005",
+      "CLRVersion": "4.0.30319.42000",
+      "KB3191566Listed": true,
+      "EvidenceFilesVerified": 93,
+      "EvidenceInventorySha256": "d65f4b7e439dc40d8bd47ea0ad1831dca06f100057bf37ec75038b2073a1d34b",
+      "ReportSha256": "b0145ad6bed8b9cde6574656ca75d6c25c7854a0ea12da8c50682ae61e7ef001",
+      "StartedUtc": "2026-11-24T00:06:40.5199492Z",
+      "CompletedUtc": "2026-11-24T00:06:50.8939673Z",
+      "Outcomes": {
+        "Match": 12,
+        "Difference": 2
+      },
+      "PreservedArchive": "turtle-screen-rc1.zip",
+      "ArchiveSha256": "3c7c0178c75a49a274a9060071b9ffd872a232f68af735cf8ec589220fea8624",
+      "ArchiveBytes": 47619
+    },
+    {
+      "Machine": "LEOPARD",
+      "RunId": "legacy-screen-20261124-000554-b4281f7c",
+      "Tier": "Legacy",
+      "OS": {
+        "ProductType": 1,
+        "Version": "6.1.7601",
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "ServicePackMajorVersion": 1,
+        "BuildNumber": "7601"
+      },
+      "PowerShellVersion": "2.0",
+      "CLRVersion": "2.0.50727.8806",
+      "KB3191566Listed": false,
+      "EvidenceFilesVerified": 93,
+      "EvidenceInventorySha256": "3ae8026bc6d522711cab2dcb993330bc11a5ef4ee2010bc25368d851383474e3",
+      "ReportSha256": "8e002fa3bdba9f330da657d2c1321348b9663c0413332b453dabcee381760c6d",
+      "StartedUtc": "2026-11-24T00:06:00.8075636Z",
+      "CompletedUtc": "2026-11-24T00:06:12.3047838Z",
+      "Outcomes": {
+        "Match": 12,
+        "Difference": 2
+      },
+      "PreservedArchive": "leopard-screen-rc1.zip",
+      "ArchiveSha256": "b3ae3da95a35726c790fbffdeaa7d13ad74db3d129bde30a46f609dc3b81a2ff",
+      "ArchiveBytes": 48601
+    }
+  ],
+  "Outcomes": {
+    "Match": 36,
+    "Difference": 6
+  },
+  "EvidenceFilesVerified": 279,
+  "ExplicitRestoreDifferences": [
+    {
+      "Machine": "NESSY",
+      "Runtime": "baseline",
+      "Name": "SCREEN_CMD_EXPLICIT",
+      "Checkpoint": "alternate",
+      "NativeCursorVisible": false,
+      "ReconstructedCursorVisible": true,
+      "LastCursorVisibilityCommand": "CSI ?25 h",
+      "NativeCursor": [
+        7,
+        23
+      ],
+      "CellDifferences": 0,
+      "AttributeDifferences": 0,
+      "RawPrefixBytes": 728
+    },
+    {
+      "Machine": "NESSY",
+      "Runtime": "accepted",
+      "Name": "SCREEN_CMD_EXPLICIT",
+      "Checkpoint": "alternate",
+      "NativeCursorVisible": false,
+      "ReconstructedCursorVisible": true,
+      "LastCursorVisibilityCommand": "CSI ?25 h",
+      "NativeCursor": [
+        7,
+        23
+      ],
+      "CellDifferences": 0,
+      "AttributeDifferences": 0,
+      "RawPrefixBytes": 728
+    },
+    {
+      "Machine": "TURTLE",
+      "Runtime": "baseline",
+      "Name": "SCREEN_CMD_EXPLICIT",
+      "Checkpoint": "alternate",
+      "NativeCursorVisible": false,
+      "ReconstructedCursorVisible": true,
+      "LastCursorVisibilityCommand": "CSI ?25 h",
+      "NativeCursor": [
+        7,
+        23
+      ],
+      "CellDifferences": 0,
+      "AttributeDifferences": 0,
+      "RawPrefixBytes": 542
+    },
+    {
+      "Machine": "TURTLE",
+      "Runtime": "accepted",
+      "Name": "SCREEN_CMD_EXPLICIT",
+      "Checkpoint": "alternate",
+      "NativeCursorVisible": false,
+      "ReconstructedCursorVisible": true,
+      "LastCursorVisibilityCommand": "CSI ?25 h",
+      "NativeCursor": [
+        7,
+        23
+      ],
+      "CellDifferences": 0,
+      "AttributeDifferences": 0,
+      "RawPrefixBytes": 542
+    },
+    {
+      "Machine": "LEOPARD",
+      "Runtime": "baseline",
+      "Name": "SCREEN_CMD_EXPLICIT",
+      "Checkpoint": "alternate",
+      "NativeCursorVisible": false,
+      "ReconstructedCursorVisible": true,
+      "LastCursorVisibilityCommand": "CSI ?25 h",
+      "NativeCursor": [
+        7,
+        23
+      ],
+      "CellDifferences": 0,
+      "AttributeDifferences": 0,
+      "RawPrefixBytes": 728
+    },
+    {
+      "Machine": "LEOPARD",
+      "Runtime": "accepted",
+      "Name": "SCREEN_CMD_EXPLICIT",
+      "Checkpoint": "alternate",
+      "NativeCursorVisible": false,
+      "ReconstructedCursorVisible": true,
+      "LastCursorVisibilityCommand": "CSI ?25 h",
+      "NativeCursor": [
+        7,
+        23
+      ],
+      "CellDifferences": 0,
+      "AttributeDifferences": 0,
+      "RawPrefixBytes": 728
+    }
+  ],
+  "ObservedExitOrder": {
+    "Between final resize checks": 12
+  },
+  "ResizeWorkflows": [
+    {
+      "Machine": "NESSY",
+      "Runtime": "baseline",
+      "Name": "SCREEN_CMD_RESIZE",
+      "MatchedLiveRequests": 8,
+      "ObservedExit": "Between final resize checks",
+      "FinalViewport": [
+        100,
+        30
+      ],
+      "FinalBuffer": [
+        100,
+        3000
+      ]
+    },
+    {
+      "Machine": "NESSY",
+      "Runtime": "baseline",
+      "Name": "SCREEN_PS_RESIZE",
+      "MatchedLiveRequests": 8,
+      "ObservedExit": "Between final resize checks",
+      "FinalViewport": [
+        100,
+        30
+      ],
+      "FinalBuffer": [
+        100,
+        3000
+      ]
+    },
+    {
+      "Machine": "NESSY",
+      "Runtime": "accepted",
+      "Name": "SCREEN_CMD_RESIZE",
+      "MatchedLiveRequests": 8,
+      "ObservedExit": "Between final resize checks",
+      "FinalViewport": [
+        100,
+        30
+      ],
+      "FinalBuffer": [
+        100,
+        3000
+      ]
+    },
+    {
+      "Machine": "NESSY",
+      "Runtime": "accepted",
+      "Name": "SCREEN_PS_RESIZE",
+      "MatchedLiveRequests": 8,
+      "ObservedExit": "Between final resize checks",
+      "FinalViewport": [
+        100,
+        30
+      ],
+      "FinalBuffer": [
+        100,
+        3000
+      ]
+    },
+    {
+      "Machine": "TURTLE",
+      "Runtime": "baseline",
+      "Name": "SCREEN_CMD_RESIZE",
+      "MatchedLiveRequests": 8,
+      "ObservedExit": "Between final resize checks",
+      "FinalViewport": [
+        100,
+        30
+      ],
+      "FinalBuffer": [
+        100,
+        3000
+      ]
+    },
+    {
+      "Machine": "TURTLE",
+      "Runtime": "baseline",
+      "Name": "SCREEN_PS_RESIZE",
+      "MatchedLiveRequests": 8,
+      "ObservedExit": "Between final resize checks",
+      "FinalViewport": [
+        100,
+        30
+      ],
+      "FinalBuffer": [
+        100,
+        3000
+      ]
+    },
+    {
+      "Machine": "TURTLE",
+      "Runtime": "accepted",
+      "Name": "SCREEN_CMD_RESIZE",
+      "MatchedLiveRequests": 8,
+      "ObservedExit": "Between final resize checks",
+      "FinalViewport": [
+        100,
+        30
+      ],
+      "FinalBuffer": [
+        100,
+        3000
+      ]
+    },
+    {
+      "Machine": "TURTLE",
+      "Runtime": "accepted",
+      "Name": "SCREEN_PS_RESIZE",
+      "MatchedLiveRequests": 8,
+      "ObservedExit": "Between final resize checks",
+      "FinalViewport": [
+        100,
+        30
+      ],
+      "FinalBuffer": [
+        100,
+        3000
+      ]
+    },
+    {
+      "Machine": "LEOPARD",
+      "Runtime": "baseline",
+      "Name": "SCREEN_CMD_RESIZE",
+      "MatchedLiveRequests": 8,
+      "ObservedExit": "Between final resize checks",
+      "FinalViewport": [
+        100,
+        30
+      ],
+      "FinalBuffer": [
+        100,
+        3000
+      ]
+    },
+    {
+      "Machine": "LEOPARD",
+      "Runtime": "baseline",
+      "Name": "SCREEN_PS_RESIZE",
+      "MatchedLiveRequests": 8,
+      "ObservedExit": "Between final resize checks",
+      "FinalViewport": [
+        100,
+        30
+      ],
+      "FinalBuffer": [
+        100,
+        3000
+      ]
+    },
+    {
+      "Machine": "LEOPARD",
+      "Runtime": "accepted",
+      "Name": "SCREEN_CMD_RESIZE",
+      "MatchedLiveRequests": 8,
+      "ObservedExit": "Between final resize checks",
+      "FinalViewport": [
+        100,
+        30
+      ],
+      "FinalBuffer": [
+        100,
+        3000
+      ]
+    },
+    {
+      "Machine": "LEOPARD",
+      "Runtime": "accepted",
+      "Name": "SCREEN_PS_RESIZE",
+      "MatchedLiveRequests": 8,
+      "ObservedExit": "Between final resize checks",
+      "FinalViewport": [
+        100,
+        30
+      ],
+      "FinalBuffer": [
+        100,
+        3000
+      ]
+    }
+  ],
+  "LiveResizeRequestsMatched": 96,
+  "ShellReturnWorkflowsMatched": 30,
+  "Step14Accepted": false
+}

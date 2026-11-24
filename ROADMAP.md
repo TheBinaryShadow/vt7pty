@@ -4,9 +4,9 @@ Updated: 2026-11-24.
 
 I've published 0.5.0 and completed the scoped Step 1.2 input and Step 1.3
 output work. I accept measured Unicode reconstruction with native cell
-placement where the console and terminal use compatible widths. Step 1.4
-screen rc1 is ready for Windows 7 testing. The broader baseline and VT7
-integration remain open.
+placement where the console and terminal use compatible widths. I reviewed
+Step 1.4 screen rc1 on all three Windows 7 machines. The broader baseline
+and VT7 integration remain open.
 [Input acceptance](docs/validation/2026-11-23-step-1.2-profiles-rc3-windows7.md#step-12-scope) ·
 [Output acceptance](docs/OUTPUT_FIDELITY.md#accepted-output-scope)
 
@@ -29,7 +29,7 @@ The [foundation](docs/FOUNDATION.md) records the engineering decisions;
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Modern native VT7Pty 0.5.x foundation | Complete; 0.5.0 accepted and published |
-| 1 | Better console fidelity and reliability | In progress. Step 1.4 screen rc1 awaits the Windows 7 runs |
+| 1 | Better console fidelity and reliability | In progress. Step 1.4 active-buffer cursor visibility is next |
 | 2 | VT7-facing API and standalone integration host | Planned after backend validation |
 | 3 | Versioned handoff ready for VT7 integration | Planned after API and consumer tests |
 | Later | Other consumers and optional ConPTY compatibility | Deferred |
@@ -155,14 +155,15 @@ measured differences and their evidence.
 
 - [x] Package paired tests for explicit restore, application exit and repeated
   resize while editing, with CMD and Windows PowerShell return checks.
-- [ ] Review screen rc1 on NESSY, TURTLE and LEOPARD.
+- [x] Review screen rc1 on NESSY, TURTLE and LEOPARD.
+- [x] Exercise repeated resize during editing/output and application exit.
 - [ ] Resolve measured F06-F07 failures in active-buffer transitions, return to
   the original screen, shell repaint and authoritative child dimensions.
-- [ ] Exercise repeated resize during editing/output and application exit.
 
 I'll complete this step when full-screen fixtures and shells reach the required
 state after resize and exit, without unexplained lasting corruption or hangs.
-[Screen rc1 candidate](docs/validation/2026-11-24-step-1.4-screen-rc1-candidate.md)
+[Screen rc1 candidate](docs/validation/2026-11-24-step-1.4-screen-rc1-candidate.md) ·
+[Windows 7 review](docs/validation/2026-11-24-step-1.4-screen-rc1-windows7.md)
 
 ### Step 1.5: Validate lifecycle and resource behavior under real workloads
 
