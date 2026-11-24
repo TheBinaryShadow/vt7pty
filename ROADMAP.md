@@ -2,13 +2,14 @@
 
 Updated: 2026-11-24.
 
-I've published 0.5.0 and completed the scoped Step 1.2 input and Step 1.3
-output work. I accept measured Unicode reconstruction with native cell
-placement where the console and terminal use compatible widths. Screen rc3
-passed the Step 1.4 resize checks on WOLF and is ready for Windows 7.
+I've published 0.5.0 and completed the scoped input, output and full-screen
+work in Steps 1.2 through 1.4. I accept measured Unicode reconstruction with
+native cell placement where the console and terminal use compatible widths.
+Screen rc3 passed on WOLF and all three Windows 7 tiers.
 The broader baseline and VT7 integration remain open.
 [Input acceptance](docs/validation/2026-11-23-step-1.2-profiles-rc3-windows7.md#step-12-scope) ·
-[Output acceptance](docs/OUTPUT_FIDELITY.md#accepted-output-scope)
+[Output acceptance](docs/OUTPUT_FIDELITY.md#accepted-output-scope) ·
+[Screen acceptance](docs/validation/2026-11-24-step-1.4-screen-rc3-windows7.md#accepted-scope)
 
 I check an item only when its stated work and required tests are complete.
 Partial implementations stay unchecked. A local pass does not replace a required
@@ -29,7 +30,7 @@ The [foundation](docs/FOUNDATION.md) records the engineering decisions;
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Modern native VT7Pty 0.5.x foundation | Complete; 0.5.0 accepted and published |
-| 1 | Better console fidelity and reliability | In progress. Screen rc3 passed on WOLF and awaits the Windows 7 runs |
+| 1 | Better console fidelity and reliability | In progress. Step 1.4 complete. Step 1.5 covers lifecycle and resources |
 | 2 | VT7-facing API and standalone integration host | Planned after backend validation |
 | 3 | Versioned handoff ready for VT7 integration | Planned after API and consumer tests |
 | Later | Other consumers and optional ConPTY compatibility | Deferred |
@@ -163,11 +164,11 @@ measured differences and their evidence.
 - [x] Verify WOLF viewport alignment and marker reflow, and resolve the
   console-host loss during live shrink.
   [Resize investigation](docs/validation/2026-11-24-step-1.4-wolf-resize-investigation.md)
-- [ ] Review screen rc3 on NESSY, TURTLE and LEOPARD.
-  [Screen rc3 candidate](docs/validation/2026-11-24-step-1.4-screen-rc3-candidate.md)
+- [x] Review screen rc3 on NESSY, TURTLE and LEOPARD.
+  [Screen rc3 Windows 7 review](docs/validation/2026-11-24-step-1.4-screen-rc3-windows7.md)
 
-I'll complete this step when full-screen fixtures and shells reach the required
-state after resize and exit, without unexplained lasting corruption or hangs.
+I accept the measured F06 and F07 restoration and resize cases with session
+flags 0 on all three Windows 7 tiers and WOLF.
 [Screen rc1 Windows 7 review](docs/validation/2026-11-24-step-1.4-screen-rc1-windows7.md) ·
 [Screen rc2 Windows 7 review](docs/validation/2026-11-24-step-1.4-screen-rc2-windows7.md)
 

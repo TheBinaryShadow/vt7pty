@@ -1,0 +1,849 @@
+{
+  "SchemaVersion": 1,
+  "Kind": "VT7PtyScreenRc3Windows7Review",
+  "Archive": "VT7Pty-screen-0.5.1-dev-rc3.zip",
+  "ArchiveSha256": "ad51f8815e2103df9664dcef40c3bd5ac7e200528bc59d6c2cf78af306ea0816",
+  "ManifestSha256": "ba0a03c20a0c8861c9e967f202bcbc11c50a205a68c9caaa4234e2b8fd00883d",
+  "Harness": {
+    "SourceTreeClean": true,
+    "VerificationSha256": "2912d98c7726390f5bfec45ee6e891f36c1a63cf016f13181ecec3d409f3f3b5",
+    "Configuration": "Release",
+    "SourceCommit": "a92b3fd4026e7d666765de7b10ab698e572eccc7",
+    "SnapshotBytes": 21396,
+    "Architecture": "x64"
+  },
+  "Runtimes": {
+    "accepted": {
+      "Archive": "VT7Pty-input-0.5.1-dev-rc2.zip",
+      "ManifestSha256": "e66b761b06c4c99fb885dcfe1862537cd9fb3dd577365569668639ccd09f7517",
+      "Version": "0.5.1-dev",
+      "Binaries": {
+        "VT7Pty-Agent.exe": "runtime/bin/VT7Pty-Agent.exe",
+        "VT7Pty-Host.dll": "runtime/bin/VT7Pty-Host.dll",
+        "VT7Pty.dll": "runtime/bin/VT7Pty.dll",
+        "VT7Pty-DebugServer.exe": "runtime/bin/VT7Pty-DebugServer.exe"
+      },
+      "SourceCommit": "0ca6e3fa78481cd4df35820b9fe3988f46e0bff4",
+      "ArchiveSha256": "93d1a1b290d796124b143d490181a861d6224bc61f36ca1cbe46113585a57fb5"
+    },
+    "candidate": {
+      "SourceCommit": "a92b3fd4026e7d666765de7b10ab698e572eccc7",
+      "Version": "0.5.1-dev",
+      "ManifestSha256": "2912d98c7726390f5bfec45ee6e891f36c1a63cf016f13181ecec3d409f3f3b5",
+      "Binaries": {
+        "VT7Pty-Agent.exe": "VT7Pty-Agent.exe",
+        "VT7Pty-Host.dll": "VT7Pty-Host.dll",
+        "VT7Pty.dll": "VT7Pty.dll",
+        "VT7Pty-DebugServer.exe": "VT7Pty-DebugServer.exe"
+      }
+    },
+    "baseline": {
+      "Archive": "VT7Pty-0.5.0-win7-x64-release-runtime.zip",
+      "ManifestSha256": "db1b7d067987d1f155f91c1e196e577f62fb530e68f179615793b3c136a231b1",
+      "Version": "0.5.0",
+      "Binaries": {
+        "VT7Pty.dll": "bin/VT7Pty.dll",
+        "VT7Pty-Agent.exe": "bin/VT7Pty-Agent.exe"
+      },
+      "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+      "ArchiveSha256": "59554a9cf8246395e60f30875e047d1bfa20d4f3f462c113ef705a86708f5304"
+    }
+  },
+  "SessionFlags": 0,
+  "Runs": [
+    {
+      "Machine": "NESSY",
+      "RunId": "nonesu-screen-20261124-014800-5bc4cd35",
+      "Tier": "NonESU",
+      "OS": {
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "BuildNumber": "7601",
+        "Version": "6.1.7601",
+        "ProductType": 1,
+        "ServicePackMajorVersion": 1
+      },
+      "PowerShellVersion": "5.1.14409.1018",
+      "CLRVersion": "4.0.30319.42000",
+      "KB3191566Listed": true,
+      "EvidenceFilesVerified": 202,
+      "EvidenceInventorySha256": "4e6c77c977e17446721498df64f531106a212f4bf9a4d5871a473abc7fa4c891",
+      "ReportSha256": "4d1f005b69f241fbcb24c43d56e6e3205875e9a0a609ac9cdcc2cb3c7bd9a5ce",
+      "StartedUtc": "2026-11-24T01:48:04.6103956Z",
+      "CompletedUtc": "2026-11-24T01:48:23.2524283Z",
+      "Outcomes": {
+        "baseline": {
+          "Match": 7,
+          "Difference": 1
+        },
+        "accepted": {
+          "Match": 7,
+          "Difference": 1
+        },
+        "candidate": {
+          "Match": 8,
+          "Difference": 0
+        }
+      },
+      "ExplicitRestoreCursor": {
+        "baseline": [
+          {
+            "Stage": "alternate",
+            "Position": [
+              7,
+              23
+            ],
+            "NativeVisible": false,
+            "StreamVisible": true
+          },
+          {
+            "Stage": "explicit-restore",
+            "Position": [
+              0,
+              8
+            ],
+            "NativeVisible": true,
+            "StreamVisible": true
+          }
+        ],
+        "accepted": [
+          {
+            "Stage": "alternate",
+            "Position": [
+              7,
+              23
+            ],
+            "NativeVisible": false,
+            "StreamVisible": true
+          },
+          {
+            "Stage": "explicit-restore",
+            "Position": [
+              0,
+              8
+            ],
+            "NativeVisible": true,
+            "StreamVisible": true
+          }
+        ],
+        "candidate": [
+          {
+            "Stage": "alternate",
+            "Position": [
+              7,
+              23
+            ],
+            "NativeVisible": false,
+            "StreamVisible": false
+          },
+          {
+            "Stage": "explicit-restore",
+            "Position": [
+              0,
+              8
+            ],
+            "NativeVisible": true,
+            "StreamVisible": true
+          }
+        ]
+      },
+      "ViewportChecks": {
+        "SCREEN_VIEWPORT": [
+          {
+            "Viewport": [
+              100,
+              30
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 30,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              80,
+              25
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 25,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              100,
+              30
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 30,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              80,
+              25
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 25,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          }
+        ],
+        "SCREEN_FIXED_ROWS": [
+          {
+            "Viewport": [
+              100,
+              30
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 30,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              80,
+              25
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 25,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              100,
+              30
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 30,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              80,
+              25
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 25,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          }
+        ]
+      },
+      "ShellChecks": [
+        {
+          "Case": "SCREEN_CMD_EXPLICIT",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            80,
+            25
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 0,
+          "ExitObservedBeforeResize": null,
+          "ExitObservedAfterResize": null
+        },
+        {
+          "Case": "SCREEN_CMD_EXIT",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            80,
+            25
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 0,
+          "ExitObservedBeforeResize": null,
+          "ExitObservedAfterResize": null
+        },
+        {
+          "Case": "SCREEN_PS_EXIT",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            80,
+            25
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 0,
+          "ExitObservedBeforeResize": null,
+          "ExitObservedAfterResize": null
+        },
+        {
+          "Case": "SCREEN_CMD_RESIZE",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            100,
+            30
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 8,
+          "ExitObservedBeforeResize": false,
+          "ExitObservedAfterResize": true
+        },
+        {
+          "Case": "SCREEN_PS_RESIZE",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            100,
+            30
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 8,
+          "ExitObservedBeforeResize": false,
+          "ExitObservedAfterResize": true
+        }
+      ]
+    },
+    {
+      "Machine": "TURTLE",
+      "RunId": "esu-screen-20261124-015100-d742fb93",
+      "Tier": "ESU",
+      "OS": {
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "BuildNumber": "7601",
+        "Version": "6.1.7601",
+        "ProductType": 1,
+        "ServicePackMajorVersion": 1
+      },
+      "PowerShellVersion": "5.1.14409.1005",
+      "CLRVersion": "4.0.30319.42000",
+      "KB3191566Listed": true,
+      "EvidenceFilesVerified": 202,
+      "EvidenceInventorySha256": "fa5ad00c161a73c74c9c80ea35a3ee7e2b6cc41c5d2aae9f1e2e3da1617bbcf5",
+      "ReportSha256": "81c2066bb6891f89f506e5f9f8c7405d3919ceea341b0dd74b700d7f368f36c5",
+      "StartedUtc": "2026-11-24T01:51:04.2578261Z",
+      "CompletedUtc": "2026-11-24T01:51:19.2962523Z",
+      "Outcomes": {
+        "baseline": {
+          "Match": 7,
+          "Difference": 1
+        },
+        "accepted": {
+          "Match": 7,
+          "Difference": 1
+        },
+        "candidate": {
+          "Match": 8,
+          "Difference": 0
+        }
+      },
+      "ExplicitRestoreCursor": {
+        "baseline": [
+          {
+            "Stage": "alternate",
+            "Position": [
+              7,
+              23
+            ],
+            "NativeVisible": false,
+            "StreamVisible": true
+          },
+          {
+            "Stage": "explicit-restore",
+            "Position": [
+              0,
+              8
+            ],
+            "NativeVisible": true,
+            "StreamVisible": true
+          }
+        ],
+        "accepted": [
+          {
+            "Stage": "alternate",
+            "Position": [
+              7,
+              23
+            ],
+            "NativeVisible": false,
+            "StreamVisible": true
+          },
+          {
+            "Stage": "explicit-restore",
+            "Position": [
+              0,
+              8
+            ],
+            "NativeVisible": true,
+            "StreamVisible": true
+          }
+        ],
+        "candidate": [
+          {
+            "Stage": "alternate",
+            "Position": [
+              7,
+              23
+            ],
+            "NativeVisible": false,
+            "StreamVisible": false
+          },
+          {
+            "Stage": "explicit-restore",
+            "Position": [
+              0,
+              8
+            ],
+            "NativeVisible": true,
+            "StreamVisible": true
+          }
+        ]
+      },
+      "ViewportChecks": {
+        "SCREEN_VIEWPORT": [
+          {
+            "Viewport": [
+              100,
+              30
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 30,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              80,
+              25
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 25,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              100,
+              30
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 30,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              80,
+              25
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 25,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          }
+        ],
+        "SCREEN_FIXED_ROWS": [
+          {
+            "Viewport": [
+              100,
+              30
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 30,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              80,
+              25
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 25,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              100,
+              30
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 30,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              80,
+              25
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 25,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          }
+        ]
+      },
+      "ShellChecks": [
+        {
+          "Case": "SCREEN_CMD_EXPLICIT",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            80,
+            25
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 0,
+          "ExitObservedBeforeResize": null,
+          "ExitObservedAfterResize": null
+        },
+        {
+          "Case": "SCREEN_CMD_EXIT",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            80,
+            25
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 0,
+          "ExitObservedBeforeResize": null,
+          "ExitObservedAfterResize": null
+        },
+        {
+          "Case": "SCREEN_PS_EXIT",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            80,
+            25
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 0,
+          "ExitObservedBeforeResize": null,
+          "ExitObservedAfterResize": null
+        },
+        {
+          "Case": "SCREEN_CMD_RESIZE",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            100,
+            30
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 8,
+          "ExitObservedBeforeResize": false,
+          "ExitObservedAfterResize": true
+        },
+        {
+          "Case": "SCREEN_PS_RESIZE",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            100,
+            30
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 8,
+          "ExitObservedBeforeResize": false,
+          "ExitObservedAfterResize": true
+        }
+      ]
+    },
+    {
+      "Machine": "LEOPARD",
+      "RunId": "legacy-screen-20261124-014803-5500b0dc",
+      "Tier": "Legacy",
+      "OS": {
+        "ProductType": 1,
+        "Version": "6.1.7601",
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "ServicePackMajorVersion": 1,
+        "BuildNumber": "7601"
+      },
+      "PowerShellVersion": "2.0",
+      "CLRVersion": "2.0.50727.8806",
+      "KB3191566Listed": false,
+      "EvidenceFilesVerified": 202,
+      "EvidenceInventorySha256": "693e8b2b6507ba5d6c49884b8440b1ea77a2f48aa5cbeb50ecbf9510791f3072",
+      "ReportSha256": "51ba5d831cd2dafc7bbd421a1ad7017123e0dc2191c6dae3d9d9be91f7a2a7bb",
+      "StartedUtc": "2026-11-24T01:48:10.4947313Z",
+      "CompletedUtc": "2026-11-24T01:48:29.1523641Z",
+      "Outcomes": {
+        "baseline": {
+          "Match": 7,
+          "Difference": 1
+        },
+        "accepted": {
+          "Match": 7,
+          "Difference": 1
+        },
+        "candidate": {
+          "Match": 8,
+          "Difference": 0
+        }
+      },
+      "ExplicitRestoreCursor": {
+        "baseline": [
+          {
+            "Stage": "alternate",
+            "Position": [
+              7,
+              23
+            ],
+            "NativeVisible": false,
+            "StreamVisible": true
+          },
+          {
+            "Stage": "explicit-restore",
+            "Position": [
+              0,
+              8
+            ],
+            "NativeVisible": true,
+            "StreamVisible": true
+          }
+        ],
+        "accepted": [
+          {
+            "Stage": "alternate",
+            "Position": [
+              7,
+              23
+            ],
+            "NativeVisible": false,
+            "StreamVisible": true
+          },
+          {
+            "Stage": "explicit-restore",
+            "Position": [
+              0,
+              8
+            ],
+            "NativeVisible": true,
+            "StreamVisible": true
+          }
+        ],
+        "candidate": [
+          {
+            "Stage": "alternate",
+            "Position": [
+              7,
+              23
+            ],
+            "NativeVisible": false,
+            "StreamVisible": false
+          },
+          {
+            "Stage": "explicit-restore",
+            "Position": [
+              0,
+              8
+            ],
+            "NativeVisible": true,
+            "StreamVisible": true
+          }
+        ]
+      },
+      "ViewportChecks": {
+        "SCREEN_VIEWPORT": [
+          {
+            "Viewport": [
+              100,
+              30
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 30,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              80,
+              25
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 25,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              100,
+              30
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 30,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              80,
+              25
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 25,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          }
+        ],
+        "SCREEN_FIXED_ROWS": [
+          {
+            "Viewport": [
+              100,
+              30
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 30,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              80,
+              25
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 25,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              100,
+              30
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 30,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          },
+          {
+            "Viewport": [
+              80,
+              25
+            ],
+            "RowOffset": 0,
+            "ComparedRows": 25,
+            "FixedMarkerBeforeRepaint": true,
+            "AlignedScreenMatches": true
+          }
+        ]
+      },
+      "ShellChecks": [
+        {
+          "Case": "SCREEN_CMD_EXPLICIT",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            80,
+            25
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 0,
+          "ExitObservedBeforeResize": null,
+          "ExitObservedAfterResize": null
+        },
+        {
+          "Case": "SCREEN_CMD_EXIT",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            80,
+            25
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 0,
+          "ExitObservedBeforeResize": null,
+          "ExitObservedAfterResize": null
+        },
+        {
+          "Case": "SCREEN_PS_EXIT",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            80,
+            25
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 0,
+          "ExitObservedBeforeResize": null,
+          "ExitObservedAfterResize": null
+        },
+        {
+          "Case": "SCREEN_CMD_RESIZE",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            100,
+            30
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 8,
+          "ExitObservedBeforeResize": false,
+          "ExitObservedAfterResize": true
+        },
+        {
+          "Case": "SCREEN_PS_RESIZE",
+          "ContinuedEditedCommand": true,
+          "ChildExitCode": 37,
+          "ShellReportedChildExit": "37",
+          "ReturnedPromptColumn": 0,
+          "RestoredViewport": [
+            100,
+            30
+          ],
+          "NativeMarkerPlacement": "Original",
+          "LiveResizeRequests": 8,
+          "ExitObservedBeforeResize": false,
+          "ExitObservedAfterResize": true
+        }
+      ]
+    }
+  ],
+  "TotalEvidenceFilesVerified": 606,
+  "TotalObservations": 72,
+  "TotalMatches": 66,
+  "ExpectedControlDifferences": 6,
+  "CandidateMatches": 24,
+  "CandidateViewportRequests": 24,
+  "CandidateFixedRowRequests": 12,
+  "CandidateLiveResizeRuns": 6,
+  "CandidateLiveResizeRequests": 48,
+  "CandidateExitResizeRequests": 6,
+  "CandidateShellReturns": 15,
+  "WolfRunId": "developmenthost-screen-20261124-012214-fbe88822",
+  "WolfCandidateMatches": 8,
+  "WolfRepeatedLiveCases": 16,
+  "WolfRepeatedLiveRequests": 128,
+  "Step14Accepted": true,
+  "MilestoneAccepted": false
+}

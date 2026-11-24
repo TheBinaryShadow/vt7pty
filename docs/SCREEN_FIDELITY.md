@@ -55,5 +55,5 @@ From a clean, committed VT7Pty checkout with the two pinned runtime ZIPs,
 I package with `Package-OutputFidelity.ps1 -Suite Screen -WithCandidate -Suffix rc3`.
 I use `tools/output/Test-ScreenEvidence.ps1 -Directory <run-directory>
 -PackageRoot <extracted-zip>` to check the returned receipts and file hashes.
-The characterization records both matches and differences. Step 1.4 stays
-open until I review the three Windows 7 runs and address required behavior.
+I recorded the accepted cases and expected control differences in the
+[screen rc3 review](validation/2026-11-24-step-1.4-screen-rc3-windows7.md).
