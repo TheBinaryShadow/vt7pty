@@ -1,0 +1,119 @@
+{
+  "RunId": "developmenthost-screen-20261124-001926-a2d91ab6",
+  "ComputerName": "WOLF",
+  "ManifestSha256": "33d9d1af6de038a649f26d42528d9bdb8ead390d09fb17444f3e35286c454bf1",
+  "InventoriedFilesVerified": 131,
+  "Outcomes": {
+    "accepted": {
+      "Match": 3,
+      "Difference": 4
+    },
+    "candidate": {
+      "Match": 4,
+      "Difference": 3
+    },
+    "baseline": {
+      "Match": 3,
+      "Difference": 4
+    }
+  },
+  "CursorChecks": [
+    {
+      "Runtime": "baseline",
+      "Phase": "alternate",
+      "Cursor": [
+        7,
+        23
+      ],
+      "NativeCursorVisible": false,
+      "ReceivedCursorVisible": true,
+      "LastVisibilityCommand": "CSI ?25 h",
+      "CellsAndAttributesMatch": true
+    },
+    {
+      "Runtime": "baseline",
+      "Phase": "explicit-restore",
+      "Cursor": [
+        0,
+        8
+      ],
+      "NativeCursorVisible": true,
+      "ReceivedCursorVisible": true,
+      "LastVisibilityCommand": "CSI ?25 h",
+      "CellsAndAttributesMatch": true
+    },
+    {
+      "Runtime": "accepted",
+      "Phase": "alternate",
+      "Cursor": [
+        7,
+        23
+      ],
+      "NativeCursorVisible": false,
+      "ReceivedCursorVisible": true,
+      "LastVisibilityCommand": "CSI ?25 h",
+      "CellsAndAttributesMatch": true
+    },
+    {
+      "Runtime": "accepted",
+      "Phase": "explicit-restore",
+      "Cursor": [
+        0,
+        8
+      ],
+      "NativeCursorVisible": true,
+      "ReceivedCursorVisible": true,
+      "LastVisibilityCommand": "CSI ?25 h",
+      "CellsAndAttributesMatch": true
+    },
+    {
+      "Runtime": "candidate",
+      "Phase": "alternate",
+      "Cursor": [
+        7,
+        23
+      ],
+      "NativeCursorVisible": false,
+      "ReceivedCursorVisible": false,
+      "LastVisibilityCommand": "CSI ?25 l",
+      "CellsAndAttributesMatch": true
+    },
+    {
+      "Runtime": "candidate",
+      "Phase": "explicit-restore",
+      "Cursor": [
+        0,
+        8
+      ],
+      "NativeCursorVisible": true,
+      "ReceivedCursorVisible": true,
+      "LastVisibilityCommand": "CSI ?25 h",
+      "CellsAndAttributesMatch": true
+    }
+  ],
+  "CandidateDifferences": {
+    "RESIZE": {
+      "Error": "resized screen mismatch"
+    },
+    "SCREEN_CMD_RESIZE": {
+      "Error": "full-screen restoration or resize differs",
+      "ScreenCheckpoints": [
+        "primary",
+        "alternate",
+        "settled-edit",
+        "after-exit"
+      ]
+    },
+    "SCREEN_PS_RESIZE": {
+      "Error": "full-screen restoration or resize differs",
+      "ScreenCheckpoints": [
+        "primary",
+        "alternate",
+        "settled-edit",
+        "after-exit"
+      ]
+    }
+  },
+  "ComparedAgainstScreenRc1": true,
+  "Step14Accepted": false
+}
