@@ -160,8 +160,9 @@ measured differences and their evidence.
 - [x] Fix active-buffer cursor visibility and verify it beside both controls on WOLF.
 - [x] Review screen rc2 and qualify the measured F06 and F07 cases on
   NESSY, TURTLE and LEOPARD.
-- [ ] Resolve the WOLF resize differences in the synchronized control and both
-  live shell workflows.
+- [ ] Verify WOLF viewport alignment and marker reflow, and resolve the
+  console-host loss during live shrink.
+  [Resize investigation](docs/validation/2026-11-24-step-1.4-wolf-resize-investigation.md)
 
 I'll complete this step when full-screen fixtures and shells reach the required
 state after resize and exit, without unexplained lasting corruption or hangs.

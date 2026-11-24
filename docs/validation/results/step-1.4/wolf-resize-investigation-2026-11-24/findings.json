@@ -1,0 +1,142 @@
+{
+  "Issued": {
+    "ViewportOffset": 8,
+    "CompletedLive": 12,
+    "LiveRequestsInCompletedRuns": 96,
+    "LostLiveShrink": 4,
+    "acceptedLostLiveShrink": 2,
+    "candidateLostLiveShrink": 2
+  },
+  "Scratch": {
+    "OtherScreenMatches": 4,
+    "ViewportOffset": 1,
+    "CompletedLive": 16,
+    "LiveRequestsInCompletedRuns": 128
+  },
+  "NativeSelection": {
+    "native-alternate-result.json": {
+      "disabled": {
+        "Trials": 6,
+        "Disconnects": 0,
+        "Completed": 6
+      },
+      "enabled": {
+        "Trials": 6,
+        "Disconnects": 5,
+        "Completed": 1
+      }
+    },
+    "native-alternate-narrow-result.json": {
+      "defer-shrink": {
+        "Trials": 8,
+        "Disconnects": 4,
+        "Completed": 4
+      },
+      "skip-shrink": {
+        "Trials": 8,
+        "Disconnects": 6,
+        "Completed": 2
+      }
+    },
+    "native-alternate-before-result.json": {
+      "pre-window": {
+        "Trials": 8,
+        "Disconnects": 8,
+        "Completed": 0
+      },
+      "unfrozen-shrink": {
+        "Trials": 8,
+        "Disconnects": 8,
+        "Completed": 0
+      }
+    },
+    "native-host-status.json": {
+      "disabled": {
+        "Trials": 4,
+        "Disconnects": 0,
+        "Completed": 4
+      },
+      "enabled": {
+        "Trials": 4,
+        "Disconnects": 4,
+        "Completed": 0
+      }
+    }
+  },
+  "ScratchAgentSha256": "3ab6beeac5367f29a8b3207c7c807981559a1660d76360b2d3a5b48b68534bcf",
+  "Rc2ManifestSha256": "33d9d1af6de038a649f26d42528d9bdb8ead390d09fb17444f3e35286c454bf1",
+  "IssuedWindowConhostEvents": [
+    {
+      "Module": "ucrtbase.dll",
+      "Pid": 59872,
+      "Utc": "2026-11-24T00:44:18.7576547Z",
+      "HexId": "e9e0",
+      "Exception": "0xc0000409",
+      "Version": "10.0.19041.7663"
+    },
+    {
+      "Module": "ucrtbase.dll",
+      "Pid": 52664,
+      "Utc": "2026-11-24T00:44:39.8250782Z",
+      "HexId": "cdb8",
+      "Exception": "0xc0000409",
+      "Version": "10.0.19041.7663"
+    },
+    {
+      "Module": "ucrtbase.dll",
+      "Pid": 61248,
+      "Utc": "2026-11-24T00:44:48.6635307Z",
+      "HexId": "ef40",
+      "Exception": "0xc0000409",
+      "Version": "10.0.19041.7663"
+    },
+    {
+      "Module": "ucrtbase.dll",
+      "Pid": 45396,
+      "Utc": "2026-11-24T00:44:58.5012760Z",
+      "HexId": "b154",
+      "Exception": "0xc0000409",
+      "Version": "10.0.19041.7663"
+    }
+  ],
+  "NativeMarker": {
+    "full-frame": [
+      {
+        "Column": 82,
+        "Row": 0,
+        "Attribute": 30
+      }
+    ],
+    "partial-frame": [
+      {
+        "Column": 2,
+        "Row": 1,
+        "Attribute": 30
+      }
+    ],
+    "marker-only": [
+      {
+        "Column": 2,
+        "Row": 1,
+        "Attribute": 30
+      }
+    ]
+  },
+  "ViewportReplay": {
+    "accepted": [
+      "native origin=0,1 cursor=17,7; replay cursor=17,8",
+      "row offset=0 cells=2000 text differences=42 attribute differences=10 cursor relative y=8",
+      "row offset=1 cells=1920 text differences=0 attribute differences=0 cursor relative y=7"
+    ],
+    "candidate": [
+      "native origin=0,1 cursor=17,7; replay cursor=17,8",
+      "row offset=0 cells=3000 text differences=42 attribute differences=10 cursor relative y=8",
+      "row offset=1 cells=2900 text differences=0 attribute differences=0 cursor relative y=7"
+    ],
+    "scratch": [
+      "native origin=0,1 cursor=17,7; replay cursor=17,8",
+      "row offset=0 cells=3000 text differences=42 attribute differences=10 cursor relative y=8",
+      "row offset=1 cells=2900 text differences=0 attribute differences=0 cursor relative y=7"
+    ]
+  }
+}
