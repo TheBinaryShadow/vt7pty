@@ -4,9 +4,9 @@ Updated: 2026-11-24.
 
 I've published 0.5.0 and completed the scoped Step 1.2 input and Step 1.3
 output work. I accept measured Unicode reconstruction with native cell
-placement where the console and terminal use compatible widths. Step 1.4
-screen rc2 is ready for Windows 7 testing. The broader baseline and VT7
-integration remain open.
+placement where the console and terminal use compatible widths. I qualified
+the Step 1.4 screen cases on all three Windows 7 tiers. The broader baseline
+and VT7 integration remain open.
 [Input acceptance](docs/validation/2026-11-23-step-1.2-profiles-rc3-windows7.md#step-12-scope) ·
 [Output acceptance](docs/OUTPUT_FIDELITY.md#accepted-output-scope)
 
@@ -29,7 +29,7 @@ The [foundation](docs/FOUNDATION.md) records the engineering decisions;
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Modern native VT7Pty 0.5.x foundation | Complete; 0.5.0 accepted and published |
-| 1 | Better console fidelity and reliability | In progress. Step 1.4 screen rc2 awaits the Windows 7 runs |
+| 1 | Better console fidelity and reliability | In progress. Step 1.4 passed on Windows 7. WOLF resize differences are open |
 | 2 | VT7-facing API and standalone integration host | Planned after backend validation |
 | 3 | Versioned handoff ready for VT7 integration | Planned after API and consumer tests |
 | Later | Other consumers and optional ConPTY compatibility | Deferred |
@@ -158,14 +158,15 @@ measured differences and their evidence.
 - [x] Review screen rc1 on NESSY, TURTLE and LEOPARD.
 - [x] Exercise repeated resize during editing/output and application exit.
 - [x] Fix active-buffer cursor visibility and verify it beside both controls on WOLF.
-- [ ] Review screen rc2 on NESSY, TURTLE and LEOPARD.
-- [ ] Resolve measured F06-F07 failures in active-buffer transitions, return to
-  the original screen, shell repaint and authoritative child dimensions.
+- [x] Review screen rc2 and qualify the measured F06 and F07 cases on
+  NESSY, TURTLE and LEOPARD.
+- [ ] Resolve the WOLF resize differences in the synchronized control and both
+  live shell workflows.
 
 I'll complete this step when full-screen fixtures and shells reach the required
 state after resize and exit, without unexplained lasting corruption or hangs.
 [Screen rc1 Windows 7 review](docs/validation/2026-11-24-step-1.4-screen-rc1-windows7.md) ·
-[Screen rc2 candidate](docs/validation/2026-11-24-step-1.4-screen-rc2-candidate.md)
+[Screen rc2 Windows 7 review](docs/validation/2026-11-24-step-1.4-screen-rc2-windows7.md)
 
 ### Step 1.5: Validate lifecycle and resource behavior under real workloads
 
