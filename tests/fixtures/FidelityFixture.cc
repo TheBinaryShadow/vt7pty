@@ -335,7 +335,7 @@ int outputFixture(const OutputCase &scenario, HANDLE output, HANDLE pipe) {
     return 0;
 }
 
-void draw(HANDLE output, bool unicode, bool alternate=false) {
+void draw(HANDLE output, bool unicode, bool alternate=false, bool fixedRows=false) {
     CONSOLE_SCREEN_BUFFER_INFO info={}; check(GetConsoleScreenBufferInfo(output,&info),"draw geometry");
     const int columns=info.srWindow.Right-info.srWindow.Left+1, rows=info.srWindow.Bottom-info.srWindow.Top+1;
     check(columns >= 40 && columns <= 120 && rows >= 12 && rows <= 40,"draw bounds");
@@ -349,6 +349,8 @@ void draw(HANDLE output, bool unicode, bool alternate=false) {
     line(3,4,L"\u010d\u0107\u017e\u0161\u0111",7);
     line(5,6,L"COLOR",0x1e);
     SMALL_RECT rectangle=info.srWindow;
+    // A full-width write can mark the row for reflow on the modern console.
+    if (fixedRows) --rectangle.Right;
     check(WriteConsoleOutputW(output,cells.data(),{static_cast<SHORT>(columns),static_cast<SHORT>(rows)},{0,0},&rectangle),"draw cells");
     check(SetConsoleTextAttribute(output,7),"draw default attribute");
     if (unicode) {
@@ -561,7 +563,8 @@ int wmain(int argc,wchar_t **argv) {
         if (const auto *scenario = findOutputCase(mode)) return outputFixture(*scenario, output.value, pipe.value);
         const bool input=mode == L"INPUT" || mode == L"PROCESSED";
         const bool unicode=mode == L"UNICODE";
-        check(input || unicode || mode == L"STATE","fixture mode");
+        const bool fixedRows=mode == L"FIXED_ROWS";
+        check(input || unicode || fixedRows || mode == L"STATE","fixture mode");
         Handle alternate;
         HANDLE active=output.value;
         std::vector<Key> keys;
@@ -570,7 +573,7 @@ int wmain(int argc,wchar_t **argv) {
                 (mode == L"PROCESSED" ? ENABLE_PROCESSED_INPUT : 0)),"fixture input mode");
             check(SetConsoleCtrlHandler(controlHandler,TRUE),"control handler");
             draw(active,false);
-        } else draw(active,unicode);
+        } else draw(active,unicode,false,fixedRows);
         auto packetStorage=observe(active,keys);
         Packet &packet=*packetStorage;
         transfer(pipe.value,&packet,sizeof(packet),true);
@@ -617,7 +620,7 @@ int wmain(int argc,wchar_t **argv) {
                 } else if (command == 'M') {
                     check(alternate.value != INVALID_HANDLE_VALUE,"restore state");
                     check(SetConsoleActiveScreenBuffer(output.value),"restore primary"); active=output.value;
-                } else if (command == 'R') { check(!input,"repaint input fixture"); draw(active,unicode); }
+                } else if (command == 'R') { check(!input,"repaint input fixture"); draw(active,unicode,false,fixedRows); }
                 else check(command == 'S',"fixture command");
                 packet=*observe(active,keys); packet.bufferTag=active == output.value ? 1u : 2u;
                 transfer(pipe.value,&packet,sizeof(packet),true);

@@ -95,7 +95,7 @@ Scraper::~Scraper()
 {
 }
 
-// Whether or not the agent is frozen on entry, it will be frozen on exit.
+// Resizing uses the selection policy for the active buffer.
 void Scraper::resizeWindow(Win32ConsoleBuffer &buffer,
                            Coord newSize,
                            ConsoleScreenBufferInfo &finalInfoOut)
@@ -187,7 +187,10 @@ static bool cursorInWindow(const ConsoleScreenBufferInfo &info)
 
 void Scraper::resizeImpl(const ConsoleScreenBufferInfo &origInfo)
 {
-    ASSERT(m_console.frozen());
+    // Selection during a modern direct resize can make a later shrink
+    // terminate the console host, even after selection has ended.
+    const bool freezeForResize = !m_console.isNewW10() || !m_directMode;
+    ASSERT(m_console.frozen() == freezeForResize);
     const int cols = m_ptySize.X;
     const int rows = m_ptySize.Y;
     Coord finalBufferSize;
@@ -253,9 +256,8 @@ void Scraper::resizeImpl(const ConsoleScreenBufferInfo &origInfo)
         vt7pty::internal::checkedNarrow<SHORT>(rows), largest.Y);
 
     {
-        // Make the window small enough.  We want the console frozen during
-        // this step so we don't accidentally move the window above the cursor.
-        m_console.setFrozen(true);
+        // Fit the temporary window using the current cursor and geometry.
+        m_console.setFrozen(freezeForResize);
         const auto info = m_consoleBuffer->bufferInfo();
         const auto &bufferSize = info.dwSize;
         const int tmpWindowWidth = std::min(bufferSize.X, visibleCols);
@@ -281,7 +283,7 @@ void Scraper::resizeImpl(const ConsoleScreenBufferInfo &origInfo)
 
     {
         // Expand the window to its full size.
-        m_console.setFrozen(true);
+        m_console.setFrozen(freezeForResize);
         const ConsoleScreenBufferInfo info = m_consoleBuffer->bufferInfo();
 
         SmallRect finalWindowRect(
@@ -319,7 +321,7 @@ void Scraper::resizeImpl(const ConsoleScreenBufferInfo &origInfo)
         m_dirtyWindowTop = finalWindowRect.Top;
     }
 
-    ASSERT(m_console.frozen());
+    ASSERT(m_console.frozen() == freezeForResize);
 }
 
 void Scraper::syncConsoleContentAndSize(
@@ -335,18 +337,30 @@ void Scraper::syncConsoleContentAndSize(
     //  - Prior to Windows 10, an out-of-range read region crashes the caller.
     //    (See tests/manual/WindowsBugCrashReader.cc.)
     //
-    if (!m_console.isNewW10() || forceResize) {
+    const bool modernConsole = m_console.isNewW10();
+    if (!modernConsole) {
         m_console.setFrozen(true);
     }
 
-    const ConsoleScreenBufferInfo info = m_consoleBuffer->bufferInfo();
-    bool cursorVisible = true;
-    CONSOLE_CURSOR_INFO cursorInfo = {};
-    if (!GetConsoleCursorInfo(m_consoleBuffer->conout(), &cursorInfo)) {
-        trace("GetConsoleCursorInfo failed");
-    } else {
-        cursorVisible = cursorInfo.bVisible != 0;
+    ConsoleScreenBufferInfo info = m_consoleBuffer->bufferInfo();
+    if (modernConsole && forceResize) {
+        if (info.bufferSize().Y == BUFFER_LINE_COUNT) {
+            m_console.setFrozen(true);
+            info = m_consoleBuffer->bufferInfo();
+        }
+        if (info.bufferSize().Y != BUFFER_LINE_COUNT) {
+            m_console.setFrozen(false);
+        }
     }
+
+    const auto cursorVisible = [&] {
+        CONSOLE_CURSOR_INFO cursorInfo = {};
+        if (!GetConsoleCursorInfo(m_consoleBuffer->conout(), &cursorInfo)) {
+            trace("GetConsoleCursorInfo failed");
+            return true;
+        }
+        return cursorInfo.bVisible != 0;
+    };
 
     // If an app resizes the buffer height, then we enter "direct mode", where
     // we stop trying to track incremental console changes.
@@ -370,26 +384,29 @@ void Scraper::syncConsoleContentAndSize(
         // before scraping.
         if (forceResize) {
             resizeImpl(info);
+            info = m_consoleBuffer->bufferInfo();
         }
-        directScrapeOutput(info, cursorVisible);
+        directScrapeOutput(info, cursorVisible());
     } else {
+        const bool visible = cursorVisible();
         if (!m_console.frozen()) {
-            if (!scrollingScrapeOutput(info, cursorVisible, true)) {
+            if (!scrollingScrapeOutput(info, visible, true)) {
                 m_console.setFrozen(true);
             }
         }
         if (m_console.frozen()) {
-            scrollingScrapeOutput(info, cursorVisible, false);
+            scrollingScrapeOutput(info, visible, false);
         }
         // In scrolling mode, we want to scrape before resizing, because we'll
         // erase everything in the console buffer up to the top of the console
         // window.
         if (forceResize) {
             resizeImpl(info);
+            info = m_consoleBuffer->bufferInfo();
         }
     }
 
-    finalInfoOut = forceResize ? m_consoleBuffer->bufferInfo() : info;
+    finalInfoOut = info;
 }
 
 // Try to match Windows' behavior w.r.t. to the LVB attribute flags.  In some

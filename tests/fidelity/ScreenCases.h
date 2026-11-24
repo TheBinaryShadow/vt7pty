@@ -30,10 +30,13 @@ inline const ScreenCase *findScreenCase(std::wstring_view name) {
 inline constexpr COORD screenInitialSize{80, 25};
 inline constexpr COORD screenGrownSize{100, 30};
 inline constexpr uint32_t screenResizePairs = 4;
+inline constexpr uint32_t viewportResizePairs = 2;
 inline constexpr DWORD screenExitCode = 37;
 inline constexpr std::wstring_view screenPrimary = L"SCREEN_PRIMARY";
 inline constexpr std::wstring_view screenAlternate = L"SCREEN_ALTERNATE";
 inline constexpr std::wstring_view screenCorner = L"CORNER";
+
+enum class PrimaryMarkerPlacement { Original, Reflowed, Unexpected };
 
 // The fixture reads these dimensions from its own screen buffer.
 struct ScreenActivity {
@@ -49,6 +52,14 @@ inline bool screenTextAt(const Packet &packet, uint32_t x, uint32_t y, std::wstr
         if (cell.Char.UnicodeChar != character || cell.Attributes != color) return false;
     }
     return true;
+}
+
+inline PrimaryMarkerPlacement primaryMarkerPlacement(const Packet &packet, bool resized) {
+    const bool original = screenTextAt(packet, 2, 1, screenPrimary, 0x1e);
+    // On growth the full-width first row can join the next row.
+    const bool reflowed = resized && screenTextAt(packet, screenInitialSize.X + 2u, 0, screenPrimary, 0x1e);
+    if (original == reflowed) return PrimaryMarkerPlacement::Unexpected;
+    return original ? PrimaryMarkerPlacement::Original : PrimaryMarkerPlacement::Reflowed;
 }
 
 } // namespace fidelity

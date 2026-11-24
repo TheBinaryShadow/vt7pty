@@ -245,6 +245,107 @@ struct Observations {
     bool cleanup=true;
     void add(const std::string &key,bool value) { fields+=","+json(key)+":"+(value ? "true" : "false"); }
 };
+
+struct ViewportComparison {
+    int rowOffset = 0;
+    uint32_t comparedRows = 0, textDifferences = 0, attributeDifferences = 0, uncoveredNonblank = 0;
+    bool geometry = false, cursor = false;
+
+    bool matches() const {
+        return geometry && cursor && comparedRows && !textDifferences && !attributeDifferences && !uncoveredNonblank;
+    }
+
+    std::string jsonFields() const {
+        return ",\"ViewportRowOffset\":" + std::to_string(rowOffset) +
+            ",\"ComparedRows\":" + std::to_string(comparedRows) +
+            ",\"CellDifferences\":" + std::to_string(textDifferences) +
+            ",\"AttributeDifferences\":" + std::to_string(attributeDifferences) +
+            ",\"UncoveredNonblankCells\":" + std::to_string(uncoveredNonblank) +
+            ",\"ViewportGeometryMatches\":" + (geometry ? "true" : "false") +
+            ",\"ViewportCursorMatches\":" + (cursor ? "true" : "false") +
+            ",\"AlignedScreenMatches\":" + (matches() ? "true" : "false");
+    }
+};
+
+ViewportComparison compareViewport(const VtState &state, const Packet &packet, uint32_t initialTop) {
+    ViewportComparison result;
+    result.rowOffset = static_cast<int>(packet.windowTop) - static_cast<int>(initialTop);
+    result.geometry = packet.windowLeft == 0 && packet.columns == static_cast<uint32_t>(state.columns()) &&
+        packet.rows == static_cast<uint32_t>(state.rows());
+    if (!result.geometry) return result;
+
+    result.cursor = static_cast<int>(packet.cursorX) == state.x() &&
+        static_cast<int>(packet.cursorY) + result.rowOffset == state.y() && (packet.cursorVisible != 0) == state.visible();
+    for (uint32_t y = 0; y < packet.rows; ++y) {
+        const int readerRow = static_cast<int>(y) + result.rowOffset;
+        const bool covered = readerRow >= 0 && readerRow < state.rows();
+        if (covered) ++result.comparedRows;
+        for (uint32_t x = 0; x < packet.columns; ++x) {
+            const auto &expected = packet.cells[y * packet.columns + x];
+            const auto attribute = visualAttribute(expected.Attributes);
+            if (!covered) {
+                if (expected.Char.UnicodeChar != L' ' || expected.Attributes != 7) ++result.uncoveredNonblank;
+                continue;
+            }
+            const auto &observed = state.at(static_cast<int>(x), readerRow);
+            if (observed.text != std::u32string(1, static_cast<char32_t>(expected.Char.UnicodeChar)) || observed.continuation)
+                ++result.textDifferences;
+            if (observed.attributes != attribute) ++result.attributeDifferences;
+        }
+    }
+    return result;
+}
+
+bool viewportResizes(Session &session, Packet &packet, const std::wstring &directory, bool fixedRows,
+    const std::function<void(char)> &snapshot, Observations &observations) {
+    const uint32_t initialTop = packet.windowTop;
+    auto save = [&](const std::wstring &label) {
+        writeFile(directory + L"\\console-" + label + L".bin",
+            std::string_view(reinterpret_cast<const char *>(&packet), sizeof(Packet)));
+    };
+    save(L"initial");
+    observations.fields += ",\"InitialViewport\":" + packetJson(packet);
+    std::string checks = "[";
+    bool matched = true;
+    for (uint32_t i = 0; i < 2 * viewportResizePairs; ++i) {
+        const COORD size = i % 2 == 0 ? screenGrownSize : screenInitialSize;
+        const uint32_t markerRow = packet.windowTop + 1;
+        const std::wstring label = L"resize-" + std::to_wstring(i + 1);
+        session.pump();
+        const auto boundary = session.raw.size();
+        session.resize(size.X, size.Y);
+        snapshot('S');
+        save(label + L"-before-repaint");
+        const bool markerFixed = markerRow >= packet.windowTop &&
+            screenTextAt(packet, 2, markerRow - packet.windowTop, L"STATE_READY", 7);
+        const std::string before = packetJson(packet);
+        const bool sizeBeforeRepaint = packet.columns == static_cast<uint32_t>(size.X) &&
+            packet.rows == static_cast<uint32_t>(size.Y) && packet.bufferColumns == packet.columns;
+
+        snapshot('R');
+        recipe(packet);
+        save(label);
+        ViewportComparison comparison;
+        session.until([&] {
+            comparison = compareViewport(session.state, packet, initialTop);
+            return comparison.matches();
+        }, 2000);
+        const bool sizeMatches = sizeBeforeRepaint && packet.columns == static_cast<uint32_t>(size.X) &&
+            packet.rows == static_cast<uint32_t>(size.Y) && packet.bufferColumns == packet.columns;
+        matched = matched && comparison.matches() && sizeMatches && (!fixedRows || markerFixed);
+        if (i) checks += ',';
+        checks += "{\"Columns\":" + std::to_string(size.X) + ",\"Rows\":" + std::to_string(size.Y) +
+            ",\"CapturedBytesBefore\":" + std::to_string(boundary) + ",\"CapturedBytes\":" +
+            std::to_string(session.raw.size()) + ",\"BeforeRepaint\":" + before + ",\"Console\":" + packetJson(packet) +
+            ",\"DecodedState\":" + differenceJson(session.state, packet) +
+            ",\"ReconstructedCursorVisible\":" + (session.state.visible() ? "true" : "false") +
+            ",\"FixedMarkerBeforeRepaint\":" + (markerFixed ? "true" : "false") +
+            ",\"RequestedSizeMatches\":" + (sizeMatches ? "true" : "false") + comparison.jsonFields() + '}';
+    }
+    observations.fields += ",\"ViewportResizes\":" + checks + ']';
+    return matched;
+}
+
 std::string pointList(std::u32string_view text) {
     std::string result = "[";
     for (const auto value : text) {
@@ -615,10 +716,14 @@ void fixtureCase(const std::wstring &name,const std::wstring &resultDirectory,Ob
     Session session;
     auto packetStorage=std::make_unique<Packet>();
     Packet &packet=*packetStorage;
+    const bool fixedRows = name == L"SCREEN_FIXED_ROWS";
+    const bool viewport = fixedRows || name == L"SCREEN_VIEWPORT";
+    bool viewportMatches = true;
     try {
         const std::wstring pipeName=L"\\\\.\\pipe\\VT7Pty.Fidelity."+std::to_wstring(GetCurrentProcessId())+L"."+std::to_wstring(GetTickCount64());
         Handle pipe(privateServer(pipeName));
         std::wstring mode=L"STATE";
+        if (fixedRows) mode=L"FIXED_ROWS";
         if (name == L"UNICODE") mode=L"UNICODE";
         if (name == L"INPUT" || name == L"UNPROCESSED_CTRL_C" || name == L"NEGATIVE_DUPLICATE") mode=L"INPUT";
         if (name == L"PROCESSED_CTRL_C") mode=L"PROCESSED";
@@ -688,6 +793,7 @@ void fixtureCase(const std::wstring &name,const std::wstring &resultDirectory,Ob
                     if (!session.until([&] { return sameScreen(session.state,packet); })) throw Mismatch("resized screen mismatch");
                 }
             }
+            if (viewport) viewportMatches = viewportResizes(session, packet, resultDirectory, fixedRows, snapshot, observations);
             if (name == L"NEGATIVE_TIMEOUT" && !session.until([] { return false; },1000))
                 throw Mismatch("deliberate readiness deadline");
             if (name == L"NEGATIVE_ORPHAN" && WaitForSingleObject(session.child.value,0) != WAIT_OBJECT_0)
@@ -700,6 +806,7 @@ void fixtureCase(const std::wstring &name,const std::wstring &resultDirectory,Ob
         const bool drain=session.state.contains(U"FINAL_DRAIN");
         observations.add("FinalDrainMatches",drain);
         if (!drain) throw Mismatch("final marker missing from decoded output");
+        if (!viewportMatches) throw Mismatch("stable resize viewport or fixed marker differs");
     } catch (...) {
         observations.comparison=differenceJson(session.state,packet);
         observations.raw=session.raw; observations.cleanup=session.cleanup(); throw;
@@ -858,8 +965,12 @@ void screenCase(const ScreenCase &scenario, const std::wstring &resultDirectory,
         validate(*packet);
         writeFile(resultDirectory + L"\\console-" + label + L".bin",
             std::string_view(reinterpret_cast<const char *>(packet.get()), sizeof(Packet)));
+        const bool afterResize = scenario.exit == ScreenExit::Resize && std::wstring_view(label) == L"after-exit";
+        const auto primaryMarker = primaryMarkerPlacement(*packet, afterResize);
         const bool marker = alternate ? screenTextAt(*packet, 2, 1, screenAlternate, 0x2f) :
-            screenTextAt(*packet, 2, 1, screenPrimary, 0x1e);
+            primaryMarker != PrimaryMarkerPlacement::Unexpected;
+        const char *markerPlacement = !marker ? "Unexpected" :
+            primaryMarker == PrimaryMarkerPlacement::Reflowed ? "Reflowed" : "Original";
         const bool geometry = packet->columns == static_cast<uint32_t>(size.X) &&
             packet->rows == static_cast<uint32_t>(size.Y) && packet->bufferColumns == static_cast<uint32_t>(size.X) &&
             (!alternate || (packet->bufferRows == static_cast<uint32_t>(size.Y) && packet->windowTop == 0 && packet->windowLeft == 0));
@@ -875,6 +986,7 @@ void screenCase(const ScreenCase &scenario, const std::wstring &resultDirectory,
         observations.comparison = differenceJson(session.state, *packet);
         if (checkpoints.size() > 1) checkpoints += ',';
         checkpoints += "{\"Name\":" + json(utf8(label)) + ",\"NativeActiveMarker\":" + (marker ? "true" : "false") +
+            ",\"NativeMarkerPlacement\":" + json(markerPlacement) +
             ",\"NativeGeometryMatches\":" + (geometry ? "true" : "false") + ",\"NativeFrameMatches\":" +
             (frame ? "true" : "false") + ",\"ReconstructedMatches\":" + (reconstructed ? "true" : "false") +
             ",\"NativeCursorVisible\":" + (packet->cursorVisible ? "true" : "false") +
@@ -895,7 +1007,14 @@ void screenCase(const ScreenCase &scenario, const std::wstring &resultDirectory,
 
     try {
         const auto prompt = startShell(scenario.cmd ? L"CMD_SCREEN" : L"PS_SCREEN", resultDirectory, L"", session, observations);
-        const auto atPrompt = [&] { return trimmed(session.state.row(session.state.y())) == prompt; };
+        const auto atPrompt = [&] {
+            const auto row = trimmed(session.state.row(session.state.y()));
+            if (row == prompt) return true;
+            // Native reflow can shift the restored prompt into leading blank cells.
+            return scenario.exit == ScreenExit::Resize && row.ends_with(prompt) &&
+                row.find_first_not_of(U' ') == row.size() - prompt.size() &&
+                static_cast<size_t>(session.state.x()) == row.size();
+        };
         const std::wstring prefix = L"\\\\.\\pipe\\VT7Pty.Screen." + std::to_wstring(GetCurrentProcessId()) +
             L"." + std::to_wstring(GetTickCount64());
         const std::wstring fixture = directory() + L"\\FidelityFixture.exe";
@@ -966,7 +1085,12 @@ void screenCase(const ScreenCase &scenario, const std::wstring &resultDirectory,
         const auto exitCode = waitFixtureExit();
         observations.fields += ",\"FullScreenExitCode\":" + std::to_string(exitCode);
         add("FullScreenExitMatches", exitCode == screenExitCode);
-        add("ReturnedToShellPrompt", session.until(atPrompt));
+        const bool returned = session.until(atPrompt);
+        add("ReturnedToShellPrompt", returned);
+        if (returned) {
+            const auto row = trimmed(session.state.row(session.state.y()));
+            observations.fields += ",\"ReturnedPromptColumn\":" + std::to_string(row.size() - prompt.size());
+        }
 
         const std::wstring statusPath = resultDirectory + L"\\child-exit-code.txt";
         const std::wstring inspectPipe = prefix + L".inspect";
@@ -1243,10 +1367,12 @@ void shellCase(const std::wstring &name,const std::wstring &directoryPath,const 
 }
 int wmain(int argc,wchar_t **argv) {
     if (argc == 2 && std::wstring_view(argv[1]) == L"--screen-cases") {
-        std::string list = "{\"SchemaVersion\":1,\"SnapshotBytes\":" + std::to_string(sizeof(Packet)) +
-            ",\"ResizePairs\":" + std::to_string(screenResizePairs) + ",\"Cases\":["
+        std::string list = "{\"SchemaVersion\":2,\"SnapshotBytes\":" + std::to_string(sizeof(Packet)) +
+            ",\"ResizePairs\":" + std::to_string(screenResizePairs) +
+            ",\"ViewportResizePairs\":" + std::to_string(viewportResizePairs) + ",\"Cases\":["
             "{\"Name\":\"ALTERNATE\",\"Area\":\"F06\",\"Mode\":\"Control\"},"
-            "{\"Name\":\"RESIZE\",\"Area\":\"F07\",\"Mode\":\"Control\"}";
+            "{\"Name\":\"SCREEN_VIEWPORT\",\"Area\":\"F07\",\"Mode\":\"Viewport\"},"
+            "{\"Name\":\"SCREEN_FIXED_ROWS\",\"Area\":\"F07\",\"Mode\":\"FixedRows\"}";
         for (const auto &scenario : screenCases) {
             const char *mode = scenario.exit == ScreenExit::Explicit ? "Explicit" :
                 scenario.exit == ScreenExit::Implicit ? "Implicit" : "Resize";
@@ -1285,7 +1411,8 @@ int wmain(int argc,wchar_t **argv) {
         const std::vector<std::wstring> cases={L"STATE",L"UNICODE",L"ALTERNATE",L"RESIZE",L"INPUT",L"PROCESSED_CTRL_C",L"UNPROCESSED_CTRL_C",L"DRAIN",L"NEGATIVE_CELL",L"NEGATIVE_ATTRIBUTE",L"NEGATIVE_CURSOR",L"NEGATIVE_PACKET",L"NEGATIVE_DUPLICATE",L"NEGATIVE_DRAIN",L"NEGATIVE_TIMEOUT",L"NEGATIVE_ORPHAN",L"CMD_EMPTY",L"CMD_PARTIAL",L"PS_EMPTY",L"PS_PARTIAL",L"PS7_EMPTY",L"PS7_PARTIAL",L"CMD_CHILD_HANDLED",L"CMD_CHILD_DEFAULT",L"CMD_CHILD_UNPROCESSED",L"PS_CHILD_HANDLED",L"PS_CHILD_DEFAULT",L"PS_CHILD_UNPROCESSED",L"PS7_CHILD_HANDLED",L"PS7_CHILD_DEFAULT",L"PS7_CHILD_UNPROCESSED",L"NEGATIVE_CHILD_CONTROL",L"NEGATIVE_CHILD_EXIT",L"READCONSOLE_TRANSPORT",L"READCONSOLE_EVENT",L"READCONSOLE_RECORD_EVENT",L"READCONSOLE_OWNED_CANCEL"};
         const auto *output = findOutputCase(name);
         const auto *screen = findScreenCase(name);
-        check(output || screen || std::find(cases.begin(),cases.end(),name) != cases.end(),"unknown case");
+        check(output || screen || name == L"SCREEN_VIEWPORT" || name == L"SCREEN_FIXED_ROWS" ||
+            std::find(cases.begin(),cases.end(),name) != cases.end(),"unknown case");
         if (output) outputCase(*output, outputDirectory, observations);
         else if (screen) screenCase(*screen, outputDirectory, observations);
         else if (name.find(L"_CHILD_") != std::wstring::npos) childCase(name,outputDirectory,program,observations);

@@ -2,17 +2,24 @@
 function Get-ScreenRuntimeRoles($Manifest) {
     'baseline'
     'accepted'
-    if ($Manifest.SchemaVersion -eq 2) { 'candidate' }
+    if ($Manifest.SchemaVersion -eq 2 -or
+        ($Manifest.SchemaVersion -eq 3 -and $Manifest.Runtimes.ContainsKey('candidate'))) { 'candidate' }
 }
 
 function Read-ScreenPackage([string]$Root) {
     $manifest = Read-VT7Json (Join-Path $Root 'manifest.json')
-    if ($manifest.Kind -cne 'VT7PtyScreenCharacterization' -or @(1,2) -notcontains $manifest.SchemaVersion -or
+    if ($manifest.Kind -cne 'VT7PtyScreenCharacterization' -or @(1,2,3) -notcontains $manifest.SchemaVersion -or
         $manifest.Step14Accepted -or $manifest.ResizePairs -ne 4) { throw 'Wrong screen characterization package.' }
     $required = @{
         ALTERNATE = 'F06/Control'; RESIZE = 'F07/Control'
         SCREEN_CMD_EXPLICIT = 'F06/Explicit'; SCREEN_CMD_EXIT = 'F06/Implicit'; SCREEN_PS_EXIT = 'F06/Implicit'
         SCREEN_CMD_RESIZE = 'F07/Resize'; SCREEN_PS_RESIZE = 'F07/Resize'
+    }
+    if ($manifest.SchemaVersion -eq 3) {
+        if ($manifest.ViewportResizePairs -ne 2) { throw 'Wrong viewport resize count.' }
+        $required.Remove('RESIZE')
+        $required.SCREEN_VIEWPORT = 'F07/Viewport'
+        $required.SCREEN_FIXED_ROWS = 'F07/FixedRows'
     }
     foreach ($case in $manifest.Cases) {
         if (-not $required.ContainsKey($case.Name) -or $required[$case.Name] -cne ($case.Area + '/' + $case.Mode)) {
@@ -32,6 +39,91 @@ function Read-ScreenSnapshot([string]$Path, [int]$Bytes) {
     return ,$snapshot
 }
 
+function Confirm-ScreenGeometry([byte[]]$Snapshot, $Console) {
+    $fields = @('Columns','Rows','BufferColumns','BufferRows','WindowLeft','WindowTop','CursorX','CursorY')
+    for ($i = 0; $i -lt $fields.Count; $i++) {
+        if ([BitConverter]::ToUInt32($Snapshot, 8 + 4 * $i) -ne $Console[$fields[$i]]) {
+            throw ('Native screen dimensions or cursor differ: ' + $fields[$i])
+        }
+    }
+}
+
+function Test-ScreenText([byte[]]$Snapshot, $Console, [int]$X, [int]$Y, [string]$Text, [int]$Attribute) {
+    if ($Y -lt 0 -or $Y -ge $Console.Rows -or $X -lt 0 -or $X + $Text.Length -gt $Console.Columns) { return $false }
+    $offset = $Snapshot.Length - 19200 + 4 * ($Y * $Console.Columns + $X)
+    for ($i = 0; $i -lt $Text.Length; $i++) {
+        if ([BitConverter]::ToUInt16($Snapshot, $offset + 4 * $i) -ne [int]($Text[$i]) -or
+            [BitConverter]::ToUInt16($Snapshot, $offset + 4 * $i + 2) -ne $Attribute) { return $false }
+    }
+    return $true
+}
+
+function Confirm-ViewportCase([string]$Directory, $Spec, $Record, $Manifest, [long]$StreamBytes, [int]$ExitCode) {
+    $bytes = $Manifest.Harness.SnapshotBytes
+    $previous = $Record.InitialViewport
+    $initialTop = $previous.WindowTop
+    $initial = Read-ScreenSnapshot (Join-Path $Directory 'console-initial.bin') $bytes
+    Confirm-ScreenGeometry $initial $previous
+    $stages = @($Record.ViewportResizes)
+    if ($stages.Count -ne 2 * $Manifest.ViewportResizePairs -or -not $Record.OwnedProcessesCleaned) {
+        throw 'Incomplete viewport resize observations.'
+    }
+    $last = 0
+    $matched = $Record.FinalDrainMatches
+    for ($i = 0; $i -lt $stages.Count; $i++) {
+        $stage = $stages[$i]
+        $prefix = 'console-resize-' + ($i + 1)
+        $before = Read-ScreenSnapshot (Join-Path $Directory ($prefix + '-before-repaint.bin')) $bytes
+        $final = Read-ScreenSnapshot (Join-Path $Directory ($prefix + '.bin')) $bytes
+        Confirm-ScreenGeometry $before $stage.BeforeRepaint
+        Confirm-ScreenGeometry $final $stage.Console
+        $columns = if ($i % 2 -eq 0) { 100 } else { 80 }
+        $rows = if ($i % 2 -eq 0) { 30 } else { 25 }
+        if ($stage.Columns -ne $columns -or $stage.Rows -ne $rows -or $stage.CapturedBytesBefore -lt $last -or
+            $stage.CapturedBytesBefore -gt $stage.CapturedBytes -or $stage.CapturedBytes -gt $StreamBytes) {
+            throw 'Wrong viewport resize request or capture offsets.'
+        }
+        $last = $stage.CapturedBytes
+        $size = $true
+        foreach ($info in @($stage.BeforeRepaint,$stage.Console)) {
+            $size = $size -and $info.Columns -eq $columns -and $info.Rows -eq $rows -and $info.BufferColumns -eq $columns
+        }
+        $markerRow = [int]$previous.WindowTop + 1 - [int]$stage.BeforeRepaint.WindowTop
+        $fixed = Test-ScreenText $before $stage.BeforeRepaint 2 $markerRow 'STATE_READY' 7
+        $console = $stage.Console
+        $decoded = $stage.DecodedState
+        $offset = [int]$console.WindowTop - [int]$initialTop
+        $geometry = $console.WindowLeft -eq 0 -and $console.Columns -eq $decoded.Columns -and $console.Rows -eq $decoded.Rows
+        $cursor = $geometry -and $console.CursorX -eq $decoded.CursorX -and $console.CursorY + $offset -eq $decoded.CursorY -and
+            ([BitConverter]::ToUInt32($final, 40) -ne 0) -eq $stage.ReconstructedCursorVisible
+        $overlap = if ($geometry) { [Math]::Max(0, [int]$console.Rows - [Math]::Abs($offset)) } else { 0 }
+        $uncovered = 0
+        if ($geometry -and $offset -ne 0) {
+            $cells = $final.Length - 19200
+            for ($y = 0; $y -lt $console.Rows; $y++) {
+                if ($y + $offset -ge 0 -and $y + $offset -lt $decoded.Rows) { continue }
+                for ($x = 0; $x -lt $console.Columns; $x++) {
+                    $index = $cells + 4 * ($y * $console.Columns + $x)
+                    if ([BitConverter]::ToUInt16($final, $index) -ne 32 -or [BitConverter]::ToUInt16($final, $index + 2) -ne 7) {
+                        $uncovered++
+                    }
+                }
+            }
+        }
+        $aligned = $geometry -and $cursor -and $overlap -gt 0 -and $stage.CellDifferences -eq 0 -and
+            $stage.AttributeDifferences -eq 0 -and $uncovered -eq 0
+        if ($stage.ViewportRowOffset -ne $offset -or $stage.ComparedRows -ne $overlap -or $stage.RequestedSizeMatches -ne $size -or
+            $stage.FixedMarkerBeforeRepaint -ne $fixed -or $stage.ViewportGeometryMatches -ne $geometry -or
+            $stage.ViewportCursorMatches -ne $cursor -or $stage.UncoveredNonblankCells -ne $uncovered -or
+            $stage.AlignedScreenMatches -ne $aligned) {
+            throw 'Viewport verdict disagrees with the measured origin, geometry or fixed marker.'
+        }
+        $matched = $matched -and $aligned -and $size -and ($Spec.Mode -cne 'FixedRows' -or $fixed)
+        $previous = $console
+    }
+    if ($matched -ne ($ExitCode -eq 0)) { throw 'Viewport result disagrees with the recorded checkpoints.' }
+}
+
 function Read-ScreenCase([string]$Directory, $Spec, [int]$ExitCode, $Manifest) {
     $native = Read-VT7Json (Join-Path $Directory 'case.json')
     $stream = Get-Item -LiteralPath (Join-Path $Directory 'stream.bin')
@@ -45,6 +137,10 @@ function Read-ScreenCase([string]$Directory, $Spec, [int]$ExitCode, $Manifest) {
         if (-not $native.OwnedProcessesCleaned -or ($ExitCode -eq 0 -and -not $native.FinalDrainMatches)) {
             throw 'Incomplete screen control.'
         }
+        return $native
+    }
+    if (@('Viewport','FixedRows') -ccontains $Spec.Mode) {
+        Confirm-ViewportCase $Directory $Spec $native $Manifest $stream.Length $ExitCode
         return $native
     }
 
@@ -65,12 +161,7 @@ function Read-ScreenCase([string]$Directory, $Spec, [int]$ExitCode, $Manifest) {
     foreach ($stage in $stages) {
         $snapshot = Read-ScreenSnapshot (Join-Path $Directory ('console-' + $stage.Name + '.bin')) $bytes
         $console = $stage.Console
-        $fields = @('Columns','Rows','BufferColumns','BufferRows','WindowLeft','WindowTop','CursorX','CursorY')
-        for ($i = 0; $i -lt $fields.Count; $i++) {
-            if ([BitConverter]::ToUInt32($snapshot, 8 + 4 * $i) -ne $console[$fields[$i]]) {
-                throw ('Native screen dimensions or cursor differ: ' + $stage.Name)
-            }
-        }
+        Confirm-ScreenGeometry $snapshot $console
         $large = $count -and $stage.Name -ceq 'after-exit'
         $columns = if ($large) { 100 } else { 80 }
         $rows = if ($large) { 30 } else { 25 }
@@ -79,6 +170,16 @@ function Read-ScreenCase([string]$Directory, $Spec, [int]$ExitCode, $Manifest) {
             $stage.RequestedColumns -ne $columns -or $stage.RequestedRows -ne $rows) { throw 'Wrong checkpoint cursor, size or offset.' }
         $last = $stage.CapturedBytes
         $alternate = @('alternate','settled-edit') -ccontains $stage.Name
+        if ($Manifest.SchemaVersion -eq 3) {
+            $text = if ($alternate) { 'SCREEN_ALTERNATE' } else { 'SCREEN_PRIMARY' }
+            $attribute = if ($alternate) { 0x2f } else { 0x1e }
+            $original = Test-ScreenText $snapshot $console 2 1 $text $attribute
+            $reflow = $large -and (Test-ScreenText $snapshot $console 82 0 $text $attribute)
+            $placement = if ($original -eq $reflow) { 'Unexpected' } elseif ($original) { 'Original' } else { 'Reflowed' }
+            if ($stage.NativeMarkerPlacement -cne $placement -or $stage.NativeActiveMarker -ne ($placement -cne 'Unexpected')) {
+                throw ('Native marker placement disagrees with snapshot: ' + $stage.Name)
+            }
+        }
         $geometry = $console.Columns -eq $columns -and $console.Rows -eq $rows -and $console.BufferColumns -eq $columns -and
             (-not $alternate -or ($console.BufferRows -eq $rows -and $console.WindowLeft -eq 0 -and $console.WindowTop -eq 0))
         $decoded = $stage.DecodedState
@@ -133,6 +234,11 @@ function Read-ScreenCase([string]$Directory, $Spec, [int]$ExitCode, $Manifest) {
     if ($native.ShellReportedChildExit -cne $shellStatus -or $native.ShellReportedExitMatches -ne ($shellStatus -ceq '37') -or
         $native.FullScreenExitMatches -ne ($native.FullScreenExitCode -eq 37) -or $native.NextEditedCommandExecuted -ne $commandRan) {
         throw 'Shell resume receipts disagree.'
+    }
+    if ($Manifest.SchemaVersion -eq 3 -and $native.ReturnedToShellPrompt -and
+        ($native.ReturnedPromptColumn -lt 0 -or $native.ReturnedPromptColumn -ge $stages[-1].RequestedColumns -or
+        (-not $count -and $native.ReturnedPromptColumn -ne 0))) {
+        throw 'Invalid restored prompt column.'
     }
     $match = $match -and $native.OwnedProcessesCleaned -and $native.ScreenWorkflowCompleted -and $native.InspectorExited -and
         $native.ReturnedToShellPrompt -and $native.FullScreenExitMatches -and $native.ShellReportedExitMatches -and

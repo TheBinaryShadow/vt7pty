@@ -17,7 +17,7 @@ if ($WithCandidate -and -not $screen) { throw 'The current build can be added to
 if ($screen) {
     . (Join-Path $root 'tools\output\ScreenEvidence.ps1')
     if (-not $PSBoundParameters.ContainsKey('Suffix')) {
-        $Suffix = if ($WithCandidate) { 'rc2' } else { 'rc1' }
+        $Suffix = if ($WithCandidate) { 'rc3' } else { 'rc1' }
     }
 }
 $source = (& git -C $root rev-parse --verify HEAD).Trim()
@@ -169,10 +169,12 @@ $manifest = @{
     Files = $files
 }
 if ($screen) {
-    $manifest.SchemaVersion = if ($WithCandidate) { 2 } else { 1 }
+    if ($compiled.SchemaVersion -ne 2) { throw 'Wrong viewport harness schema.' }
+    $manifest.SchemaVersion = 3
     $manifest.Kind = 'VT7PtyScreenCharacterization'
     $manifest.Step14Accepted = $false
     $manifest.ResizePairs = $compiled.ResizePairs
+    $manifest.ViewportResizePairs = $compiled.ViewportResizePairs
     $manifest.Cases = @($compiled.Cases | ForEach-Object { @{Name = $_.Name; Area = $_.Area; Mode = $_.Mode} })
 } else {
     $manifest.SchemaVersion = 2
