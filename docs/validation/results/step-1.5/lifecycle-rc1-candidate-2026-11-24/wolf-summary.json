@@ -1,0 +1,224 @@
+{
+  "SchemaVersion": 1,
+  "ComputerName": "WOLF",
+  "RunId": "developmenthost-lifecycle-20261124-022235-2237eab7",
+  "OS": {
+    "Caption": "Microsoft Windows 10 IoT Enterprise LTSC",
+    "BuildNumber": "19044",
+    "Version": "10.0.19044",
+    "ProductType": 1,
+    "ServicePackMajorVersion": 0
+  },
+  "Tier": "DevelopmentHost",
+  "PowerShellVersion": "5.1.19041.7844",
+  "SessionFlags": 0,
+  "ManifestSha256": "2a99a6498ba061dfb4cf58cfc11b3cac93ab49cac14059a3513848e3a783d995",
+  "Runtimes": {
+    "accepted": {
+      "Archive": "VT7Pty-screen-0.5.1-dev-rc3.zip",
+      "ManifestSha256": "2912d98c7726390f5bfec45ee6e891f36c1a63cf016f13181ecec3d409f3f3b5",
+      "Version": "0.5.1-dev",
+      "Binaries": {
+        "VT7Pty-Agent.exe": "VT7Pty-Agent.exe",
+        "VT7Pty-Host.dll": "VT7Pty-Host.dll",
+        "VT7Pty.dll": "VT7Pty.dll",
+        "VT7Pty-DebugServer.exe": "VT7Pty-DebugServer.exe"
+      },
+      "SourceCommit": "a92b3fd4026e7d666765de7b10ab698e572eccc7",
+      "ArchiveSha256": "ad51f8815e2103df9664dcef40c3bd5ac7e200528bc59d6c2cf78af306ea0816"
+    },
+    "baseline": {
+      "Archive": "VT7Pty-0.5.0-win7-x64-release-runtime.zip",
+      "ManifestSha256": "db1b7d067987d1f155f91c1e196e577f62fb530e68f179615793b3c136a231b1",
+      "Version": "0.5.0",
+      "Binaries": {
+        "VT7Pty.dll": "bin/VT7Pty.dll",
+        "VT7Pty-Agent.exe": "bin/VT7Pty-Agent.exe"
+      },
+      "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+      "ArchiveSha256": "59554a9cf8246395e60f30875e047d1bfa20d4f3f462c113ef705a86708f5304"
+    }
+  },
+  "EvidenceFilesVerified": 129,
+  "PositiveCases": 14,
+  "MissingMarkerControlsDetected": 2,
+  "SessionContractChecks": 10,
+  "ReleaseVerificationChecks": 37,
+  "Controls": {
+    "LegacyParserPassed": true,
+    "ScreenCases": [
+      "ALTERNATE",
+      "SCREEN_VIEWPORT",
+      "SCREEN_FIXED_ROWS",
+      "SCREEN_CMD_EXPLICIT",
+      "SCREEN_CMD_EXIT",
+      "SCREEN_PS_EXIT",
+      "SCREEN_CMD_RESIZE",
+      "SCREEN_PS_RESIZE"
+    ],
+    "ReviewerControls": [
+      {
+        "Error": "Drain verdict disagrees with recorded rows, tail or shutdown.",
+        "Case": "LIFECYCLE_CMD_DRAIN",
+        "Rejected": true
+      },
+      {
+        "Error": "Invalid resize, key or timing evidence at measurement 1",
+        "Case": "LIFECYCLE_MEASURE_1",
+        "Rejected": true
+      }
+    ]
+  },
+  "Measurements": {
+    "baseline": {
+      "Input": {
+        "Count": 48,
+        "P50Us": 2275,
+        "P95Us": 2751,
+        "MaxUs": 2812
+      },
+      "Resize": {
+        "Count": 48,
+        "P50Us": 7288,
+        "P95Us": 8665,
+        "MaxUs": 9393
+      },
+      "Barrier": {
+        "Count": 48,
+        "P50Us": 20560,
+        "P95Us": 26566,
+        "MaxUs": 26762
+      },
+      "IdleWindowUs": [
+        1000524,
+        1001861,
+        1002492
+      ],
+      "ActiveWindowUs": [
+        508657,
+        505610,
+        503524
+      ],
+      "JobMembership": [
+        {
+          "Caller": true,
+          "Agent": true,
+          "Child": true
+        },
+        {
+          "Caller": true,
+          "Agent": true,
+          "Child": true
+        },
+        {
+          "Caller": true,
+          "Agent": true,
+          "Child": true
+        }
+      ],
+      "Regressions": [
+        {
+          "Name": "REPEAT",
+          "DurationMilliseconds": 41905,
+          "ExitCode": 0
+        },
+        {
+          "Name": "RESIZE",
+          "DurationMilliseconds": 1544,
+          "ExitCode": 0
+        },
+        {
+          "Name": "SHUTDOWN",
+          "DurationMilliseconds": 3320,
+          "ExitCode": 0
+        },
+        {
+          "Name": "SPAWN_FAILURE",
+          "DurationMilliseconds": 104,
+          "ExitCode": 0
+        },
+        {
+          "Name": "CONCURRENT",
+          "DurationMilliseconds": 295,
+          "ExitCode": 0
+        }
+      ]
+    },
+    "accepted": {
+      "Input": {
+        "Count": 48,
+        "P50Us": 2260,
+        "P95Us": 2652,
+        "MaxUs": 2807
+      },
+      "Resize": {
+        "Count": 48,
+        "P50Us": 7766,
+        "P95Us": 15100,
+        "MaxUs": 16868
+      },
+      "Barrier": {
+        "Count": 48,
+        "P50Us": 20131,
+        "P95Us": 26327,
+        "MaxUs": 26598
+      },
+      "IdleWindowUs": [
+        1001746,
+        1002271,
+        1001258
+      ],
+      "ActiveWindowUs": [
+        497829,
+        500680,
+        496635
+      ],
+      "JobMembership": [
+        {
+          "Caller": true,
+          "Agent": true,
+          "Child": true
+        },
+        {
+          "Caller": true,
+          "Agent": true,
+          "Child": true
+        },
+        {
+          "Caller": true,
+          "Agent": true,
+          "Child": true
+        }
+      ],
+      "Regressions": [
+        {
+          "Name": "REPEAT",
+          "DurationMilliseconds": 43843,
+          "ExitCode": 0
+        },
+        {
+          "Name": "RESIZE",
+          "DurationMilliseconds": 1440,
+          "ExitCode": 0
+        },
+        {
+          "Name": "SHUTDOWN",
+          "DurationMilliseconds": 3480,
+          "ExitCode": 0
+        },
+        {
+          "Name": "SPAWN_FAILURE",
+          "DurationMilliseconds": 88,
+          "ExitCode": 0
+        },
+        {
+          "Name": "CONCURRENT",
+          "DurationMilliseconds": 326,
+          "ExitCode": 0
+        }
+      ]
+    }
+  },
+  "Step15Accepted": false,
+  "MilestoneAccepted": false
+}

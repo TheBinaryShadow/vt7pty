@@ -30,7 +30,7 @@ The [foundation](docs/FOUNDATION.md) records the engineering decisions;
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Modern native VT7Pty 0.5.x foundation | Complete; 0.5.0 accepted and published |
-| 1 | Better console fidelity and reliability | In progress. Step 1.4 complete. Step 1.5 covers lifecycle and resources |
+| 1 | Better console fidelity and reliability | In progress. Lifecycle rc1 passed on WOLF and is ready for Windows 7 |
 | 2 | VT7-facing API and standalone integration host | Planned after backend validation |
 | 3 | Versioned handoff ready for VT7 integration | Planned after API and consumer tests |
 | Later | Other consumers and optional ConPTY compatibility | Deferred |
@@ -174,9 +174,10 @@ flags 0 on all three Windows 7 tiers and WOLF.
 
 ### Step 1.5: Validate lifecycle and resource behavior under real workloads
 
-- [ ] Qualify the paired lifecycle package on WOLF and review the baseline
-  measurements from NESSY, TURTLE and LEOPARD.
-  [Lifecycle test guide](docs/LIFECYCLE_FIDELITY.md)
+- [x] Qualify the paired lifecycle package on WOLF.
+  [Lifecycle rc1 verification](docs/validation/2026-11-24-step-1.5-lifecycle-rc1-candidate.md)
+- [ ] Review the lifecycle and baseline measurements from NESSY, TURTLE and
+  LEOPARD. [Lifecycle test guide](docs/LIFECYCLE_FIDELITY.md)
 - [ ] Resolve measured F08-F09 failures in final drain, child status, close,
   failure cleanup, response times and resource stability.
 - [ ] Before 1.0, qualify Windows 7 job inheritance, permitted and denied
