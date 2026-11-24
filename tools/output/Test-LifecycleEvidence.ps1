@@ -71,5 +71,5 @@ foreach ($role in @('baseline','accepted')) {
         }
     }
 }
-$counts = @($run.Cases | Group-Object Outcome | ForEach-Object { $_.Name + ' ' + $_.Count })
+$counts = @($run.Cases | Group-Object { $_.Outcome } | ForEach-Object { $_.Name + ' ' + $_.Count })
 Write-Host ('Lifecycle evidence verified on ' + $run.ComputerName + ' (' + $run.Tier + '). ' + ($counts -join ', ') + '.')
