@@ -19,6 +19,7 @@ still in progress. [Profile rc3 Windows 7 review](2026-11-23-step-1.2-profiles-r
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
+| Step 1.4 screen rc3 | [8 candidate cases and 16 live resize repeats passed on WOLF](2026-11-24-step-1.4-screen-rc3-candidate.md) | Pending on NESSY, TURTLE and LEOPARD |
 | Step 1.4 WOLF resize | [Viewport offset, native reflow and console-host loss investigated](2026-11-24-step-1.4-wolf-resize-investigation.md) | [Screen rc2 passed the tested scope](2026-11-24-step-1.4-screen-rc2-windows7.md) |
 | Step 1.4 active-buffer cursor fix | [Screen rc2, fixed case verified beside both controls](2026-11-24-step-1.4-screen-rc2-candidate.md) | [Fixed runtime passed 21/21 across the three tiers](2026-11-24-step-1.4-screen-rc2-windows7.md) |
 | Step 1.4 full-screen restoration and resize | [Screen rc1, 14 WOLF observations and verified delivery](2026-11-24-step-1.4-screen-rc1-candidate.md) | [36 matches and six cursor visibility differences](2026-11-24-step-1.4-screen-rc1-windows7.md) |

@@ -1,0 +1,116 @@
+{
+  "RunId": "developmenthost-screen-20261124-012214-fbe88822",
+  "ComputerName": "WOLF",
+  "OS": {
+    "Caption": "Microsoft Windows 10 IoT Enterprise LTSC",
+    "BuildNumber": "19044",
+    "Version": "10.0.19044",
+    "ProductType": 1,
+    "ServicePackMajorVersion": 0
+  },
+  "Outcomes": {
+    "accepted": {
+      "Match": 7,
+      "Difference": 1
+    },
+    "candidate": {
+      "Match": 8
+    },
+    "baseline": {
+      "Match": 7,
+      "Difference": 1
+    }
+  },
+  "ManifestSha256": "ba0a03c20a0c8861c9e967f202bcbc11c50a205a68c9caaa4234e2b8fd00883d",
+  "InventoriedFilesVerified": 202,
+  "RepeatedLiveCases": 16,
+  "RepeatedLiveRequests": 128,
+  "OutputRc3OutcomesRepeated": 21,
+  "ViewportChecks": {
+    "SCREEN_VIEWPORT": [
+      {
+        "Viewport": [
+          100,
+          30
+        ],
+        "RowOffset": 0,
+        "ComparedRows": 30,
+        "FixedMarkerBeforeRepaint": false,
+        "AlignedScreenMatches": true
+      },
+      {
+        "Viewport": [
+          80,
+          25
+        ],
+        "RowOffset": 1,
+        "ComparedRows": 24,
+        "FixedMarkerBeforeRepaint": false,
+        "AlignedScreenMatches": true
+      },
+      {
+        "Viewport": [
+          100,
+          30
+        ],
+        "RowOffset": 1,
+        "ComparedRows": 29,
+        "FixedMarkerBeforeRepaint": false,
+        "AlignedScreenMatches": true
+      },
+      {
+        "Viewport": [
+          80,
+          25
+        ],
+        "RowOffset": 2,
+        "ComparedRows": 23,
+        "FixedMarkerBeforeRepaint": false,
+        "AlignedScreenMatches": true
+      }
+    ],
+    "SCREEN_FIXED_ROWS": [
+      {
+        "Viewport": [
+          100,
+          30
+        ],
+        "RowOffset": 0,
+        "ComparedRows": 30,
+        "FixedMarkerBeforeRepaint": true,
+        "AlignedScreenMatches": true
+      },
+      {
+        "Viewport": [
+          80,
+          25
+        ],
+        "RowOffset": 0,
+        "ComparedRows": 25,
+        "FixedMarkerBeforeRepaint": true,
+        "AlignedScreenMatches": true
+      },
+      {
+        "Viewport": [
+          100,
+          30
+        ],
+        "RowOffset": 0,
+        "ComparedRows": 30,
+        "FixedMarkerBeforeRepaint": true,
+        "AlignedScreenMatches": true
+      },
+      {
+        "Viewport": [
+          80,
+          25
+        ],
+        "RowOffset": 0,
+        "ComparedRows": 25,
+        "FixedMarkerBeforeRepaint": true,
+        "AlignedScreenMatches": true
+      }
+    ]
+  },
+  "CandidateStep14Accepted": false
+}

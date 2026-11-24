@@ -4,9 +4,9 @@ Updated: 2026-11-24.
 
 I've published 0.5.0 and completed the scoped Step 1.2 input and Step 1.3
 output work. I accept measured Unicode reconstruction with native cell
-placement where the console and terminal use compatible widths. I qualified
-the Step 1.4 screen cases on all three Windows 7 tiers. The broader baseline
-and VT7 integration remain open.
+placement where the console and terminal use compatible widths. Screen rc3
+passed the Step 1.4 resize checks on WOLF and is ready for Windows 7.
+The broader baseline and VT7 integration remain open.
 [Input acceptance](docs/validation/2026-11-23-step-1.2-profiles-rc3-windows7.md#step-12-scope) ·
 [Output acceptance](docs/OUTPUT_FIDELITY.md#accepted-output-scope)
 
@@ -29,7 +29,7 @@ The [foundation](docs/FOUNDATION.md) records the engineering decisions;
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Modern native VT7Pty 0.5.x foundation | Complete; 0.5.0 accepted and published |
-| 1 | Better console fidelity and reliability | In progress. Step 1.4 passed on Windows 7. WOLF resize differences are open |
+| 1 | Better console fidelity and reliability | In progress. Screen rc3 passed on WOLF and awaits the Windows 7 runs |
 | 2 | VT7-facing API and standalone integration host | Planned after backend validation |
 | 3 | Versioned handoff ready for VT7 integration | Planned after API and consumer tests |
 | Later | Other consumers and optional ConPTY compatibility | Deferred |
@@ -160,9 +160,11 @@ measured differences and their evidence.
 - [x] Fix active-buffer cursor visibility and verify it beside both controls on WOLF.
 - [x] Review screen rc2 and qualify the measured F06 and F07 cases on
   NESSY, TURTLE and LEOPARD.
-- [ ] Verify WOLF viewport alignment and marker reflow, and resolve the
+- [x] Verify WOLF viewport alignment and marker reflow, and resolve the
   console-host loss during live shrink.
   [Resize investigation](docs/validation/2026-11-24-step-1.4-wolf-resize-investigation.md)
+- [ ] Review screen rc3 on NESSY, TURTLE and LEOPARD.
+  [Screen rc3 candidate](docs/validation/2026-11-24-step-1.4-screen-rc3-candidate.md)
 
 I'll complete this step when full-screen fixtures and shells reach the required
 state after resize and exit, without unexplained lasting corruption or hangs.
