@@ -9,9 +9,11 @@ int64_t lifecycleElapsed(LifecycleClock::time_point start) {
 }
 
 std::string lifecycleRecipes() {
-    std::string result = "{\"SchemaVersion\":1,\"SnapshotBytes\":" + std::to_string(sizeof(Packet)) +
+    std::string result = "{\"SchemaVersion\":2,\"SnapshotBytes\":" + std::to_string(sizeof(Packet)) +
         ",\"OutputRows\":" + std::to_string(lifecycleRows) + ",\"Samples\":" + std::to_string(lifecycleSamples) +
         ",\"IdleMilliseconds\":" + std::to_string(lifecycleIdleMs) +
+        ",\"ActiveMilliseconds\":" + std::to_string(lifecycleActiveMs) +
+        ",\"ActiveStepMilliseconds\":" + std::to_string(lifecycleActiveStepMs) +
         ",\"ShutdownMilliseconds\":" + std::to_string(lifecycleShutdownMs) + ",\"Cases\":[";
     for (const auto &test : lifecycleCases) {
         if (&test != lifecycleCases) result += ',';
@@ -204,6 +206,47 @@ std::string lifecycleResources(const Session &session) {
         ",\"Child\":" + processResources(session.child.value) + '}';
 }
 
+struct LifecycleStep {
+    const Packet &snapshot;
+    int64_t inputUs;
+    int64_t resizeRpcUs;
+    int64_t readerResizeUs;
+    int64_t barrierUs;
+};
+
+LifecycleStep measureLifecycleStep(Session &session,LifecycleFixture &fixture,int ordinal) {
+    const int index = (ordinal - 1) % lifecycleSamples;
+    if (ordinal > 1 && index == 0 && fixture.snapshot('C').keyCount != 0)
+        throw Mismatch("lifecycle fixture did not clear recorded keys");
+    const char key = static_cast<char>('a' + index);
+    const auto inputStart = LifecycleClock::now();
+    session.input(std::string_view(&key,1));
+    if (!session.until([&] { return fixture.snapshot('S').keyCount > static_cast<uint32_t>(index); }))
+        throw Mismatch("input receipt deadline");
+    const auto inputUs = lifecycleElapsed(inputStart);
+    const int columns = index % 2 == 0 ? 100 : 80;
+    const int rows = index % 2 == 0 ? 30 : 25;
+    const auto resizeStart = LifecycleClock::now();
+    session.resizeBackend(columns,rows);
+    const auto resizeRpcUs = lifecycleElapsed(resizeStart);
+    const auto readerStart = LifecycleClock::now();
+    session.state.resize(columns,rows);
+    const auto readerResizeUs = lifecycleElapsed(readerStart);
+    const auto barrierStart = LifecycleClock::now();
+    const auto &packet = fixture.snapshot('B');
+    const auto ascii = utf8(lifecycleBarrierMarker(ordinal));
+    const std::u32string marker(ascii.begin(),ascii.end());
+    const bool barrier = session.until([&] { return session.state.contains(marker); });
+    const auto barrierUs = lifecycleElapsed(barrierStart);
+    if (packet.keyCount != static_cast<uint32_t>(index+1) ||
+        packet.keys[index].character != static_cast<uint32_t>(key) || packet.keys[index].repeat != 1)
+        throw Mismatch("input sample differs from expected key or repeat count");
+    if (packet.columns != static_cast<uint32_t>(columns) || packet.rows != static_cast<uint32_t>(rows) ||
+        packet.bufferColumns != packet.columns || !barrier)
+        throw Mismatch("measurement resize or VT barrier differs");
+    return {packet,inputUs,resizeRpcUs,readerResizeUs,barrierUs};
+}
+
 void lifecycleMeasure(const std::wstring &resultDirectory,Session &session,Observations &observations) {
     LifecycleFixture fixture(session,L"LIFECYCLE_MEASURE",L"measure");
     if (!session.until([&] { return session.state.contains(U"STATE_READY"); }))
@@ -211,47 +254,49 @@ void lifecycleMeasure(const std::wstring &resultDirectory,Session &session,Obser
     observations.fields += ",\"JobMembership\":" + lifecycleJobContext(session);
     const auto idleBefore = lifecycleResources(session);
     const auto idleStart = LifecycleClock::now();
-    session.until([&] { return lifecycleElapsed(idleStart) >= lifecycleIdleMs * 1000ll; },lifecycleIdleMs+2000);
+    if (!session.until([&] { return lifecycleElapsed(idleStart) >= lifecycleIdleMs * 1000ll; },lifecycleIdleMs+2000))
+        throw Mismatch("idle resource window did not complete");
     const auto idleUs = lifecycleElapsed(idleStart);
     const auto idleAfter = lifecycleResources(session);
-    const auto activeStart = LifecycleClock::now();
+    const auto timingStart = LifecycleClock::now();
     std::string samples;
-    for (int index=0;index<lifecycleSamples;++index) {
-        const char key = static_cast<char>('a' + index);
-        const auto inputStart = LifecycleClock::now();
-        session.input(std::string_view(&key,1));
-        if (!session.until([&] { return fixture.snapshot('S').keyCount > static_cast<uint32_t>(index); }))
-            throw Mismatch("input receipt deadline");
-        const auto inputUs = lifecycleElapsed(inputStart);
-        const int columns = index % 2 == 0 ? 100 : 80;
-        const int rows = index % 2 == 0 ? 30 : 25;
-        const auto resizeStart = LifecycleClock::now();
-        session.resize(columns,rows);
-        const auto resizeUs = lifecycleElapsed(resizeStart);
-        const auto barrierStart = LifecycleClock::now();
-        const auto &packet = fixture.snapshot('B');
-        const auto ascii = utf8(lifecycleBarrierMarker(index+1));
-        const std::u32string marker(ascii.begin(),ascii.end());
-        const bool barrier = session.until([&] { return session.state.contains(marker); });
-        const auto barrierUs = lifecycleElapsed(barrierStart);
-        const auto sequence = std::to_wstring(index+1);
-        writeFile(resultDirectory + L"\\console-" + sequence + L".bin",
-            std::string_view(reinterpret_cast<const char *>(&packet),sizeof(packet)));
-        if (packet.keyCount != static_cast<uint32_t>(index+1) ||
-            packet.keys[index].character != static_cast<uint32_t>(key) || packet.keys[index].repeat != 1)
-            throw Mismatch("input sample differs from expected key or repeat count");
-        if (packet.columns != static_cast<uint32_t>(columns) || packet.rows != static_cast<uint32_t>(rows) ||
-            packet.bufferColumns != packet.columns || !barrier)
-            throw Mismatch("measurement resize or VT barrier differs");
+    for (int ordinal=1;ordinal<=lifecycleSamples;++ordinal) {
+        const auto step = measureLifecycleStep(session,fixture,ordinal);
+        writeFile(resultDirectory + L"\\console-" + std::to_wstring(ordinal) + L".bin",
+            std::string_view(reinterpret_cast<const char *>(&step.snapshot),sizeof(Packet)));
         if (!samples.empty()) samples += ',';
-        samples += "{\"InputUs\":" + std::to_string(inputUs) + ",\"ResizeUs\":" + std::to_string(resizeUs) +
-            ",\"BarrierUs\":" + std::to_string(barrierUs) + ",\"CapturedBytes\":" + std::to_string(session.raw.size()) + '}';
+        samples += "{\"InputUs\":" + std::to_string(step.inputUs) +
+            ",\"ResizeRpcUs\":" + std::to_string(step.resizeRpcUs) +
+            ",\"ReaderResizeUs\":" + std::to_string(step.readerResizeUs) +
+            ",\"BarrierUs\":" + std::to_string(step.barrierUs) +
+            ",\"CapturedBytes\":" + std::to_string(session.raw.size()) + '}';
+    }
+    const auto timingUs = lifecycleElapsed(timingStart);
+    const auto activeBefore = lifecycleResources(session);
+    const auto activeStart = LifecycleClock::now();
+    const Packet *lastActiveSnapshot = nullptr;
+    int activeSteps = 0;
+    while (lifecycleElapsed(activeStart) < lifecycleActiveMs * 1000ll) {
+        const auto stepStart = LifecycleClock::now();
+        if (activeSteps == lifecycleActiveStepLimit) throw Mismatch("active resource step limit");
+        const auto step = measureLifecycleStep(session,fixture,lifecycleSamples + ++activeSteps);
+        lastActiveSnapshot = &step.snapshot;
+        // Bound the rate on faster hosts while continuing to drain the stream.
+        if (!session.until([&] { return lifecycleElapsed(stepStart) >= lifecycleActiveStepMs * 1000ll; },
+            lifecycleActiveStepMs+2000))
+            throw Mismatch("active step pacing deadline");
     }
     const auto activeUs = lifecycleElapsed(activeStart);
     const auto activeAfter = lifecycleResources(session);
+    if (!lastActiveSnapshot || activeSteps < lifecycleSamples)
+        throw Mismatch("active resource window did not sustain the workload");
+    writeFile(resultDirectory + L"\\console-active-final.bin",
+        std::string_view(reinterpret_cast<const char *>(lastActiveSnapshot),sizeof(Packet)));
     observations.fields += ",\"Measurements\":[" + samples + "],\"IdleUs\":" + std::to_string(idleUs) +
-        ",\"ActiveUs\":" + std::to_string(activeUs) + ",\"IdleBefore\":" + idleBefore +
-        ",\"IdleAfter\":" + idleAfter + ",\"ActiveAfter\":" + activeAfter;
+        ",\"TimingUs\":" + std::to_string(timingUs) + ",\"ActiveUs\":" + std::to_string(activeUs) +
+        ",\"ActiveSteps\":" + std::to_string(activeSteps) + ",\"ActiveCapturedBytes\":" + std::to_string(session.raw.size()) +
+        ",\"IdleBefore\":" + idleBefore + ",\"IdleAfter\":" + idleAfter +
+        ",\"ActiveBefore\":" + activeBefore + ",\"ActiveAfter\":" + activeAfter;
     fixture.send('Q');
     session.finish();
     const bool final = session.state.contains(U"FINAL_DRAIN");

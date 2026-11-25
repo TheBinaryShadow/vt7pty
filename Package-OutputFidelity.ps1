@@ -25,7 +25,7 @@ if ($screen) {
 }
 if ($lifecycle) {
     . (Join-Path $root 'tools\output\LifecycleEvidence.ps1')
-    if (-not $PSBoundParameters.ContainsKey('Suffix')) { $Suffix = 'rc1' }
+    if (-not $PSBoundParameters.ContainsKey('Suffix')) { $Suffix = 'rc2' }
 }
 $source = (& git -C $root rev-parse --verify HEAD).Trim()
 if ($LASTEXITCODE -ne 0 -or @(& git -C $root status --porcelain=v1).Count) {
@@ -211,13 +211,15 @@ if ($screen) {
     $manifest.ViewportResizePairs = $compiled.ViewportResizePairs
     $manifest.Cases = @($compiled.Cases | ForEach-Object { @{Name = $_.Name; Area = $_.Area; Mode = $_.Mode} })
 } elseif ($lifecycle) {
-    if ($compiled.SchemaVersion -ne 1) { throw 'Wrong lifecycle harness schema.' }
-    $manifest.SchemaVersion = 1
+    if ($compiled.SchemaVersion -ne 2) { throw 'Wrong lifecycle harness schema.' }
+    $manifest.SchemaVersion = 2
     $manifest.Kind = 'VT7PtyLifecycleCharacterization'
     $manifest.Step15Accepted = $false
     $manifest.OutputRows = $compiled.OutputRows
     $manifest.Samples = $compiled.Samples
     $manifest.IdleMilliseconds = $compiled.IdleMilliseconds
+    $manifest.ActiveMilliseconds = $compiled.ActiveMilliseconds
+    $manifest.ActiveStepMilliseconds = $compiled.ActiveStepMilliseconds
     $manifest.ShutdownMilliseconds = $compiled.ShutdownMilliseconds
     $manifest.Cases = @($compiled.Cases | ForEach-Object { @{Name = $_.Name; Area = $_.Area} })
     $manifest.Regressions = @(Get-LifecycleRegressionNames)

@@ -114,7 +114,7 @@ public:
         do { pump(); if (condition()) return true; Sleep(2); } while (GetTickCount64()<deadline);
         pump(); return condition();
     }
-    void resize(int columns,int rows) {
+    void resizeBackend(int columns,int rows) {
         vt7pty_error_ptr_t error = nullptr;
         const BOOL resized = vt7pty_set_size(pty_, columns, rows, &error);
         if (error) {
@@ -123,6 +123,9 @@ public:
             if (!resized) throw std::runtime_error("resize: " + message);
         }
         check(resized != FALSE, "resize");
+    }
+    void resize(int columns,int rows) {
+        resizeBackend(columns,rows);
         state.resize(columns,rows);
     }
     void finish(DWORD expectedStatus=0) {

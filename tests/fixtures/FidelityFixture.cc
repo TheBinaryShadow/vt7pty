@@ -580,7 +580,7 @@ int wmain(int argc,wchar_t **argv) {
         Packet &packet=*packetStorage;
         transfer(pipe.value,&packet,sizeof(packet),true);
         int barriers=0;
-        const ULONGLONG deadline=GetTickCount64()+30000;
+        const ULONGLONG deadline=GetTickCount64()+(lifecycle ? lifecycleFixtureDeadlineMs : 30000u);
         while (GetTickCount64() < deadline) {
             if (input) {
                 DWORD count=0;
@@ -623,8 +623,10 @@ int wmain(int argc,wchar_t **argv) {
                 } else if (command == 'M') {
                     check(alternate.value != INVALID_HANDLE_VALUE,"restore state");
                     check(SetConsoleActiveScreenBuffer(output.value),"restore primary"); active=output.value;
+                } else if (command == 'C' && lifecycle) {
+                    keys.clear();
                 } else if (command == 'B' && lifecycle) {
-                    check(barriers < lifecycleSamples,"lifecycle barrier count");
+                    check(barriers < lifecycleSamples + lifecycleActiveStepLimit,"lifecycle barrier count");
                     CONSOLE_SCREEN_BUFFER_INFO info={};
                     check(GetConsoleScreenBufferInfo(active,&info),"lifecycle barrier geometry");
                     const auto marker=lifecycleBarrierMarker(++barriers);

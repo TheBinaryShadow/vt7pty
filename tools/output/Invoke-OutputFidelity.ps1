@@ -73,51 +73,60 @@ if ($ready) {
         $ready = $false
     }
 }
-if ($ready) {
+function Invoke-FidelityObservation([string]$Role,$Spec) {
+    $bin = Join-Path $root ($Role + '\bin')
+    $relative = $Role + '/' + $Spec.Name
+    $directory = Join-Path $resultRoot $relative
+    [void][IO.Directory]::CreateDirectory($directory)
+    $case = @{Runtime = $Role; Name = $Spec.Name; Area = $Spec.Area; Directory = $relative
+        Status = 'Incomplete'; Outcome = ''; Controller = $null; Error = ''}
+    Write-Host ($Role + ' ' + $Spec.Name)
+    try {
+        $controller = Invoke-InputProcess (Join-Path $bin 'FidelityTest.exe') ($Spec.Name + ' "' + $directory + '"') $bin 75000 $environment
+        $case.Controller = $controller
+        if ($controller.TimedOut) { throw 'Native fidelity case exceeded its deadline.' }
+        if ($screen) {
+            $observed = Read-ScreenCase $directory $Spec $controller.ExitCode $manifest
+        } elseif ($lifecycle) {
+            $observed = Read-LifecycleCase $directory $Spec $controller.ExitCode $manifest $Role
+        } else {
+            $observed = Read-OutputCase $directory $Spec $controller.ExitCode $manifest.Harness.SnapshotBytes
+        }
+        $case.Status = 'Observed'
+        $case.Outcome = if ($lifecycle) { Get-LifecycleOutcome $observed }
+            elseif ($observed.Status -ceq 'Fail') { 'Difference' }
+            elseif (-not $screen -and $observed.CapabilityUnavailable) { 'CapabilityUnavailable' } else { 'Match' }
+    } catch {
+        $case.Error = $_.Exception.Message
+    }
+    return $case
+}
+
+function Invoke-LifecycleRegressions([string]$Role) {
+    $bin = Join-Path $root ($Role + '\bin')
+    foreach ($name in $manifest.Regressions) {
+        Write-Host ($Role + ' regression ' + $name)
+        $regression = @{Runtime = $Role; Name = $name; Controller = $null; Error = ''}
+        try {
+            $limit = if ($name -ceq 'REPEAT') { 300000 } else { 60000 }
+            $regression.Controller = Invoke-InputProcess (Join-Path $bin 'SessionContractTest.exe') $name $bin $limit $environment
+            if (-not (Test-LifecycleRegression $regression)) { throw 'Session contract regression failed.' }
+        } catch {
+            $regression.Error = $_.Exception.Message
+        }
+        $regression
+    }
+}
+
+if ($ready -and $lifecycle -and $manifest.SchemaVersion -eq 2) {
+    foreach ($item in @(Get-LifecycleCaseSchedule $manifest)) {
+        $report.Cases += Invoke-FidelityObservation $item.Runtime $item.Spec
+    }
+    foreach ($role in $roles) { $report.Regressions += @(Invoke-LifecycleRegressions $role) }
+} elseif ($ready) {
     foreach ($role in $roles) {
-        $bin = Join-Path $root ($role + '\bin')
-        $exe = Join-Path $bin 'FidelityTest.exe'
-        foreach ($spec in $manifest.Cases) {
-            $relative = $role + '/' + $spec.Name
-            $directory = Join-Path $resultRoot $relative
-            [void][IO.Directory]::CreateDirectory($directory)
-            $case = @{Runtime = $role; Name = $spec.Name; Area = $spec.Area; Directory = $relative
-                Status = 'Incomplete'; Outcome = ''; Controller = $null; Error = ''}
-            Write-Host ($role + ' ' + $spec.Name)
-            try {
-                $controller = Invoke-InputProcess $exe ($spec.Name + ' "' + $directory + '"') $bin 75000 $environment
-                $case.Controller = $controller
-                if ($controller.TimedOut) { throw 'Native fidelity case exceeded its deadline.' }
-                if ($screen) {
-                    $observed = Read-ScreenCase $directory $spec $controller.ExitCode $manifest
-                } elseif ($lifecycle) {
-                    $observed = Read-LifecycleCase $directory $spec $controller.ExitCode $manifest $role
-                } else {
-                    $observed = Read-OutputCase $directory $spec $controller.ExitCode $manifest.Harness.SnapshotBytes
-                }
-                $case.Status = 'Observed'
-                $case.Outcome = if ($lifecycle) { Get-LifecycleOutcome $observed }
-                    elseif ($observed.Status -ceq 'Fail') { 'Difference' }
-                    elseif (-not $screen -and $observed.CapabilityUnavailable) { 'CapabilityUnavailable' } else { 'Match' }
-            } catch {
-                $case.Error = $_.Exception.Message
-            }
-            $report.Cases += $case
-        }
-        if ($lifecycle) {
-            foreach ($name in $manifest.Regressions) {
-                Write-Host ($role + ' regression ' + $name)
-                $regression = @{ Runtime = $role; Name = $name; Controller = $null; Error = '' }
-                try {
-                    $limit = if ($name -ceq 'REPEAT') { 300000 } else { 60000 }
-                    $regression.Controller = Invoke-InputProcess (Join-Path $bin 'SessionContractTest.exe') $name $bin $limit $environment
-                    if (-not (Test-LifecycleRegression $regression)) { throw 'Session contract regression failed.' }
-                } catch {
-                    $regression.Error = $_.Exception.Message
-                }
-                $report.Regressions += $regression
-            }
-        }
+        foreach ($spec in $manifest.Cases) { $report.Cases += Invoke-FidelityObservation $role $spec }
+        if ($lifecycle) { $report.Regressions += @(Invoke-LifecycleRegressions $role) }
     }
 }
 $report.CharacterizationComplete = $ready -and $report.Cases.Count -eq $roles.Count * $manifest.Cases.Count -and

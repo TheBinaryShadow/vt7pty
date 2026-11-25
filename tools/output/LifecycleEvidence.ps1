@@ -7,11 +7,26 @@ function Get-LifecycleRegressionNames {
     'CONCURRENT'
 }
 
+function Get-LifecycleCaseSchedule($Manifest) {
+    $acceptedFirst = $false
+    foreach ($spec in $Manifest.Cases) {
+        $order = @('baseline','accepted')
+        if ($spec.Area -ceq 'F09') {
+            if ($acceptedFirst) { $order = @('accepted','baseline') }
+            $acceptedFirst = -not $acceptedFirst
+        }
+        foreach ($role in $order) { @{Runtime=$role; Spec=$spec} }
+    }
+}
+
 function Read-LifecyclePackage([string]$Root) {
     $manifest = Read-VT7Json (Join-Path $Root 'manifest.json')
-    if ($manifest.Kind -cne 'VT7PtyLifecycleCharacterization' -or $manifest.SchemaVersion -ne 1 -or
+    $extended = $manifest.SchemaVersion -eq 2
+    $idle = if ($extended) { 15000 } else { 1000 }
+    if ($manifest.Kind -cne 'VT7PtyLifecycleCharacterization' -or @(1,2) -notcontains $manifest.SchemaVersion -or
         $manifest.Step15Accepted -or $manifest.OutputRows -ne 200 -or $manifest.Samples -ne 16 -or
-        $manifest.IdleMilliseconds -ne 1000 -or $manifest.ShutdownMilliseconds -ne 10000 -or
+        $manifest.IdleMilliseconds -ne $idle -or $manifest.ShutdownMilliseconds -ne 10000 -or
+        ($extended -and ($manifest.ActiveMilliseconds -ne 20000 -or $manifest.ActiveStepMilliseconds -ne 25)) -or
         ($manifest.Regressions -join ',') -cne ((Get-LifecycleRegressionNames) -join ',')) {
         throw 'Wrong lifecycle characterization recipe.'
     }
@@ -20,6 +35,7 @@ function Read-LifecyclePackage([string]$Root) {
         LIFECYCLE_RECOVER = 'F08'; LIFECYCLE_CLOSE = 'F08'
         LIFECYCLE_MEASURE_1 = 'F09'; LIFECYCLE_MEASURE_2 = 'F09'; LIFECYCLE_MEASURE_3 = 'F09'
     }
+    if ($extended) { $cases['LIFECYCLE_MEASURE_4'] = 'F09' }
     foreach ($spec in $manifest.Cases) {
         if (-not $cases.ContainsKey($spec.Name) -or $cases[$spec.Name] -cne $spec.Area) {
             throw ('Wrong or repeated lifecycle case: ' + $spec.Name)
@@ -52,14 +68,53 @@ function Get-LifecycleOutcome($Record) {
     return 'Difference'
 }
 
+function Confirm-LifecycleSnapshot([string]$Path, [int]$Ordinal, $Manifest) {
+    $snapshot = [IO.File]::ReadAllBytes($Path)
+    $index = ($Ordinal - 1) % $Manifest.Samples
+    $columns = if ($index % 2 -eq 0) { 100 } else { 80 }
+    $rows = if ($index % 2 -eq 0) { 30 } else { 25 }
+    $key = 148 + 16 * $index
+    if ($snapshot.Length -ne $Manifest.Harness.SnapshotBytes -or
+        [BitConverter]::ToUInt32($snapshot,0) -ne 0x31465456 -or [BitConverter]::ToUInt32($snapshot,4) -ne 1 -or
+        [BitConverter]::ToUInt32($snapshot,8) -ne $columns -or [BitConverter]::ToUInt32($snapshot,12) -ne $rows -or
+        [BitConverter]::ToUInt32($snapshot,16) -ne $columns -or [BitConverter]::ToUInt32($snapshot,64) -ne ($index + 1) -or
+        [BitConverter]::ToUInt32($snapshot,$key) -ne (97 + $index) -or [BitConverter]::ToUInt32($snapshot,$key + 12) -ne 1) {
+        throw ('Invalid resize or key evidence at measurement ' + $Ordinal)
+    }
+    $offset = $snapshot.Length - 19200 + 4 * (10 * $columns + 2)
+    $marker = 'VT7_BARRIER_' + $Ordinal + '_END'
+    for ($j = 0; $j -lt $marker.Length; $j++) {
+        if ([BitConverter]::ToUInt16($snapshot,$offset + 4 * $j) -ne [int]($marker[$j])) {
+            throw ('Wrong native barrier marker at measurement ' + $Ordinal)
+        }
+    }
+}
+
 function Confirm-LifecycleMeasurements([string]$Directory, $Record, $Manifest, [int]$StreamBytes) {
+    $extended = $Manifest.SchemaVersion -eq 2
+    $phases = @('InputUs','ResizeUs','BarrierUs')
+    $timingUs = $Record.ActiveUs
+    $windows = @('IdleBefore','IdleAfter','ActiveAfter')
+    if ($extended) {
+        $phases = @('InputUs','ResizeRpcUs','ReaderResizeUs','BarrierUs')
+        $timingUs = $Record.TimingUs
+        $windows = @('IdleBefore','IdleAfter','ActiveBefore','ActiveAfter')
+        $stepLimit = 1 + $Manifest.ActiveMilliseconds / $Manifest.ActiveStepMilliseconds
+        if (($Record.ActiveSteps -isnot [int] -and $Record.ActiveSteps -isnot [long]) -or
+            $Record.ActiveUs -lt 1000 * $Manifest.ActiveMilliseconds -or
+            $Record.ActiveSteps -lt $Manifest.Samples -or $Record.ActiveSteps -gt $stepLimit -or
+            $Record.ActiveUs -lt 1000 * $Manifest.ActiveStepMilliseconds * $Record.ActiveSteps) {
+            throw 'Incomplete active lifecycle window.'
+        }
+    }
     if ($Record.Measurements.Count -ne $Manifest.Samples -or
-        $Record.IdleUs -lt 1000 * $Manifest.IdleMilliseconds -or $Record.ActiveUs -le 0) {
+        $Record.IdleUs -lt 1000 * $Manifest.IdleMilliseconds -or $timingUs -le 0) {
         throw 'Incomplete lifecycle measurements.'
     }
     foreach ($role in @('Caller','Agent','Child')) {
         $previous = $Record.IdleBefore[$role]
-        foreach ($sample in @($previous,$Record.IdleAfter[$role],$Record.ActiveAfter[$role])) {
+        foreach ($window in $windows) {
+            $sample = $Record[$window][$role]
             if ($sample.CreationTime -le 0 -or $sample.CreationTime -ne $previous.CreationTime -or
                 $sample.Cpu100ns -lt $previous.Cpu100ns -or $sample.Handles -le 0 -or
                 $sample.PrivateBytes -le 0 -or $sample.WorkingSetBytes -lt 0) {
@@ -69,30 +124,27 @@ function Confirm-LifecycleMeasurements([string]$Directory, $Record, $Manifest, [
         }
     }
     $last = 0
+    $measuredUs = 0L
     for ($i = 0; $i -lt $Record.Measurements.Count; $i++) {
         $sample = $Record.Measurements[$i]
-        $snapshot = [IO.File]::ReadAllBytes((Join-Path $Directory ('console-' + ($i + 1) + '.bin')))
-        $columns = if ($i % 2 -eq 0) { 100 } else { 80 }
-        $rows = if ($i % 2 -eq 0) { 30 } else { 25 }
-        $key = 148 + 16 * $i
-        if ($sample.InputUs -lt 0 -or $sample.ResizeUs -lt 0 -or $sample.BarrierUs -lt 0 -or
-            ($sample.InputUs + $sample.ResizeUs + $sample.BarrierUs) -gt $Record.ActiveUs -or
-            $sample.CapturedBytes -le $last -or $sample.CapturedBytes -gt $StreamBytes -or
-            $snapshot.Length -ne $Manifest.Harness.SnapshotBytes -or
-            [BitConverter]::ToUInt32($snapshot,0) -ne 0x31465456 -or [BitConverter]::ToUInt32($snapshot,4) -ne 1 -or
-            [BitConverter]::ToUInt32($snapshot,8) -ne $columns -or [BitConverter]::ToUInt32($snapshot,12) -ne $rows -or
-            [BitConverter]::ToUInt32($snapshot,16) -ne $columns -or [BitConverter]::ToUInt32($snapshot,64) -ne ($i + 1) -or
-            [BitConverter]::ToUInt32($snapshot,$key) -ne (97 + $i) -or [BitConverter]::ToUInt32($snapshot,$key + 12) -ne 1) {
-            throw ('Invalid resize, key or timing evidence at measurement ' + ($i + 1))
-        }
-        $offset = $snapshot.Length - 19200 + 4 * (10 * $columns + 2)
-        $marker = 'VT7_BARRIER_' + ($i + 1) + '_END'
-        for ($j = 0; $j -lt $marker.Length; $j++) {
-            if ([BitConverter]::ToUInt16($snapshot,$offset + 4 * $j) -ne [int]($marker[$j])) {
-                throw ('Wrong native barrier marker at measurement ' + ($i + 1))
+        foreach ($phase in $phases) {
+            $duration = $sample[$phase]
+            if (($duration -isnot [int] -and $duration -isnot [long]) -or $duration -lt 0 -or $duration -gt $timingUs) {
+                throw ('Invalid ' + $phase + ' at measurement ' + ($i + 1))
             }
+            $measuredUs += $duration
         }
+        if ($measuredUs -gt $timingUs -or $sample.CapturedBytes -le $last -or $sample.CapturedBytes -gt $StreamBytes) {
+            throw ('Invalid timing window or stream offset at measurement ' + ($i + 1))
+        }
+        Confirm-LifecycleSnapshot (Join-Path $Directory ('console-' + ($i + 1) + '.bin')) ($i + 1) $Manifest
         $last = $sample.CapturedBytes
+    }
+    if ($extended) {
+        if ($Record.ActiveCapturedBytes -le $last -or $Record.ActiveCapturedBytes -gt $StreamBytes) {
+            throw 'Wrong active lifecycle stream offset.'
+        }
+        Confirm-LifecycleSnapshot (Join-Path $Directory 'console-active-final.bin') ($Manifest.Samples + $Record.ActiveSteps) $Manifest
     }
 }
 

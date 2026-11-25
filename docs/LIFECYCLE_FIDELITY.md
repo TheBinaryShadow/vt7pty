@@ -1,8 +1,8 @@
 # Lifecycle and resource tests
 
-I use lifecycle rc1 for the first paired Step 1.5 runs. It tests the released
-0.5.0 runtime and the exact runtime accepted in screen rc3 with the same
-fixture and session flags 0.
+I use lifecycle rc2 to repeat the Step 1.5 performance measurements. It
+tests released 0.5.0 and the exact runtime accepted in screen rc3 with
+the same fixture and session flags 0.
 
 ## Run it on Windows 7
 
@@ -18,7 +18,9 @@ sends its own input. Keep the desktop unlocked until collection finishes.
 
 LEOPARD uses installed PowerShell 2.0 without KB3191566. Copy the complete
 new `results\<run-id>` directory to `K:\VT7_work\results`, including any
-failures. I expect 16 case observations and 10 session contract checks.
+failures. I expect 18 case observations and 10 session contract checks.
+The idle and active windows alone take at least 4 minutes 40 seconds
+per machine.
 
 ## What I measure
 
@@ -33,23 +35,26 @@ failures. I expect 16 case observations and 10 session contract checks.
   verify the neighbor still renders and drains. The released runtime uses
   free. The accepted runtime also exercises idempotent close and a
   rejected resize after retirement.
-- **Response and resources.** Each of three trials per runtime records
-  16 input receipts, resize phases and repaint barriers with a monotonic
-  clock. Each resize phase includes the RPC and the test reader's resize.
-  The barrier waits for a new marker in the decoded stream after
-  a native snapshot. I record caller, agent and fixture CPU time, private
-  bytes, working set and handle counts across the idle and active windows.
+- **Response.** I run four paired trials, alternating which runtime goes
+  first. Each trial records 16 input receipts, backend resize RPCs, reader
+  resizes and repaint barriers with a monotonic clock. The barrier waits
+  for a new marker in the decoded stream after a native snapshot.
+- **Resources.** I measure 15 seconds of idle time and at least 20 seconds
+  of repeated input, resize and repaint work per trial. The active window
+  starts after the latency measurements. I record caller, agent and
+  fixture CPU time, private bytes, working set and handle counts at both
+  ends of each window. I preserve the completed operation count and the
+  final active snapshot.
   [Windows process memory counters](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-process_memory_counters_ex)
 - **Existing gates.** I run the 500-session handle check, 100-resize load,
   repeated shutdown, failed-spawn and concurrent-session checks against
   both packaged runtimes. I run the full soak during milestone qualification.
 
 I use the repeated Windows 7 baseline samples to set latency and resource
-budgets. Each sample includes harness and fixture overhead. Shutdown has a
-10-second limit. The close and measurement cases record enclosing-job
-membership. The [process lifetime plan](PROCESS_LIFETIME.md) tracks the
-job-policy, abrupt-exit and descendant cases.
-[Windows 7 measurements](validation/2026-11-25-step-1.5-lifecycle-rc1-windows7.md#timing-and-resources)
+budgets. The resource windows include harness and fixture work. Shutdown
+has a 10-second limit. The close and measurement cases record enclosing-job
+membership. [Process lifetime plan](PROCESS_LIFETIME.md) ·
+[Initial Windows 7 measurements](validation/2026-11-25-step-1.5-lifecycle-rc1-windows7.md#timing-and-resources)
 
 ## Build and review
 
@@ -57,5 +62,6 @@ From a clean, committed checkout, I build and package with
 `Package-OutputFidelity.ps1 -Suite Lifecycle`, using the pinned 0.5.0
 runtime and screen rc3 archives. I review the returned run with
 `tools/output/Test-LifecycleEvidence.ps1 -Directory <run-directory> -PackageRoot <extracted-zip>`.
-The reviewer checks the package and evidence hashes, raw drain sequence,
-native measurements and regression receipts.
+The reviewer checks the package and evidence hashes, run order, raw drain
+sequence, native measurements and regression receipts. I can also review
+archived rc1 results with the same script.

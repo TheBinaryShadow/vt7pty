@@ -8,7 +8,11 @@ namespace fidelity {
 
 inline constexpr int lifecycleRows = 200;
 inline constexpr int lifecycleSamples = 16;
-inline constexpr int lifecycleIdleMs = 1000;
+inline constexpr int lifecycleIdleMs = 15000;
+inline constexpr int lifecycleActiveMs = 20000;
+inline constexpr int lifecycleActiveStepMs = 25;
+inline constexpr int lifecycleActiveStepLimit = 1 + lifecycleActiveMs / lifecycleActiveStepMs;
+inline constexpr unsigned int lifecycleFixtureDeadlineMs = 65000;
 inline constexpr unsigned int lifecycleExitCode = 37;
 inline constexpr unsigned int lifecycleShutdownMs = 10000;
 
@@ -28,6 +32,7 @@ inline constexpr LifecycleCase lifecycleCases[] = {
     {L"LIFECYCLE_MEASURE_1", LifecycleMode::Measure},
     {L"LIFECYCLE_MEASURE_2", LifecycleMode::Measure},
     {L"LIFECYCLE_MEASURE_3", LifecycleMode::Measure},
+    {L"LIFECYCLE_MEASURE_4", LifecycleMode::Measure},
 };
 
 inline const LifecycleCase *findLifecycleCase(std::wstring_view name) {
