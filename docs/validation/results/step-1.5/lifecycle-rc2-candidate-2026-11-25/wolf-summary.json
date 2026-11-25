@@ -1,0 +1,338 @@
+{
+  "SchemaVersion": 1,
+  "ComputerName": "WOLF",
+  "RunId": "developmenthost-lifecycle-20261125-224549-8dbb3144",
+  "OS": {
+    "Caption": "Microsoft Windows 10 IoT Enterprise LTSC",
+    "BuildNumber": "19044",
+    "Version": "10.0.19044",
+    "ProductType": 1,
+    "ServicePackMajorVersion": 0
+  },
+  "Tier": "DevelopmentHost",
+  "PowerShellVersion": "5.1.19041.7844",
+  "DurationSeconds": 386.4,
+  "SessionFlags": 0,
+  "ManifestSha256": "90a43afe339cb15118be3503ef855f5b77c52269912622e65163e7c2e65f2947",
+  "Runtimes": {
+    "accepted": {
+      "Archive": "VT7Pty-screen-0.5.1-dev-rc3.zip",
+      "ManifestSha256": "2912d98c7726390f5bfec45ee6e891f36c1a63cf016f13181ecec3d409f3f3b5",
+      "Version": "0.5.1-dev",
+      "Binaries": {
+        "VT7Pty-Agent.exe": "VT7Pty-Agent.exe",
+        "VT7Pty-Host.dll": "VT7Pty-Host.dll",
+        "VT7Pty.dll": "VT7Pty.dll",
+        "VT7Pty-DebugServer.exe": "VT7Pty-DebugServer.exe"
+      },
+      "SourceCommit": "a92b3fd4026e7d666765de7b10ab698e572eccc7",
+      "ArchiveSha256": "ad51f8815e2103df9664dcef40c3bd5ac7e200528bc59d6c2cf78af306ea0816"
+    },
+    "baseline": {
+      "Archive": "VT7Pty-0.5.0-win7-x64-release-runtime.zip",
+      "ManifestSha256": "db1b7d067987d1f155f91c1e196e577f62fb530e68f179615793b3c136a231b1",
+      "Version": "0.5.0",
+      "Binaries": {
+        "VT7Pty.dll": "bin/VT7Pty.dll",
+        "VT7Pty-Agent.exe": "bin/VT7Pty-Agent.exe"
+      },
+      "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+      "ArchiveSha256": "59554a9cf8246395e60f30875e047d1bfa20d4f3f462c113ef705a86708f5304"
+    }
+  },
+  "EvidenceFilesVerified": 173,
+  "PositiveCases": 16,
+  "MissingMarkerControlsDetected": 2,
+  "SessionContractChecks": 10,
+  "ReleaseVerificationChecks": 37,
+  "TrialOrder": [
+    "baseline/LIFECYCLE_MEASURE_1",
+    "accepted/LIFECYCLE_MEASURE_1",
+    "accepted/LIFECYCLE_MEASURE_2",
+    "baseline/LIFECYCLE_MEASURE_2",
+    "baseline/LIFECYCLE_MEASURE_3",
+    "accepted/LIFECYCLE_MEASURE_3",
+    "accepted/LIFECYCLE_MEASURE_4",
+    "baseline/LIFECYCLE_MEASURE_4"
+  ],
+  "Measurements": {
+    "baseline": {
+      "InputUs": {
+        "Count": 64,
+        "P50Us": 2185,
+        "P95Us": 2771,
+        "MaxUs": 2810
+      },
+      "ResizeRpcUs": {
+        "Count": 64,
+        "P50Us": 8306,
+        "P95Us": 10062,
+        "MaxUs": 11202
+      },
+      "ReaderResizeUs": {
+        "Count": 64,
+        "P50Us": 53,
+        "P95Us": 75,
+        "MaxUs": 92
+      },
+      "BarrierUs": {
+        "Count": 64,
+        "P50Us": 19871,
+        "P95Us": 26410,
+        "MaxUs": 27611
+      },
+      "Trials": [
+        {
+          "Case": "LIFECYCLE_MEASURE_1",
+          "IdleUs": 15000376,
+          "TimingUs": 498053,
+          "ActiveUs": 20031736,
+          "ActiveSteps": 641,
+          "JobMembership": {
+            "Caller": true,
+            "Agent": true,
+            "Child": true
+          },
+          "CpuDeltas": {
+            "Caller": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 937500
+            },
+            "Agent": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 1250000
+            },
+            "Child": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 781250
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_2",
+          "IdleUs": 15002226,
+          "TimingUs": 499712,
+          "ActiveUs": 20000917,
+          "ActiveSteps": 639,
+          "JobMembership": {
+            "Caller": true,
+            "Agent": true,
+            "Child": true
+          },
+          "CpuDeltas": {
+            "Caller": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 625000
+            },
+            "Agent": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 1875000
+            },
+            "Child": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 1093750
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_3",
+          "IdleUs": 15001751,
+          "TimingUs": 498136,
+          "ActiveUs": 20029627,
+          "ActiveSteps": 637,
+          "JobMembership": {
+            "Caller": true,
+            "Agent": true,
+            "Child": true
+          },
+          "CpuDeltas": {
+            "Caller": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 312500
+            },
+            "Agent": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 1718750
+            },
+            "Child": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 468750
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_4",
+          "IdleUs": 15000453,
+          "TimingUs": 498606,
+          "ActiveUs": 20026718,
+          "ActiveSteps": 641,
+          "JobMembership": {
+            "Caller": true,
+            "Agent": true,
+            "Child": true
+          },
+          "CpuDeltas": {
+            "Caller": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 781250
+            },
+            "Agent": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 1875000
+            },
+            "Child": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 1406250
+            }
+          }
+        }
+      ]
+    },
+    "accepted": {
+      "InputUs": {
+        "Count": 64,
+        "P50Us": 2205,
+        "P95Us": 2769,
+        "MaxUs": 2817
+      },
+      "ResizeRpcUs": {
+        "Count": 64,
+        "P50Us": 8466,
+        "P95Us": 10437,
+        "MaxUs": 11322
+      },
+      "ReaderResizeUs": {
+        "Count": 64,
+        "P50Us": 51,
+        "P95Us": 71,
+        "MaxUs": 86
+      },
+      "BarrierUs": {
+        "Count": 64,
+        "P50Us": 20469,
+        "P95Us": 26669,
+        "MaxUs": 27492
+      },
+      "Trials": [
+        {
+          "Case": "LIFECYCLE_MEASURE_1",
+          "IdleUs": 15001392,
+          "TimingUs": 500378,
+          "ActiveUs": 20006770,
+          "ActiveSteps": 630,
+          "JobMembership": {
+            "Caller": true,
+            "Agent": true,
+            "Child": true
+          },
+          "CpuDeltas": {
+            "Caller": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 468750
+            },
+            "Agent": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 1406250
+            },
+            "Child": {
+              "IdleCpu100ns": 156250,
+              "ActiveCpu100ns": 625000
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_2",
+          "IdleUs": 15002087,
+          "TimingUs": 495816,
+          "ActiveUs": 20006251,
+          "ActiveSteps": 637,
+          "JobMembership": {
+            "Caller": true,
+            "Agent": true,
+            "Child": true
+          },
+          "CpuDeltas": {
+            "Caller": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 468750
+            },
+            "Agent": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 1406250
+            },
+            "Child": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 625000
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_3",
+          "IdleUs": 15000675,
+          "TimingUs": 509228,
+          "ActiveUs": 20024980,
+          "ActiveSteps": 641,
+          "JobMembership": {
+            "Caller": true,
+            "Agent": true,
+            "Child": true
+          },
+          "CpuDeltas": {
+            "Caller": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 625000
+            },
+            "Agent": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 2500000
+            },
+            "Child": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 781250
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_4",
+          "IdleUs": 15001343,
+          "TimingUs": 493225,
+          "ActiveUs": 20001772,
+          "ActiveSteps": 640,
+          "JobMembership": {
+            "Caller": true,
+            "Agent": true,
+            "Child": true
+          },
+          "CpuDeltas": {
+            "Caller": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 625000
+            },
+            "Agent": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 1875000
+            },
+            "Child": {
+              "IdleCpu100ns": 0,
+              "ActiveCpu100ns": 625000
+            }
+          }
+        }
+      ]
+    }
+  },
+  "TotalActiveSteps": 5106,
+  "NonzeroActiveCpuDeltas": 24,
+  "ActiveCpuDeltas": 24,
+  "Controls": [
+    "ReaderTiming",
+    "ActiveWindow",
+    "ActiveCount",
+    "ReorderedTrial"
+  ],
+  "Rc1Windows7RunsReviewed": 3,
+  "RebuiltScreenCases": 8,
+  "PowerShell2ParserPassed": true,
+  "Step15Accepted": false,
+  "MilestoneAccepted": false
+}
