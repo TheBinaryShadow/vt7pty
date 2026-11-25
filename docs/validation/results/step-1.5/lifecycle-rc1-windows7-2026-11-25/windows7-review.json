@@ -1,0 +1,2083 @@
+{
+  "SchemaVersion": 1,
+  "Kind": "VT7PtyLifecycleRc1Windows7Review",
+  "Archive": "VT7Pty-lifecycle-0.5.1-dev-rc1.zip",
+  "ArchiveSha256": "b886ccfabaf50d48f2cb96af9ad5507e3307a387639582b774fd54c986809a85",
+  "ManifestSha256": "2a99a6498ba061dfb4cf58cfc11b3cac93ab49cac14059a3513848e3a783d995",
+  "Harness": {
+    "SourceTreeClean": true,
+    "VerificationSha256": "95833c10ca793877cc7defafa340b48641d45e68a4e391e2855a88b01ce45821",
+    "Configuration": "Release",
+    "SourceCommit": "28ba5edf6333c42dbcd1dc1f3f116530dce46b1e",
+    "SnapshotBytes": 21396,
+    "Architecture": "x64"
+  },
+  "SessionFlags": 0,
+  "TotalEvidenceFilesVerified": 387,
+  "CaseObservations": 48,
+  "PositiveMatches": 42,
+  "MissingMarkerControlsDetected": 6,
+  "SessionContractChecksPassed": 30,
+  "F09Trials": 18,
+  "MeasurementsPerMetric": 288,
+  "PercentileMethod": "Nearest rank per machine and runtime",
+  "WolfRunId": "developmenthost-lifecycle-20261124-022235-2237eab7",
+  "Runs": [
+    {
+      "ComputerName": "NESSY",
+      "Tier": "NonESU",
+      "RunId": "nonesu-lifecycle-20261125-154252-5b835dfc",
+      "OS": {
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "BuildNumber": "7601",
+        "Version": "6.1.7601",
+        "ProductType": 1,
+        "ServicePackMajorVersion": 1
+      },
+      "PowerShellVersion": "5.1.14409.1018",
+      "CLRVersion": "4.0.30319.42000",
+      "KB3191566Listed": true,
+      "StartedUtc": "2026-11-25T15:42:57.143732Z",
+      "CompletedUtc": "2026-11-25T15:44:43.6919192Z",
+      "SessionFlags": 0,
+      "EvidenceFilesVerified": 129,
+      "ReportSha256": "544e49caaf3aee027d5204454a8642f34c32e050a7e6fc8bc1e0bf7378c650b0",
+      "EvidenceInventorySha256": "f608cedb860f75ceb8c7d1781564e11f03f5d69457bc3d5dff971f1c68a6ae6d",
+      "RuntimeResults": {
+        "baseline": {
+          "Matches": 7,
+          "MissingMarkerControls": 1,
+          "Drains": [
+            {
+              "Case": "LIFECYCLE_CMD_DRAIN",
+              "DurationMilliseconds": 249,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": true,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            },
+            {
+              "Case": "LIFECYCLE_PS_DRAIN",
+              "DurationMilliseconds": 390,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": true,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            },
+            {
+              "Case": "LIFECYCLE_NEGATIVE_DRAIN",
+              "DurationMilliseconds": 203,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": false,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            }
+          ],
+          "Close": {
+            "ExplicitCloseAvailable": false,
+            "CloseContract": true,
+            "SelectedExited": true,
+            "NeighborAlive": true,
+            "NeighborFinalDrain": true,
+            "ShutdownMicroseconds": 23937,
+            "JobMembership": {
+              "Caller": false,
+              "Agent": false,
+              "Child": false
+            },
+            "OwnedProcessesCleaned": true
+          },
+          "Recovery": {
+            "UnexpectedStart": false,
+            "UnexpectedChildHandle": false,
+            "SpawnApiError": 2,
+            "SpawnWin32Error": 2,
+            "Recovered": true,
+            "OwnedProcessesCleaned": true
+          },
+          "TrialCount": 3,
+          "Measurements": {
+            "InputUs": {
+              "Count": 48,
+              "Min": 7759,
+              "P50": 9761,
+              "P95": 16296,
+              "Max": 17689
+            },
+            "ResizeUs": {
+              "Count": 48,
+              "Min": 6386,
+              "P50": 7749,
+              "P95": 9919,
+              "Max": 16822
+            },
+            "BarrierUs": {
+              "Count": 48,
+              "Min": 23190,
+              "P50": 36792,
+              "P95": 39033,
+              "Max": 43938
+            }
+          },
+          "TrialMeasurements": [
+            {
+              "Case": "LIFECYCLE_MEASURE_1",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 8738,
+                  "P50": 9791,
+                  "P95": 17689,
+                  "Max": 17689
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 7042,
+                  "P50": 7839,
+                  "P95": 16445,
+                  "Max": 16445
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 33973,
+                  "P50": 36484,
+                  "P95": 43747,
+                  "Max": 43747
+                }
+              },
+              "IdleUs": 1014249,
+              "ActiveUs": 1022607,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_2",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 7759,
+                  "P50": 8933,
+                  "P95": 16296,
+                  "Max": 16296
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 6386,
+                  "P50": 7258,
+                  "P95": 8264,
+                  "Max": 8264
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 23190,
+                  "P50": 38089,
+                  "P95": 39033,
+                  "Max": 39033
+                }
+              },
+              "IdleUs": 1014233,
+              "ActiveUs": 990147,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_3",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 9257,
+                  "P50": 9865,
+                  "P95": 17393,
+                  "Max": 17393
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 6831,
+                  "P50": 7992,
+                  "P95": 16822,
+                  "Max": 16822
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 32625,
+                  "P50": 36323,
+                  "P95": 43938,
+                  "Max": 43938
+                }
+              },
+              "IdleUs": 1013876,
+              "ActiveUs": 1022284,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            }
+          ],
+          "Resources": {
+            "Caller": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 2613248.0,
+              "MaxWorkingSetBytes": 5144576.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 69,
+                "P50": 69,
+                "P95": 69,
+                "Max": 69
+              },
+              "ActivePrivateBytesDelta": [
+                122880,
+                122880,
+                122880
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            },
+            "Agent": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 3231744.0,
+              "MaxWorkingSetBytes": 5881856.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 45,
+                "P50": 45,
+                "P95": 45,
+                "Max": 45
+              },
+              "ActivePrivateBytesDelta": [
+                0,
+                0,
+                0
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            },
+            "Child": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 1196032.0,
+              "MaxWorkingSetBytes": 2633728.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 8,
+                "P50": 8,
+                "P95": 8,
+                "Max": 8
+              },
+              "ActivePrivateBytesDelta": [
+                24576,
+                24576,
+                24576
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "Regressions": [
+            {
+              "Name": "REPEAT",
+              "DurationMilliseconds": 38076,
+              "ExitCode": 0
+            },
+            {
+              "Name": "RESIZE",
+              "DurationMilliseconds": 3191,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SHUTDOWN",
+              "DurationMilliseconds": 3177,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SPAWN_FAILURE",
+              "DurationMilliseconds": 73,
+              "ExitCode": 0
+            },
+            {
+              "Name": "CONCURRENT",
+              "DurationMilliseconds": 277,
+              "ExitCode": 0
+            }
+          ],
+          "ResizeByDirectionUs": {
+            "Grow": {
+              "Count": 24,
+              "P50": 7749,
+              "P95": 16445,
+              "Max": 16822
+            },
+            "Shrink": {
+              "Count": 24,
+              "P50": 7726,
+              "P95": 9570,
+              "Max": 9919
+            }
+          },
+          "SumOfMeasuredPhasesUs": {
+            "Count": 48,
+            "P50": 54132,
+            "P95": 55650,
+            "Max": 78153
+          }
+        },
+        "accepted": {
+          "Matches": 7,
+          "MissingMarkerControls": 1,
+          "Drains": [
+            {
+              "Case": "LIFECYCLE_CMD_DRAIN",
+              "DurationMilliseconds": 374,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": true,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            },
+            {
+              "Case": "LIFECYCLE_PS_DRAIN",
+              "DurationMilliseconds": 468,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": true,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            },
+            {
+              "Case": "LIFECYCLE_NEGATIVE_DRAIN",
+              "DurationMilliseconds": 343,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": false,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            }
+          ],
+          "Close": {
+            "ExplicitCloseAvailable": true,
+            "CloseContract": true,
+            "SelectedExited": true,
+            "NeighborAlive": true,
+            "NeighborFinalDrain": true,
+            "ShutdownMicroseconds": 23737,
+            "JobMembership": {
+              "Caller": false,
+              "Agent": false,
+              "Child": false
+            },
+            "OwnedProcessesCleaned": true
+          },
+          "Recovery": {
+            "UnexpectedStart": false,
+            "UnexpectedChildHandle": false,
+            "SpawnApiError": 2,
+            "SpawnWin32Error": 2,
+            "Recovered": true,
+            "OwnedProcessesCleaned": true
+          },
+          "TrialCount": 3,
+          "Measurements": {
+            "InputUs": {
+              "Count": 48,
+              "Min": 6844,
+              "P50": 9367,
+              "P95": 17012,
+              "Max": 17489
+            },
+            "ResizeUs": {
+              "Count": 48,
+              "Min": 7255,
+              "P50": 9926,
+              "P95": 20227,
+              "Max": 26824
+            },
+            "BarrierUs": {
+              "Count": 48,
+              "Min": 1521,
+              "P50": 33928,
+              "P95": 38257,
+              "Max": 40757
+            }
+          },
+          "TrialMeasurements": [
+            {
+              "Case": "LIFECYCLE_MEASURE_1",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 7490,
+                  "P50": 9270,
+                  "P95": 17489,
+                  "Max": 17489
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 7255,
+                  "P50": 8451,
+                  "P95": 26824,
+                  "Max": 26824
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 1521,
+                  "P50": 35814,
+                  "P95": 38456,
+                  "Max": 38456
+                }
+              },
+              "IdleUs": 1013754,
+              "ActiveUs": 990316,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_2",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 9279,
+                  "P50": 10149,
+                  "P95": 17378,
+                  "Max": 17378
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 9349,
+                  "P50": 10700,
+                  "P95": 20227,
+                  "Max": 20227
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 31619,
+                  "P50": 33733,
+                  "P95": 40757,
+                  "Max": 40757
+                }
+              },
+              "IdleUs": 1013556,
+              "ActiveUs": 1022900,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_3",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 6844,
+                  "P50": 8583,
+                  "P95": 16239,
+                  "Max": 16239
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 8060,
+                  "P50": 9283,
+                  "P95": 12088,
+                  "Max": 12088
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 2899,
+                  "P50": 34937,
+                  "P95": 37430,
+                  "Max": 37430
+                }
+              },
+              "IdleUs": 1014345,
+              "ActiveUs": 866975,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            }
+          ],
+          "Resources": {
+            "Caller": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 2768896.0,
+              "MaxWorkingSetBytes": 5537792.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 74,
+                "P50": 74,
+                "P95": 74,
+                "Max": 74
+              },
+              "ActivePrivateBytesDelta": [
+                122880,
+                122880,
+                122880
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            },
+            "Agent": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 3227648.0,
+              "MaxWorkingSetBytes": 5873664.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 45,
+                "P50": 45,
+                "P95": 45,
+                "Max": 45
+              },
+              "ActivePrivateBytesDelta": [
+                0,
+                0,
+                0
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            },
+            "Child": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 1196032.0,
+              "MaxWorkingSetBytes": 2633728.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 8,
+                "P50": 8,
+                "P95": 8,
+                "Max": 8
+              },
+              "ActivePrivateBytesDelta": [
+                24576,
+                24576,
+                24576
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "Regressions": [
+            {
+              "Name": "REPEAT",
+              "DurationMilliseconds": 38238,
+              "ExitCode": 0
+            },
+            {
+              "Name": "RESIZE",
+              "DurationMilliseconds": 3214,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SHUTDOWN",
+              "DurationMilliseconds": 2892,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SPAWN_FAILURE",
+              "DurationMilliseconds": 57,
+              "ExitCode": 0
+            },
+            {
+              "Name": "CONCURRENT",
+              "DurationMilliseconds": 185,
+              "ExitCode": 0
+            }
+          ],
+          "ResizeByDirectionUs": {
+            "Grow": {
+              "Count": 24,
+              "P50": 10471,
+              "P95": 14500,
+              "Max": 20227
+            },
+            "Shrink": {
+              "Count": 24,
+              "P50": 9787,
+              "P95": 24023,
+              "Max": 26824
+            }
+          },
+          "SumOfMeasuredPhasesUs": {
+            "Count": 48,
+            "P50": 54259,
+            "P95": 62413,
+            "Max": 78362
+          }
+        }
+      }
+    },
+    {
+      "ComputerName": "TURTLE",
+      "Tier": "ESU",
+      "RunId": "esu-lifecycle-20261125-154314-df05f42a",
+      "OS": {
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "BuildNumber": "7601",
+        "Version": "6.1.7601",
+        "ProductType": 1,
+        "ServicePackMajorVersion": 1
+      },
+      "PowerShellVersion": "5.1.14409.1005",
+      "CLRVersion": "4.0.30319.42000",
+      "KB3191566Listed": true,
+      "StartedUtc": "2026-11-25T15:43:19.4330481Z",
+      "CompletedUtc": "2026-11-25T15:44:32.784376Z",
+      "SessionFlags": 0,
+      "EvidenceFilesVerified": 129,
+      "ReportSha256": "c58980059f7ab47dd3d1e2352d807d3a51cc39c70309ef9a01cbcab7cc018cfc",
+      "EvidenceInventorySha256": "f722850d4a16209f4ee9e0cbc3e1987cb68ae90e2248f17382133a0e8680909c",
+      "RuntimeResults": {
+        "baseline": {
+          "Matches": 7,
+          "MissingMarkerControls": 1,
+          "Drains": [
+            {
+              "Case": "LIFECYCLE_CMD_DRAIN",
+              "DurationMilliseconds": 94,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": true,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            },
+            {
+              "Case": "LIFECYCLE_PS_DRAIN",
+              "DurationMilliseconds": 188,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": true,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            },
+            {
+              "Case": "LIFECYCLE_NEGATIVE_DRAIN",
+              "DurationMilliseconds": 63,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": false,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            }
+          ],
+          "Close": {
+            "ExplicitCloseAvailable": false,
+            "CloseContract": true,
+            "SelectedExited": true,
+            "NeighborAlive": true,
+            "NeighborFinalDrain": true,
+            "ShutdownMicroseconds": 3725,
+            "JobMembership": {
+              "Caller": false,
+              "Agent": false,
+              "Child": false
+            },
+            "OwnedProcessesCleaned": true
+          },
+          "Recovery": {
+            "UnexpectedStart": false,
+            "UnexpectedChildHandle": false,
+            "SpawnApiError": 2,
+            "SpawnWin32Error": 2,
+            "Recovered": true,
+            "OwnedProcessesCleaned": true
+          },
+          "TrialCount": 3,
+          "Measurements": {
+            "InputUs": {
+              "Count": 48,
+              "Min": 10646,
+              "P50": 15544,
+              "P95": 15751,
+              "Max": 15770
+            },
+            "ResizeUs": {
+              "Count": 48,
+              "Min": 1747,
+              "P50": 1989,
+              "P95": 2205,
+              "Max": 2367
+            },
+            "BarrierUs": {
+              "Count": 48,
+              "Min": 13730,
+              "P50": 44617,
+              "P95": 44830,
+              "Max": 44851
+            }
+          },
+          "TrialMeasurements": [
+            {
+              "Case": "LIFECYCLE_MEASURE_1",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 10687,
+                  "P50": 15549,
+                  "P95": 15770,
+                  "Max": 15770
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 1975,
+                  "P50": 2137,
+                  "P95": 2367,
+                  "Max": 2367
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 28675,
+                  "P50": 44454,
+                  "P95": 44630,
+                  "Max": 44630
+                }
+              },
+              "IdleUs": 1013898,
+              "ActiveUs": 982983,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_2",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 10646,
+                  "P50": 15524,
+                  "P95": 15759,
+                  "Max": 15759
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 1783,
+                  "P50": 1848,
+                  "P95": 2060,
+                  "Max": 2060
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 28990,
+                  "P50": 44694,
+                  "P95": 44835,
+                  "Max": 44835
+                }
+              },
+              "IdleUs": 1013905,
+              "ActiveUs": 983013,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_3",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 10769,
+                  "P50": 15568,
+                  "P95": 15751,
+                  "Max": 15751
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 1747,
+                  "P50": 1884,
+                  "P95": 2095,
+                  "Max": 2095
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 13730,
+                  "P50": 44669,
+                  "P95": 44851,
+                  "Max": 44851
+                }
+              },
+              "IdleUs": 1013906,
+              "ActiveUs": 951779,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            }
+          ],
+          "Resources": {
+            "Caller": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 4173824.0,
+              "MaxWorkingSetBytes": 6803456.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 86,
+                "P50": 86,
+                "P95": 86,
+                "Max": 86
+              },
+              "ActivePrivateBytesDelta": [
+                122880,
+                122880,
+                122880
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            },
+            "Agent": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 4800512.0,
+              "MaxWorkingSetBytes": 7479296.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 45,
+                "P50": 45,
+                "P95": 45,
+                "Max": 45
+              },
+              "ActivePrivateBytesDelta": [
+                12288,
+                12288,
+                12288
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            },
+            "Child": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 1990656.0,
+              "MaxWorkingSetBytes": 3424256.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 8,
+                "P50": 8,
+                "P95": 8,
+                "Max": 8
+              },
+              "ActivePrivateBytesDelta": [
+                24576,
+                24576,
+                24576
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "Regressions": [
+            {
+              "Name": "REPEAT",
+              "DurationMilliseconds": 23720,
+              "ExitCode": 0
+            },
+            {
+              "Name": "RESIZE",
+              "DurationMilliseconds": 3173,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SHUTDOWN",
+              "DurationMilliseconds": 2513,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SPAWN_FAILURE",
+              "DurationMilliseconds": 30,
+              "ExitCode": 0
+            },
+            {
+              "Name": "CONCURRENT",
+              "DurationMilliseconds": 103,
+              "ExitCode": 0
+            }
+          ],
+          "ResizeByDirectionUs": {
+            "Grow": {
+              "Count": 24,
+              "P50": 2000,
+              "P95": 2271,
+              "Max": 2367
+            },
+            "Shrink": {
+              "Count": 24,
+              "P50": 1848,
+              "P95": 2203,
+              "Max": 2204
+            }
+          },
+          "SumOfMeasuredPhasesUs": {
+            "Count": 48,
+            "P50": 62156,
+            "P95": 62180,
+            "Max": 62181
+          }
+        },
+        "accepted": {
+          "Matches": 7,
+          "MissingMarkerControls": 1,
+          "Drains": [
+            {
+              "Case": "LIFECYCLE_CMD_DRAIN",
+              "DurationMilliseconds": 62,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": true,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            },
+            {
+              "Case": "LIFECYCLE_PS_DRAIN",
+              "DurationMilliseconds": 187,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": true,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            },
+            {
+              "Case": "LIFECYCLE_NEGATIVE_DRAIN",
+              "DurationMilliseconds": 93,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": false,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            }
+          ],
+          "Close": {
+            "ExplicitCloseAvailable": true,
+            "CloseContract": true,
+            "SelectedExited": true,
+            "NeighborAlive": true,
+            "NeighborFinalDrain": true,
+            "ShutdownMicroseconds": 3195,
+            "JobMembership": {
+              "Caller": false,
+              "Agent": false,
+              "Child": false
+            },
+            "OwnedProcessesCleaned": true
+          },
+          "Recovery": {
+            "UnexpectedStart": false,
+            "UnexpectedChildHandle": false,
+            "SpawnApiError": 2,
+            "SpawnWin32Error": 2,
+            "Recovered": true,
+            "OwnedProcessesCleaned": true
+          },
+          "TrialCount": 3,
+          "Measurements": {
+            "InputUs": {
+              "Count": 48,
+              "Min": 3840,
+              "P50": 15546,
+              "P95": 15733,
+              "Max": 15743
+            },
+            "ResizeUs": {
+              "Count": 48,
+              "Min": 2007,
+              "P50": 2228,
+              "P95": 2517,
+              "Max": 3099
+            },
+            "BarrierUs": {
+              "Count": 48,
+              "Min": 13209,
+              "P50": 44346,
+              "P95": 44539,
+              "Max": 44594
+            }
+          },
+          "TrialMeasurements": [
+            {
+              "Case": "LIFECYCLE_MEASURE_1",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 10656,
+                  "P50": 15556,
+                  "P95": 15733,
+                  "Max": 15733
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 2014,
+                  "P50": 2181,
+                  "P95": 2518,
+                  "Max": 2518
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 28579,
+                  "P50": 44407,
+                  "P95": 44594,
+                  "Max": 44594
+                }
+              },
+              "IdleUs": 1013903,
+              "ActiveUs": 983110,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_2",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 10599,
+                  "P50": 15537,
+                  "P95": 15743,
+                  "Max": 15743
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 2007,
+                  "P50": 2212,
+                  "P95": 3099,
+                  "Max": 3099
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 28656,
+                  "P50": 44403,
+                  "P95": 44579,
+                  "Max": 44579
+                }
+              },
+              "IdleUs": 1013900,
+              "ActiveUs": 982961,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_3",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 3840,
+                  "P50": 15502,
+                  "P95": 15740,
+                  "Max": 15740
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 2140,
+                  "P50": 2275,
+                  "P95": 2517,
+                  "Max": 2517
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 13209,
+                  "P50": 44179,
+                  "P95": 44472,
+                  "Max": 44472
+                }
+              },
+              "IdleUs": 1013873,
+              "ActiveUs": 827009,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            }
+          ],
+          "Resources": {
+            "Caller": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 4333568.0,
+              "MaxWorkingSetBytes": 7229440.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 91,
+                "P50": 91,
+                "P95": 91,
+                "Max": 91
+              },
+              "ActivePrivateBytesDelta": [
+                122880,
+                122880,
+                122880
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            },
+            "Agent": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 4792320.0,
+              "MaxWorkingSetBytes": 7512064.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 45,
+                "P50": 45,
+                "P95": 45,
+                "Max": 45
+              },
+              "ActivePrivateBytesDelta": [
+                12288,
+                12288,
+                12288
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            },
+            "Child": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 1986560.0,
+              "MaxWorkingSetBytes": 3420160.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 8,
+                "P50": 8,
+                "P95": 8,
+                "Max": 8
+              },
+              "ActivePrivateBytesDelta": [
+                24576,
+                24576,
+                24576
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "Regressions": [
+            {
+              "Name": "REPEAT",
+              "DurationMilliseconds": 23642,
+              "ExitCode": 0
+            },
+            {
+              "Name": "RESIZE",
+              "DurationMilliseconds": 3177,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SHUTDOWN",
+              "DurationMilliseconds": 2513,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SPAWN_FAILURE",
+              "DurationMilliseconds": 28,
+              "ExitCode": 0
+            },
+            {
+              "Name": "CONCURRENT",
+              "DurationMilliseconds": 107,
+              "ExitCode": 0
+            }
+          ],
+          "ResizeByDirectionUs": {
+            "Grow": {
+              "Count": 24,
+              "P50": 2311,
+              "P95": 2518,
+              "Max": 3099
+            },
+            "Shrink": {
+              "Count": 24,
+              "P50": 2174,
+              "P95": 2289,
+              "Max": 2517
+            }
+          },
+          "SumOfMeasuredPhasesUs": {
+            "Count": 48,
+            "P50": 62144,
+            "P95": 62179,
+            "Max": 62222
+          }
+        }
+      }
+    },
+    {
+      "ComputerName": "LEOPARD",
+      "Tier": "Legacy",
+      "RunId": "legacy-lifecycle-20261125-154240-94641bd2",
+      "OS": {
+        "ProductType": 1,
+        "Version": "6.1.7601",
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "ServicePackMajorVersion": 1,
+        "BuildNumber": "7601"
+      },
+      "PowerShellVersion": "2.0",
+      "CLRVersion": "2.0.50727.8806",
+      "KB3191566Listed": false,
+      "StartedUtc": "2026-11-25T15:42:47.7400409Z",
+      "CompletedUtc": "2026-11-25T15:44:32.1822243Z",
+      "SessionFlags": 0,
+      "EvidenceFilesVerified": 129,
+      "ReportSha256": "8e603baaf007d83e8d689eb5540f3c3d980ab9f8a68eade31d14e3b7667e89dd",
+      "EvidenceInventorySha256": "1be7a66ce1a3144ffb2fcd7c5f233974118897dba945865984ff32655de326aa",
+      "RuntimeResults": {
+        "baseline": {
+          "Matches": 7,
+          "MissingMarkerControls": 1,
+          "Drains": [
+            {
+              "Case": "LIFECYCLE_CMD_DRAIN",
+              "DurationMilliseconds": 187,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": true,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            },
+            {
+              "Case": "LIFECYCLE_PS_DRAIN",
+              "DurationMilliseconds": 328,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": true,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            },
+            {
+              "Case": "LIFECYCLE_NEGATIVE_DRAIN",
+              "DurationMilliseconds": 140,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": false,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            }
+          ],
+          "Close": {
+            "ExplicitCloseAvailable": false,
+            "CloseContract": true,
+            "SelectedExited": true,
+            "NeighborAlive": true,
+            "NeighborFinalDrain": true,
+            "ShutdownMicroseconds": 11924,
+            "JobMembership": {
+              "Caller": false,
+              "Agent": false,
+              "Child": false
+            },
+            "OwnedProcessesCleaned": true
+          },
+          "Recovery": {
+            "UnexpectedStart": false,
+            "UnexpectedChildHandle": false,
+            "SpawnApiError": 2,
+            "SpawnWin32Error": 2,
+            "Recovered": true,
+            "OwnedProcessesCleaned": true
+          },
+          "TrialCount": 3,
+          "Measurements": {
+            "InputUs": {
+              "Count": 48,
+              "Min": 16022,
+              "P50": 16283,
+              "P95": 17243,
+              "Max": 19082
+            },
+            "ResizeUs": {
+              "Count": 48,
+              "Min": 7455,
+              "P50": 9003,
+              "P95": 11101,
+              "Max": 12815
+            },
+            "BarrierUs": {
+              "Count": 48,
+              "Min": 20899,
+              "P50": 36733,
+              "P95": 38060,
+              "Max": 38177
+            }
+          },
+          "TrialMeasurements": [
+            {
+              "Case": "LIFECYCLE_MEASURE_1",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 16086,
+                  "P50": 16410,
+                  "P95": 19082,
+                  "Max": 19082
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 7803,
+                  "P50": 9113,
+                  "P95": 12815,
+                  "Max": 12815
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 20899,
+                  "P50": 36444,
+                  "P95": 38060,
+                  "Max": 38060
+                }
+              },
+              "IdleUs": 1013668,
+              "ActiveUs": 983626,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_2",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 16022,
+                  "P50": 16389,
+                  "P95": 17592,
+                  "Max": 17592
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 7455,
+                  "P50": 9003,
+                  "P95": 10250,
+                  "Max": 10250
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 21279,
+                  "P50": 36733,
+                  "P95": 38174,
+                  "Max": 38174
+                }
+              },
+              "IdleUs": 1013750,
+              "ActiveUs": 983062,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_3",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 16092,
+                  "P50": 16231,
+                  "P95": 16481,
+                  "Max": 16481
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 7804,
+                  "P50": 8361,
+                  "P95": 9974,
+                  "Max": 9974
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 20955,
+                  "P50": 36758,
+                  "P95": 38177,
+                  "Max": 38177
+                }
+              },
+              "IdleUs": 1013809,
+              "ActiveUs": 983057,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            }
+          ],
+          "Resources": {
+            "Caller": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 2613248.0,
+              "MaxWorkingSetBytes": 5152768.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 74,
+                "P50": 74,
+                "P95": 74,
+                "Max": 74
+              },
+              "ActivePrivateBytesDelta": [
+                122880,
+                122880,
+                122880
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            },
+            "Agent": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 3219456.0,
+              "MaxWorkingSetBytes": 5861376.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 45,
+                "P50": 45,
+                "P95": 45,
+                "Max": 45
+              },
+              "ActivePrivateBytesDelta": [
+                0,
+                0,
+                0
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            },
+            "Child": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 1200128.0,
+              "MaxWorkingSetBytes": 2641920.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 8,
+                "P50": 8,
+                "P95": 8,
+                "Max": 8
+              },
+              "ActivePrivateBytesDelta": [
+                24576,
+                24576,
+                24576
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "Regressions": [
+            {
+              "Name": "REPEAT",
+              "DurationMilliseconds": 37463,
+              "ExitCode": 0
+            },
+            {
+              "Name": "RESIZE",
+              "DurationMilliseconds": 3222,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SHUTDOWN",
+              "DurationMilliseconds": 3079,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SPAWN_FAILURE",
+              "DurationMilliseconds": 62,
+              "ExitCode": 0
+            },
+            {
+              "Name": "CONCURRENT",
+              "DurationMilliseconds": 223,
+              "ExitCode": 0
+            }
+          ],
+          "ResizeByDirectionUs": {
+            "Grow": {
+              "Count": 24,
+              "P50": 9113,
+              "P95": 11036,
+              "Max": 11101
+            },
+            "Shrink": {
+              "Count": 24,
+              "P50": 8239,
+              "P95": 12255,
+              "Max": 12815
+            }
+          },
+          "SumOfMeasuredPhasesUs": {
+            "Count": 48,
+            "P50": 61962,
+            "P95": 62460,
+            "Max": 62572
+          }
+        },
+        "accepted": {
+          "Matches": 7,
+          "MissingMarkerControls": 1,
+          "Drains": [
+            {
+              "Case": "LIFECYCLE_CMD_DRAIN",
+              "DurationMilliseconds": 218,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": true,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            },
+            {
+              "Case": "LIFECYCLE_PS_DRAIN",
+              "DurationMilliseconds": 390,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": true,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            },
+            {
+              "Case": "LIFECYCLE_NEGATIVE_DRAIN",
+              "DurationMilliseconds": 202,
+              "ChildExitedBeforeReader": true,
+              "OutputEof": true,
+              "AgentExitedAfterDrain": true,
+              "RowsMatched": true,
+              "FinalMarkerMatched": false,
+              "ChildExitCode": 37,
+              "OwnedProcessesCleaned": true
+            }
+          ],
+          "Close": {
+            "ExplicitCloseAvailable": true,
+            "CloseContract": true,
+            "SelectedExited": true,
+            "NeighborAlive": true,
+            "NeighborFinalDrain": true,
+            "ShutdownMicroseconds": 25497,
+            "JobMembership": {
+              "Caller": false,
+              "Agent": false,
+              "Child": false
+            },
+            "OwnedProcessesCleaned": true
+          },
+          "Recovery": {
+            "UnexpectedStart": false,
+            "UnexpectedChildHandle": false,
+            "SpawnApiError": 2,
+            "SpawnWin32Error": 2,
+            "Recovered": true,
+            "OwnedProcessesCleaned": true
+          },
+          "TrialCount": 3,
+          "Measurements": {
+            "InputUs": {
+              "Count": 48,
+              "Min": 13575,
+              "P50": 16230,
+              "P95": 18913,
+              "Max": 19196
+            },
+            "ResizeUs": {
+              "Count": 48,
+              "Min": 7461,
+              "P50": 8657,
+              "P95": 15527,
+              "Max": 15821
+            },
+            "BarrierUs": {
+              "Count": 48,
+              "Min": 7172,
+              "P50": 29949,
+              "P95": 38319,
+              "Max": 38639
+            }
+          },
+          "TrialMeasurements": [
+            {
+              "Case": "LIFECYCLE_MEASURE_1",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 13575,
+                  "P50": 18125,
+                  "P95": 19196,
+                  "Max": 19196
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 8025,
+                  "P50": 9942,
+                  "P95": 15527,
+                  "Max": 15527
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 7325,
+                  "P50": 31056,
+                  "P95": 33978,
+                  "Max": 33978
+                }
+              },
+              "IdleUs": 1013885,
+              "ActiveUs": 813003,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_2",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 14228,
+                  "P50": 14684,
+                  "P95": 16216,
+                  "Max": 16216
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 7618,
+                  "P50": 8305,
+                  "P95": 9243,
+                  "Max": 9243
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 7172,
+                  "P50": 7962,
+                  "P95": 38639,
+                  "Max": 38639
+                }
+              },
+              "IdleUs": 1014192,
+              "ActiveUs": 578250,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_3",
+              "Latency": {
+                "InputUs": {
+                  "Count": 16,
+                  "Min": 16145,
+                  "P50": 16356,
+                  "P95": 18496,
+                  "Max": 18496
+                },
+                "ResizeUs": {
+                  "Count": 16,
+                  "Min": 7461,
+                  "P50": 8115,
+                  "P95": 15821,
+                  "Max": 15821
+                },
+                "BarrierUs": {
+                  "Count": 16,
+                  "Min": 21197,
+                  "P50": 37372,
+                  "P95": 38425,
+                  "Max": 38425
+                }
+              },
+              "IdleUs": 1014263,
+              "ActiveUs": 983081,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              }
+            }
+          ],
+          "Resources": {
+            "Caller": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 2752512.0,
+              "MaxWorkingSetBytes": 5545984.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 79,
+                "P50": 79,
+                "P95": 79,
+                "Max": 79
+              },
+              "ActivePrivateBytesDelta": [
+                122880,
+                122880,
+                122880
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            },
+            "Agent": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                156001
+              ],
+              "MaxPrivateBytes": 3215360.0,
+              "MaxWorkingSetBytes": 6164480.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 45,
+                "P50": 45,
+                "P95": 45,
+                "Max": 45
+              },
+              "ActivePrivateBytesDelta": [
+                0,
+                0,
+                0
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            },
+            "Child": {
+              "IdleCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "ActiveCpu100ns": [
+                0,
+                0,
+                0
+              ],
+              "MaxPrivateBytes": 1191936.0,
+              "MaxWorkingSetBytes": 2699264.0,
+              "Handles": {
+                "Count": 9,
+                "Min": 8,
+                "P50": 8,
+                "P95": 8,
+                "Max": 8
+              },
+              "ActivePrivateBytesDelta": [
+                24576,
+                24576,
+                24576
+              ],
+              "ActiveHandleDelta": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "Regressions": [
+            {
+              "Name": "REPEAT",
+              "DurationMilliseconds": 38671,
+              "ExitCode": 0
+            },
+            {
+              "Name": "RESIZE",
+              "DurationMilliseconds": 3221,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SHUTDOWN",
+              "DurationMilliseconds": 3091,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SPAWN_FAILURE",
+              "DurationMilliseconds": 73,
+              "ExitCode": 0
+            },
+            {
+              "Name": "CONCURRENT",
+              "DurationMilliseconds": 224,
+              "ExitCode": 0
+            }
+          ],
+          "ResizeByDirectionUs": {
+            "Grow": {
+              "Count": 24,
+              "P50": 8690,
+              "P95": 11207,
+              "Max": 15527
+            },
+            "Shrink": {
+              "Count": 24,
+              "P50": 8438,
+              "P95": 15708,
+              "Max": 15821
+            }
+          },
+          "SumOfMeasuredPhasesUs": {
+            "Count": 48,
+            "P50": 61785,
+            "P95": 62184,
+            "Max": 62451
+          }
+        }
+      }
+    }
+  ],
+  "Step15Accepted": false,
+  "MilestoneAccepted": false,
+  "CpuCounterIntervals": {
+    "Count": 108,
+    "ZeroDeltas": 107,
+    "NonzeroDeltas": [
+      {
+        "Machine": "LEOPARD",
+        "Role": "accepted",
+        "Case": "LIFECYCLE_MEASURE_3",
+        "Process": "Agent",
+        "Idle100ns": 0,
+        "Active100ns": 156001,
+        "Before100ns": 156001
+      }
+    ]
+  },
+  "MeasuredF08CasesPassed": true,
+  "PerformanceBudgetsEstablished": false
+}

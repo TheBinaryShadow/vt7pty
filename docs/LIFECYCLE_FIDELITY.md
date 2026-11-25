@@ -34,8 +34,9 @@ failures. I expect 16 case observations and 10 session contract checks.
   free. The accepted runtime also exercises idempotent close and a
   rejected resize after retirement.
 - **Response and resources.** Each of three trials per runtime records
-  16 input receipts, resize RPCs and repaint barriers with a monotonic
-  clock. The barrier waits for a new marker in the decoded stream after
+  16 input receipts, resize phases and repaint barriers with a monotonic
+  clock. Each resize phase includes the RPC and the test reader's resize.
+  The barrier waits for a new marker in the decoded stream after
   a native snapshot. I record caller, agent and fixture CPU time, private
   bytes, working set and handle counts across the idle and active windows.
   [Windows process memory counters](https://learn.microsoft.com/en-us/windows/win32/api/psapi/ns-psapi-process_memory_counters_ex)
@@ -48,6 +49,7 @@ budgets. Each sample includes harness and fixture overhead. Shutdown has a
 10-second limit. The close and measurement cases record enclosing-job
 membership. The [process lifetime plan](PROCESS_LIFETIME.md) tracks the
 job-policy, abrupt-exit and descendant cases.
+[Windows 7 measurements](validation/2026-11-25-step-1.5-lifecycle-rc1-windows7.md#timing-and-resources)
 
 ## Build and review
 
