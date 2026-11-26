@@ -118,7 +118,7 @@ function Invoke-LifecycleRegressions([string]$Role) {
     }
 }
 
-if ($ready -and $lifecycle -and $manifest.SchemaVersion -eq 2) {
+if ($ready -and $lifecycle -and $manifest.SchemaVersion -ge 2) {
     foreach ($item in @(Get-LifecycleCaseSchedule $manifest)) {
         $report.Cases += Invoke-FidelityObservation $item.Runtime $item.Spec
     }

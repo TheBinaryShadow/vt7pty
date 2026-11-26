@@ -49,7 +49,7 @@ if ($run.Tier -cne 'DevelopmentHost' -and ($run.OS.Version -cnotlike '6.1.*' -or
 if ($run.Tier -ceq 'Legacy' -and ($run.PowerShellVersion -cne '2.0' -or $run.CLRVersion -cnotlike '2.0.*' -or
     @($run.Updates | Where-Object { $_.Id -ceq 'KB3191566' }).Count)) { throw 'Wrong legacy engine or update state.' }
 
-if ($package.SchemaVersion -eq 2) {
+if ($package.SchemaVersion -ge 2) {
     $expectedOrder = @(Get-LifecycleCaseSchedule $package | ForEach-Object { $_.Runtime + '/' + $_.Spec.Name })
     $observedOrder = @($run.Cases | ForEach-Object { $_.Runtime + '/' + $_.Name })
     if (($expectedOrder -join ',') -cne ($observedOrder -join ',')) { throw 'Wrong lifecycle runtime order.' }

@@ -9,7 +9,7 @@ int64_t lifecycleElapsed(LifecycleClock::time_point start) {
 }
 
 std::string lifecycleRecipes() {
-    std::string result = "{\"SchemaVersion\":2,\"SnapshotBytes\":" + std::to_string(sizeof(Packet)) +
+    std::string result = "{\"SchemaVersion\":3,\"SnapshotBytes\":" + std::to_string(sizeof(Packet)) +
         ",\"OutputRows\":" + std::to_string(lifecycleRows) + ",\"Samples\":" + std::to_string(lifecycleSamples) +
         ",\"IdleMilliseconds\":" + std::to_string(lifecycleIdleMs) +
         ",\"ActiveMilliseconds\":" + std::to_string(lifecycleActiveMs) +
@@ -188,13 +188,16 @@ uint64_t fileTimeValue(FILETIME value) {
 
 std::string processResources(HANDLE process) {
     FILETIME creation={}, exit={}, kernel={}, user={};
+    ULONG64 cycles = 0;
     DWORD handles = 0;
     PROCESS_MEMORY_COUNTERS_EX memory={};
-    check(GetProcessTimes(process,&creation,&exit,&kernel,&user),"lifecycle CPU sample");
+    check(GetProcessTimes(process,&creation,&exit,&kernel,&user),"lifecycle CPU time sample");
+    check(QueryProcessCycleTime(process,&cycles),"lifecycle CPU cycle sample");
     check(GetProcessHandleCount(process,&handles),"lifecycle handle sample");
     check(K32GetProcessMemoryInfo(process,reinterpret_cast<PROCESS_MEMORY_COUNTERS *>(&memory),sizeof(memory)),
         "lifecycle memory sample");
     return "{\"Cpu100ns\":" + std::to_string(fileTimeValue(kernel) + fileTimeValue(user)) +
+        ",\"CpuCycles\":" + std::to_string(cycles) +
         ",\"CreationTime\":" + std::to_string(fileTimeValue(creation)) + ",\"Handles\":" + std::to_string(handles) +
         ",\"PrivateBytes\":" + std::to_string(memory.PrivateUsage) +
         ",\"WorkingSetBytes\":" + std::to_string(memory.WorkingSetSize) + '}';

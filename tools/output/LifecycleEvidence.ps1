@@ -21,9 +21,9 @@ function Get-LifecycleCaseSchedule($Manifest) {
 
 function Read-LifecyclePackage([string]$Root) {
     $manifest = Read-VT7Json (Join-Path $Root 'manifest.json')
-    $extended = $manifest.SchemaVersion -eq 2
+    $extended = $manifest.SchemaVersion -ge 2
     $idle = if ($extended) { 15000 } else { 1000 }
-    if ($manifest.Kind -cne 'VT7PtyLifecycleCharacterization' -or @(1,2) -notcontains $manifest.SchemaVersion -or
+    if ($manifest.Kind -cne 'VT7PtyLifecycleCharacterization' -or @(1,2,3) -notcontains $manifest.SchemaVersion -or
         $manifest.Step15Accepted -or $manifest.OutputRows -ne 200 -or $manifest.Samples -ne 16 -or
         $manifest.IdleMilliseconds -ne $idle -or $manifest.ShutdownMilliseconds -ne 10000 -or
         ($extended -and ($manifest.ActiveMilliseconds -ne 20000 -or $manifest.ActiveStepMilliseconds -ne 25)) -or
@@ -91,7 +91,8 @@ function Confirm-LifecycleSnapshot([string]$Path, [int]$Ordinal, $Manifest) {
 }
 
 function Confirm-LifecycleMeasurements([string]$Directory, $Record, $Manifest, [int]$StreamBytes) {
-    $extended = $Manifest.SchemaVersion -eq 2
+    $extended = $Manifest.SchemaVersion -ge 2
+    $cyclesRequired = $Manifest.SchemaVersion -ge 3
     $phases = @('InputUs','ResizeUs','BarrierUs')
     $timingUs = $Record.ActiveUs
     $windows = @('IdleBefore','IdleAfter','ActiveAfter')
@@ -119,6 +120,13 @@ function Confirm-LifecycleMeasurements([string]$Directory, $Record, $Manifest, [
                 $sample.Cpu100ns -lt $previous.Cpu100ns -or $sample.Handles -le 0 -or
                 $sample.PrivateBytes -le 0 -or $sample.WorkingSetBytes -lt 0) {
                 throw ('Invalid process resource sample: ' + $role)
+            }
+            if ($cyclesRequired) {
+                $cycles = $sample['CpuCycles']
+                if (($cycles -isnot [int] -and $cycles -isnot [long]) -or $cycles -lt 0 -or
+                    $cycles -lt $previous['CpuCycles']) {
+                    throw ('Invalid process cycle sample: ' + $role + '/' + $window)
+                }
             }
             $previous = $sample
         }
