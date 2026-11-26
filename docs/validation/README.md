@@ -19,7 +19,7 @@ still in progress. [Profile rc3 Windows 7 review](2026-11-23-step-1.2-profiles-r
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
-| Step 1.5 lifecycle rc2 | [Split timing and extended CPU measurements verified on WOLF](2026-11-25-step-1.5-lifecycle-rc2-candidate.md) | Pending on NESSY, TURTLE and LEOPARD |
+| Step 1.5 lifecycle rc2 | [Split timing and extended CPU measurements verified on WOLF](2026-11-25-step-1.5-lifecycle-rc2-candidate.md) | [48 positive cases and 30 session checks passed. CPU budgeting open.](2026-11-26-step-1.5-lifecycle-rc2-windows7.md) |
 | Step 1.5 lifecycle rc1 | [14 positive cases, both controls and 10 session checks verified on WOLF](2026-11-24-step-1.5-lifecycle-rc1-candidate.md) | [42 positive cases and 30 session checks passed. Timing follow-up open.](2026-11-25-step-1.5-lifecycle-rc1-windows7.md) |
 | Step 1.4 screen rc3 | [8 candidate cases and 16 live resize repeats passed on WOLF](2026-11-24-step-1.4-screen-rc3-candidate.md) | [24/24 candidate cases passed on NESSY, TURTLE and LEOPARD](2026-11-24-step-1.4-screen-rc3-windows7.md) |
 | Step 1.4 WOLF resize | [Viewport offset, native reflow and console-host loss investigated](2026-11-24-step-1.4-wolf-resize-investigation.md) | [Screen rc2 passed the tested scope](2026-11-24-step-1.4-screen-rc2-windows7.md) |

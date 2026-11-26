@@ -54,7 +54,8 @@ I use the repeated Windows 7 baseline samples to set latency and resource
 budgets. The resource windows include harness and fixture work. Shutdown
 has a 10-second limit. The close and measurement cases record enclosing-job
 membership. [Process lifetime plan](PROCESS_LIFETIME.md) ·
-[Initial Windows 7 measurements](validation/2026-11-25-step-1.5-lifecycle-rc1-windows7.md#timing-and-resources)
+[Rc1 Windows 7 measurements](validation/2026-11-25-step-1.5-lifecycle-rc1-windows7.md#timing-and-resources) ·
+[Rc2 Windows 7 measurements](validation/2026-11-26-step-1.5-lifecycle-rc2-windows7.md#resize-timing)
 
 ## Build and review
 

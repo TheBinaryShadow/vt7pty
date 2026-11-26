@@ -1,6 +1,6 @@
 # VT7Pty roadmap
 
-Updated: 2026-11-25.
+Updated: 2026-11-26.
 
 I've published 0.5.0 and completed the scoped input, output and full-screen
 work in Steps 1.2 through 1.4. I accept measured Unicode reconstruction with
@@ -30,7 +30,7 @@ The [foundation](docs/FOUNDATION.md) records the engineering decisions;
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Modern native VT7Pty 0.5.x foundation | Complete; 0.5.0 accepted and published |
-| 1 | Better console fidelity and reliability | In progress. Lifecycle rc2 passed on WOLF and is ready for Windows 7 |
+| 1 | Better console fidelity and reliability | In progress. Lifecycle rc2 verified on all three Windows 7 tiers. CPU budgeting remains open |
 | 2 | VT7-facing API and standalone integration host | Planned after backend validation |
 | 3 | Versioned handoff ready for VT7 integration | Planned after API and consumer tests |
 | Later | Other consumers and optional ConPTY compatibility | Deferred |
@@ -180,7 +180,8 @@ flags 0 on all three Windows 7 tiers and WOLF.
   LEOPARD. [Lifecycle rc1 Windows 7 review](docs/validation/2026-11-25-step-1.5-lifecycle-rc1-windows7.md)
 - [x] Verify split resize timing, alternating trial order and longer CPU
   windows on WOLF. [Lifecycle rc2 verification](docs/validation/2026-11-25-step-1.5-lifecycle-rc2-candidate.md)
-- [ ] Review lifecycle rc2 on NESSY, TURTLE and LEOPARD.
+- [x] Review lifecycle rc2 on NESSY, TURTLE and LEOPARD.
+  [Lifecycle rc2 Windows 7 review](docs/validation/2026-11-26-step-1.5-lifecycle-rc2-windows7.md)
 - [ ] Resolve measured F08-F09 failures in final drain, child status, close,
   failure cleanup, response times and resource stability.
 - [ ] Before 1.0, qualify Windows 7 job inheritance, permitted and denied
@@ -189,7 +190,8 @@ flags 0 on all three Windows 7 tiers and WOLF.
   [VSoft.Process PR #18](https://github.com/VSoftTechnologies/VSoft.Process/pull/18).
 - [ ] Preserve existing lifecycle/stress gates and establish target-derived
   performance budgets before accepting performance changes. Use the rc2
-  runs to check the resize tail and establish CPU and resource budgets.
+  timing, handle and memory measurements as references and qualify CPU
+  sampling with enough resolution for the Windows 7 workload.
 
 I qualify the measured final drain, exit status, close and recovery cases
 with session flags 0.
