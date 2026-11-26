@@ -1,0 +1,24 @@
+{
+  "Archive": "VT7Pty-lifecycle-0.5.1-dev-rc3.zip",
+  "Bytes": 5637291,
+  "Sha256": "a27836fb46e7f4923a8834ee2e983d71cb1a0a505e6d22d4499c3d3affaf9bc3",
+  "ManifestSha256": "c688bda1bde5d7b5146a62310d12335463726c67206b99837c006c3c1041fe49",
+  "FilesVerified": 33,
+  "Harness": {
+    "SourceTreeClean": true,
+    "VerificationSha256": "572e2084369f15a12cd29104e1ba1ab156e4331c356e5010ad28ff5280804ad9",
+    "Configuration": "Release",
+    "SourceCommit": "438297da97fb8320345f01d4101c2294186df7bc",
+    "SnapshotBytes": 21396,
+    "Architecture": "x64"
+  },
+  "RuntimeFilesMatched": {
+    "baseline/bin/VT7Pty.dll": "f0509b31d81508c047fb1f6a20836ce6a4ab97f0d13790da42b387548f955167",
+    "baseline/bin/VT7Pty-Agent.exe": "b6b7e083e9dab1bbf29603a3721e6d261c94e8ad3a230b8526e7b6123f1df1b2",
+    "accepted/bin/VT7Pty-Agent.exe": "15b78a1010712460412d3806e1a4d26a25e314023f0afdfd1d5c48edf994ee56",
+    "accepted/bin/VT7Pty-Host.dll": "163107e676974741058c606b725ac567c0f5eddd87140531b54b745303a17060",
+    "accepted/bin/VT7Pty.dll": "89ee652bbcd03772190d510744a9d8ad74e1633e8c43017a3f57f8aafedc5353",
+    "accepted/bin/VT7Pty-DebugServer.exe": "1e3e7df562f20d60ff8179c91f00a455afc657c7151ebb2e8fe3ee395cfdadb1"
+  },
+  "SidecarMatched": true
+}
