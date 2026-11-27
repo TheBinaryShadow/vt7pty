@@ -69,7 +69,8 @@ measurement cases record enclosing-job membership.
 [Process lifetime plan](PROCESS_LIFETIME.md) ·
 [Rc1 Windows 7 measurements](validation/2026-11-25-step-1.5-lifecycle-rc1-windows7.md#timing-and-resources) ·
 [Rc2 Windows 7 measurements](validation/2026-11-26-step-1.5-lifecycle-rc2-windows7.md#resize-timing) ·
-[Rc3 Windows 7 measurements](validation/2026-11-27-step-1.5-lifecycle-rc3-windows7.md#cycle-measurements)
+[Rc3 Windows 7 measurements](validation/2026-11-27-step-1.5-lifecycle-rc3-windows7.md#cycle-measurements) ·
+[Rc4 Windows 7 trace review](validation/2026-11-27-step-1.5-lifecycle-rc4-windows7.md#leopard-trace)
 
 ## Build and review
 
