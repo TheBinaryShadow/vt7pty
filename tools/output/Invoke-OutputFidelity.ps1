@@ -60,7 +60,11 @@ $report = @{
     MilestoneAccepted = $false
 }
 $report[$(if ($screen) { 'Step14Accepted' } elseif ($lifecycle) { 'Step15Accepted' } else { 'Step13Accepted' })] = $false
-if ($lifecycle) { $report.Regressions = @() }
+if ($lifecycle) {
+    $report.Regressions = @()
+    $lifecycleSchedule = @(Get-LifecycleCaseSchedule $manifest)
+    if ($manifest.SchemaVersion -ge 4) { $report.ResizeTrace = $manifest.ResizeTrace }
+}
 $ready = $preflight.Count -eq 0
 if ($ready) {
     try {
@@ -82,7 +86,9 @@ function Invoke-FidelityObservation([string]$Role,$Spec) {
         Status = 'Incomplete'; Outcome = ''; Controller = $null; Error = ''}
     Write-Host ($Role + ' ' + $Spec.Name)
     try {
-        $controller = Invoke-InputProcess (Join-Path $bin 'FidelityTest.exe') ($Spec.Name + ' "' + $directory + '"') $bin 75000 $environment
+        $arguments = $Spec.Name + ' "' + $directory + '"'
+        if ($Role -ceq 'diagnostic') { $arguments += ' --resize-trace' }
+        $controller = Invoke-InputProcess (Join-Path $bin 'FidelityTest.exe') $arguments $bin 75000 $environment
         $case.Controller = $controller
         if ($controller.TimedOut) { throw 'Native fidelity case exceeded its deadline.' }
         if ($screen) {
@@ -119,7 +125,7 @@ function Invoke-LifecycleRegressions([string]$Role) {
 }
 
 if ($ready -and $lifecycle -and $manifest.SchemaVersion -ge 2) {
-    foreach ($item in @(Get-LifecycleCaseSchedule $manifest)) {
+    foreach ($item in $lifecycleSchedule) {
         $report.Cases += Invoke-FidelityObservation $item.Runtime $item.Spec
     }
     foreach ($role in $roles) { $report.Regressions += @(Invoke-LifecycleRegressions $role) }
@@ -129,7 +135,8 @@ if ($ready -and $lifecycle -and $manifest.SchemaVersion -ge 2) {
         if ($lifecycle) { $report.Regressions += @(Invoke-LifecycleRegressions $role) }
     }
 }
-$report.CharacterizationComplete = $ready -and $report.Cases.Count -eq $roles.Count * $manifest.Cases.Count -and
+$expectedCases = if ($lifecycle) { $lifecycleSchedule.Count } else { $roles.Count * $manifest.Cases.Count }
+$report.CharacterizationComplete = $ready -and $report.Cases.Count -eq $expectedCases -and
     @($report.Cases | Where-Object { $_.Status -ne 'Observed' }).Count -eq 0
 if ($lifecycle) {
     $report.CharacterizationComplete = $report.CharacterizationComplete -and

@@ -8,14 +8,21 @@ param(
 
     [switch]$DetailedOutput,
 
-    [switch]$StaticAnalysis
+    [switch]$StaticAnalysis,
+
+    [switch]$LifecycleResizeTrace
 )
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
 
 $repositoryRoot = $PSScriptRoot
-$solutionPath = Join-Path $repositoryRoot 'VT7Pty.sln'
+if ($LifecycleResizeTrace -and $Configuration -ne 'Release') {
+    throw 'The lifecycle resize trace is a Release agent build.'
+}
+$buildPath = Join-Path $repositoryRoot $(if ($LifecycleResizeTrace) {
+    'projects\VT7Pty-Agent.vcxproj'
+} else { 'VT7Pty.sln' })
 $vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
 if (-not (Test-Path -LiteralPath $vswherePath)) {
     throw "Visual Studio Installer discovery tool was not found at $vswherePath"
@@ -46,6 +53,7 @@ $legacyArtifactNames = @(
 
 foreach ($configurationName in $configurations) {
     $binaryDirectory = Join-Path $repositoryRoot "artifacts\bin\x64\$configurationName"
+    if ($LifecycleResizeTrace) { $binaryDirectory = Join-Path $binaryDirectory 'lifecycle-resize-trace' }
     foreach ($legacyArtifactName in $legacyArtifactNames) {
         $legacyArtifactPath = Join-Path $binaryDirectory $legacyArtifactName
         if (Test-Path -LiteralPath $legacyArtifactPath -PathType Leaf) {
@@ -55,7 +63,7 @@ foreach ($configurationName in $configurations) {
 
     Write-Host "Building VT7Pty native targets: $configurationName|x64"
     $arguments = @(
-        $solutionPath,
+        $buildPath,
         '/nologo',
         '/m',
         "/t:$Target",
@@ -64,6 +72,7 @@ foreach ($configurationName in $configurations) {
         '/p:PreferredToolArchitecture=x64',
         "/verbosity:$verbosity"
     )
+    if ($LifecycleResizeTrace) { $arguments += '/p:VT7PtyLifecycleResizeTrace=true' }
     if ($StaticAnalysis) {
         $arguments += @(
             '/p:EnablePREfast=true',

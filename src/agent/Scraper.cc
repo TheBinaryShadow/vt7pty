@@ -30,6 +30,7 @@
 #include <utility>
 
 #include "../shared/Assert.h"
+#include "../shared/LifecycleResizeTrace.h"
 #include "../shared/Narrow.h"
 
 #include "ConsoleFont.h"
@@ -100,6 +101,7 @@ void Scraper::resizeWindow(Win32ConsoleBuffer &buffer,
                            Coord newSize,
                            ConsoleScreenBufferInfo &finalInfoOut)
 {
+    VT7PTY_RESIZE_TRACE(SyncResize);
     m_consoleBuffer = &buffer;
     m_ptySize = newSize;
     syncConsoleContentAndSize(true, finalInfoOut);
@@ -243,6 +245,7 @@ void Scraper::resizeImpl(const ConsoleScreenBufferInfo &origInfo)
         // Windows 10 (10240 build) if the console selection is in progress, so
         // unfreeze it first.
         m_console.setFrozen(false);
+        VT7PTY_RESIZE_TRACE(Font);
         setSmallFont(m_consoleBuffer->conout(), cols, m_console.isNewW10());
     }
 

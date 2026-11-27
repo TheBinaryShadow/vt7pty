@@ -12,6 +12,12 @@
     <UseDebugLibraries Condition="'$(Configuration)' == 'Release'">false</UseDebugLibraries>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(VT7PtyLifecycleResizeTrace)' == 'true'">
+    <OutDir>$(OutDir)lifecycle-resize-trace\</OutDir>
+    <IntDir>$(IntDir)lifecycle-resize-trace\</IntDir>
+    <VT7PtyGeneratedDirectory>$(IntDir)generated\</VT7PtyGeneratedDirectory>
+  </PropertyGroup>
+
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(VT7PtyRepositoryRoot)src;$(VT7PtyRepositoryRoot)src\include;$(VT7PtyGeneratedDirectory);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

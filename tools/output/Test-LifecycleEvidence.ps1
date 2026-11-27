@@ -14,6 +14,7 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Directory = [IO.Path]::GetFullPath($Directory).TrimEnd('\')
 $PackageRoot = [IO.Path]::GetFullPath($PackageRoot).TrimEnd('\')
 $package = Read-LifecyclePackage $PackageRoot
+$schedule = @(Get-LifecycleCaseSchedule $package)
 $inventory = Read-VT7Json (Join-Path $Directory 'evidence-files.json')
 $names = @{}
 foreach ($file in $inventory.Files) {
@@ -38,7 +39,7 @@ if ($run.SchemaVersion -ne 1 -or $run.Kind -cne 'VT7PtyLifecycleResults' -or
     -not $run.CharacterizationComplete -or $run.Step15Accepted -or $run.MilestoneAccepted -or
     @($run.PreflightErrors).Count -ne 0 -or $run.Oracle.ExitCode -ne 0 -or $run.Oracle.TimedOut -or
     $run.Oracle.StandardOutput -cne 'VT7Pty VT state oracle tests passed.' -or
-    $run.Runtimes.Count -ne 2 -or $run.Cases.Count -ne 2 * $package.Cases.Count -or
+    $run.Runtimes.Count -ne 2 -or $run.Cases.Count -ne $schedule.Count -or
     $run.Regressions.Count -ne 2 * $package.Regressions.Count) {
     throw 'Incomplete lifecycle results or wrong package identity.'
 }
@@ -50,9 +51,27 @@ if ($run.Tier -ceq 'Legacy' -and ($run.PowerShellVersion -cne '2.0' -or $run.CLR
     @($run.Updates | Where-Object { $_.Id -ceq 'KB3191566' }).Count)) { throw 'Wrong legacy engine or update state.' }
 
 if ($package.SchemaVersion -ge 2) {
-    $expectedOrder = @(Get-LifecycleCaseSchedule $package | ForEach-Object { $_.Runtime + '/' + $_.Spec.Name })
+    $expectedOrder = @($schedule | ForEach-Object { $_.Runtime + '/' + $_.Spec.Name })
     $observedOrder = @($run.Cases | ForEach-Object { $_.Runtime + '/' + $_.Name })
     if (($expectedOrder -join ',') -cne ($observedOrder -join ',')) { throw 'Wrong lifecycle runtime order.' }
+}
+if ($package.SchemaVersion -ge 4) {
+    foreach ($field in @('SchemaVersion','SourceCommit','ParentCommit','AgentSha256','Capacity')) {
+        if ($run.ResizeTrace[$field] -cne $package.ResizeTrace[$field]) { throw 'Diagnostic resize provenance differs.' }
+    }
+}
+
+foreach ($item in $schedule) {
+    $role = $item.Runtime
+    $spec = $item.Spec
+    $relative = $role + '/' + $spec.Name
+    $cases = @($run.Cases | Where-Object { $_.Runtime -ceq $role -and $_.Name -ceq $spec.Name })
+    if ($cases.Count -ne 1 -or $cases[0].Directory -cne $relative -or $cases[0].Area -cne $spec.Area -or
+        $cases[0].Status -cne 'Observed' -or $cases[0].Controller.TimedOut) {
+        throw ('Invalid lifecycle case inventory: ' + $relative)
+    }
+    $record = Read-LifecycleCase (Join-Path $Directory $relative) $spec $cases[0].Controller.ExitCode $package $role
+    if ($cases[0].Outcome -cne (Get-LifecycleOutcome $record)) { throw ('Lifecycle outcome differs: ' + $relative) }
 }
 
 foreach ($role in @('baseline','accepted')) {
@@ -60,16 +79,6 @@ foreach ($role in @('baseline','accepted')) {
     $expected = $package.Runtimes[$role]
     if ($actual.SourceCommit -cne $expected.SourceCommit -or $actual.ManifestSha256 -cne $expected.ManifestSha256 -or
         $actual.ArchiveSha256 -cne $expected.ArchiveSha256) { throw ('Runtime provenance differs: ' + $role) }
-    foreach ($spec in $package.Cases) {
-        $relative = $role + '/' + $spec.Name
-        $cases = @($run.Cases | Where-Object { $_.Runtime -ceq $role -and $_.Name -ceq $spec.Name })
-        if ($cases.Count -ne 1 -or $cases[0].Directory -cne $relative -or $cases[0].Area -cne $spec.Area -or
-            $cases[0].Status -cne 'Observed' -or $cases[0].Controller.TimedOut) {
-            throw ('Invalid lifecycle case inventory: ' + $relative)
-        }
-        $record = Read-LifecycleCase (Join-Path $Directory $relative) $spec $cases[0].Controller.ExitCode $package $role
-        if ($cases[0].Outcome -cne (Get-LifecycleOutcome $record)) { throw ('Lifecycle outcome differs: ' + $relative) }
-    }
     foreach ($name in $package.Regressions) {
         $checks = @($run.Regressions | Where-Object { $_.Runtime -ceq $role -and $_.Name -ceq $name })
         if ($checks.Count -ne 1 -or $checks[0].Error -or -not (Test-LifecycleRegression $checks[0])) {

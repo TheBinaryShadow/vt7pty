@@ -29,6 +29,7 @@
 #include <string>
 
 #include "../shared/DebugClient.h"
+#include "../shared/LifecycleResizeTrace.h"
 #include "../shared/Narrow.h"
 #include "../shared/Assert.h"
 
@@ -87,6 +88,7 @@ void Win32Console::setFrozen(bool frozen) {
     if (frozen == m_frozen) {
         // Do nothing.
     } else if (frozen) {
+        VT7PTY_RESIZE_TRACE(Freeze);
 #ifdef VT7PTY_H3_FREEZE
         h3freeze::record(h3freeze::FreezeBegin,m_frozen);
 #endif
@@ -100,6 +102,7 @@ void Win32Console::setFrozen(bool frozen) {
 #endif
     } else {
         // Send Escape to cancel the selection.
+        VT7PTY_RESIZE_TRACE(Unfreeze);
 #ifdef VT7PTY_H3_FREEZE
         h3freeze::record(h3freeze::UnfreezeBegin,m_frozen);
 #endif

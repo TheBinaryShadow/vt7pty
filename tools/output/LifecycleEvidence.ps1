@@ -16,6 +16,9 @@ function Get-LifecycleCaseSchedule($Manifest) {
             $acceptedFirst = -not $acceptedFirst
         }
         foreach ($role in $order) { @{Runtime=$role; Spec=$spec} }
+        if ($Manifest.SchemaVersion -ge 4 -and $spec.Area -ceq 'F09') {
+            @{Runtime='diagnostic'; Spec=$spec}
+        }
     }
 }
 
@@ -23,7 +26,7 @@ function Read-LifecyclePackage([string]$Root) {
     $manifest = Read-VT7Json (Join-Path $Root 'manifest.json')
     $extended = $manifest.SchemaVersion -ge 2
     $idle = if ($extended) { 15000 } else { 1000 }
-    if ($manifest.Kind -cne 'VT7PtyLifecycleCharacterization' -or @(1,2,3) -notcontains $manifest.SchemaVersion -or
+    if ($manifest.Kind -cne 'VT7PtyLifecycleCharacterization' -or @(1,2,3,4) -notcontains $manifest.SchemaVersion -or
         $manifest.Step15Accepted -or $manifest.OutputRows -ne 200 -or $manifest.Samples -ne 16 -or
         $manifest.IdleMilliseconds -ne $idle -or $manifest.ShutdownMilliseconds -ne 10000 -or
         ($extended -and ($manifest.ActiveMilliseconds -ne 20000 -or $manifest.ActiveStepMilliseconds -ne 25)) -or
@@ -50,6 +53,21 @@ function Read-LifecyclePackage([string]$Root) {
         if (-not $files['baseline/bin/' + $name] -or
             $files['baseline/bin/' + $name] -cne $files['accepted/bin/' + $name]) {
             throw ('Lifecycle regression builds differ: ' + $name)
+        }
+    }
+    if ($manifest.SchemaVersion -ge 4) {
+        $trace = $manifest.ResizeTrace
+        $agent = $files['diagnostic/bin/VT7Pty-Agent.exe']
+        if ($trace.SchemaVersion -ne 1 -or $trace.SourceCommit -cne $manifest.Harness.SourceCommit -or
+            $trace.ParentCommit -cne $manifest.Runtimes.accepted.SourceCommit -or $trace.Capacity -ne 4096 -or
+            -not $agent -or $agent -cne $trace.AgentSha256 -or $agent -ceq $files['accepted/bin/VT7Pty-Agent.exe']) {
+            throw 'Wrong diagnostic resize agent identity.'
+        }
+        foreach ($name in @('VT7Pty.dll','VT7Pty-Host.dll','VT7Pty-DebugServer.exe','FidelityTest.exe','FidelityFixture.exe')) {
+            if (-not $files['accepted/bin/' + $name] -or
+                $files['accepted/bin/' + $name] -cne $files['diagnostic/bin/' + $name]) {
+                throw ('Diagnostic copy differs from the accepted runtime or harness: ' + $name)
+            }
         }
     }
     return $manifest
@@ -156,6 +174,64 @@ function Confirm-LifecycleMeasurements([string]$Directory, $Record, $Manifest, [
     }
 }
 
+function Test-LifecycleQpc($Value) {
+    return ($Value -is [int] -or $Value -is [long]) -and $Value -gt 0
+}
+
+function Confirm-LifecycleResizeTrace([string]$Path, $Record, $Manifest) {
+    $trace = Read-VT7Json $Path
+    if ($trace.SchemaVersion -ne $Manifest.ResizeTrace.SchemaVersion -or $trace.Dropped -ne 0 -or
+        -not (Test-LifecycleQpc $trace.Frequency) -or -not (Test-LifecycleQpc $trace.BeginQpc) -or
+        -not (Test-LifecycleQpc $trace.EndQpc) -or $trace.EndQpc -lt $trace.BeginQpc -or
+        $trace.AgentPid -le 0 -or $trace.AgentPid -ne $trace.ExpectedAgentPid -or
+        $trace.Calls.Count -ne $Manifest.Samples -or $trace.Spans.Count -gt $Manifest.ResizeTrace.Capacity) {
+        throw 'Incomplete diagnostic resize trace.'
+    }
+    $resizePhases = @('OpenBuffer','SyncResize','Font','BufferSize','WindowRect','SizeEvent')
+    $phases = @('Dispatch','Resize','Reply','PollTimeout','Input','Scrape','Freeze','Unfreeze') + $resizePhases
+    $lastEnd = $trace.BeginQpc - 1
+    foreach ($span in $trace.Spans) {
+        if ($phases -cnotcontains $span.Phase -or -not (Test-LifecycleQpc $span.BeginQpc) -or
+            -not (Test-LifecycleQpc $span.EndQpc) -or $span.BeginQpc -lt $trace.BeginQpc - 1 -or
+            $span.EndQpc -lt $span.BeginQpc -or $span.EndQpc -lt $lastEnd) {
+            throw 'Invalid resize agent span.'
+        }
+        $lastEnd = $span.EndQpc
+    }
+    $dispatches = @($trace.Spans | Where-Object { $_.Phase -ceq 'Dispatch' })
+    $resizes = @($trace.Spans | Where-Object { $_.Phase -ceq 'Resize' })
+    $replies = @($trace.Spans | Where-Object { $_.Phase -ceq 'Reply' })
+    if ($dispatches.Count -ne $Manifest.Samples -or $resizes.Count -ne $dispatches.Count -or
+        $replies.Count -ne $dispatches.Count) { throw 'Resize trace did not capture each RPC dispatch and reply.' }
+
+    $lastEnd = $trace.BeginQpc
+    for ($i = 0; $i -lt $Manifest.Samples; $i++) {
+        $call = $trace.Calls[$i]
+        $dispatch = $dispatches[$i]
+        $resize = $resizes[$i]
+        $reply = $replies[$i]
+        $columns = if ($i % 2 -eq 0) { 100 } else { 80 }
+        $rows = if ($i % 2 -eq 0) { 30 } else { 25 }
+        if ($call.Ordinal -ne $i + 1 -or $call.Columns -ne $columns -or $call.Rows -ne $rows -or
+            -not (Test-LifecycleQpc $call.BeginQpc) -or -not (Test-LifecycleQpc $call.EndQpc) -or
+            $call.BeginQpc -lt $lastEnd -or $call.EndQpc -lt $call.BeginQpc -or $call.EndQpc -gt $trace.EndQpc -or
+            $dispatch.Columns -ne $columns -or $dispatch.Rows -ne $rows -or
+            $resize.Columns -ne $columns -or $resize.Rows -ne $rows -or
+            $dispatch.BeginQpc -lt $call.BeginQpc - 1 -or $resize.BeginQpc -lt $dispatch.BeginQpc -or
+            $reply.BeginQpc -lt $resize.EndQpc -or $reply.BeginQpc -gt $call.EndQpc + 1 -or
+            $dispatch.EndQpc -lt $reply.EndQpc) { throw ('Resize trace RPC timeline disagrees at call ' + ($i + 1)) }
+        $rpcUs = [decimal]::Floor([decimal]($call.EndQpc - $call.BeginQpc) * 1000000 / [decimal]$trace.Frequency)
+        if ($rpcUs -ne $Record.Measurements[$i].ResizeRpcUs) { throw 'Resize trace duration disagrees with the RPC sample.' }
+        $phasesSeen = @($trace.Spans | Where-Object {
+            $_.BeginQpc -ge $resize.BeginQpc -and $_.EndQpc -le $resize.EndQpc
+        } | ForEach-Object { $_.Phase })
+        foreach ($phase in $resizePhases) {
+            if ($phasesSeen -cnotcontains $phase) { throw ('Missing timed resize phase: ' + $phase) }
+        }
+        $lastEnd = $call.EndQpc
+    }
+}
+
 function Read-LifecycleCase([string]$Directory, $Spec, [int]$ExitCode, $Manifest, [string]$Role) {
     $record = Read-VT7Json (Join-Path $Directory 'case.json')
     $path = Join-Path $Directory 'stream.bin'
@@ -205,6 +281,10 @@ function Read-LifecycleCase([string]$Directory, $Spec, [int]$ExitCode, $Manifest
             Confirm-LifecycleMeasurements $Directory $record $Manifest $bytes
             if (-not $record.FinalMarkerMatched -or -not $ascii.Contains('FINAL_DRAIN')) { throw 'Measurement final marker missing.' }
         } else { throw 'Missing delayed-reader evidence.' }
+    }
+    if ($Role -ceq 'diagnostic') {
+        if ($ExitCode -ne 0) { throw ('Diagnostic resize workload failed: ' + $record.Error) }
+        Confirm-LifecycleResizeTrace (Join-Path $Directory 'resize-trace.json') $record $Manifest
     }
     return $record
 }

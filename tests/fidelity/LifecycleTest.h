@@ -217,7 +217,8 @@ struct LifecycleStep {
     int64_t barrierUs;
 };
 
-LifecycleStep measureLifecycleStep(Session &session,LifecycleFixture &fixture,int ordinal) {
+LifecycleStep measureLifecycleStep(Session &session,LifecycleFixture &fixture,int ordinal,
+                                   LifecycleResizeCapture *trace = nullptr) {
     const int index = (ordinal - 1) % lifecycleSamples;
     if (ordinal > 1 && index == 0 && fixture.snapshot('C').keyCount != 0)
         throw Mismatch("lifecycle fixture did not clear recorded keys");
@@ -230,8 +231,11 @@ LifecycleStep measureLifecycleStep(Session &session,LifecycleFixture &fixture,in
     const int columns = index % 2 == 0 ? 100 : 80;
     const int rows = index % 2 == 0 ? 30 : 25;
     const auto resizeStart = LifecycleClock::now();
+    const auto traceStart = trace ? lifecycle_resize_trace::timestamp() : 0;
     session.resizeBackend(columns,rows);
-    const auto resizeRpcUs = lifecycleElapsed(resizeStart);
+    const auto resizeRpcUs = trace
+        ? trace->record(ordinal, columns, rows, traceStart, lifecycle_resize_trace::timestamp())
+        : lifecycleElapsed(resizeStart);
     const auto readerStart = LifecycleClock::now();
     session.state.resize(columns,rows);
     const auto readerResizeUs = lifecycleElapsed(readerStart);
@@ -250,7 +254,8 @@ LifecycleStep measureLifecycleStep(Session &session,LifecycleFixture &fixture,in
     return {packet,inputUs,resizeRpcUs,readerResizeUs,barrierUs};
 }
 
-void lifecycleMeasure(const std::wstring &resultDirectory,Session &session,Observations &observations) {
+void lifecycleMeasure(const std::wstring &resultDirectory,Session &session,Observations &observations,
+                      LifecycleResizeCapture *trace) {
     LifecycleFixture fixture(session,L"LIFECYCLE_MEASURE",L"measure");
     if (!session.until([&] { return session.state.contains(U"STATE_READY"); }))
         throw Mismatch("lifecycle measurement fixture did not become ready");
@@ -261,10 +266,11 @@ void lifecycleMeasure(const std::wstring &resultDirectory,Session &session,Obser
         throw Mismatch("idle resource window did not complete");
     const auto idleUs = lifecycleElapsed(idleStart);
     const auto idleAfter = lifecycleResources(session);
+    if (trace) trace->start();
     const auto timingStart = LifecycleClock::now();
     std::string samples;
     for (int ordinal=1;ordinal<=lifecycleSamples;++ordinal) {
-        const auto step = measureLifecycleStep(session,fixture,ordinal);
+        const auto step = measureLifecycleStep(session,fixture,ordinal,trace);
         writeFile(resultDirectory + L"\\console-" + std::to_wstring(ordinal) + L".bin",
             std::string_view(reinterpret_cast<const char *>(&step.snapshot),sizeof(Packet)));
         if (!samples.empty()) samples += ',';
@@ -275,6 +281,7 @@ void lifecycleMeasure(const std::wstring &resultDirectory,Session &session,Obser
             ",\"CapturedBytes\":" + std::to_string(session.raw.size()) + '}';
     }
     const auto timingUs = lifecycleElapsed(timingStart);
+    if (trace) trace->stop();
     const auto activeBefore = lifecycleResources(session);
     const auto activeStart = LifecycleClock::now();
     const Packet *lastActiveSnapshot = nullptr;
@@ -307,9 +314,17 @@ void lifecycleMeasure(const std::wstring &resultDirectory,Session &session,Obser
     if (!final) throw Mismatch("measurement final marker missing");
 }
 
-void lifecycleCase(const LifecycleCase &test,const std::wstring &resultDirectory,Observations &observations) {
+void lifecycleCase(const LifecycleCase &test,const std::wstring &resultDirectory,Observations &observations,
+                   bool traceResize) {
+    std::optional<LifecycleResizeCapture> trace;
+    if (traceResize) {
+        check(test.mode == LifecycleMode::Measure, "resize trace requires a lifecycle measurement");
+        trace.emplace();
+        trace->prepareLaunch();
+    }
     Session session;
     try {
+        if (trace) trace->finishLaunch(session.agent.value);
         switch (test.mode) {
         case LifecycleMode::CmdDrain:
         case LifecycleMode::PowerShellDrain:
@@ -323,17 +338,26 @@ void lifecycleCase(const LifecycleCase &test,const std::wstring &resultDirectory
             lifecycleClose(session,observations);
             break;
         case LifecycleMode::Measure:
-            lifecycleMeasure(resultDirectory,session,observations);
+            lifecycleMeasure(resultDirectory,session,observations,trace ? &*trace : nullptr);
             break;
         }
     } catch (...) {
+        if (trace) trace->stop();
         if (observations.raw.empty()) observations.raw = session.raw;
         const bool cleaned = session.cleanup();
         observations.cleanup = observations.cleanup && cleaned;
+        if (trace) {
+            try {
+                trace->save(resultDirectory,session.agent.value);
+            } catch (const std::exception &error) {
+                fprintf(stderr, "Cannot preserve partial resize trace: %s\n", error.what());
+            }
+        }
         throw;
     }
     if (observations.raw.empty()) observations.raw = session.raw;
     const bool cleaned = session.cleanup();
     observations.cleanup = observations.cleanup && cleaned;
+    if (trace) trace->save(resultDirectory,session.agent.value);
     if (!observations.cleanup) throw Mismatch("owned process exceeded cleanup deadline");
 }

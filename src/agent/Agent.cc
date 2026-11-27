@@ -19,6 +19,7 @@
 // IN THE SOFTWARE.
 
 #include "Agent.h"
+#include "../shared/LifecycleResizeTrace.h"
 #ifdef VT7PTY_H3_FREEZE
 #include "../../tests/fidelity/HostFreezeAgent.h"
 #endif
@@ -466,8 +467,10 @@ void Agent::handleSetSizePacket(ReadBuffer &packet)
     if (cols < 1 || rows < 1) {
         throw ReadBuffer::DecodeError();
     }
+    VT7PTY_RESIZE_TRACE(Dispatch, cols, rows);
     resizeWindow(cols, rows);
     auto reply = newPacket();
+    VT7PTY_RESIZE_TRACE(Reply);
     writePacket(reply);
 }
 
@@ -504,6 +507,7 @@ void Agent::handleGetConsoleProcessListPacket(ReadBuffer &packet)
 
 void Agent::pollConinPipe()
 {
+    VT7PTY_RESIZE_TRACE(Input);
     const std::string newData = m_coninPipe->readAllToString();
     if (hasDebugFlag("input_separated_bytes")) {
         // This debug flag is intended to help with testing incomplete escape
@@ -519,6 +523,7 @@ void Agent::pollConinPipe()
 
 void Agent::onPollTimeout()
 {
+    VT7PTY_RESIZE_TRACE(PollTimeout);
 #ifdef VT7PTY_H3_FREEZE
     if(m_freezeResearch) m_freezeResearch->tick();
 #endif
@@ -591,6 +596,7 @@ void Agent::autoClosePipesForShutdown()
 
 std::unique_ptr<Win32ConsoleBuffer> Agent::openPrimaryBuffer()
 {
+    VT7PTY_RESIZE_TRACE(OpenBuffer);
     // If we're using a separate buffer for stderr, and a program were to
     // activate the stderr buffer, then we could accidentally scrape the same
     // buffer twice.  That probably shouldn't happen in ordinary use, but it
@@ -605,6 +611,7 @@ std::unique_ptr<Win32ConsoleBuffer> Agent::openPrimaryBuffer()
 
 void Agent::resizeWindow(int cols, int rows)
 {
+    VT7PTY_RESIZE_TRACE(Resize, cols, rows);
 #ifdef VT7PTY_H3_FREEZE
     if(m_freezeResearch && m_freezeResearch->deferResize(cols,rows)) return;
     h3freeze::AgentScope traceScope(m_console,h3freeze::ResizeBegin,h3freeze::ResizeEnd,cols,rows);
@@ -638,6 +645,7 @@ void Agent::resizeWindow(int cols, int rows)
     //    *window* height, not the *buffer* height.
     // This synthesization works around a design flaw in the console.  It's probably
     // harmless.  See https://github.com/rprichard/winpty/issues/110.
+    VT7PTY_RESIZE_TRACE(SizeEvent);
     INPUT_RECORD sizeEvent {};
     sizeEvent.EventType = WINDOW_BUFFER_SIZE_EVENT;
     sizeEvent.Event.WindowBufferSizeEvent.dwSize = primaryBuffer->bufferSize();
@@ -647,6 +655,7 @@ void Agent::resizeWindow(int cols, int rows)
 
 void Agent::scrapeBuffers()
 {
+    VT7PTY_RESIZE_TRACE(Scrape);
 #ifdef VT7PTY_H3_FREEZE
     h3freeze::AgentScope traceScope(m_console,h3freeze::ScrapeBegin,h3freeze::ScrapeEnd);
 #endif

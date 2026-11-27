@@ -6,6 +6,9 @@
 #include "ScreenCases.h"
 #include "LifecycleCases.h"
 #include "../../src/include/vt7pty.h"
+#define VT7PTY_LIFECYCLE_TRACE_READER
+#include "../../src/shared/LifecycleResizeTrace.h"
+#undef VT7PTY_LIFECYCLE_TRACE_READER
 #include <psapi.h>
 #include <bit>
 #include <chrono>
@@ -13,6 +16,8 @@
 #include <functional>
 #include <fstream>
 #include <filesystem>
+#include <new>
+#include <optional>
 #include <sstream>
 
 using namespace fidelity;
@@ -1382,6 +1387,7 @@ void shellCase(const std::wstring &name,const std::wstring &directoryPath,const 
     } catch (...) { observations.raw=session.raw; observations.cleanup=session.cleanup(); throw; }
     observations.raw=session.raw; observations.cleanup=session.cleanup();
 }
+#include "LifecycleResizeCapture.h"
 #include "LifecycleTest.h"
 }
 int wmain(int argc,wchar_t **argv) {
@@ -1437,7 +1443,7 @@ int wmain(int argc,wchar_t **argv) {
         const auto *lifecycle = findLifecycleCase(name);
         check(output || screen || lifecycle || name == L"SCREEN_VIEWPORT" || name == L"SCREEN_FIXED_ROWS" ||
             std::find(cases.begin(),cases.end(),name) != cases.end(),"unknown case");
-        if (lifecycle) lifecycleCase(*lifecycle, outputDirectory, observations);
+        if (lifecycle) lifecycleCase(*lifecycle, outputDirectory, observations, program == L"--resize-trace");
         else if (output) outputCase(*output, outputDirectory, observations);
         else if (screen) screenCase(*screen, outputDirectory, observations);
         else if (name.find(L"_CHILD_") != std::wstring::npos) childCase(name,outputDirectory,program,observations);

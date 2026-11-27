@@ -25,6 +25,7 @@
 #include <sstream>
 
 #include "../shared/DebugClient.h"
+#include "../shared/LifecycleResizeTrace.h"
 #include "../shared/Narrow.h"
 #include "../shared/Assert.h"
 
@@ -106,6 +107,7 @@ SmallRect Win32ConsoleBuffer::windowRect() {
 
 bool Win32ConsoleBuffer::resizeBufferRange(const Coord &initialSize,
                                            Coord &finalSize) {
+    VT7PTY_RESIZE_TRACE(BufferSize, initialSize.X, initialSize.Y);
     if (SetConsoleScreenBufferSize(m_conout, initialSize)) {
         finalSize = initialSize;
         return true;
@@ -141,6 +143,7 @@ void Win32ConsoleBuffer::resizeBuffer(const Coord &size) {
 }
 
 void Win32ConsoleBuffer::moveWindow(const SmallRect &rect) {
+    VT7PTY_RESIZE_TRACE(WindowRect, rect.width(), rect.height());
     // TODO: error handling
     if (!SetConsoleWindowInfo(m_conout, TRUE, &rect)) {
         trace("SetConsoleWindowInfo failed");

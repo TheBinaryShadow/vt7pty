@@ -6,6 +6,7 @@ param(
     [ValidateSet('Output','Screen','Lifecycle')][string]$Suite = 'Output',
     [switch]$WithCandidate,
     [string]$AcceptedScreenArchive = '',
+    [switch]$TraceResize,
     [switch]$NoBuild
 )
 
@@ -17,6 +18,7 @@ $root = $PSScriptRoot
 $screen = $Suite -eq 'Screen'
 $lifecycle = $Suite -eq 'Lifecycle'
 if ($WithCandidate -and -not $screen) { throw 'The current build can be added to the Screen suite.' }
+if ($TraceResize -and -not $lifecycle) { throw 'The diagnostic resize trace uses the Lifecycle suite.' }
 if ($screen) {
     . (Join-Path $root 'tools\output\ScreenEvidence.ps1')
     if (-not $PSBoundParameters.ContainsKey('Suffix')) {
@@ -25,6 +27,7 @@ if ($screen) {
 }
 if ($lifecycle) {
     . (Join-Path $root 'tools\output\LifecycleEvidence.ps1')
+    if ($TraceResize -and -not $PSBoundParameters.ContainsKey('Suffix')) { $Suffix = 'rc4' }
 }
 $source = (& git -C $root rev-parse --verify HEAD).Trim()
 if ($LASTEXITCODE -ne 0 -or @(& git -C $root status --porcelain=v1).Count) {
@@ -60,7 +63,10 @@ foreach ($path in @($stage,$zip,($zip + '.sha256'))) {
     if (Test-Path -LiteralPath $path) { throw ('Candidate already exists: ' + $path) }
 }
 
-if (-not $NoBuild) { & (Join-Path $root 'Build-VT7Pty.ps1') -Configuration Release }
+if (-not $NoBuild) {
+    & (Join-Path $root 'Build-VT7Pty.ps1') -Configuration Release
+    if ($TraceResize) { & (Join-Path $root 'Build-VT7Pty.ps1') -Configuration Release -LifecycleResizeTrace }
+}
 & (Join-Path $root 'Verify-VT7Pty.ps1') -Configuration Release -NoBuild
 $bin = Join-Path $root 'artifacts\bin\x64\Release'
 $verificationPath = Join-Path $root 'artifacts\verification\x64\Release\verification.json'
@@ -145,12 +151,26 @@ if ($WithCandidate) {
     }
     $runtimes.candidate = @{Version = $version; SourceCommit = $source; ManifestSha256 = $verificationHash; Binaries = $binaries}
 }
+if ($TraceResize) {
+    $identity = [IO.File]::ReadAllLines((Join-Path $root 'build\obj\VT7Pty-Agent\x64\Release\lifecycle-resize-trace\generated\SourceIdentity.txt'))
+    if ($identity[0] -cne $version -or $identity[1] -cne $source) {
+        throw 'Wrong diagnostic agent build identity.'
+    }
+    $diagnosticBin = Join-Path $stage 'diagnostic\bin'
+    [void][IO.Directory]::CreateDirectory($diagnosticBin)
+    foreach ($name in $acceptedNames) {
+        $origin = if ($name -ceq 'VT7Pty-Agent.exe') { Join-Path $bin ('lifecycle-resize-trace\' + $name) }
+            else { Join-Path $stage ('accepted\bin\' + $name) }
+        Copy-Item -LiteralPath $origin -Destination (Join-Path $diagnosticBin $name)
+    }
+    $roles += 'diagnostic'
+}
 $caseArgument = '--' + $Suite.ToLowerInvariant() + '-cases'
 $casesJson = $null
-$testPrograms = @('FidelityTest.exe','FidelityFixture.exe')
-if ($lifecycle) { $testPrograms += @('SessionContractTest.exe','SessionFixture.exe') }
 foreach ($role in $roles) {
     $runtimeBin = Join-Path $stage ($role + '\bin')
+    $testPrograms = @('FidelityTest.exe','FidelityFixture.exe')
+    if ($lifecycle -and $role -cne 'diagnostic') { $testPrograms += @('SessionContractTest.exe','SessionFixture.exe') }
     foreach ($name in $testPrograms) {
         Copy-Item -LiteralPath (Join-Path $bin $name) -Destination (Join-Path $runtimeBin $name)
     }
@@ -222,6 +242,11 @@ if ($screen) {
     $manifest.ShutdownMilliseconds = $compiled.ShutdownMilliseconds
     $manifest.Cases = @($compiled.Cases | ForEach-Object { @{Name = $_.Name; Area = $_.Area} })
     $manifest.Regressions = @(Get-LifecycleRegressionNames)
+    if ($TraceResize) {
+        $manifest.SchemaVersion = 4
+        $manifest.ResizeTrace = @{SchemaVersion = 1; SourceCommit = $source; ParentCommit = $accepted.SourceCommit
+            AgentSha256 = Get-VT7Sha256 (Join-Path $diagnosticBin 'VT7Pty-Agent.exe'); Capacity = 4096}
+    }
 } else {
     $manifest.SchemaVersion = 2
     $manifest.Kind = 'VT7PtyOutputCharacterization'

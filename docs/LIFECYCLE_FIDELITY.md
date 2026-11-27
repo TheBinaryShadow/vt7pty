@@ -1,8 +1,8 @@
 # Lifecycle and resource tests
 
-I use lifecycle rc3 to measure CPU cycles in the Step 1.5 workload.
-It tests released 0.5.0 and the exact runtime accepted in screen rc3
-with the same fixture and session flags 0.
+I use lifecycle rc4 to trace the slow resize calls seen on NESSY and
+LEOPARD. Released 0.5.0 and the exact screen rc3 runtime are the controls.
+All trials use the same fixture and session flags 0.
 
 ## Run it on Windows 7
 
@@ -18,9 +18,9 @@ sends its own input. Keep the desktop unlocked until collection finishes.
 
 LEOPARD uses installed PowerShell 2.0 without KB3191566. Copy the complete
 new `results\<run-id>` directory to `K:\VT7_work\results`, including any
-failures. I expect 18 case observations and 10 session contract checks.
-The idle and active windows alone take at least 4 minutes 40 seconds
-per machine.
+failures. I expect 22 case observations, 10 session contract checks and
+four files named `resize-trace.json`. The idle and active windows take
+at least seven minutes per machine before the contract checks and setup.
 
 ## What I measure
 
@@ -39,6 +39,16 @@ per machine.
   first. Each trial records 16 input receipts, backend resize RPCs, reader
   resizes and repaint barriers with a monotonic clock. The barrier waits
   for a new marker in the decoded stream after a native snapshot.
+- **Resize trace.** After each control pair I repeat the timing workload
+  with a diagnostic copy of screen rc3. Only its agent is rebuilt with
+  tracing. I record the caller's 16 RPC intervals and the agent's dispatch,
+  resize and reply timing on the same clock. Within the agent I time
+  selection, font, buffer size, window placement and size-event work.
+  I also record input and scrape work that can delay dispatch. Trace
+  records are collected in memory during the timing window and written
+  after the agent exits. I use the controls to check whether a slow tail
+  also occurs without tracing.
+  [Windows performance counter](https://learn.microsoft.com/en-us/windows/win32/sysinfo/acquiring-high-resolution-time-stamps)
 - **Resources.** I measure 15 seconds of idle time and at least 20 seconds
   of repeated input, resize and repaint work per trial. The active window
   starts after the latency measurements. I record caller, agent and
@@ -64,10 +74,11 @@ measurement cases record enclosing-job membership.
 ## Build and review
 
 From a clean, committed checkout, I build and package with
-`Package-OutputFidelity.ps1 -Suite Lifecycle`, using the pinned 0.5.0
+`Package-OutputFidelity.ps1 -Suite Lifecycle -TraceResize`, using the pinned 0.5.0
 runtime and screen rc3 archives. I review the returned run with
 `tools/output/Test-LifecycleEvidence.ps1 -Directory <run-directory> -PackageRoot <extracted-zip>`.
 The reviewer checks the package and evidence hashes, run order, raw drain
 sequence, native measurements and regression receipts. It checks that
-cycle totals stay monotonic for each process. I can also review archived
-rc1 and rc2 results with the same script.
+cycle totals stay monotonic for each process. For rc4 it checks the
+diagnostic agent identity and matches every trace interval to its resize
+sample. I can review archived rc1 through rc3 results with the same script.
