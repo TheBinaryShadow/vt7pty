@@ -19,6 +19,7 @@ still in progress. [Profile rc3 Windows 7 review](2026-11-23-step-1.2-profiles-r
 
 | Work | Candidate and development results | Windows 7 results |
 | --- | --- | --- |
+| Step 1.5 lifecycle rc4 | [64 resize calls traced on WOLF with both runtime controls](2026-11-27-step-1.5-lifecycle-rc4-candidate.md) | Pending on NESSY, TURTLE and LEOPARD |
 | Step 1.5 lifecycle rc3 | [48 process intervals with measurable CPU cycles on WOLF](2026-11-27-step-1.5-lifecycle-rc3-candidate.md) | [All functional checks passed. Cycle capture qualified and resize timing open.](2026-11-27-step-1.5-lifecycle-rc3-windows7.md) |
 | Step 1.5 lifecycle rc2 | [Split timing and extended CPU measurements verified on WOLF](2026-11-25-step-1.5-lifecycle-rc2-candidate.md) | [48 positive cases and 30 session checks passed. CPU budgeting open.](2026-11-26-step-1.5-lifecycle-rc2-windows7.md) |
 | Step 1.5 lifecycle rc1 | [14 positive cases, both controls and 10 session checks verified on WOLF](2026-11-24-step-1.5-lifecycle-rc1-candidate.md) | [42 positive cases and 30 session checks passed. Timing follow-up open.](2026-11-25-step-1.5-lifecycle-rc1-windows7.md) |

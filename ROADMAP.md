@@ -30,7 +30,7 @@ The [foundation](docs/FOUNDATION.md) records the engineering decisions;
 | Milestone | Outcome | Status |
 | --- | --- | --- |
 | 0 | Modern native VT7Pty 0.5.x foundation | Complete; 0.5.0 accepted and published |
-| 1 | Better console fidelity and reliability | In progress. Rc3 cycle capture qualified on Windows 7. Resize timing and budgets remain open |
+| 1 | Better console fidelity and reliability | In progress. Lifecycle rc4 resize diagnostic ready for Windows 7 |
 | 2 | VT7-facing API and standalone integration host | Planned after backend validation |
 | 3 | Versioned handoff ready for VT7 integration | Planned after API and consumer tests |
 | Later | Other consumers and optional ConPTY compatibility | Deferred |
@@ -186,8 +186,10 @@ flags 0 on all three Windows 7 tiers and WOLF.
   [Lifecycle rc3 verification](docs/validation/2026-11-27-step-1.5-lifecycle-rc3-candidate.md)
 - [x] Review the paired rc3 cycle measurements on NESSY, TURTLE and LEOPARD.
   [Lifecycle rc3 Windows 7 review](docs/validation/2026-11-27-step-1.5-lifecycle-rc3-windows7.md)
-- [ ] Trace the slow resize RPCs observed on NESSY and LEOPARD and resolve
-  any timing or resource issues found in F08-F09 qualification.
+- [x] Add resize tracing and verify the exact rc4 package on WOLF.
+  [Lifecycle rc4 diagnostic](docs/validation/2026-11-27-step-1.5-lifecycle-rc4-candidate.md)
+- [ ] Review rc4 timing on NESSY, TURTLE and LEOPARD. Locate the slow calls
+  and resolve timing or resource issues found in F08-F09 qualification.
 - [ ] Before 1.0, qualify Windows 7 job inheritance, permitted and denied
   breakaway, abrupt caller exit and descendant cleanup. Follow the
   [process lifetime plan](docs/PROCESS_LIFETIME.md), prompted by

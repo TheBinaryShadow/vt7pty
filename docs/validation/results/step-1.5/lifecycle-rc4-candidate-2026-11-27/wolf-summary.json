@@ -1,0 +1,907 @@
+{
+  "Archive": "VT7Pty-lifecycle-0.5.1-dev-rc4.zip",
+  "ArchiveSha256": "dfa41f7a61dd45f9c9b415b76526766aaafbc8fe181fbc59a323882d8161ae7a",
+  "ManifestSha256": "142b8cc525bfe594665faf1aa1685328f0d2285fd0aba6bb869c07fe17073b39",
+  "ComputerName": "WOLF",
+  "RunId": "developmenthost-lifecycle-20261127-175324-568bb4c7",
+  "Tier": "DevelopmentHost",
+  "OS": {
+    "ProductType": 1,
+    "Version": "10.0.19044",
+    "Caption": "Microsoft Windows 10 IoT Enterprise LTSC",
+    "ServicePackMajorVersion": 0,
+    "BuildNumber": "19044"
+  },
+  "PowerShellVersion": "2.0",
+  "CLRVersion": "2.0.50727.9188",
+  "StartedUtc": "2026-11-27T17:53:25.1012863Z",
+  "CompletedUtc": "2026-11-27T18:02:10.906257Z",
+  "ReleaseChecks": 37,
+  "OraclePassed": true,
+  "CaseObservations": 22,
+  "PositiveMatches": 20,
+  "MissingMarkerControlsDetected": 2,
+  "SessionContractChecks": 10,
+  "EvidenceFilesVerified": 253,
+  "TracedRpcCount": 64.0,
+  "AgentPhaseSpans": 1280.0,
+  "DroppedSpans": 0.0,
+  "Runtimes": {
+    "accepted": {
+      "Archive": "VT7Pty-screen-0.5.1-dev-rc3.zip",
+      "ManifestSha256": "2912d98c7726390f5bfec45ee6e891f36c1a63cf016f13181ecec3d409f3f3b5",
+      "Version": "0.5.1-dev",
+      "Binaries": {
+        "VT7Pty-Agent.exe": "VT7Pty-Agent.exe",
+        "VT7Pty-Host.dll": "VT7Pty-Host.dll",
+        "VT7Pty.dll": "VT7Pty.dll",
+        "VT7Pty-DebugServer.exe": "VT7Pty-DebugServer.exe"
+      },
+      "SourceCommit": "a92b3fd4026e7d666765de7b10ab698e572eccc7",
+      "ArchiveSha256": "ad51f8815e2103df9664dcef40c3bd5ac7e200528bc59d6c2cf78af306ea0816"
+    },
+    "baseline": {
+      "Archive": "VT7Pty-0.5.0-win7-x64-release-runtime.zip",
+      "ManifestSha256": "db1b7d067987d1f155f91c1e196e577f62fb530e68f179615793b3c136a231b1",
+      "Version": "0.5.0",
+      "Binaries": {
+        "VT7Pty.dll": "bin/VT7Pty.dll",
+        "VT7Pty-Agent.exe": "bin/VT7Pty-Agent.exe"
+      },
+      "SourceCommit": "cbd17727b3c8af21e5afd4499b8dca7d2140ed9d",
+      "ArchiveSha256": "59554a9cf8246395e60f30875e047d1bfa20d4f3f462c113ef705a86708f5304"
+    }
+  },
+  "ResizeTrace": {
+    "Capacity": 4096,
+    "ParentCommit": "a92b3fd4026e7d666765de7b10ab698e572eccc7",
+    "SchemaVersion": 1,
+    "SourceCommit": "39a50fc7b568e44b125cf8e36a3dd96a05284dcd",
+    "AgentSha256": "d0018e18a02251bc26237c6853cbe40e9252fd7f3b8eca5b24cd99e8aa051e0f"
+  },
+  "SessionFlags": 0,
+  "Step15Accepted": false,
+  "MilestoneAccepted": false,
+  "Trials": [
+    {
+      "Case": "LIFECYCLE_MEASURE_1",
+      "Runtime": "baseline",
+      "Samples": 16,
+      "ActiveSteps": 638,
+      "P50ResizeRpcUs": 7288,
+      "MaxResizeRpcUs": 9940.0,
+      "Trace": null
+    },
+    {
+      "Case": "LIFECYCLE_MEASURE_1",
+      "Runtime": "accepted",
+      "Samples": 16,
+      "ActiveSteps": 641,
+      "P50ResizeRpcUs": 6818,
+      "MaxResizeRpcUs": 8711.0,
+      "Trace": null
+    },
+    {
+      "Case": "LIFECYCLE_MEASURE_1",
+      "Runtime": "diagnostic",
+      "Samples": 16,
+      "ActiveSteps": 640,
+      "P50ResizeRpcUs": 7180,
+      "MaxResizeRpcUs": 8246.0,
+      "Trace": {
+        "Frequency": 10000000,
+        "AgentPid": 67312,
+        "Dropped": 0,
+        "Spans": 320,
+        "Calls": [
+          {
+            "Ordinal": 1,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 8246,
+            "BeforeDispatchUs": 23.1,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 8205.5,
+            "AgentBeforeReplyUs": 1.8,
+            "FromReplyStartUs": 15.9
+          },
+          {
+            "Ordinal": 2,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7420,
+            "BeforeDispatchUs": 21.2,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 7380.0,
+            "AgentBeforeReplyUs": 1.6,
+            "FromReplyStartUs": 17.1
+          },
+          {
+            "Ordinal": 3,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 7453,
+            "BeforeDispatchUs": 21.0,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 7415.6,
+            "AgentBeforeReplyUs": 1.6,
+            "FromReplyStartUs": 14.8
+          },
+          {
+            "Ordinal": 4,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7180,
+            "BeforeDispatchUs": 21.3,
+            "AgentBeforeResizeUs": 0.4,
+            "AgentResizeUs": 7142.2,
+            "AgentBeforeReplyUs": 1.6,
+            "FromReplyStartUs": 14.6
+          },
+          {
+            "Ordinal": 5,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 8102,
+            "BeforeDispatchUs": 23.5,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 8053.3,
+            "AgentBeforeReplyUs": 2.9,
+            "FromReplyStartUs": 22.6
+          },
+          {
+            "Ordinal": 6,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7874,
+            "BeforeDispatchUs": 21.3,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 7828.3,
+            "AgentBeforeReplyUs": 3.0,
+            "FromReplyStartUs": 21.5
+          },
+          {
+            "Ordinal": 7,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 7506,
+            "BeforeDispatchUs": 23.6,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 7462.0,
+            "AgentBeforeReplyUs": 2.1,
+            "FromReplyStartUs": 18.9
+          },
+          {
+            "Ordinal": 8,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7328,
+            "BeforeDispatchUs": 24.1,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 7277.2,
+            "AgentBeforeReplyUs": 3.4,
+            "FromReplyStartUs": 24.0
+          },
+          {
+            "Ordinal": 9,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 7038,
+            "BeforeDispatchUs": 20.0,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 7001.3,
+            "AgentBeforeReplyUs": 2.2,
+            "FromReplyStartUs": 15.1
+          },
+          {
+            "Ordinal": 10,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 6706,
+            "BeforeDispatchUs": 19.2,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 6672.0,
+            "AgentBeforeReplyUs": 1.4,
+            "FromReplyStartUs": 13.6
+          },
+          {
+            "Ordinal": 11,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6319,
+            "BeforeDispatchUs": 20.4,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 6285.3,
+            "AgentBeforeReplyUs": 1.3,
+            "FromReplyStartUs": 12.4
+          },
+          {
+            "Ordinal": 12,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 6250,
+            "BeforeDispatchUs": 17.0,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 6219.4,
+            "AgentBeforeReplyUs": 1.3,
+            "FromReplyStartUs": 12.4
+          },
+          {
+            "Ordinal": 13,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6575,
+            "BeforeDispatchUs": 21.6,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 6534.3,
+            "AgentBeforeReplyUs": 1.7,
+            "FromReplyStartUs": 17.7
+          },
+          {
+            "Ordinal": 14,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7074,
+            "BeforeDispatchUs": 22.9,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 7035.9,
+            "AgentBeforeReplyUs": 1.9,
+            "FromReplyStartUs": 14.1
+          },
+          {
+            "Ordinal": 15,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6935,
+            "BeforeDispatchUs": 22.1,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 6895.4,
+            "AgentBeforeReplyUs": 2.1,
+            "FromReplyStartUs": 15.4
+          },
+          {
+            "Ordinal": 16,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7695,
+            "BeforeDispatchUs": 25.9,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 7650.3,
+            "AgentBeforeReplyUs": 2.3,
+            "FromReplyStartUs": 17.4
+          }
+        ]
+      }
+    },
+    {
+      "Case": "LIFECYCLE_MEASURE_2",
+      "Runtime": "accepted",
+      "Samples": 16,
+      "ActiveSteps": 640,
+      "P50ResizeRpcUs": 6581,
+      "MaxResizeRpcUs": 11981.0,
+      "Trace": null
+    },
+    {
+      "Case": "LIFECYCLE_MEASURE_2",
+      "Runtime": "baseline",
+      "Samples": 16,
+      "ActiveSteps": 641,
+      "P50ResizeRpcUs": 8390,
+      "MaxResizeRpcUs": 13738.0,
+      "Trace": null
+    },
+    {
+      "Case": "LIFECYCLE_MEASURE_2",
+      "Runtime": "diagnostic",
+      "Samples": 16,
+      "ActiveSteps": 641,
+      "P50ResizeRpcUs": 7054,
+      "MaxResizeRpcUs": 11642.0,
+      "Trace": {
+        "Frequency": 10000000,
+        "AgentPid": 68672,
+        "Dropped": 0,
+        "Spans": 320,
+        "Calls": [
+          {
+            "Ordinal": 1,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 7994,
+            "BeforeDispatchUs": 21.9,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 7954.8,
+            "AgentBeforeReplyUs": 1.7,
+            "FromReplyStartUs": 15.8
+          },
+          {
+            "Ordinal": 2,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7741,
+            "BeforeDispatchUs": 21.5,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 7699.6,
+            "AgentBeforeReplyUs": 1.3,
+            "FromReplyStartUs": 18.9
+          },
+          {
+            "Ordinal": 3,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6364,
+            "BeforeDispatchUs": 17.9,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 6333.5,
+            "AgentBeforeReplyUs": 1.4,
+            "FromReplyStartUs": 12.0
+          },
+          {
+            "Ordinal": 4,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 6403,
+            "BeforeDispatchUs": 17.8,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 6371.2,
+            "AgentBeforeReplyUs": 1.1,
+            "FromReplyStartUs": 13.3
+          },
+          {
+            "Ordinal": 5,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6455,
+            "BeforeDispatchUs": 17.6,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 6425.5,
+            "AgentBeforeReplyUs": 1.6,
+            "FromReplyStartUs": 10.6
+          },
+          {
+            "Ordinal": 6,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7562,
+            "BeforeDispatchUs": 20.8,
+            "AgentBeforeResizeUs": 0.3,
+            "AgentResizeUs": 7518.6,
+            "AgentBeforeReplyUs": 2.5,
+            "FromReplyStartUs": 20.5
+          },
+          {
+            "Ordinal": 7,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6842,
+            "BeforeDispatchUs": 20.5,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 6806.1,
+            "AgentBeforeReplyUs": 1.5,
+            "FromReplyStartUs": 14.7
+          },
+          {
+            "Ordinal": 8,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 6691,
+            "BeforeDispatchUs": 22.2,
+            "AgentBeforeResizeUs": 0.2,
+            "AgentResizeUs": 6655.1,
+            "AgentBeforeReplyUs": 1.3,
+            "FromReplyStartUs": 13.0
+          },
+          {
+            "Ordinal": 9,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6290,
+            "BeforeDispatchUs": 19.3,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 6245.1,
+            "AgentBeforeReplyUs": 2.4,
+            "FromReplyStartUs": 23.4
+          },
+          {
+            "Ordinal": 10,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7054,
+            "BeforeDispatchUs": 19.0,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 7019.4,
+            "AgentBeforeReplyUs": 1.7,
+            "FromReplyStartUs": 14.7
+          },
+          {
+            "Ordinal": 11,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6597,
+            "BeforeDispatchUs": 19.4,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 6564.0,
+            "AgentBeforeReplyUs": 1.8,
+            "FromReplyStartUs": 12.5
+          },
+          {
+            "Ordinal": 12,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 11642,
+            "BeforeDispatchUs": 25.1,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 11586.5,
+            "AgentBeforeReplyUs": 2.8,
+            "FromReplyStartUs": 28.1
+          },
+          {
+            "Ordinal": 13,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 8707,
+            "BeforeDispatchUs": 22.3,
+            "AgentBeforeResizeUs": 0.4,
+            "AgentResizeUs": 8660.4,
+            "AgentBeforeReplyUs": 2.4,
+            "FromReplyStartUs": 21.5
+          },
+          {
+            "Ordinal": 14,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 9857,
+            "BeforeDispatchUs": 26.1,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 9800.0,
+            "AgentBeforeReplyUs": 3.7,
+            "FromReplyStartUs": 27.7
+          },
+          {
+            "Ordinal": 15,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 8982,
+            "BeforeDispatchUs": 28.8,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 8932.3,
+            "AgentBeforeReplyUs": 1.9,
+            "FromReplyStartUs": 19.5
+          },
+          {
+            "Ordinal": 16,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 8449,
+            "BeforeDispatchUs": 24.9,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 8397.3,
+            "AgentBeforeReplyUs": 3.2,
+            "FromReplyStartUs": 24.3
+          }
+        ]
+      }
+    },
+    {
+      "Case": "LIFECYCLE_MEASURE_3",
+      "Runtime": "baseline",
+      "Samples": 16,
+      "ActiveSteps": 640,
+      "P50ResizeRpcUs": 7173,
+      "MaxResizeRpcUs": 8372.0,
+      "Trace": null
+    },
+    {
+      "Case": "LIFECYCLE_MEASURE_3",
+      "Runtime": "accepted",
+      "Samples": 16,
+      "ActiveSteps": 641,
+      "P50ResizeRpcUs": 6975,
+      "MaxResizeRpcUs": 8648.0,
+      "Trace": null
+    },
+    {
+      "Case": "LIFECYCLE_MEASURE_3",
+      "Runtime": "diagnostic",
+      "Samples": 16,
+      "ActiveSteps": 641,
+      "P50ResizeRpcUs": 7090,
+      "MaxResizeRpcUs": 9687.0,
+      "Trace": {
+        "Frequency": 10000000,
+        "AgentPid": 29716,
+        "Dropped": 0,
+        "Spans": 320,
+        "Calls": [
+          {
+            "Ordinal": 1,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 8016,
+            "BeforeDispatchUs": 23.0,
+            "AgentBeforeResizeUs": 0.3,
+            "AgentResizeUs": 7973.6,
+            "AgentBeforeReplyUs": 1.6,
+            "FromReplyStartUs": 17.8
+          },
+          {
+            "Ordinal": 2,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7114,
+            "BeforeDispatchUs": 21.0,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 7077.9,
+            "AgentBeforeReplyUs": 1.6,
+            "FromReplyStartUs": 13.7
+          },
+          {
+            "Ordinal": 3,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 5999,
+            "BeforeDispatchUs": 19.2,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 5965.7,
+            "AgentBeforeReplyUs": 1.3,
+            "FromReplyStartUs": 13.2
+          },
+          {
+            "Ordinal": 4,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 6633,
+            "BeforeDispatchUs": 21.4,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 6598.2,
+            "AgentBeforeReplyUs": 1.2,
+            "FromReplyStartUs": 13.0
+          },
+          {
+            "Ordinal": 5,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 5991,
+            "BeforeDispatchUs": 19.3,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 5958.5,
+            "AgentBeforeReplyUs": 1.4,
+            "FromReplyStartUs": 12.6
+          },
+          {
+            "Ordinal": 6,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 8317,
+            "BeforeDispatchUs": 25.9,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 8265.9,
+            "AgentBeforeReplyUs": 2.1,
+            "FromReplyStartUs": 23.2
+          },
+          {
+            "Ordinal": 7,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 7145,
+            "BeforeDispatchUs": 21.6,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 7107.7,
+            "AgentBeforeReplyUs": 1.7,
+            "FromReplyStartUs": 14.0
+          },
+          {
+            "Ordinal": 8,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7090,
+            "BeforeDispatchUs": 21.9,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 7050.9,
+            "AgentBeforeReplyUs": 2.0,
+            "FromReplyStartUs": 15.6
+          },
+          {
+            "Ordinal": 9,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 7408,
+            "BeforeDispatchUs": 23.2,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 7364.6,
+            "AgentBeforeReplyUs": 2.3,
+            "FromReplyStartUs": 18.3
+          },
+          {
+            "Ordinal": 10,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7838,
+            "BeforeDispatchUs": 28.1,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 7781.5,
+            "AgentBeforeReplyUs": 2.8,
+            "FromReplyStartUs": 26.0
+          },
+          {
+            "Ordinal": 11,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 7680,
+            "BeforeDispatchUs": 27.1,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 7634.2,
+            "AgentBeforeReplyUs": 2.0,
+            "FromReplyStartUs": 17.5
+          },
+          {
+            "Ordinal": 12,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 6654,
+            "BeforeDispatchUs": 20.5,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 6617.9,
+            "AgentBeforeReplyUs": 2.0,
+            "FromReplyStartUs": 13.9
+          },
+          {
+            "Ordinal": 13,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 9687,
+            "BeforeDispatchUs": 20.4,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 9641.2,
+            "AgentBeforeReplyUs": 2.8,
+            "FromReplyStartUs": 23.4
+          },
+          {
+            "Ordinal": 14,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 6908,
+            "BeforeDispatchUs": 21.9,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 6870.9,
+            "AgentBeforeReplyUs": 1.2,
+            "FromReplyStartUs": 14.4
+          },
+          {
+            "Ordinal": 15,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6763,
+            "BeforeDispatchUs": 21.6,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 6725.5,
+            "AgentBeforeReplyUs": 1.3,
+            "FromReplyStartUs": 15.3
+          },
+          {
+            "Ordinal": 16,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 6718,
+            "BeforeDispatchUs": 19.3,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 6684.3,
+            "AgentBeforeReplyUs": 1.5,
+            "FromReplyStartUs": 13.6
+          }
+        ]
+      }
+    },
+    {
+      "Case": "LIFECYCLE_MEASURE_4",
+      "Runtime": "accepted",
+      "Samples": 16,
+      "ActiveSteps": 640,
+      "P50ResizeRpcUs": 7057,
+      "MaxResizeRpcUs": 8211.0,
+      "Trace": null
+    },
+    {
+      "Case": "LIFECYCLE_MEASURE_4",
+      "Runtime": "baseline",
+      "Samples": 16,
+      "ActiveSteps": 639,
+      "P50ResizeRpcUs": 9823,
+      "MaxResizeRpcUs": 11658.0,
+      "Trace": null
+    },
+    {
+      "Case": "LIFECYCLE_MEASURE_4",
+      "Runtime": "diagnostic",
+      "Samples": 16,
+      "ActiveSteps": 641,
+      "P50ResizeRpcUs": 7323,
+      "MaxResizeRpcUs": 8674.0,
+      "Trace": {
+        "Frequency": 10000000,
+        "AgentPid": 70800,
+        "Dropped": 0,
+        "Spans": 320,
+        "Calls": [
+          {
+            "Ordinal": 1,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 7900,
+            "BeforeDispatchUs": 24.6,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 7856.5,
+            "AgentBeforeReplyUs": 2.4,
+            "FromReplyStartUs": 16.8
+          },
+          {
+            "Ordinal": 2,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 8055,
+            "BeforeDispatchUs": 20.7,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 8011.9,
+            "AgentBeforeReplyUs": 2.5,
+            "FromReplyStartUs": 20.5
+          },
+          {
+            "Ordinal": 3,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 8337,
+            "BeforeDispatchUs": 28.0,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 8279.0,
+            "AgentBeforeReplyUs": 3.3,
+            "FromReplyStartUs": 26.7
+          },
+          {
+            "Ordinal": 4,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7729,
+            "BeforeDispatchUs": 25.3,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 7682.0,
+            "AgentBeforeReplyUs": 2.8,
+            "FromReplyStartUs": 19.6
+          },
+          {
+            "Ordinal": 5,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 7677,
+            "BeforeDispatchUs": 22.2,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 7633.8,
+            "AgentBeforeReplyUs": 2.3,
+            "FromReplyStartUs": 19.5
+          },
+          {
+            "Ordinal": 6,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7323,
+            "BeforeDispatchUs": 21.5,
+            "AgentBeforeResizeUs": 0.2,
+            "AgentResizeUs": 7283.7,
+            "AgentBeforeReplyUs": 1.7,
+            "FromReplyStartUs": 16.0
+          },
+          {
+            "Ordinal": 7,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6578,
+            "BeforeDispatchUs": 20.3,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 6542.7,
+            "AgentBeforeReplyUs": 1.1,
+            "FromReplyStartUs": 14.1
+          },
+          {
+            "Ordinal": 8,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 6528,
+            "BeforeDispatchUs": 20.6,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 6492.4,
+            "AgentBeforeReplyUs": 1.5,
+            "FromReplyStartUs": 14.1
+          },
+          {
+            "Ordinal": 9,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6159,
+            "BeforeDispatchUs": 18.9,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 6127.9,
+            "AgentBeforeReplyUs": 1.0,
+            "FromReplyStartUs": 12.0
+          },
+          {
+            "Ordinal": 10,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 6187,
+            "BeforeDispatchUs": 17.6,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 6155.7,
+            "AgentBeforeReplyUs": 1.6,
+            "FromReplyStartUs": 12.4
+          },
+          {
+            "Ordinal": 11,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6379,
+            "BeforeDispatchUs": 17.8,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 6348.8,
+            "AgentBeforeReplyUs": 1.0,
+            "FromReplyStartUs": 12.3
+          },
+          {
+            "Ordinal": 12,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 8330,
+            "BeforeDispatchUs": 21.4,
+            "AgentBeforeResizeUs": 0.2,
+            "AgentResizeUs": 8286.4,
+            "AgentBeforeReplyUs": 3.1,
+            "FromReplyStartUs": 19.3
+          },
+          {
+            "Ordinal": 13,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 8005,
+            "BeforeDispatchUs": 34.7,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 7942.9,
+            "AgentBeforeReplyUs": 2.6,
+            "FromReplyStartUs": 25.1
+          },
+          {
+            "Ordinal": 14,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 8674,
+            "BeforeDispatchUs": 22.5,
+            "AgentBeforeResizeUs": 0.0,
+            "AgentResizeUs": 8628.9,
+            "AgentBeforeReplyUs": 2.3,
+            "FromReplyStartUs": 21.2
+          },
+          {
+            "Ordinal": 15,
+            "Columns": 100,
+            "Rows": 30,
+            "RpcUs": 6875,
+            "BeforeDispatchUs": 20.5,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 6838.3,
+            "AgentBeforeReplyUs": 1.8,
+            "FromReplyStartUs": 14.3
+          },
+          {
+            "Ordinal": 16,
+            "Columns": 80,
+            "Rows": 25,
+            "RpcUs": 7158,
+            "BeforeDispatchUs": 21.2,
+            "AgentBeforeResizeUs": 0.1,
+            "AgentResizeUs": 7119.9,
+            "AgentBeforeReplyUs": 1.9,
+            "FromReplyStartUs": 15.6
+          }
+        ]
+      }
+    }
+  ]
+}
