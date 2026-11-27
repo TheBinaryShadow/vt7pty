@@ -58,7 +58,8 @@ separate measurement. Shutdown has a 10-second limit. The close and
 measurement cases record enclosing-job membership.
 [Process lifetime plan](PROCESS_LIFETIME.md) ·
 [Rc1 Windows 7 measurements](validation/2026-11-25-step-1.5-lifecycle-rc1-windows7.md#timing-and-resources) ·
-[Rc2 Windows 7 measurements](validation/2026-11-26-step-1.5-lifecycle-rc2-windows7.md#resize-timing)
+[Rc2 Windows 7 measurements](validation/2026-11-26-step-1.5-lifecycle-rc2-windows7.md#resize-timing) ·
+[Rc3 Windows 7 measurements](validation/2026-11-27-step-1.5-lifecycle-rc3-windows7.md#cycle-measurements)
 
 ## Build and review
 

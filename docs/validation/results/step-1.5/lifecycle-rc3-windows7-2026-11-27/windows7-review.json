@@ -1,0 +1,2839 @@
+{
+  "SchemaVersion": 1,
+  "Kind": "VT7PtyLifecycleRc3Windows7Review",
+  "Archive": "VT7Pty-lifecycle-0.5.1-dev-rc3.zip",
+  "ArchiveSha256": "a27836fb46e7f4923a8834ee2e983d71cb1a0a505e6d22d4499c3d3affaf9bc3",
+  "ManifestSha256": "c688bda1bde5d7b5146a62310d12335463726c67206b99837c006c3c1041fe49",
+  "Harness": {
+    "SourceTreeClean": true,
+    "VerificationSha256": "572e2084369f15a12cd29104e1ba1ab156e4331c356e5010ad28ff5280804ad9",
+    "Configuration": "Release",
+    "SourceCommit": "438297da97fb8320345f01d4101c2294186df7bc",
+    "SnapshotBytes": 21396,
+    "Architecture": "x64"
+  },
+  "TotalEvidenceFilesVerified": 519,
+  "CaseObservations": 54,
+  "PositiveMatches": 48,
+  "MissingMarkerControlsDetected": 6,
+  "SessionContractChecksPassed": 30,
+  "Trials": 24,
+  "LatencySamplesPerMetric": 384,
+  "IdleIntervals": 72,
+  "ActiveIntervals": 72,
+  "IdleIntervalsWithCycleActivity": 72,
+  "ActiveIntervalsWithCycleActivity": 72,
+  "IdleIntervalsWithCpuTime": 1,
+  "ActiveIntervalsWithCpuTime": 16,
+  "CycleDeltasWhenCpuTimeUnchanged": 127,
+  "ActiveOperations": 7998,
+  "WolfRunId": "developmenthost-lifecycle-20261126-232909-9a2e0a2b",
+  "MeasuredF08CasesPassed": true,
+  "Step15Accepted": false,
+  "MilestoneAccepted": false,
+  "Runs": [
+    {
+      "Machine": "NESSY",
+      "Tier": "NonESU",
+      "RunId": "nonesu-lifecycle-20261127-084232-7e85934c",
+      "OS": {
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "BuildNumber": "7601",
+        "Version": "6.1.7601",
+        "ProductType": 1,
+        "ServicePackMajorVersion": 1
+      },
+      "PowerShellVersion": "5.1.14409.1018",
+      "CLRVersion": "4.0.30319.42000",
+      "KB3191566Listed": true,
+      "UpdateIdsMatchRc2": true,
+      "StartedUtc": "2026-11-27T08:42:42.197728Z",
+      "CompletedUtc": "2026-11-27T08:49:23.3680327Z",
+      "SessionFlags": 0,
+      "EvidenceFilesVerified": 173,
+      "ReportSha256": "723b880e7164d9d7cbb8d2b5d4765a0bc1216bd74b7c291a1962ae7db5d489ed",
+      "EvidenceInventorySha256": "c5784abad0b044230ed73699cd2654cdbe5981ef819cd2e62365492a8ad9b1c1",
+      "TrialOrder": [
+        "baseline/1",
+        "accepted/1",
+        "accepted/2",
+        "baseline/2",
+        "baseline/3",
+        "accepted/3",
+        "accepted/4",
+        "baseline/4"
+      ],
+      "Runtimes": {
+        "baseline": {
+          "PositiveMatches": 8,
+          "MissingMarkerControls": 1,
+          "ShutdownMicroseconds": 16064,
+          "CloseJobMembership": {
+            "Caller": false,
+            "Agent": false,
+            "Child": false
+          },
+          "Latency": {
+            "InputUs": {
+              "Count": 64,
+              "Min": 4667,
+              "Median": 9096.0,
+              "P95": 16383,
+              "Max": 17162
+            },
+            "ResizeRpcUs": {
+              "Count": 64,
+              "Min": 8140,
+              "Median": 11141.5,
+              "P95": 14987,
+              "Max": 19728
+            },
+            "ReaderResizeUs": {
+              "Count": 64,
+              "Min": 19,
+              "Median": 140.0,
+              "P95": 356,
+              "Max": 416
+            },
+            "BarrierUs": {
+              "Count": 64,
+              "Min": 2787,
+              "Median": 33481.0,
+              "P95": 36095,
+              "Max": 43459
+            },
+            "MeasuredPhasesUs": {
+              "Count": 64,
+              "Min": 21628,
+              "Median": 54528.5,
+              "P95": 62100,
+              "Max": 66031
+            }
+          },
+          "Rc2ResizeRpcP95Us": 12462,
+          "Trials": [
+            {
+              "Case": "LIFECYCLE_MEASURE_1",
+              "IdleUs": 15006789,
+              "ActiveUs": 20035923,
+              "ActiveSteps": 346,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 121976937,
+                  "ActiveCycles": 484051068,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 156001,
+                  "IdleCyclesPerSecond": 8128117.01,
+                  "ActiveCyclesPerOperation": 1398991.53
+                },
+                "Agent": {
+                  "IdleCycles": 460115602,
+                  "ActiveCycles": 1339712420,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 30660496.53,
+                  "ActiveCyclesPerOperation": 3872001.21
+                },
+                "Child": {
+                  "IdleCycles": 171866464,
+                  "ActiveCycles": 835290121,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 11452580.83,
+                  "ActiveCyclesPerOperation": 2414133.3
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 10602,
+                "Median": 12294.0,
+                "P95": 14765,
+                "Max": 14765
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_2",
+              "IdleUs": 15007117,
+              "ActiveUs": 20010074,
+              "ActiveSteps": 344,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 96705750,
+                  "ActiveCycles": 379801254,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 6443992.54,
+                  "ActiveCyclesPerOperation": 1104073.41
+                },
+                "Agent": {
+                  "IdleCycles": 388570844,
+                  "ActiveCycles": 1200859460,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 624004,
+                  "IdleCyclesPerSecond": 25892437.83,
+                  "ActiveCyclesPerOperation": 3490870.52
+                },
+                "Child": {
+                  "IdleCycles": 105889239,
+                  "ActiveCycles": 678276245,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 7055934.79,
+                  "ActiveCyclesPerOperation": 1971733.27
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 9491,
+                "Median": 11301.0,
+                "P95": 13760,
+                "Max": 13760
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_3",
+              "IdleUs": 15006452,
+              "ActiveUs": 20023359,
+              "ActiveSteps": 355,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 95969610,
+                  "ActiveCycles": 416008158,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 156001,
+                  "IdleCyclesPerSecond": 6395223.2,
+                  "ActiveCyclesPerOperation": 1171853.97
+                },
+                "Agent": {
+                  "IdleCycles": 395503230,
+                  "ActiveCycles": 1169205735,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 468003,
+                  "IdleCyclesPerSecond": 26355545.6,
+                  "ActiveCyclesPerOperation": 3293537.28
+                },
+                "Child": {
+                  "IdleCycles": 114268478,
+                  "ActiveCycles": 681268983,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 7614623.23,
+                  "ActiveCyclesPerOperation": 1919067.56
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 8140,
+                "Median": 9973.0,
+                "P95": 16714,
+                "Max": 16714
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_4",
+              "IdleUs": 15006349,
+              "ActiveUs": 20022178,
+              "ActiveSteps": 326,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 94869177,
+                  "ActiveCycles": 392258842,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 6321935.94,
+                  "ActiveCyclesPerOperation": 1203247.98
+                },
+                "Agent": {
+                  "IdleCycles": 419988775,
+                  "ActiveCycles": 1200512826,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 27987405.53,
+                  "ActiveCyclesPerOperation": 3682554.68
+                },
+                "Child": {
+                  "IdleCycles": 106782885,
+                  "ActiveCycles": 688870492,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 7115847.1,
+                  "ActiveCyclesPerOperation": 2113099.67
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 9430,
+                "Median": 10795.5,
+                "P95": 19728,
+                "Max": 19728
+              }
+            }
+          ],
+          "Resources": {
+            "Caller": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 6321935.94,
+                "Median": 6419607.87,
+                "P95": 8128117.01,
+                "Max": 8128117.01
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 1104073.41,
+                "Median": 1187550.975,
+                "P95": 1398991.53,
+                "Max": 1398991.53
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 69,
+                "Median": 69.0,
+                "P95": 70,
+                "Max": 70
+              },
+              "MaxPrivateBytes": 2781184,
+              "MaxWorkingSetBytes": 5369856,
+              "ActiveHandleDeltas": [
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            "Agent": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 25892437.83,
+                "Median": 27171475.565,
+                "P95": 30660496.53,
+                "Max": 30660496.53
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 3293537.28,
+                "Median": 3586712.6,
+                "P95": 3872001.21,
+                "Max": 3872001.21
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 45,
+                "Median": 45.0,
+                "P95": 45,
+                "Max": 45
+              },
+              "MaxPrivateBytes": 3231744,
+              "MaxWorkingSetBytes": 5861376,
+              "ActiveHandleDeltas": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "Child": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 7055934.79,
+                "Median": 7365235.165,
+                "P95": 11452580.83,
+                "Max": 11452580.83
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 1919067.56,
+                "Median": 2042416.47,
+                "P95": 2414133.3,
+                "Max": 2414133.3
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 8,
+                "Median": 8.0,
+                "P95": 8,
+                "Max": 8
+              },
+              "MaxPrivateBytes": 1191936,
+              "MaxWorkingSetBytes": 2637824,
+              "ActiveHandleDeltas": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "Regressions": [
+            {
+              "Name": "REPEAT",
+              "DurationMilliseconds": 46150,
+              "ExitCode": 0
+            },
+            {
+              "Name": "RESIZE",
+              "DurationMilliseconds": 3250,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SHUTDOWN",
+              "DurationMilliseconds": 3241,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SPAWN_FAILURE",
+              "DurationMilliseconds": 68,
+              "ExitCode": 0
+            },
+            {
+              "Name": "CONCURRENT",
+              "DurationMilliseconds": 265,
+              "ExitCode": 0
+            }
+          ],
+          "ResizeRpcTail": {
+            "Machine": "NESSY",
+            "Role": "baseline",
+            "Rc2MaximumUs": 18005,
+            "GrowP95Us": 14987,
+            "ShrinkP95Us": 16714,
+            "ReaderMaxUs": 416,
+            "CountAboveRc2Max": 1,
+            "Trials": [
+              {
+                "Pair": 1,
+                "First": "baseline",
+                "PeakUs": 14765,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 2,
+                "First": "accepted",
+                "PeakUs": 13760,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 3,
+                "First": "baseline",
+                "PeakUs": 16714,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 4,
+                "First": "accepted",
+                "PeakUs": 19728,
+                "AboveRc2Max": 1
+              }
+            ],
+            "Top": [
+              {
+                "Pair": 4,
+                "Step": 2,
+                "Direction": "Shrink",
+                "RpcUs": 19728,
+                "ReaderUs": 116,
+                "BarrierUs": 12900
+              }
+            ]
+          }
+        },
+        "accepted": {
+          "PositiveMatches": 8,
+          "MissingMarkerControls": 1,
+          "ShutdownMicroseconds": 16811,
+          "CloseJobMembership": {
+            "Caller": false,
+            "Agent": false,
+            "Child": false
+          },
+          "Latency": {
+            "InputUs": {
+              "Count": 64,
+              "Min": 2558,
+              "Median": 9320.5,
+              "P95": 15965,
+              "Max": 23687
+            },
+            "ResizeRpcUs": {
+              "Count": 64,
+              "Min": 9281,
+              "Median": 11167.5,
+              "P95": 36078,
+              "Max": 45698
+            },
+            "ReaderResizeUs": {
+              "Count": 64,
+              "Min": 18,
+              "Median": 29.5,
+              "P95": 243,
+              "Max": 624
+            },
+            "BarrierUs": {
+              "Count": 64,
+              "Min": 2365,
+              "Median": 34517.5,
+              "P95": 43937,
+              "Max": 45092
+            },
+            "MeasuredPhasesUs": {
+              "Count": 64,
+              "Min": 18531,
+              "Median": 54872.5,
+              "P95": 82659,
+              "Max": 107411
+            }
+          },
+          "Rc2ResizeRpcP95Us": 12283,
+          "Trials": [
+            {
+              "Case": "LIFECYCLE_MEASURE_1",
+              "IdleUs": 15006884,
+              "ActiveUs": 20054486,
+              "ActiveSteps": 325,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 107670296,
+                  "ActiveCycles": 370762715,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 7174727.01,
+                  "ActiveCyclesPerOperation": 1140808.35
+                },
+                "Agent": {
+                  "IdleCycles": 421396535,
+                  "ActiveCycles": 1126296672,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 28080215.39,
+                  "ActiveCyclesPerOperation": 3465528.22
+                },
+                "Child": {
+                  "IdleCycles": 130923346,
+                  "ActiveCycles": 663440249,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 8724219.23,
+                  "ActiveCyclesPerOperation": 2041354.61
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 9991,
+                "Median": 11167.5,
+                "P95": 12104,
+                "Max": 12104
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_2",
+              "IdleUs": 15007033,
+              "ActiveUs": 20007305,
+              "ActiveSteps": 330,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 94413719,
+                  "ActiveCycles": 361450480,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 6291298.15,
+                  "ActiveCyclesPerOperation": 1095304.48
+                },
+                "Agent": {
+                  "IdleCycles": 372653198,
+                  "ActiveCycles": 1070269361,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 24831903.68,
+                  "ActiveCyclesPerOperation": 3243240.49
+                },
+                "Child": {
+                  "IdleCycles": 118475273,
+                  "ActiveCycles": 657805759,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 7894650.0,
+                  "ActiveCyclesPerOperation": 1993350.78
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 9281,
+                "Median": 10378.5,
+                "P95": 11830,
+                "Max": 11830
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_3",
+              "IdleUs": 15007826,
+              "ActiveUs": 20021846,
+              "ActiveSteps": 318,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 99440407,
+                  "ActiveCycles": 370464105,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 312002,
+                  "IdleCyclesPerSecond": 6625903.51,
+                  "ActiveCyclesPerOperation": 1164981.46
+                },
+                "Agent": {
+                  "IdleCycles": 395662942,
+                  "ActiveCycles": 1143857460,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 468003,
+                  "IdleCyclesPerSecond": 26363774.61,
+                  "ActiveCyclesPerOperation": 3597036.04
+                },
+                "Child": {
+                  "IdleCycles": 111185239,
+                  "ActiveCycles": 643665217,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 7408484.01,
+                  "ActiveCyclesPerOperation": 2024104.46
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 10639,
+                "Median": 25748.5,
+                "P95": 45698,
+                "Max": 45698
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_4",
+              "IdleUs": 15007059,
+              "ActiveUs": 20037644,
+              "ActiveSteps": 347,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 83618970,
+                  "ActiveCycles": 389509740,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 312002,
+                  "IdleCyclesPerSecond": 5571975.83,
+                  "ActiveCyclesPerOperation": 1122506.46
+                },
+                "Agent": {
+                  "IdleCycles": 376963944,
+                  "ActiveCycles": 1154088212,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 780005,
+                  "IdleCyclesPerSecond": 25119108.55,
+                  "ActiveCyclesPerOperation": 3325902.63
+                },
+                "Child": {
+                  "IdleCycles": 109234460,
+                  "ActiveCycles": 707364711,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 7278871.9,
+                  "ActiveCyclesPerOperation": 2038515.02
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 9656,
+                "Median": 10988.5,
+                "P95": 16004,
+                "Max": 16004
+              }
+            }
+          ],
+          "Resources": {
+            "Caller": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 5571975.83,
+                "Median": 6458600.83,
+                "P95": 7174727.01,
+                "Max": 7174727.01
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 1095304.48,
+                "Median": 1131657.405,
+                "P95": 1164981.46,
+                "Max": 1164981.46
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 74,
+                "Median": 74.0,
+                "P95": 75,
+                "Max": 75
+              },
+              "MaxPrivateBytes": 2936832,
+              "MaxWorkingSetBytes": 5787648,
+              "ActiveHandleDeltas": [
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            "Agent": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 24831903.68,
+                "Median": 25741441.58,
+                "P95": 28080215.39,
+                "Max": 28080215.39
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 3243240.49,
+                "Median": 3395715.425,
+                "P95": 3597036.04,
+                "Max": 3597036.04
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 45,
+                "Median": 45.0,
+                "P95": 45,
+                "Max": 45
+              },
+              "MaxPrivateBytes": 3260416,
+              "MaxWorkingSetBytes": 5857280,
+              "ActiveHandleDeltas": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "Child": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 7278871.9,
+                "Median": 7651567.005,
+                "P95": 8724219.23,
+                "Max": 8724219.23
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 1993350.78,
+                "Median": 2031309.74,
+                "P95": 2041354.61,
+                "Max": 2041354.61
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 8,
+                "Median": 8.0,
+                "P95": 8,
+                "Max": 8
+              },
+              "MaxPrivateBytes": 1191936,
+              "MaxWorkingSetBytes": 2637824,
+              "ActiveHandleDeltas": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "Regressions": [
+            {
+              "Name": "REPEAT",
+              "DurationMilliseconds": 47514,
+              "ExitCode": 0
+            },
+            {
+              "Name": "RESIZE",
+              "DurationMilliseconds": 3235,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SHUTDOWN",
+              "DurationMilliseconds": 3345,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SPAWN_FAILURE",
+              "DurationMilliseconds": 72,
+              "ExitCode": 0
+            },
+            {
+              "Name": "CONCURRENT",
+              "DurationMilliseconds": 285,
+              "ExitCode": 0
+            }
+          ],
+          "ResizeRpcTail": {
+            "Machine": "NESSY",
+            "Role": "accepted",
+            "Rc2MaximumUs": 18005,
+            "GrowP95Us": 39416,
+            "ShrinkP95Us": 36078,
+            "ReaderMaxUs": 624,
+            "CountAboveRc2Max": 12,
+            "Trials": [
+              {
+                "Pair": 1,
+                "First": "baseline",
+                "PeakUs": 12104,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 2,
+                "First": "accepted",
+                "PeakUs": 11830,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 3,
+                "First": "baseline",
+                "PeakUs": 45698,
+                "AboveRc2Max": 12
+              },
+              {
+                "Pair": 4,
+                "First": "accepted",
+                "PeakUs": 16004,
+                "AboveRc2Max": 0
+              }
+            ],
+            "Top": [
+              {
+                "Pair": 3,
+                "Step": 3,
+                "Direction": "Grow",
+                "RpcUs": 45698,
+                "ReaderUs": 22,
+                "BarrierUs": 42257
+              },
+              {
+                "Pair": 3,
+                "Step": 12,
+                "Direction": "Shrink",
+                "RpcUs": 43132,
+                "ReaderUs": 624,
+                "BarrierUs": 43937
+              },
+              {
+                "Pair": 3,
+                "Step": 1,
+                "Direction": "Grow",
+                "RpcUs": 39416,
+                "ReaderUs": 243,
+                "BarrierUs": 44065
+              },
+              {
+                "Pair": 3,
+                "Step": 2,
+                "Direction": "Shrink",
+                "RpcUs": 36078,
+                "ReaderUs": 30,
+                "BarrierUs": 34705
+              },
+              {
+                "Pair": 3,
+                "Step": 6,
+                "Direction": "Shrink",
+                "RpcUs": 35275,
+                "ReaderUs": 31,
+                "BarrierUs": 37176
+              },
+              {
+                "Pair": 3,
+                "Step": 5,
+                "Direction": "Grow",
+                "RpcUs": 30107,
+                "ReaderUs": 19,
+                "BarrierUs": 44658
+              }
+            ]
+          }
+        }
+      },
+      "PairedChanges": [
+        {
+          "Case": "LIFECYCLE_MEASURE_1",
+          "FirstRuntime": "baseline",
+          "ProcessChanges": {
+            "Caller": {
+              "ActiveCyclesPerOperationPercentChange": -18.455,
+              "IdleCyclesPerSecondPercentChange": -11.73
+            },
+            "Agent": {
+              "ActiveCyclesPerOperationPercentChange": -10.498,
+              "IdleCyclesPerSecondPercentChange": -8.416
+            },
+            "Child": {
+              "ActiveCyclesPerOperationPercentChange": -15.442,
+              "IdleCyclesPerSecondPercentChange": -23.823
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_2",
+          "FirstRuntime": "accepted",
+          "ProcessChanges": {
+            "Caller": {
+              "ActiveCyclesPerOperationPercentChange": -0.794,
+              "IdleCyclesPerSecondPercentChange": -2.37
+            },
+            "Agent": {
+              "ActiveCyclesPerOperationPercentChange": -7.094,
+              "IdleCyclesPerSecondPercentChange": -4.096
+            },
+            "Child": {
+              "ActiveCyclesPerOperationPercentChange": 1.096,
+              "IdleCyclesPerSecondPercentChange": 11.887
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_3",
+          "FirstRuntime": "baseline",
+          "ProcessChanges": {
+            "Caller": {
+              "ActiveCyclesPerOperationPercentChange": -0.586,
+              "IdleCyclesPerSecondPercentChange": 3.607
+            },
+            "Agent": {
+              "ActiveCyclesPerOperationPercentChange": 9.215,
+              "IdleCyclesPerSecondPercentChange": 0.031
+            },
+            "Child": {
+              "ActiveCyclesPerOperationPercentChange": 5.473,
+              "IdleCyclesPerSecondPercentChange": -2.707
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_4",
+          "FirstRuntime": "accepted",
+          "ProcessChanges": {
+            "Caller": {
+              "ActiveCyclesPerOperationPercentChange": -6.71,
+              "IdleCyclesPerSecondPercentChange": -11.863
+            },
+            "Agent": {
+              "ActiveCyclesPerOperationPercentChange": -9.685,
+              "IdleCyclesPerSecondPercentChange": -10.249
+            },
+            "Child": {
+              "ActiveCyclesPerOperationPercentChange": -3.53,
+              "IdleCyclesPerSecondPercentChange": 2.291
+            }
+          }
+        }
+      ]
+    },
+    {
+      "Machine": "TURTLE",
+      "Tier": "ESU",
+      "RunId": "esu-lifecycle-20261127-084454-f39bfc84",
+      "OS": {
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "BuildNumber": "7601",
+        "Version": "6.1.7601",
+        "ProductType": 1,
+        "ServicePackMajorVersion": 1
+      },
+      "PowerShellVersion": "5.1.14409.1005",
+      "CLRVersion": "4.0.30319.42000",
+      "KB3191566Listed": true,
+      "UpdateIdsMatchRc2": true,
+      "StartedUtc": "2026-11-27T08:44:59.8084786Z",
+      "CompletedUtc": "2026-11-27T08:50:53.9361242Z",
+      "SessionFlags": 0,
+      "EvidenceFilesVerified": 173,
+      "ReportSha256": "44ce4930b278f253e27d7d932cb6ad9f1663be127484128bdf4a93e9debbf844",
+      "EvidenceInventorySha256": "d4c17e943da1d5f76490f9a614a5674e97864c62434200453cd86dcd4cab8851",
+      "TrialOrder": [
+        "baseline/1",
+        "accepted/1",
+        "accepted/2",
+        "baseline/2",
+        "baseline/3",
+        "accepted/3",
+        "accepted/4",
+        "baseline/4"
+      ],
+      "Runtimes": {
+        "baseline": {
+          "PositiveMatches": 8,
+          "MissingMarkerControls": 1,
+          "ShutdownMicroseconds": 2527,
+          "CloseJobMembership": {
+            "Caller": false,
+            "Agent": false,
+            "Child": false
+          },
+          "Latency": {
+            "InputUs": {
+              "Count": 64,
+              "Min": 10618,
+              "Median": 15542.0,
+              "P95": 15776,
+              "Max": 15807
+            },
+            "ResizeRpcUs": {
+              "Count": 64,
+              "Min": 1574,
+              "Median": 1814.0,
+              "P95": 2001,
+              "Max": 2105
+            },
+            "ReaderResizeUs": {
+              "Count": 64,
+              "Min": 25,
+              "Median": 38.0,
+              "P95": 44,
+              "Max": 60
+            },
+            "BarrierUs": {
+              "Count": 64,
+              "Min": 44461,
+              "Median": 44767.0,
+              "P95": 44948,
+              "Max": 44989
+            },
+            "MeasuredPhasesUs": {
+              "Count": 64,
+              "Min": 57197,
+              "Median": 62156.0,
+              "P95": 62387,
+              "Max": 62403
+            }
+          },
+          "Rc2ResizeRpcP95Us": 2007,
+          "Trials": [
+            {
+              "Case": "LIFECYCLE_MEASURE_1",
+              "IdleUs": 15006660,
+              "ActiveUs": 20029199,
+              "ActiveSteps": 323,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 9828074,
+                  "ActiveCycles": 174238916,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 654914.15,
+                  "ActiveCyclesPerOperation": 539439.37
+                },
+                "Agent": {
+                  "IdleCycles": 48419706,
+                  "ActiveCycles": 161169758,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 3226547.81,
+                  "ActiveCyclesPerOperation": 498977.58
+                },
+                "Child": {
+                  "IdleCycles": 28097260,
+                  "ActiveCycles": 126804428,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 1872319.36,
+                  "ActiveCyclesPerOperation": 392583.37
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 1695,
+                "Median": 1841.5,
+                "P95": 2039,
+                "Max": 2039
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_2",
+              "IdleUs": 15006660,
+              "ActiveUs": 20029193,
+              "ActiveSteps": 322,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 9247388,
+                  "ActiveCycles": 130925262,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 616218.93,
+                  "ActiveCyclesPerOperation": 406600.19
+                },
+                "Agent": {
+                  "IdleCycles": 64713016,
+                  "ActiveCycles": 218242226,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 4312286.41,
+                  "ActiveCyclesPerOperation": 677770.89
+                },
+                "Child": {
+                  "IdleCycles": 31884758,
+                  "ActiveCycles": 147130002,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 2124707.16,
+                  "ActiveCyclesPerOperation": 456925.47
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 1799,
+                "Median": 1904.5,
+                "P95": 2105,
+                "Max": 2105
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_3",
+              "IdleUs": 15006663,
+              "ActiveUs": 20028917,
+              "ActiveSteps": 321,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 11019536,
+                  "ActiveCycles": 177473064,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 734309.55,
+                  "ActiveCyclesPerOperation": 552875.59
+                },
+                "Agent": {
+                  "IdleCycles": 58146868,
+                  "ActiveCycles": 194062990,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 3874736.71,
+                  "ActiveCyclesPerOperation": 604557.6
+                },
+                "Child": {
+                  "IdleCycles": 30046446,
+                  "ActiveCycles": 141398792,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 2002207.02,
+                  "ActiveCyclesPerOperation": 440494.68
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 1694,
+                "Median": 1798.0,
+                "P95": 2001,
+                "Max": 2001
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_4",
+              "IdleUs": 15006665,
+              "ActiveUs": 20029504,
+              "ActiveSteps": 323,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 10312540,
+                  "ActiveCycles": 140358902,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 687197.32,
+                  "ActiveCyclesPerOperation": 434547.68
+                },
+                "Agent": {
+                  "IdleCycles": 47261734,
+                  "ActiveCycles": 166669938,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 3149382.89,
+                  "ActiveCyclesPerOperation": 516006.0
+                },
+                "Child": {
+                  "IdleCycles": 30578172,
+                  "ActiveCycles": 163263104,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 2037639.41,
+                  "ActiveCyclesPerOperation": 505458.53
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 1574,
+                "Median": 1679.5,
+                "P95": 1906,
+                "Max": 1906
+              }
+            }
+          ],
+          "Resources": {
+            "Caller": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 616218.93,
+                "Median": 671055.735,
+                "P95": 734309.55,
+                "Max": 734309.55
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 406600.19,
+                "Median": 486993.525,
+                "P95": 552875.59,
+                "Max": 552875.59
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 86,
+                "Median": 86.0,
+                "P95": 87,
+                "Max": 87
+              },
+              "MaxPrivateBytes": 4374528,
+              "MaxWorkingSetBytes": 7069696,
+              "ActiveHandleDeltas": [
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            "Agent": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 3149382.89,
+                "Median": 3550642.26,
+                "P95": 4312286.41,
+                "Max": 4312286.41
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 498977.58,
+                "Median": 560281.8,
+                "P95": 677770.89,
+                "Max": 677770.89
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 45,
+                "Median": 45.0,
+                "P95": 45,
+                "Max": 45
+              },
+              "MaxPrivateBytes": 4820992,
+              "MaxWorkingSetBytes": 7483392,
+              "ActiveHandleDeltas": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "Child": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 1872319.36,
+                "Median": 2019923.2149999999,
+                "P95": 2124707.16,
+                "Max": 2124707.16
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 392583.37,
+                "Median": 448710.07499999995,
+                "P95": 505458.53,
+                "Max": 505458.53
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 8,
+                "Median": 8.0,
+                "P95": 9,
+                "Max": 9
+              },
+              "MaxPrivateBytes": 1994752,
+              "MaxWorkingSetBytes": 3428352,
+              "ActiveHandleDeltas": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          "Regressions": [
+            {
+              "Name": "REPEAT",
+              "DurationMilliseconds": 25211,
+              "ExitCode": 0
+            },
+            {
+              "Name": "RESIZE",
+              "DurationMilliseconds": 3175,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SHUTDOWN",
+              "DurationMilliseconds": 3516,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SPAWN_FAILURE",
+              "DurationMilliseconds": 25,
+              "ExitCode": 0
+            },
+            {
+              "Name": "CONCURRENT",
+              "DurationMilliseconds": 93,
+              "ExitCode": 0
+            }
+          ],
+          "ResizeRpcTail": {
+            "Machine": "TURTLE",
+            "Role": "baseline",
+            "Rc2MaximumUs": 2146,
+            "GrowP95Us": 2039,
+            "ShrinkP95Us": 1872,
+            "ReaderMaxUs": 60,
+            "CountAboveRc2Max": 0,
+            "Trials": [
+              {
+                "Pair": 1,
+                "First": "baseline",
+                "PeakUs": 2039,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 2,
+                "First": "accepted",
+                "PeakUs": 2105,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 3,
+                "First": "baseline",
+                "PeakUs": 2001,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 4,
+                "First": "accepted",
+                "PeakUs": 1906,
+                "AboveRc2Max": 0
+              }
+            ],
+            "Top": []
+          }
+        },
+        "accepted": {
+          "PositiveMatches": 8,
+          "MissingMarkerControls": 1,
+          "ShutdownMicroseconds": 1979,
+          "CloseJobMembership": {
+            "Caller": false,
+            "Agent": false,
+            "Child": false
+          },
+          "Latency": {
+            "InputUs": {
+              "Count": 64,
+              "Min": 10229,
+              "Median": 15489.0,
+              "P95": 15767,
+              "Max": 15828
+            },
+            "ResizeRpcUs": {
+              "Count": 64,
+              "Min": 1604,
+              "Median": 1784.0,
+              "P95": 2131,
+              "Max": 2243
+            },
+            "ReaderResizeUs": {
+              "Count": 64,
+              "Min": 24,
+              "Median": 40.0,
+              "P95": 46,
+              "Max": 60
+            },
+            "BarrierUs": {
+              "Count": 64,
+              "Min": 44308,
+              "Median": 44785.0,
+              "P95": 44957,
+              "Max": 44996
+            },
+            "MeasuredPhasesUs": {
+              "Count": 64,
+              "Min": 56867,
+              "Median": 62085.0,
+              "P95": 62389,
+              "Max": 62405
+            }
+          },
+          "Rc2ResizeRpcP95Us": 1993,
+          "Trials": [
+            {
+              "Case": "LIFECYCLE_MEASURE_1",
+              "IdleUs": 15006666,
+              "ActiveUs": 20060620,
+              "ActiveSteps": 329,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 12832892,
+                  "ActiveCycles": 147733094,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 855146.11,
+                  "ActiveCyclesPerOperation": 449036.76
+                },
+                "Agent": {
+                  "IdleCycles": 51024548,
+                  "ActiveCycles": 171087320,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 3400125.52,
+                  "ActiveCyclesPerOperation": 520022.25
+                },
+                "Child": {
+                  "IdleCycles": 30485930,
+                  "ActiveCycles": 170350982,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 2031492.54,
+                  "ActiveCyclesPerOperation": 517784.14
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 1736,
+                "Median": 1959.5,
+                "P95": 2243,
+                "Max": 2243
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_2",
+              "IdleUs": 15006647,
+              "ActiveUs": 20029169,
+              "ActiveSteps": 324,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 16895688,
+                  "ActiveCycles": 138432734,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 1125880.28,
+                  "ActiveCyclesPerOperation": 427261.52
+                },
+                "Agent": {
+                  "IdleCycles": 43628154,
+                  "ActiveCycles": 145501300,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 2907255.3,
+                  "ActiveCyclesPerOperation": 449078.09
+                },
+                "Child": {
+                  "IdleCycles": 19149582,
+                  "ActiveCycles": 90294412,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 1276073.33,
+                  "ActiveCyclesPerOperation": 278686.46
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 1604,
+                "Median": 1690.5,
+                "P95": 1963,
+                "Max": 1963
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_3",
+              "IdleUs": 15006663,
+              "ActiveUs": 20029480,
+              "ActiveSteps": 321,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 11092840,
+                  "ActiveCycles": 165582686,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 739194.32,
+                  "ActiveCyclesPerOperation": 515833.91
+                },
+                "Agent": {
+                  "IdleCycles": 51725152,
+                  "ActiveCycles": 168255052,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 3446812.39,
+                  "ActiveCyclesPerOperation": 524159.04
+                },
+                "Child": {
+                  "IdleCycles": 20445424,
+                  "ActiveCycles": 83936854,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 1362423.08,
+                  "ActiveCyclesPerOperation": 261485.53
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 1713,
+                "Median": 1804.5,
+                "P95": 1912,
+                "Max": 1912
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_4",
+              "IdleUs": 15006658,
+              "ActiveUs": 20029182,
+              "ActiveSteps": 329,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 11388980,
+                  "ActiveCycles": 173914250,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 758928.47,
+                  "ActiveCyclesPerOperation": 528614.74
+                },
+                "Agent": {
+                  "IdleCycles": 46267574,
+                  "ActiveCycles": 157404972,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 3083136.43,
+                  "ActiveCyclesPerOperation": 478434.57
+                },
+                "Child": {
+                  "IdleCycles": 25906844,
+                  "ActiveCycles": 123590000,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 1726356.66,
+                  "ActiveCyclesPerOperation": 375653.5
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 1686,
+                "Median": 1781.5,
+                "P95": 1909,
+                "Max": 1909
+              }
+            }
+          ],
+          "Resources": {
+            "Caller": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 739194.32,
+                "Median": 807037.29,
+                "P95": 1125880.28,
+                "Max": 1125880.28
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 427261.52,
+                "Median": 482435.33499999996,
+                "P95": 528614.74,
+                "Max": 528614.74
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 91,
+                "Median": 91.0,
+                "P95": 92,
+                "Max": 92
+              },
+              "MaxPrivateBytes": 4534272,
+              "MaxWorkingSetBytes": 7491584,
+              "ActiveHandleDeltas": [
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            "Agent": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 2907255.3,
+                "Median": 3241630.975,
+                "P95": 3446812.39,
+                "Max": 3446812.39
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 449078.09,
+                "Median": 499228.41000000003,
+                "P95": 524159.04,
+                "Max": 524159.04
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 45,
+                "Median": 45.0,
+                "P95": 45,
+                "Max": 45
+              },
+              "MaxPrivateBytes": 4849664,
+              "MaxWorkingSetBytes": 7495680,
+              "ActiveHandleDeltas": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "Child": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 1276073.33,
+                "Median": 1544389.87,
+                "P95": 2031492.54,
+                "Max": 2031492.54
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 261485.53,
+                "Median": 327169.98,
+                "P95": 517784.14,
+                "Max": 517784.14
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 8,
+                "Median": 8.0,
+                "P95": 8,
+                "Max": 8
+              },
+              "MaxPrivateBytes": 1994752,
+              "MaxWorkingSetBytes": 3424256,
+              "ActiveHandleDeltas": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "Regressions": [
+            {
+              "Name": "REPEAT",
+              "DurationMilliseconds": 24482,
+              "ExitCode": 0
+            },
+            {
+              "Name": "RESIZE",
+              "DurationMilliseconds": 3886,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SHUTDOWN",
+              "DurationMilliseconds": 2511,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SPAWN_FAILURE",
+              "DurationMilliseconds": 26,
+              "ExitCode": 0
+            },
+            {
+              "Name": "CONCURRENT",
+              "DurationMilliseconds": 92,
+              "ExitCode": 0
+            }
+          ],
+          "ResizeRpcTail": {
+            "Machine": "TURTLE",
+            "Role": "accepted",
+            "Rc2MaximumUs": 2146,
+            "GrowP95Us": 2158,
+            "ShrinkP95Us": 2131,
+            "ReaderMaxUs": 60,
+            "CountAboveRc2Max": 3,
+            "Trials": [
+              {
+                "Pair": 1,
+                "First": "baseline",
+                "PeakUs": 2243,
+                "AboveRc2Max": 3
+              },
+              {
+                "Pair": 2,
+                "First": "accepted",
+                "PeakUs": 1963,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 3,
+                "First": "baseline",
+                "PeakUs": 1912,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 4,
+                "First": "accepted",
+                "PeakUs": 1909,
+                "AboveRc2Max": 0
+              }
+            ],
+            "Top": [
+              {
+                "Pair": 1,
+                "Step": 11,
+                "Direction": "Grow",
+                "RpcUs": 2243,
+                "ReaderUs": 26,
+                "BarrierUs": 44308
+              },
+              {
+                "Pair": 1,
+                "Step": 12,
+                "Direction": "Shrink",
+                "RpcUs": 2194,
+                "ReaderUs": 24,
+                "BarrierUs": 44344
+              },
+              {
+                "Pair": 1,
+                "Step": 3,
+                "Direction": "Grow",
+                "RpcUs": 2158,
+                "ReaderUs": 28,
+                "BarrierUs": 44396
+              }
+            ]
+          }
+        }
+      },
+      "PairedChanges": [
+        {
+          "Case": "LIFECYCLE_MEASURE_1",
+          "FirstRuntime": "baseline",
+          "ProcessChanges": {
+            "Caller": {
+              "ActiveCyclesPerOperationPercentChange": -16.759,
+              "IdleCyclesPerSecondPercentChange": 30.574
+            },
+            "Agent": {
+              "ActiveCyclesPerOperationPercentChange": 4.218,
+              "IdleCyclesPerSecondPercentChange": 5.38
+            },
+            "Child": {
+              "ActiveCyclesPerOperationPercentChange": 31.892,
+              "IdleCyclesPerSecondPercentChange": 8.501
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_2",
+          "FirstRuntime": "accepted",
+          "ProcessChanges": {
+            "Caller": {
+              "ActiveCyclesPerOperationPercentChange": 5.081,
+              "IdleCyclesPerSecondPercentChange": 82.708
+            },
+            "Agent": {
+              "ActiveCyclesPerOperationPercentChange": -33.742,
+              "IdleCyclesPerSecondPercentChange": -32.582
+            },
+            "Child": {
+              "ActiveCyclesPerOperationPercentChange": -39.008,
+              "IdleCyclesPerSecondPercentChange": -39.941
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_3",
+          "FirstRuntime": "baseline",
+          "ProcessChanges": {
+            "Caller": {
+              "ActiveCyclesPerOperationPercentChange": -6.7,
+              "IdleCyclesPerSecondPercentChange": 0.665
+            },
+            "Agent": {
+              "ActiveCyclesPerOperationPercentChange": -13.299,
+              "IdleCyclesPerSecondPercentChange": -11.044
+            },
+            "Child": {
+              "ActiveCyclesPerOperationPercentChange": -40.638,
+              "IdleCyclesPerSecondPercentChange": -31.954
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_4",
+          "FirstRuntime": "accepted",
+          "ProcessChanges": {
+            "Caller": {
+              "ActiveCyclesPerOperationPercentChange": 21.647,
+              "IdleCyclesPerSecondPercentChange": 10.438
+            },
+            "Agent": {
+              "ActiveCyclesPerOperationPercentChange": -7.281,
+              "IdleCyclesPerSecondPercentChange": -2.103
+            },
+            "Child": {
+              "ActiveCyclesPerOperationPercentChange": -25.681,
+              "IdleCyclesPerSecondPercentChange": -15.277
+            }
+          }
+        }
+      ]
+    },
+    {
+      "Machine": "LEOPARD",
+      "Tier": "Legacy",
+      "RunId": "legacy-lifecycle-20261127-084239-539a84de",
+      "OS": {
+        "ProductType": 1,
+        "Version": "6.1.7601",
+        "Caption": "Microsoft Windows 7 Ultimate ",
+        "ServicePackMajorVersion": 1,
+        "BuildNumber": "7601"
+      },
+      "PowerShellVersion": "2.0",
+      "CLRVersion": "2.0.50727.8806",
+      "KB3191566Listed": false,
+      "UpdateIdsMatchRc2": true,
+      "StartedUtc": "2026-11-27T08:42:48.9119394Z",
+      "CompletedUtc": "2026-11-27T08:49:24.8874349Z",
+      "SessionFlags": 0,
+      "EvidenceFilesVerified": 173,
+      "ReportSha256": "4583ed702c5b27e96c197d194cf97a421673d5c26223716c236ffa27ea4b20eb",
+      "EvidenceInventorySha256": "a2dd535ba712830dc15c6d85ee4398bdbfee693a24501d0fe98590bca5df18b9",
+      "TrialOrder": [
+        "baseline/1",
+        "accepted/1",
+        "accepted/2",
+        "baseline/2",
+        "baseline/3",
+        "accepted/3",
+        "accepted/4",
+        "baseline/4"
+      ],
+      "Runtimes": {
+        "baseline": {
+          "PositiveMatches": 8,
+          "MissingMarkerControls": 1,
+          "ShutdownMicroseconds": 28123,
+          "CloseJobMembership": {
+            "Caller": false,
+            "Agent": false,
+            "Child": false
+          },
+          "Latency": {
+            "InputUs": {
+              "Count": 64,
+              "Min": 12407,
+              "Median": 16384.5,
+              "P95": 17388,
+              "Max": 19175
+            },
+            "ResizeRpcUs": {
+              "Count": 64,
+              "Min": 7757,
+              "Median": 11485.0,
+              "P95": 16022,
+              "Max": 24905
+            },
+            "ReaderResizeUs": {
+              "Count": 64,
+              "Min": 14,
+              "Median": 39.0,
+              "P95": 310,
+              "Max": 486
+            },
+            "BarrierUs": {
+              "Count": 64,
+              "Min": 3470,
+              "Median": 33673.0,
+              "P95": 37006,
+              "Max": 43921
+            },
+            "MeasuredPhasesUs": {
+              "Count": 64,
+              "Min": 29013,
+              "Median": 61845.5,
+              "P95": 62638,
+              "Max": 75596
+            }
+          },
+          "Rc2ResizeRpcP95Us": 10110,
+          "Trials": [
+            {
+              "Case": "LIFECYCLE_MEASURE_1",
+              "IdleUs": 15006895,
+              "ActiveUs": 20013781,
+              "ActiveSteps": 328,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 150016462,
+                  "ActiveCycles": 502116961,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 9996502.41,
+                  "ActiveCyclesPerOperation": 1530844.39
+                },
+                "Agent": {
+                  "IdleCycles": 501708991,
+                  "ActiveCycles": 1334121373,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 33431898.54,
+                  "ActiveCyclesPerOperation": 4067443.21
+                },
+                "Child": {
+                  "IdleCycles": 197195408,
+                  "ActiveCycles": 831089656,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 13140320.37,
+                  "ActiveCyclesPerOperation": 2533809.93
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 10773,
+                "Median": 12649.5,
+                "P95": 15353,
+                "Max": 15353
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_2",
+              "IdleUs": 15006818,
+              "ActiveUs": 20060270,
+              "ActiveSteps": 359,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 88203185,
+                  "ActiveCycles": 403387136,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 468003,
+                  "IdleCyclesPerSecond": 5877540.8,
+                  "ActiveCyclesPerOperation": 1123641.05
+                },
+                "Agent": {
+                  "IdleCycles": 390806588,
+                  "ActiveCycles": 1218777227,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 780005,
+                  "IdleCyclesPerSecond": 26041935.61,
+                  "ActiveCyclesPerOperation": 3394922.64
+                },
+                "Child": {
+                  "IdleCycles": 116162329,
+                  "ActiveCycles": 716848259,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 7740636.89,
+                  "ActiveCyclesPerOperation": 1996791.81
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 9544,
+                "Median": 12642.5,
+                "P95": 24905,
+                "Max": 24905
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_3",
+              "IdleUs": 15006479,
+              "ActiveUs": 20013540,
+              "ActiveSteps": 338,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 97642688,
+                  "ActiveCycles": 404925094,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 312002,
+                  "IdleCyclesPerSecond": 6506702.07,
+                  "ActiveCyclesPerOperation": 1198003.24
+                },
+                "Agent": {
+                  "IdleCycles": 418509760,
+                  "ActiveCycles": 1224165468,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 624004,
+                  "IdleCyclesPerSecond": 27888604.65,
+                  "ActiveCyclesPerOperation": 3621791.33
+                },
+                "Child": {
+                  "IdleCycles": 133175016,
+                  "ActiveCycles": 727440070,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 8874501.21,
+                  "ActiveCyclesPerOperation": 2152189.56
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 8776,
+                "Median": 10603.0,
+                "P95": 14350,
+                "Max": 14350
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_4",
+              "IdleUs": 15007046,
+              "ActiveUs": 20060710,
+              "ActiveSteps": 342,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 108985690,
+                  "ActiveCycles": 402742560,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 7262301.32,
+                  "ActiveCyclesPerOperation": 1177609.82
+                },
+                "Agent": {
+                  "IdleCycles": 424996953,
+                  "ActiveCycles": 1223125854,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 28319827.43,
+                  "ActiveCyclesPerOperation": 3576391.39
+                },
+                "Child": {
+                  "IdleCycles": 125933744,
+                  "ActiveCycles": 727596540,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 8391641.1,
+                  "ActiveCyclesPerOperation": 2127475.26
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 7757,
+                "Median": 10698.5,
+                "P95": 12166,
+                "Max": 12166
+              }
+            }
+          ],
+          "Resources": {
+            "Caller": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 5877540.8,
+                "Median": 6884501.695,
+                "P95": 9996502.41,
+                "Max": 9996502.41
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 1123641.05,
+                "Median": 1187806.53,
+                "P95": 1530844.39,
+                "Max": 1530844.39
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 74,
+                "Median": 74.0,
+                "P95": 75,
+                "Max": 75
+              },
+              "MaxPrivateBytes": 2805760,
+              "MaxWorkingSetBytes": 5423104,
+              "ActiveHandleDeltas": [
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            "Agent": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 26041935.61,
+                "Median": 28104216.04,
+                "P95": 33431898.54,
+                "Max": 33431898.54
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 3394922.64,
+                "Median": 3599091.3600000003,
+                "P95": 4067443.21,
+                "Max": 4067443.21
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 45,
+                "Median": 45.0,
+                "P95": 45,
+                "Max": 45
+              },
+              "MaxPrivateBytes": 3264512,
+              "MaxWorkingSetBytes": 5869568,
+              "ActiveHandleDeltas": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "Child": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 7740636.89,
+                "Median": 8633071.155000001,
+                "P95": 13140320.37,
+                "Max": 13140320.37
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 1996791.81,
+                "Median": 2139832.41,
+                "P95": 2533809.93,
+                "Max": 2533809.93
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 8,
+                "Median": 8.0,
+                "P95": 8,
+                "Max": 8
+              },
+              "MaxPrivateBytes": 1200128,
+              "MaxWorkingSetBytes": 2637824,
+              "ActiveHandleDeltas": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "Regressions": [
+            {
+              "Name": "REPEAT",
+              "DurationMilliseconds": 43358,
+              "ExitCode": 0
+            },
+            {
+              "Name": "RESIZE",
+              "DurationMilliseconds": 3231,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SHUTDOWN",
+              "DurationMilliseconds": 3309,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SPAWN_FAILURE",
+              "DurationMilliseconds": 85,
+              "ExitCode": 0
+            },
+            {
+              "Name": "CONCURRENT",
+              "DurationMilliseconds": 321,
+              "ExitCode": 0
+            }
+          ],
+          "ResizeRpcTail": {
+            "Machine": "LEOPARD",
+            "Role": "baseline",
+            "Rc2MaximumUs": 15141,
+            "GrowP95Us": 18068,
+            "ShrinkP95Us": 13662,
+            "ReaderMaxUs": 486,
+            "CountAboveRc2Max": 5,
+            "Trials": [
+              {
+                "Pair": 1,
+                "First": "baseline",
+                "PeakUs": 15353,
+                "AboveRc2Max": 1
+              },
+              {
+                "Pair": 2,
+                "First": "accepted",
+                "PeakUs": 24905,
+                "AboveRc2Max": 4
+              },
+              {
+                "Pair": 3,
+                "First": "baseline",
+                "PeakUs": 14350,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 4,
+                "First": "accepted",
+                "PeakUs": 12166,
+                "AboveRc2Max": 0
+              }
+            ],
+            "Top": [
+              {
+                "Pair": 2,
+                "Step": 3,
+                "Direction": "Grow",
+                "RpcUs": 24905,
+                "ReaderUs": 243,
+                "BarrierUs": 35051
+              },
+              {
+                "Pair": 2,
+                "Step": 4,
+                "Direction": "Shrink",
+                "RpcUs": 19528,
+                "ReaderUs": 257,
+                "BarrierUs": 11267
+              },
+              {
+                "Pair": 2,
+                "Step": 13,
+                "Direction": "Grow",
+                "RpcUs": 18068,
+                "ReaderUs": 456,
+                "BarrierUs": 42377
+              },
+              {
+                "Pair": 2,
+                "Step": 5,
+                "Direction": "Grow",
+                "RpcUs": 16022,
+                "ReaderUs": 78,
+                "BarrierUs": 43921
+              },
+              {
+                "Pair": 1,
+                "Step": 9,
+                "Direction": "Grow",
+                "RpcUs": 15353,
+                "ReaderUs": 29,
+                "BarrierUs": 16448
+              }
+            ]
+          }
+        },
+        "accepted": {
+          "PositiveMatches": 8,
+          "MissingMarkerControls": 1,
+          "ShutdownMicroseconds": 20174,
+          "CloseJobMembership": {
+            "Caller": false,
+            "Agent": false,
+            "Child": false
+          },
+          "Latency": {
+            "InputUs": {
+              "Count": 64,
+              "Min": 11452,
+              "Median": 16335.0,
+              "P95": 21142,
+              "Max": 23471
+            },
+            "ResizeRpcUs": {
+              "Count": 64,
+              "Min": 8498,
+              "Median": 10328.5,
+              "P95": 38478,
+              "Max": 64644
+            },
+            "ReaderResizeUs": {
+              "Count": 64,
+              "Min": 16,
+              "Median": 31.0,
+              "P95": 217,
+              "Max": 480
+            },
+            "BarrierUs": {
+              "Count": 64,
+              "Min": 3971,
+              "Median": 36122.5,
+              "P95": 43198,
+              "Max": 45235
+            },
+            "MeasuredPhasesUs": {
+              "Count": 64,
+              "Min": 30372,
+              "Median": 61929.0,
+              "P95": 93529,
+              "Max": 123716
+            }
+          },
+          "Rc2ResizeRpcP95Us": 9743,
+          "Trials": [
+            {
+              "Case": "LIFECYCLE_MEASURE_1",
+              "IdleUs": 15006400,
+              "ActiveUs": 20044978,
+              "ActiveSteps": 332,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 113494028,
+                  "ActiveCycles": 414153837,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 7563041.64,
+                  "ActiveCyclesPerOperation": 1247451.32
+                },
+                "Agent": {
+                  "IdleCycles": 413288375,
+                  "ActiveCycles": 1168104279,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 27540807.59,
+                  "ActiveCyclesPerOperation": 3518386.38
+                },
+                "Child": {
+                  "IdleCycles": 126658798,
+                  "ActiveCycles": 708741733,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 8440318.66,
+                  "ActiveCyclesPerOperation": 2134764.26
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 8556,
+                "Median": 9338.5,
+                "P95": 10711,
+                "Max": 10711
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_2",
+              "IdleUs": 15006395,
+              "ActiveUs": 20028615,
+              "ActiveSteps": 328,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 98765063,
+                  "ActiveCycles": 412786460,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 6581531.61,
+                  "ActiveCyclesPerOperation": 1258495.3
+                },
+                "Agent": {
+                  "IdleCycles": 397287232,
+                  "ActiveCycles": 1137030778,
+                  "IdleCpu100ns": 156001,
+                  "ActiveCpu100ns": 468003,
+                  "IdleCyclesPerSecond": 26474528.49,
+                  "ActiveCyclesPerOperation": 3466557.25
+                },
+                "Child": {
+                  "IdleCycles": 117208283,
+                  "ActiveCycles": 666300912,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 7810555.63,
+                  "ActiveCyclesPerOperation": 2031405.22
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 8498,
+                "Median": 9692.5,
+                "P95": 10375,
+                "Max": 10375
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_3",
+              "IdleUs": 15006433,
+              "ActiveUs": 20044700,
+              "ActiveSteps": 347,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 99249218,
+                  "ActiveCycles": 383575300,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 6613778.1,
+                  "ActiveCyclesPerOperation": 1105404.32
+                },
+                "Agent": {
+                  "IdleCycles": 486319210,
+                  "ActiveCycles": 1517891807,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 780005,
+                  "IdleCyclesPerSecond": 32407382.22,
+                  "ActiveCyclesPerOperation": 4374327.97
+                },
+                "Child": {
+                  "IdleCycles": 127936401,
+                  "ActiveCycles": 686344015,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 8525437.12,
+                  "ActiveCyclesPerOperation": 1977936.64
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 11216,
+                "Median": 18129.5,
+                "P95": 48056,
+                "Max": 48056
+              }
+            },
+            {
+              "Case": "LIFECYCLE_MEASURE_4",
+              "IdleUs": 15006472,
+              "ActiveUs": 20047915,
+              "ActiveSteps": 341,
+              "JobMembership": {
+                "Caller": false,
+                "Agent": false,
+                "Child": false
+              },
+              "ProcessCounters": {
+                "Caller": {
+                  "IdleCycles": 96904967,
+                  "ActiveCycles": 388927663,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 156001,
+                  "IdleCyclesPerSecond": 6457544.92,
+                  "ActiveCyclesPerOperation": 1140550.33
+                },
+                "Agent": {
+                  "IdleCycles": 398823414,
+                  "ActiveCycles": 1147678083,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 468003,
+                  "IdleCyclesPerSecond": 26576760.61,
+                  "ActiveCyclesPerOperation": 3365624.88
+                },
+                "Child": {
+                  "IdleCycles": 124126328,
+                  "ActiveCycles": 683724577,
+                  "IdleCpu100ns": 0,
+                  "ActiveCpu100ns": 0,
+                  "IdleCyclesPerSecond": 8271519.65,
+                  "ActiveCyclesPerOperation": 2005057.41
+                }
+              },
+              "ResizeRpcUs": {
+                "Count": 16,
+                "Min": 9564,
+                "Median": 23369.0,
+                "P95": 64644,
+                "Max": 64644
+              }
+            }
+          ],
+          "Resources": {
+            "Caller": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 6457544.92,
+                "Median": 6597654.855,
+                "P95": 7563041.64,
+                "Max": 7563041.64
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 1105404.32,
+                "Median": 1194000.8250000002,
+                "P95": 1258495.3,
+                "Max": 1258495.3
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 79,
+                "Median": 79.0,
+                "P95": 80,
+                "Max": 80
+              },
+              "MaxPrivateBytes": 2940928,
+              "MaxWorkingSetBytes": 5791744,
+              "ActiveHandleDeltas": [
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            "Agent": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 26474528.49,
+                "Median": 27058784.1,
+                "P95": 32407382.22,
+                "Max": 32407382.22
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 3365624.88,
+                "Median": 3492471.815,
+                "P95": 4374327.97,
+                "Max": 4374327.97
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 45,
+                "Median": 45.0,
+                "P95": 45,
+                "Max": 45
+              },
+              "MaxPrivateBytes": 3227648,
+              "MaxWorkingSetBytes": 5877760,
+              "ActiveHandleDeltas": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            "Child": {
+              "IdleCyclesPerSecond": {
+                "Count": 4,
+                "Min": 7810555.63,
+                "Median": 8355919.155,
+                "P95": 8525437.12,
+                "Max": 8525437.12
+              },
+              "ActiveCyclesPerOperation": {
+                "Count": 4,
+                "Min": 1977936.64,
+                "Median": 2018231.315,
+                "P95": 2134764.26,
+                "Max": 2134764.26
+              },
+              "Handles": {
+                "Count": 16,
+                "Min": 8,
+                "Median": 8.0,
+                "P95": 8,
+                "Max": 8
+              },
+              "MaxPrivateBytes": 1200128,
+              "MaxWorkingSetBytes": 2637824,
+              "ActiveHandleDeltas": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          "Regressions": [
+            {
+              "Name": "REPEAT",
+              "DurationMilliseconds": 44865,
+              "ExitCode": 0
+            },
+            {
+              "Name": "RESIZE",
+              "DurationMilliseconds": 3204,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SHUTDOWN",
+              "DurationMilliseconds": 3306,
+              "ExitCode": 0
+            },
+            {
+              "Name": "SPAWN_FAILURE",
+              "DurationMilliseconds": 69,
+              "ExitCode": 0
+            },
+            {
+              "Name": "CONCURRENT",
+              "DurationMilliseconds": 250,
+              "ExitCode": 0
+            }
+          ],
+          "ResizeRpcTail": {
+            "Machine": "LEOPARD",
+            "Role": "accepted",
+            "Rc2MaximumUs": 15141,
+            "GrowP95Us": 48056,
+            "ShrinkP95Us": 38478,
+            "ReaderMaxUs": 480,
+            "CountAboveRc2Max": 21,
+            "Trials": [
+              {
+                "Pair": 1,
+                "First": "baseline",
+                "PeakUs": 10711,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 2,
+                "First": "accepted",
+                "PeakUs": 10375,
+                "AboveRc2Max": 0
+              },
+              {
+                "Pair": 3,
+                "First": "baseline",
+                "PeakUs": 48056,
+                "AboveRc2Max": 10
+              },
+              {
+                "Pair": 4,
+                "First": "accepted",
+                "PeakUs": 64644,
+                "AboveRc2Max": 11
+              }
+            ],
+            "Top": [
+              {
+                "Pair": 4,
+                "Step": 1,
+                "Direction": "Grow",
+                "RpcUs": 64644,
+                "ReaderUs": 121,
+                "BarrierUs": 37809
+              },
+              {
+                "Pair": 3,
+                "Step": 5,
+                "Direction": "Grow",
+                "RpcUs": 48056,
+                "ReaderUs": 18,
+                "BarrierUs": 37473
+              },
+              {
+                "Pair": 4,
+                "Step": 2,
+                "Direction": "Shrink",
+                "RpcUs": 42134,
+                "ReaderUs": 91,
+                "BarrierUs": 44993
+              },
+              {
+                "Pair": 3,
+                "Step": 8,
+                "Direction": "Shrink",
+                "RpcUs": 38478,
+                "ReaderUs": 32,
+                "BarrierUs": 35634
+              },
+              {
+                "Pair": 4,
+                "Step": 7,
+                "Direction": "Grow",
+                "RpcUs": 36602,
+                "ReaderUs": 25,
+                "BarrierUs": 37560
+              },
+              {
+                "Pair": 4,
+                "Step": 3,
+                "Direction": "Grow",
+                "RpcUs": 35256,
+                "ReaderUs": 82,
+                "BarrierUs": 38592
+              }
+            ]
+          }
+        }
+      },
+      "PairedChanges": [
+        {
+          "Case": "LIFECYCLE_MEASURE_1",
+          "FirstRuntime": "baseline",
+          "ProcessChanges": {
+            "Caller": {
+              "ActiveCyclesPerOperationPercentChange": -18.512,
+              "IdleCyclesPerSecondPercentChange": -24.343
+            },
+            "Agent": {
+              "ActiveCyclesPerOperationPercentChange": -13.499,
+              "IdleCyclesPerSecondPercentChange": -17.621
+            },
+            "Child": {
+              "ActiveCyclesPerOperationPercentChange": -15.749,
+              "IdleCyclesPerSecondPercentChange": -35.768
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_2",
+          "FirstRuntime": "accepted",
+          "ProcessChanges": {
+            "Caller": {
+              "ActiveCyclesPerOperationPercentChange": 12.002,
+              "IdleCyclesPerSecondPercentChange": 11.978
+            },
+            "Agent": {
+              "ActiveCyclesPerOperationPercentChange": 2.11,
+              "IdleCyclesPerSecondPercentChange": 1.661
+            },
+            "Child": {
+              "ActiveCyclesPerOperationPercentChange": 1.733,
+              "IdleCyclesPerSecondPercentChange": 0.903
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_3",
+          "FirstRuntime": "baseline",
+          "ProcessChanges": {
+            "Caller": {
+              "ActiveCyclesPerOperationPercentChange": -7.729,
+              "IdleCyclesPerSecondPercentChange": 1.646
+            },
+            "Agent": {
+              "ActiveCyclesPerOperationPercentChange": 20.778,
+              "IdleCyclesPerSecondPercentChange": 16.203
+            },
+            "Child": {
+              "ActiveCyclesPerOperationPercentChange": -8.097,
+              "IdleCyclesPerSecondPercentChange": -3.933
+            }
+          }
+        },
+        {
+          "Case": "LIFECYCLE_MEASURE_4",
+          "FirstRuntime": "accepted",
+          "ProcessChanges": {
+            "Caller": {
+              "ActiveCyclesPerOperationPercentChange": -3.147,
+              "IdleCyclesPerSecondPercentChange": -11.081
+            },
+            "Agent": {
+              "ActiveCyclesPerOperationPercentChange": -5.893,
+              "IdleCyclesPerSecondPercentChange": -6.155
+            },
+            "Child": {
+              "ActiveCyclesPerOperationPercentChange": -5.754,
+              "IdleCyclesPerSecondPercentChange": -1.431
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "CycleCaptureQualifiedForMeasuredWorkload": true,
+  "PerformanceBudgetsEstablished": false
+}
